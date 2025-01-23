@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Details</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #4CAF50;
+        }
+
+        .task-detail {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            width: 60%;
+            margin: 0 auto;
+        }
+
+        .task-detail p {
+            font-size: 18px;
+            line-height: 1.6;
+        }
+
+        .task-detail form {
+            margin-top: 20px;
+        }
+
+        .task-detail input, .task-detail textarea {
+            padding: 10px;
+            margin-bottom: 10px;
+            width: 100%;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        a {
+            text-decoration: none;
+            color: #007BFF;
+            font-weight: bold;
+        }
+
+        a:hover {
+            color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="task-detail">
+        <h1>{{ task.title }}</h1>
+        <p><strong>Status:</strong> {{ task.status }}</p>
+        <p><strong>Description:</strong> {{ task.description }}</p>
+        <p><strong>Priority:</strong> {{ task.get_priority_display }}</p>   
+        <p><strong>Due Date:</strong> {{ task.due_date }}</p>  
+        <p><strong>Created At:</strong> {{ task.created_at }}</p>
+        
+        <!-- Edit Button -->
+        <button id="editBtn" onclick="toggleEditForm()">Edit Task</button>
+
+        <div id="editForm" style="display:none;">
+            <h2>Edit Task</h2>
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}  <!-- Render the form fields here -->
+                <button type="submit">Save Changes</button>
+            </form>
+        </div>
+
+        <a href="{% url 'home' %}">Back to Task List</a>
+    </div>
+
+    <script>
+        function toggleEditForm() {
+            var editForm = document.getElementById("editForm");
+            var editBtn = document.getElementById("editBtn");
+            
+            if (editForm.style.display === "none") {
+                editForm.style.display = "block";
+                editBtn.innerHTML = "Cancel Edit";  // Change button text
+            } else {
+                editForm.style.display = "none";
+                editBtn.innerHTML = "Edit Task";  // Reset button text
+            }
+        }
+    </script>
+</body>
+</html>

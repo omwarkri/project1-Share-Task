@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ app_name }}</title>
+    <style>
+        /* General Styles */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            text-align: center;
+            color: #4CAF50;
+            margin-top: 20px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #555;
+            margin-top: 30px;
+        }
+
+        a {
+            text-decoration: none;
+            color: #4CAF50;
+            font-weight: bold;
+        }
+
+        a:hover {
+            color: #388E3C;
+        }
+
+        /* Container Styles */
+        .container {
+            width: 90%;
+            max-width: 800px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+
+        /* Task List Styles */
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            background: #f4f4f4;
+            padding: 15px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        li strong {
+            font-size: 18px;
+        }
+
+        li p {
+            margin: 5px 0 0 0;
+            font-size: 14px;
+            color: #777;
+        }
+
+        /* Button Group Styles */
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .button-group a {
+            background: #4CAF50;
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: background 0.3s ease;
+        }
+
+        .button-group a:hover {
+            background: #388E3C;
+        }
+
+        /* Add Task Button */
+        .add-task {
+            display: inline-block;
+            margin: 20px auto;
+            text-align: center;
+            background: #007BFF;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: background 0.3s ease;
+        }
+
+        .add-task:hover {
+            background: #0056b3;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            font-size: 14px;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div style="text-align: right; margin: 10px;">
+            {% if user.is_authenticated %}
+                <span>Welcome, {{ user.username }}!</span>
+                <form method="post" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button type="submit">Logout</button>
+                </form>
+                
+            {% else %}
+                <a href="{% url 'login' %}" style="color: #007BFF; text-decoration: none; font-weight: bold;">Login</a>
+            {% endif %}
+        </div>
+    </header>
+    <h1>{{ app_name }}</h1>
+    <div class="container">
+        <h2>Task List</h2>
+        
+        <a href="{% url 'add_task' %}" class="add-task">Add a New Task</a>
+
+        <ul>
+            {% for task in tasks %}
+                <li>
+                    <div>
+                        <strong>{{ task.title }}</strong>
+                        <p>Status: {{ task.status }}</p>
+                    </div>
+                    <div class="button-group">
+                        {% if task.status != 'completed' %}
+                            <a href="{% url 'change_task_status' task.id 'completed' %}">Completed</a>
+                            
+                            {% if task.status != 'in_progress' %}
+                                <a href="{% url 'change_task_status' task.id 'in_progress' %}">In Progress</a>
+                            {% endif %}
+                            
+                            {% if task.status != 'pending' and task.status != 'in_progress' %}
+                                <a href="{% url 'change_task_status' task.id 'pending' %}">Pending</a>
+                            {% endif %}
+                        {% endif %}
+                        
+                        <a href="{% url 'task_detail' task.id %}">View Task Details</a> 
+                        <a href="{% url 'delete_task' task.id %}" style="color: red;" onclick="return confirm('Are you sure you want to delete this task?');">Delete</a>
+                    </div>           
+                    
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <footer>
+        &copy; {{ year }} {{ app_name }}. All rights reserved.
+    </footer>
+</body>

@@ -1,0 +1,122 @@
+{% extends 'task/base.html' %}
+
+{% block content %}
+<div>
+    <h1>{{ app_name }}</h1>
+
+    <div class="container">
+        <h2>Your Tasks</h2>
+        <a href="{% url 'add_task' %}" class="add-task">Add a New Task</a>
+        <ul>
+            {% for task_data in tasks_with_suggestions %}
+                <li>
+                    <strong>{{ task_data.task.title }}</strong>
+                    <p>Status: {{ task_data.task.status }}</p>
+
+                    <!-- Suggested Users -->
+                    <div class="suggested-users">
+                        <h4>Suggested Users:</h4>
+                        <h5>Currently Working:</h5>
+                        <ul>
+                            {% for user in task_data.users_in_progress %}
+                                <li class="user-chat">
+                                    <div>
+                                        <strong>{{ user.username }}</strong>
+                                    </div>
+                                    <ul>
+                                        {% for user_task in user.tasks %}
+                                            <li>
+                                                <strong>Task Title:</strong> {{ user_task.task_title }}
+                                                <a href="{% url 'task_detail' user_task.task_id %}" class="task-details-button">View Task Details</a>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                    <a href="{% url 'chat' user.user_id %}" class="chat-button">Chat</a>
+                                </li>
+                            {% empty %}
+                                <li>No users currently working on similar tasks.</li>
+                            {% endfor %}
+                        </ul>
+
+                        <h5>Completed Similar Tasks:</h5>
+                        <ul>
+                            {% for user in task_data.users_completed %}
+                                <li class="user-chat">
+                                    <div>
+                                        <strong>{{ user.username }}</strong>
+                                    </div>
+                                    <ul>
+                                        {% for user_task in user.tasks %}
+                                            <li>
+                                                <strong>Task Title:</strong> {{ user_task.task_title }}
+                                                <a href="{% url 'task_detail' user_task.task_id %}" class="task-details-button">View Task Details</a>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                    <a href="{% url 'chat' user.user_id %}" class="chat-button">Chat</a>
+                                </li>
+                            {% empty %}
+                                <li>No users have completed similar tasks.</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+
+                    <!-- Task Actions -->
+                    <div class="button-group">
+                        {% if task_data.task.status != 'completed' %}
+                            <a href="#" onclick="openModal({{ task_data.task.id }})">Completed</a>
+
+                            {% if task_data.task.status != 'in_progress' %}
+                                <a href="{% url 'change_task_status' task_data.task.id 'in_progress' %}">In Progress</a>
+                            {% endif %}
+
+                            {% if task_data.task.status != 'pending' and task_data.task.status != 'in_progress' %}
+                                <a href="{% url 'change_task_status' task_data.task.id 'pending' %}">Pending</a>
+                            {% endif %}
+                        {% endif %}
+
+                        <a href="{% url 'task_detail' task_data.task.id %}">View Task Details</a>
+                        <a href="{% url 'delete_task' task_data.task.id %}" style="color: red;" onclick="return confirm('Are you sure you want to delete this task?');">Delete</a>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+<!-- Modals for Task Completion -->
+<!-- Modals for Task Completion -->
+{% for task_data in tasks_with_suggestions %}
+<div id="shareTaskModal-{{ task_data.task.id }}" class="modal" style="display: none;">
+    <div class="modal-content">
+        <h3>Share Your Task Completion</h3>
+        <p>Would you like to share how you completed this task?</p>
+        
+        <!-- Option to skip sharing -->
+        <form method="post" enctype="multipart/form-data" action="{% url 'complete_task' task_data.task.id %}">
+            {% csrf_token %}
+            <label for="completion_details">How did you complete the task?</label>
+            <textarea name="completion_details" id="completion_details" rows="4"></textarea>
+        
+            <label for="uploaded_image">Upload Image (optional):</label>
+            <input type="file" name="uploaded_image" id="uploaded_image" accept="image/*">
+        
+            <label for="uploaded_file">Upload Video/File (optional):</label>
+            <input type="file" name="uploaded_file" id="uploaded_file" accept="video/*,.pdf,.doc,.docx">
+
+            <!-- Checkbox for skipping sharing -->
+            <div>
+                <label>
+                    <input type="checkbox" name="skip_sharing" id="skip_sharing">
+                    I do not want to share my completion details.
+                </label>
+            </div>
+        
+            <button type="submit">Submit</button>
+        </form>
+        
+    </div>
+</div>
+{% endfor %}
+
+{% endblock %}

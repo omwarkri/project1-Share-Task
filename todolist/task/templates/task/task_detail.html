@@ -64,6 +64,20 @@
         a:hover {
             color: #0056b3;
         }
+
+        .completion-detail {
+            margin-top: 20px;
+            background: #e8f5e9;
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .completion-detail img, .completion-detail video {
+            max-width: 100%;
+            height: auto;
+            margin: 10px 0;
+            border-radius: 8px;
+        }
     </style>
 </head>
 <body>
@@ -74,18 +88,47 @@
         <p><strong>Priority:</strong> {{ task.get_priority_display }}</p>   
         <p><strong>Due Date:</strong> {{ task.due_date }}</p>  
         <p><strong>Created At:</strong> {{ task.created_at }}</p>
-        
-        <!-- Edit Button -->
-        <button id="editBtn" onclick="toggleEditForm()">Edit Task</button>
 
-        <div id="editForm" style="display:none;">
-            <h2>Edit Task</h2>
-            <form method="post">
-                {% csrf_token %}
-                {{ form.as_p }}  <!-- Render the form fields here -->
-                <button type="submit">Save Changes</button>
-            </form>
-        </div>
+        {% if task.status == "completed" %}
+            <!-- Display task completion details -->
+            <div class="completion-detail">
+                <h2>Task Completion Details</h2>
+                <p><strong>Details:</strong> {{ task.completion_details.completion_details }}</p>
+
+                {% if task.completion_details.uploaded_image %}
+                    <h3>Uploaded Image</h3>
+                    <img src="{{ task.completion_details.uploaded_image.url }}" alt="Completion Image">
+                {% endif %}
+
+                {% if task.completion_details.uploaded_file %}
+                    <h3>Uploaded Video/File</h3>
+                    <video controls>
+                        <source src="{{ task.completion_details.uploaded_file.url }}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                {% endif %}
+            </div>
+        {% else %}
+            <!-- Show Edit Button if user is the creator -->
+            {% if task.user == user %}
+                <button id="editBtn" onclick="toggleEditForm()">Edit Task</button>
+
+                {% if user.subscription.is_subscription_valid %}
+                    <div id="editForm" style="display:none;">
+                        <h2>Edit Task</h2>
+                        <form method="post">
+                            {% csrf_token %}
+                            {{ form.as_p }}
+                            <button type="submit">Save Changes</button>
+                        </form>
+                    </div>
+                {% else %}
+                    <h1>Subscription Required</h1>
+                    <p>You need an active subscription to edit tasks.</p>
+                    <a href="{% url 'create_subscription' %}">Subscribe Now</a>
+                {% endif %}
+            {% endif %}
+        {% endif %}
 
         <a href="{% url 'home' %}">Back to Task List</a>
     </div>

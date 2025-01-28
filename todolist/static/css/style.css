@@ -1,0 +1,216 @@
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #f4f7fc;
+    color: #333;
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+}
+
+h1 {
+    text-align: center;
+    color: #28a745;
+    margin-top: 30px;
+    font-size: 2.5em;
+    font-weight: 600;
+}
+
+h2 {
+    text-align: center;
+    color: #333;
+    margin-top: 30px;
+    font-size: 1.8em;
+}
+
+a {
+    text-decoration: none;
+    color: #007bff;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: #0056b3;
+}
+
+/* Container Styles */
+.container {
+    width: 90%;
+    max-width: 900px;
+    margin: 30px auto;
+    background: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+/* Task List Styles */
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+li {
+    background: #ffffff;
+    padding: 20px;
+    margin: 20px 0;
+    border: 1px solid #e1e1e1;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+li:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+li strong {
+    font-size: 1.2em;
+    color: #333;
+}
+
+li p {
+    font-size: 1em;
+    color: #666;
+}
+
+/* Suggested Users Styles */
+.suggested-users h4 {
+    font-size: 1.1em;
+    color: #28a745;
+    margin-bottom: 10px;
+}
+
+.suggested-users h5 {
+    font-size: 1em;
+    color: #666;
+    margin-top: 10px;
+}
+
+.suggested-users ul {
+    padding: 0;
+}
+
+.suggested-users li {
+    font-size: 1em;
+    color: #555;
+    padding-left: 15px;
+    margin-bottom: 5px;
+}
+
+/* User Chat Styles */
+li.user-chat {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f0f8ff;
+    padding: 15px;
+    border-radius: 8px;
+}
+
+.user-chat div {
+    flex: 1;
+}
+
+.user-chat ul {
+    padding: 0;
+    list-style: none;
+}
+
+/* Button Group Styles */
+.button-group {
+    display: flex;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.button-group a {
+    background: #28a745;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 5px;
+    font-size: 1em;
+    text-align: center;
+    transition: background-color 0.3s ease;
+    text-decoration: none;
+}
+
+.button-group a:hover {
+    background: #218838;
+}
+
+.button-group a[style="color: red;"] {
+    background: red;
+}
+
+.button-group a[style="color: red;"]:hover {
+    background: darkred;
+}
+
+/* Add Task Button */
+.add-task {
+    display: inline-block;
+    background: #007bff;
+    color: white;
+    padding: 12px 30px;
+    border-radius: 5px;
+    font-size: 1.2em;
+    transition: background 0.3s ease;
+    margin: 15px 0;
+    text-align: center;
+}
+
+.add-task:hover {
+    background: #0056b3;
+}
+
+/* Footer */
+footer {
+    text-align: center;
+    margin-top: 40px;
+    font-size: 14px;
+    color: #777;
+}
+
+/* Login Section */
+header div {
+    text-align: right;
+    margin: 20px;
+}
+
+header form button {
+    background-color: #007bff;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+header form button:hover {
+    background-color: #0056b3;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .container {
+        width: 100%;
+        padding: 20px;
+    }
+
+    .button-group {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .button-group a {
+        width: 100%;
+    }
+
+    .add-task {
+        width: 100%;
+        margin-top: 20px;
+    }
+}

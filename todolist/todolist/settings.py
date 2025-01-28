@@ -41,8 +41,18 @@ INSTALLED_APPS = [
     'user',
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',
+    'subscription',
+    'chat'
     
 ]
+
+
+
+import os
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 
 # settings.py
 
@@ -134,7 +144,15 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
+# Static files (CSS, JavaScript, Images)
+STATIC_URL = '/static/'
+
+# Directory to store static files
+STATICFILES_DIRS = [BASE_DIR / "static"]
+
+# For production: directory to collect static files
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -160,11 +178,11 @@ TEMPLATES = [
 ]
 
 
-STATIC_URL = '/static/'
+# STATIC_URL = '/static/'
 
-STATICFILES_DIRS = [
-    BASE_DIR / 'static',  # If you have a global static folder outside the app
-]
+# STATICFILES_DIRS = [
+#     BASE_DIR / 'static',  # If you have a global static folder outside the app
+# ]
 
 
 # settings.py
@@ -178,3 +196,16 @@ SIMPLE_JWT = {
     'BLACKLIST_AFTER_ROTATION': False,
 }
 LOGOUT_REDIRECT_URL = '/'
+
+# settings.py
+LOGIN_URL = '/user/login/'  # Replace with your custom login URL
+
+
+
+PAYPAL_MODE="sandbox"
+PAYPAL_CLIENT_ID="AcXonSAOFg31vhUoYrzu-chZ29YHqAXKxJA971kPSLRMrpVxJdiie97p2PACVLj24deek5WjuGTl20yR"
+PAYPAL_CLIENT_SECRET="EMkEBl8Gc21xA4cuXHGKyxWz8HNaZq4MGuVjH2bZm1EF1QfI3rKhNcFXrYrnpqj3-kQX4RQcmWKhlPkZ"
+
+
+# Use the CustomUser model as the default user model
+AUTH_USER_MODEL = 'user.CustomUser'

@@ -16,10 +16,13 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path,include
-from task.views import home,add_task, change_task_status,delete_task,task_detail,edit_task
+from task.views import home,add_task, change_task_status,delete_task,task_detail,edit_task,complete_task
 from rest_framework_simplejwt import views as jwt_views
 from user.views import ProtectedView 
 from django.contrib.auth.views import LogoutView
+from django.conf import settings
+from django.conf.urls.static import static
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('user/',include('user.urls')),
@@ -33,6 +36,9 @@ urlpatterns = [
     path('api/token/', jwt_views.TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', jwt_views.TokenRefreshView.as_view(), name='token_refresh'),
     path('protected/', ProtectedView.as_view(), name='protected'),
-]
+    path('',include('subscription.urls')),
+    path('',include('chat.urls')),
+    path('share-task/<int:task_id>/', complete_task, name='complete_task'),
+]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 

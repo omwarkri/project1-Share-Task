@@ -1,0 +1,53 @@
+{% extends 'task/base.html' %}
+
+{% block content %}
+<div>
+    <h1>Suggested Users for Task: {{ task.title }}</h1>
+
+    <div class="container">
+        <h2>Suggested Users Currently Working on Similar Tasks</h2>
+        <ul>
+            {% for user in task_data.users_in_progress %}
+                <li class="user-chat">
+                    <div>
+                        <strong>{{ user.username }}</strong>
+                    </div>
+                    <ul>
+                        {% for user_task in user.tasks %}
+                            <li>
+                                <strong>Task Title:</strong> {{ user_task.task_title }}
+                                <a href="{% url 'task_detail' user_task.task_id %}" class="task-details-button">View Task Details</a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                    <a href="{% url 'chat' user.user_id %}" class="chat-button">Chat</a>
+                </li>
+            {% empty %}
+                <li>No users currently working on similar tasks.</li>
+            {% endfor %}
+        </ul>
+
+        <h2>Suggested Users Who Have Completed Similar Tasks</h2>
+        <ul>
+            {% for user in task_data.users_completed %}
+                <li class="user-chat">
+                    <div>
+                        <strong>{{ user.username }}</strong>
+                    </div>
+                    <ul>
+                        {% for user_task in user.tasks %}
+                            <li>
+                                <strong>Task Title:</strong> {{ user_task.task_title }}
+                                <a href="{% url 'task_detail' user_task.task_id %}" class="task-details-button">View Task Details</a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                    <a href="{% url 'chat' user.user_id %}" class="chat-button">Chat</a>
+                </li>
+            {% empty %}
+                <li>No users have completed similar tasks.</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %}

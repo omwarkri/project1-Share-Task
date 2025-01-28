@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path,include
-from task.views import home,add_task, change_task_status,delete_task,task_detail,edit_task,complete_task
+from task.views import home,add_task, change_task_status,delete_task,task_detail,edit_task,complete_task,suggested_users
 from rest_framework_simplejwt import views as jwt_views
 from user.views import ProtectedView 
 from django.contrib.auth.views import LogoutView
@@ -39,6 +39,7 @@ urlpatterns = [
     path('',include('subscription.urls')),
     path('',include('chat.urls')),
     path('share-task/<int:task_id>/', complete_task, name='complete_task'),
+    path('task/<int:task_id>/suggested_users/', suggested_users, name='suggested_users'),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 

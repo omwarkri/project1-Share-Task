@@ -240,3 +240,19 @@ def complete_task(request, task_id):
         return redirect('task_detail', task_id=task.id)
     
     return render(request, 'task_detail.html', {'task': task})
+
+
+
+from django.shortcuts import render
+from .models import Task
+from user.models import CustomUser  # Import your models
+
+
+def suggested_users(request, task_id):
+    task = Task.objects.get(id=task_id)
+    task_data = get_suggested_users(task,request.user)
+    
+    return render(request, 'task/suggested_users.html', {
+        'task': task,
+        'task_data': task_data,
+    })

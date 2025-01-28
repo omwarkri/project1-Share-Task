@@ -193,6 +193,19 @@ header form button:hover {
     background-color: #0056b3;
 }
 
+.suggested-users-button {
+    background-color: #007BFF;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-decoration: none;
+}
+
+.suggested-users-button:hover {
+    background-color: #0056b3;
+}
+
+
 /* Responsive Styles */
 @media (max-width: 768px) {
     .container {

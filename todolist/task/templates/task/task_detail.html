@@ -94,12 +94,12 @@
             <div class="completion-detail">
                 <h2>Task Completion Details</h2>
                 <p><strong>Details:</strong> {{ task.completion_details.completion_details }}</p>
-
+            
                 {% if task.completion_details.uploaded_image %}
                     <h3>Uploaded Image</h3>
                     <img src="{{ task.completion_details.uploaded_image.url }}" alt="Completion Image">
                 {% endif %}
-
+            
                 {% if task.completion_details.uploaded_file %}
                     <h3>Uploaded Video/File</h3>
                     <video controls>
@@ -107,7 +107,14 @@
                         Your browser does not support the video tag.
                     </video>
                 {% endif %}
+            
+                {% if task.user %}
+                    <h3>Task Completed By: {{ task.user.username }}</h3>
+                    <!-- Chat Button -->
+                    <a href="{% url 'chat' task.user.id %}" class="chat-button">Chat with {{ task.user.username }}</a>
+                {% endif %}
             </div>
+            
         {% else %}
             <!-- Show Edit Button if user is the creator -->
             {% if task.user == user %}

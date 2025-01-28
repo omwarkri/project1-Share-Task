@@ -75,46 +75,46 @@ headers = {
 
 
 
-url = "https://api-m.sandbox.paypal.com/v1/billing/plans/P-7X9246493R192901HM6LVXEI"
-response = requests.get(url, headers=headers)
+# url = "https://api-m.sandbox.paypal.com/v1/billing/plans/P-7X9246493R192901HM6LVXEI"
+# response = requests.get(url, headers=headers)
 
-if response.status_code == 200:
-    print("Plan get Successfully:", response.json())
-else:
-    print("Error:", response.status_code, response.text)
+# if response.status_code == 200:
+#     print("Plan get Successfully:", response.json())
+# else:
+#     print("Error:", response.status_code, response.text)
 
 
 
-# import requests
-# from requests.auth import HTTPBasicAuth
+import requests
+from requests.auth import HTTPBasicAuth
 
-# PAYPAL_CLIENT_ID="AcXonSAOFg31vhUoYrzu-chZ29YHqAXKxJA971kPSLRMrpVxJdiie97p2PACVLj24deek5WjuGTl20yR"
-# PAYPAL_CLIENT_SECRET="EMkEBl8Gc21xA4cuXHGKyxWz8HNaZq4MGuVjH2bZm1EF1QfI3rKhNcFXrYrnpqj3-kQX4RQcmWKhlPkZ"
+PAYPAL_CLIENT_ID="AcXonSAOFg31vhUoYrzu-chZ29YHqAXKxJA971kPSLRMrpVxJdiie97p2PACVLj24deek5WjuGTl20yR"
+PAYPAL_CLIENT_SECRET="EMkEBl8Gc21xA4cuXHGKyxWz8HNaZq4MGuVjH2bZm1EF1QfI3rKhNcFXrYrnpqj3-kQX4RQcmWKhlPkZ"
 
-# # Replace with your sandbox credentials
-# client_id = PAYPAL_CLIENT_ID
-# client_secret = PAYPAL_CLIENT_SECRET
+# Replace with your sandbox credentials
+client_id = PAYPAL_CLIENT_ID
+client_secret = PAYPAL_CLIENT_SECRET
 
 # # PayPal OAuth 2.0 Token endpoint
-# url = "https://api-m.sandbox.paypal.com/v1/oauth2/token"
+url = "https://api-m.sandbox.paypal.com/v1/oauth2/token"
 
-# # Headers
-# headers = {
-#     "Accept": "application/json",
-#     "Accept-Language": "en_US",
-# }
+# Headers
+headers = {
+    "Accept": "application/json",
+    "Accept-Language": "en_US",
+}
 
-# # Request body
-# data = {
-#     "grant_type": "client_credentials",
-# }
+# Request body
+data = {
+    "grant_type": "client_credentials",
+}
 
-# # Make the POST request to get the access token
-# response = requests.post(url, headers=headers, data=data, auth=HTTPBasicAuth(client_id, client_secret))
+# Make the POST request to get the access token
+response = requests.post(url, headers=headers, data=data, auth=HTTPBasicAuth(client_id, client_secret))
 
-# # Check the response
-# if response.status_code == 200:
-#     access_token = response.json().get("access_token")
-#     print("Access Token:", access_token)
-# else:
-#     print("Failed to get token:", response.status_code, response.text)
+# Check the response
+if response.status_code == 200:
+    access_token = response.json().get("access_token")
+    print("Access Token:", access_token)
+else:
+    print("Failed to get token:", response.status_code, response.text)

@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-q@=i731s$q8+^qv617(+f9-=&tkg)fmr80262)d7c%9nc*=!wb
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['share-task.onrender.com']
+ALLOWED_HOSTS = ['share-task.onrender.com','127.0.0.1']
 
 
 # Application definition
@@ -110,28 +110,28 @@ WSGI_APPLICATION = 'todolist.wsgi.application'
 # }
 
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'share_task',
-        'USER': 'share_task_user',
-        'PASSWORD': 'hZrrRKws2LV2pDSvgOMgfnfZRCFrdAQQ',
-        'HOST': 'dpg-cud6k0in91rc73epr120-a.oregon-postgres.render.com',  # or your server IP
-        'PORT': '5432',       # default PostgreSQL port
-    }
-}
-
-
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.postgresql',
 #         'NAME': 'share_task',
 #         'USER': 'share_task_user',
 #         'PASSWORD': 'hZrrRKws2LV2pDSvgOMgfnfZRCFrdAQQ',
-#         'HOST': 'dpg-cud6k0in91rc73epr120-a',  # or your server IP
+#         'HOST': 'dpg-cud6k0in91rc73epr120-a.oregon-postgres.render.com',  # or your server IP
 #         'PORT': '5432',       # default PostgreSQL port
 #     }
 # }
+
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'share_task',
+        'USER': 'share_task_user',
+        'PASSWORD': 'hZrrRKws2LV2pDSvgOMgfnfZRCFrdAQQ',
+        'HOST': 'dpg-cud6k0in91rc73epr120-a',  # or your server IP
+        'PORT': '5432',       # default PostgreSQL port
+    }
+}
 
 
 

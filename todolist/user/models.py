@@ -1,9 +1,11 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+# from task.models import Task
 
 class CustomUser(AbstractUser):
     phone_number = models.CharField(max_length=15, blank=True, null=True)
     profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
+    tasks = models.ManyToManyField('task.Task', related_name='users', blank=True) 
     
     # Adding related_name to avoid clashes with auth.User
     groups = models.ManyToManyField(

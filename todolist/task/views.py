@@ -31,24 +31,23 @@ from django.contrib.auth import get_user_model
 
 def get_suggested_users(task, current_user):
     """
-    Fetch users currently working on or who have completed similar tasks based on title.
-    Share each user's associated task title and task ID.
-    Exclude the current logged-in user and tasks that are not shareable.
+    Fetch users working on or who have completed similar tasks.
+    Exclude the current user and non-shareable tasks.
     """
-    # Find tasks with similar titles, excluding the current task, and tasks that are not shareable
+    # Find shareable tasks with similar titles, excluding the current task
     similar_tasks = Task.objects.filter(title__icontains=task.title, shareable=True).exclude(id=task.id)
-
-    # Users currently working on similar tasks (pending status), excluding the current user
+    print(similar_tasks)
+    # Users working on similar tasks (pending status)
     users_in_progress = CustomUser.objects.filter(
-        tasks__in=similar_tasks.filter(status='pending')
+        task_user__in=similar_tasks.filter(status='pending')
     ).exclude(id=current_user.id).distinct()
-
-    # Users who have completed similar tasks, excluding the current user
+    print(users_in_progress)
+    # Users who completed similar tasks
     users_completed = CustomUser.objects.filter(
         tasks__in=similar_tasks.filter(status='completed')
     ).exclude(id=current_user.id).distinct()
 
-    # Collect user details along with their associated tasks
+    # Collect user details with associated tasks
     def get_user_tasks(users, task_status):
         return [
             {
@@ -57,7 +56,7 @@ def get_suggested_users(task, current_user):
                 "email": user.email,
                 "tasks": [
                     {"task_id": t.id, "task_title": t.title}
-                    for t in similar_tasks.filter(status=task_status, user=user.id)
+                    for t in similar_tasks.filter(status=task_status, user=user)
                 ],
             }
             for user in users
@@ -67,8 +66,9 @@ def get_suggested_users(task, current_user):
         "users_in_progress": get_user_tasks(users_in_progress, "pending"),
         "users_completed": get_user_tasks(users_completed, "completed"),
     }
-    print(response)
+    print("Suggested Users Response:", response)
     return response
+
 
 
 

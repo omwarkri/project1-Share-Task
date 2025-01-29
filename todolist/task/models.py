@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth import get_user_model  # Dynamically fetches the user model
-
+from user.models import CustomUser
 class Task(models.Model):
     STATUS_CHOICES = [
         ('pending', 'Pending'),
@@ -16,13 +16,13 @@ class Task(models.Model):
         ('critical', 'Critical'),
     ]
 
-    user = models.ForeignKey(
-        get_user_model(),
-        on_delete=models.CASCADE,
-        related_name='tasks',
-        blank=True,
-        null=True
-    )  # Relates the task to a user (creator)
+
+
+    # In Task model
+    # In Task model
+    user = models.ForeignKey(CustomUser, related_name='task_user', on_delete=models.CASCADE,default=1)
+
+
 
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)

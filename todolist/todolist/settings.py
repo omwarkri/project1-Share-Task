@@ -114,9 +114,9 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'Share Task',
-        'USER': 'postgres',
-        'PASSWORD': 'Shantanu8983@',
-        'HOST': 'localhost',  # or your server IP
+        'USER': 'share_task_user',
+        'PASSWORD': 'hZrrRKws2LV2pDSvgOMgfnfZRCFrdAQQ',
+        'HOST': 'dpg-cud6k0in91rc73epr120-a',  # or your server IP
         'PORT': '5432',       # default PostgreSQL port
     }
 }

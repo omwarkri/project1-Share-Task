@@ -22,9 +22,16 @@ from user.views import ProtectedView
 from django.contrib.auth.views import LogoutView
 from django.conf import settings
 from django.conf.urls.static import static
+from django.http import HttpResponse
+from django.core.management import call_command
+
+def create_superuser(request):
+    call_command('createsuperuser', interactive=False, username='Avatar', email='shantanuchavhan002@gmail.com', password='Chavhan123@')
+    return HttpResponse("Superuser created successfully.")
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('create-superuser/', create_superuser),  # Temporary endpoint
     path('user/',include('user.urls')),
     path('user/logout/', LogoutView.as_view(), name='logout'),
     path('', home,name='home'),

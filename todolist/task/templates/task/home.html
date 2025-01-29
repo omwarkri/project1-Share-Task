@@ -7,11 +7,11 @@
     <div class="container">
         <h2>Your Tasks</h2>
         <a href="{% url 'add_task' %}" class="add-task">Add a New Task</a>
-        <ul>
+        <ul class="task-list">
             {% for task_data in tasks_with_suggestions %}
-                <li>
-                    <strong>{{ task_data.task.title }}</strong>
-                    <p>Status: {{ task_data.task.status }}</p>
+                <li class="task-item">
+                    <strong class="task-title">{{ task_data.task.title }}</strong>
+                    <p class="task-status">Status: {{ task_data.task.status }}</p>
 
                     <!-- Suggested Users Button -->
                     <a href="{% url 'suggested_users' task_data.task.id %}" class="suggested-users-button">Find Task partner</a>
@@ -19,24 +19,251 @@
                     <!-- Task Actions -->
                     <div class="button-group">
                         {% if task_data.task.status != 'completed' %}
-                            <a href="#" onclick="openModal({{ task_data.task.id }})">Completed</a>
+                            <a href="#" onclick="openModal({{ task_data.task.id }})" class="task-action">Completed</a>
 
                             {% if task_data.task.status != 'in_progress' %}
-                                <a href="{% url 'change_task_status' task_data.task.id 'in_progress' %}">In Progress</a>
+                                <a href="{% url 'change_task_status' task_data.task.id 'in_progress' %}" class="task-action">In Progress</a>
                             {% endif %}
 
                             {% if task_data.task.status != 'pending' and task_data.task.status != 'in_progress' %}
-                                <a href="{% url 'change_task_status' task_data.task.id 'pending' %}">Pending</a>
+                                <a href="{% url 'change_task_status' task_data.task.id 'pending' %}" class="task-action">Pending</a>
                             {% endif %}
                         {% endif %}
 
-                        <a href="{% url 'task_detail' task_data.task.id %}">View Task Details</a>
-                        <a href="{% url 'delete_task' task_data.task.id %}" style="color: red;" onclick="return confirm('Are you sure you want to delete this task?');">Delete</a>
+                        <a href="{% url 'task_detail' task_data.task.id %}" class="task-action">View Task Details</a>
+                        <a href="{% url 'delete_task' task_data.task.id %}" class="task-action delete-task" onclick="return confirm('Are you sure you want to delete this task?');">Delete</a>
                     </div>
                 </li>
             {% endfor %}
         </ul>
     </div>
 </div>
+
+
+{% for task_data in tasks_with_suggestions %}
+<div id="shareTaskModal-{{ task_data.task.id }}" class="modal" style="display: none;">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeModal({{ task_data.task.id }})">&times;</span>
+        <h3>Share Your Task Completion</h3>
+        <p>Would you like to share how you completed this task?</p>
+        
+        <!-- Option to skip sharing -->
+        <form method="post" enctype="multipart/form-data" action="{% url 'complete_task' task_data.task.id %}">
+            {% csrf_token %}
+            <label for="completion_details">How did you complete the task?</label>
+            <textarea name="completion_details" id="completion_details" rows="4"></textarea>
+        
+            <label for="uploaded_image">Upload Image (optional):</label>
+            <input type="file" name="uploaded_image" id="uploaded_image" accept="image/*">
+        
+            <label for="uploaded_file">Upload Video/File (optional):</label>
+            <input type="file" name="uploaded_file" id="uploaded_file" accept="video/*,.pdf,.doc,.docx">
+
+            <!-- Checkbox for skipping sharing -->
+            <div class="skip-sharing">
+                <label>
+                    <input type="checkbox" name="skip_sharing" id="skip_sharing">
+                    I do not want to share my completion details.
+                </label>
+            </div>
+        
+            <button type="submit" class="submit-button">Submit</button>
+        </form>
+        
+    </div>
+</div>
+{% endfor %}
+
+
+<style>
+    /* General Styles */
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        color: #333;
+        margin: 0;
+        padding: 0;
+    }
+
+    .container {
+        max-width: 800px;
+        margin: 20px auto;
+        padding: 20px;
+        background-color: #fff;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+        text-align: center;
+        color: #4CAF50;
+    }
+
+    h2 {
+        color: #333;
+    }
+
+    .add-task {
+        display: inline-block;
+        margin-bottom: 20px;
+        padding: 10px 15px;
+        background-color: #4CAF50;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+    }
+
+    .add-task:hover {
+        background-color: #45a049;
+    }
+
+    .task-list {
+        list-style-type: none;
+        padding: 0;
+    }
+
+    .task-item {
+        border-bottom: 1px solid #ddd;
+        padding: 15px 0;
+    }
+
+    .task-title {
+        font-size: 1.2em;
+        color: #333;
+    }
+
+    .task-status {
+        color: #666;
+    }
+
+    .suggested-users-button {
+        display: inline-block;
+        padding: 5px 10px;
+        background-color: #008CBA;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        margin: 10px 0;
+    }
+
+    .suggested-users-button:hover {
+        background-color: #007B9E;
+    }
+
+    .button-group {
+        margin-top: 10px;
+    }
+
+    .task-action {
+        display: inline-block;
+        padding: 5px 10px;
+        margin-right: 10px;
+        background-color: #f1f1f1;
+        color: #333;
+        text-decoration: none;
+        border-radius: 5px;
+    }
+
+    .task-action:hover {
+        background-color: #ddd;
+    }
+
+    .delete-task {
+        background-color: #f44336;
+        color: white;
+    }
+
+    .delete-task:hover {
+        background-color: #e53935;
+    }
+
+    /* Modal Styles */
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    }
+
+    .modal-content {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        width: 90%;
+        max-width: 500px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        position: relative;
+    }
+
+    .close-modal {
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        font-size: 24px;
+        cursor: pointer;
+        color: #333;
+    }
+
+    .close-modal:hover {
+        color: #f44336;
+    }
+
+    .modal-content h3 {
+        margin-top: 0;
+        color: #4CAF50;
+    }
+
+    .modal-content p {
+        margin-bottom: 20px;
+    }
+
+    .modal-content label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+    }
+
+    .modal-content textarea,
+    .modal-content input[type="file"] {
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 15px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+
+    .skip-sharing {
+        margin-bottom: 15px;
+    }
+
+    .submit-button {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .submit-button:hover {
+        background-color: #45a049;
+    }
+</style>
+
+<script>
+    function openModal(taskId) {
+        document.getElementById(`shareTaskModal-${taskId}`).style.display = 'flex';
+    }
+
+    function closeModal(taskId) {
+        document.getElementById(`shareTaskModal-${taskId}`).style.display = 'none';
+    }
+</script>
 
 {% endblock %}

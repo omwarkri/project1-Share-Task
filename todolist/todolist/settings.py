@@ -134,6 +134,9 @@ DATABASES = {
 }
 
 
+USE_TZ = False
+
+
 
 
 # Password validation

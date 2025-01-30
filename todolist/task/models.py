@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth import get_user_model  # Dynamically fetches the user model
 from user.models import CustomUser
+from django.utils import timezone
 class Task(models.Model):
     STATUS_CHOICES = [
         ('pending', 'Pending'),
@@ -38,7 +39,7 @@ class Task(models.Model):
         default='pending'
     )
     shareable = models.BooleanField(default=True)  # Flag to indicate if the task is shareable
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):

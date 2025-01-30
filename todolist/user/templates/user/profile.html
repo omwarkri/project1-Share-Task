@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    {% load custom_filters %}
+
+    <style>
+        /* General Styles */
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        h1, h2 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            font-size: 1.8em;
+            margin-top: 30px;
+        }
+
+        p {
+            font-size: 1.1em;
+            color: #555;
+            margin: 5px 0;
+        }
+
+        /* Card Styles */
+        .card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            max-width: 1000px;
+            width: 100%;
+            margin: 20px 0;
+        }
+
+        /* Calendar Styles */
+        .calendar {
+            display: grid;
+            grid-template-columns: repeat(52, 15px);
+            gap: 3px;
+            margin-top: 20px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .calendar-header {
+            grid-column: 1 / -1; /* Span the entire width of the calendar */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9em;
+            color: #555;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        .calendar-header span {
+            margin: 0 5px;
+        }
+
+        .day {
+            width: 15px;
+            height: 15px;
+            background-color: #e0e0e0;
+            border-radius: 3px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .day:hover {
+            transform: scale(1.2);
+            opacity: 0.8;
+        }
+
+        /* Color Classes */
+        .green {
+            background-color: #4CAF50; /* Green */
+        }
+
+        .dark-green {
+            background-color: #388E3C; /* Darker Green */
+        }
+
+        .yellow {
+            background-color: #FFEB3B; /* Yellow */
+        }
+
+        /* Button Styles */
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 500;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            margin-top: 20px;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .calendar {
+                grid-template-columns: repeat(26, 15px);
+            }
+
+            .calendar-header {
+                font-size: 0.8em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .calendar {
+                grid-template-columns: repeat(13, 15px);
+            }
+
+            .calendar-header {
+                font-size: 0.7em;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            h2 {
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>Welcome, {{ user.username }}!</h1>
+        <p>Email: {{ user.email }}</p>
+        <p>Score: {{ user.score }}</p>
+
+        <h2>Your Activity Calendar</h2>
+        <div class="calendar">
+            <div class="calendar-header">
+                <span>{{ previous_month|date:"F Y" }}</span> <!-- Current -11 Month -->
+                <span>{{ current_month|date:"F Y" }}</span> <!-- Current Month -->
+            </div>
+            
+            {% for date in dates %}
+                <div class="day 
+                    {% if color_map|get_item:date == 'green' %}
+                        green
+                    {% elif color_map|get_item:date == 'dark_green' %}
+                        dark-green
+                    {% elif color_map|get_item:date == 'yellow' %}
+                        yellow
+                    {% endif %}" 
+                    title="{{ date }}">
+                </div>
+            {% endfor %}
+        </div>
+
+        <form method="post" action="{% url 'logout' %}" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit">Logout</button>
+        </form>
+    </div>
+</body>
+</html>

@@ -97,111 +97,128 @@
 {% endfor %}
 
 <style>
+    /* CSS Variables for Consistent Styling */
+    :root {
+        --primary-color: #4CAF50; /* Green */
+        --secondary-color: #008CBA; /* Blue */
+        --danger-color: #f44336; /* Red */
+        --background-color: #f8f9fa; /* Light Gray */
+        --text-color: #333; /* Dark Gray */
+        --border-color: #e0e0e0; /* Light Gray */
+        --shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        --radius: 6px;
+        --transition: all 0.2s ease;
+    }
+
     /* General Styles */
     body {
-        font-family: 'Poppins', sans-serif;
-        background-color: #f8f9fa;
-        color: #333;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background-color: var(--background-color);
+        color: var(--text-color);
         margin: 0;
-        padding: 0;
+        padding: 20px;
     }
 
     .container {
         max-width: 800px;
-        margin: 20px auto;
-        padding: 20px;
+        margin: 0 auto;
         background-color: #fff;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        border-radius: 8px;
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        padding: 20px;
+    }
+
+    h1, h2 {
+        color: var(--primary-color);
+        margin-bottom: 15px;
     }
 
     h1 {
+        font-size: 24px;
         text-align: center;
-        color: #4CAF50;
-        font-size: 2.5em;
-        margin-bottom: 20px;
     }
 
     h2 {
-        color: #333;
-        font-size: 1.8em;
-        margin-bottom: 20px;
+        font-size: 20px;
     }
 
+    /* Add Task Button */
     .add-task {
         display: inline-block;
-        margin-bottom: 20px;
-        padding: 10px 20px;
-        background-color: #4CAF50;
+        margin-bottom: 15px;
+        padding: 8px 16px;
+        background-color: var(--primary-color);
         color: white;
         text-decoration: none;
-        border-radius: 25px;
+        border-radius: var(--radius);
         cursor: pointer;
-        font-size: 1em;
-        transition: background-color 0.3s ease;
+        font-size: 14px;
+        transition: var(--transition);
     }
 
     .add-task:hover {
         background-color: #45a049;
     }
 
+    /* Task List */
     .task-list {
         list-style-type: none;
         padding: 0;
     }
 
     .task-item {
-        border-bottom: 1px solid #ddd;
-        padding: 20px 0;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border-bottom: 1px solid var(--border-color);
+        padding: 15px 0;
+        transition: var(--transition);
     }
 
     .task-item:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        background-color: #fafafa;
     }
 
     .task-title {
-        font-size: 1.4em;
-        color: #333;
-        margin-bottom: 10px;
+        font-size: 16px;
+        color: var(--text-color);
+        margin-bottom: 5px;
     }
 
     .task-status {
         color: #666;
-        font-size: 0.9em;
+        font-size: 14px;
     }
 
+    /* Suggested Users Button */
     .suggested-users-button {
         display: inline-block;
-        padding: 8px 16px;
-        background-color: #008CBA;
+        padding: 6px 12px;
+        background-color: var(--secondary-color);
         color: white;
         text-decoration: none;
-        border-radius: 8px;
-        margin: 10px 0;
-        font-size: 0.9em;
-        transition: background-color 0.3s ease;
+        border-radius: var(--radius);
+        margin: 8px 0;
+        font-size: 14px;
+        transition: var(--transition);
     }
 
     .suggested-users-button:hover {
         background-color: #007B9E;
     }
 
+    /* Task Actions */
     .button-group {
-        margin-top: 15px;
+        margin-top: 10px;
     }
 
     .task-action {
         display: inline-block;
-        padding: 8px 16px;
-        margin-right: 10px;
+        padding: 6px 12px;
+        margin-right: 8px;
         background-color: #f1f1f1;
-        color: #333;
+        color: var(--text-color);
         text-decoration: none;
-        border-radius: 8px;
-        font-size: 0.9em;
-        transition: background-color 0.3s ease;
+        border-radius: var(--radius);
+        font-size: 14px;
+        transition: var(--transition);
     }
 
     .task-action:hover {
@@ -209,7 +226,7 @@
     }
 
     .delete-task {
-        background-color: #f44336;
+        background-color: var(--danger-color);
         color: white;
     }
 
@@ -234,23 +251,11 @@
     .modal-content {
         background-color: #fff;
         padding: 20px;
-        border-radius: 8px;
+        border-radius: var(--radius);
         width: 90%;
         max-width: 500px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        box-shadow: var(--shadow);
         position: relative;
-        animation: slideIn 0.3s ease;
-    }
-
-    @keyframes slideIn {
-        from {
-            transform: translateY(-20px);
-            opacity: 0;
-        }
-        to {
-            transform: translateY(0);
-            opacity: 1;
-        }
     }
 
     .close-modal {
@@ -259,56 +264,56 @@
         right: 15px;
         font-size: 24px;
         cursor: pointer;
-        color: #333;
-        transition: color 0.3s ease;
+        color: var(--text-color);
+        transition: var(--transition);
     }
 
     .close-modal:hover {
-        color: #f44336;
+        color: var(--danger-color);
     }
 
     .modal-content h3 {
         margin-top: 0;
-        color: #4CAF50;
-        font-size: 1.5em;
+        color: var(--primary-color);
+        font-size: 18px;
     }
 
     .modal-content p {
-        margin-bottom: 20px;
-        font-size: 1em;
+        margin-bottom: 15px;
+        font-size: 14px;
     }
 
     .modal-content label {
         display: block;
         margin-bottom: 5px;
         font-weight: bold;
-        font-size: 0.9em;
+        font-size: 14px;
     }
 
     .modal-content textarea,
     .modal-content input[type="file"] {
         width: 100%;
-        padding: 10px;
-        margin-bottom: 15px;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        font-size: 0.9em;
+        padding: 8px;
+        margin-bottom: 10px;
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius);
+        font-size: 14px;
     }
 
     .skip-sharing {
-        margin-bottom: 15px;
+        margin-bottom: 10px;
     }
 
     .submit-button {
         display: inline-block;
-        padding: 10px 20px;
-        background-color: #4CAF50;
+        padding: 8px 16px;
+        background-color: var(--primary-color);
         color: white;
         border: none;
-        border-radius: 25px;
+        border-radius: var(--radius);
         cursor: pointer;
-        font-size: 1em;
-        transition: background-color 0.3s ease;
+        font-size: 14px;
+        transition: var(--transition);
     }
 
     .submit-button:hover {

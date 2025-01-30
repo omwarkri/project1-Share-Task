@@ -160,11 +160,10 @@ header, main, footer {
 <body>
     <header class="header-div">
         <h1>{{ app_name }}</h1>
-        <div >
-            
+        <div>
             {% if user.is_authenticated %}
-                <span>Welcome, {{ user.username }}!</span>
-                <form method="post" action="{% url 'logout' %}">
+                <span>Welcome, <a href="{% url 'profile' %}">{{ user.username }}</a>!</span>
+                <form method="post" action="{% url 'logout' %}" style="display: inline;">
                     {% csrf_token %}
                     <button type="submit">Logout</button>
                 </form>
@@ -173,6 +172,7 @@ header, main, footer {
             {% endif %}
         </div>
     </header>
+    
 
     <main>
         {% block content %}

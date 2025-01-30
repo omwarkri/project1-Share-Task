@@ -108,19 +108,52 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 
 
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from .forms import TaskForm
+from user.models import UserActivity
+from datetime import date
+
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from .forms import TaskForm
+
+from datetime import date
+from django.utils import timezone
+
+# Create a timezone-aware date (you can convert to midnight or current time)
+activity_date = timezone.localdate()  # This gives the current date in the active timezone
+
+
 @login_required  # Ensure the user is authenticated
 def add_task(request):
     if request.method == 'POST':
+        form = TaskForm(request.POST)  # Bind the form with POST data
         
         if form.is_valid():
             task = form.save(commit=False)  # Don't save to database yet
             task.user = request.user       # Set the current user as the task owner
             task.save()                    # Save the task to the database
+            
+            # Check if UserActivity already exists for the user on the current date
+            activity, created = UserActivity.objects.get_or_create(
+                user=task.user,
+                activity_date=activity_date ,
+                defaults={'activity_type': 'Task Created'}
+            )
+
+            # If the activity already exists, it won't be updated, and the created flag will be False
+            if not created:
+                activity.activity_type = 'Task Created'  # If needed, update activity_type
+                activity.save()
+
             return redirect('home')        # Redirect to the home page or task list
     else:
-        form = TaskForm()
+        form = TaskForm()  # Initialize the form for GET request
 
     return render(request, 'task/add_task.html', {'form': form})
+
+
 
 
 
@@ -133,6 +166,7 @@ def change_task_status(request, task_id, new_status):
     
     # Update the status
     task.status = new_status
+    UserActivity.objects.get_or_create(user=task.user, activity_date=date.today(), activity_type='Task updated')
     task.save()
     
     # Redirect back to the task list or any other page
@@ -208,21 +242,32 @@ def edit_task(request, task_id):
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from .models import Task, TaskCompletionDetails
+from user.models import UserActivity
+from django.contrib.auth.decorators import login_required
+from datetime import date
 
+@login_required
 def complete_task(request, task_id):
     task = Task.objects.get(id=task_id)
 
     if request.method == 'POST':
-        skip_sharing = request.POST.get('skip_sharing')  # Check if the user chose to skip sharing
+        skip_sharing = request.POST.get('skip_sharing')
 
-        # If the user chose to skip sharing, just mark the task as completed
+        # Mark the task as completed without sharing completion details
         if skip_sharing:
             task.status = 'completed'
             task.save()
+
+            # Increment user score
+            task.user.score += 1
+            task.user.save()
+
+            UserActivity.objects.get_or_create(user=task.user, activity_date=date.today())
+
             messages.success(request, 'Task marked as completed without sharing completion details.')
             return redirect('task_detail', task_id=task.id)
 
-        # If the user wants to share completion details, save them
+        # Save completion details if the user wants to share them
         completion_details = request.POST.get('completion_details')
         uploaded_image = request.FILES.get('uploaded_image')
         uploaded_file = request.FILES.get('uploaded_file')
@@ -239,10 +284,14 @@ def complete_task(request, task_id):
         task.status = 'completed'
         task.save()
 
+        # Increment user score
+        task.user.score += 1
+        task.user.save()
+
         messages.success(request, 'Task completed and details shared successfully.')
         return redirect('task_detail', task_id=task.id)
-    
-    return render(request, 'task_detail.html', {'task': task})
+
+    return render(request, 'task/task_detail.html', {'task': task})
 
 
 

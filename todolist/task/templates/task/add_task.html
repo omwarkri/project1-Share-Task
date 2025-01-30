@@ -7,43 +7,59 @@
     <style>
         /* General Styles */
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f9f9f9;
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8;
             color: #333;
             margin: 0;
             padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
-            
+            min-height: 100vh;
         }
 
         h1 {
             text-align: center;
-            color: #4CAF50;
-            margin-bottom: 20px;
+            color: #2c3e50;
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
         }
 
         a {
             text-decoration: none;
-            color: #007BFF;
-            font-weight: bold;
+            color: #3498db;
+            font-weight: 600;
             display: inline-block;
-            margin-top: 15px;
+            margin-top: 20px;
+            transition: color 0.3s ease;
         }
 
         a:hover {
-            color: #0056b3;
+            color: #2980b9;
         }
 
         /* Form Container */
         .form-container {
-            background: #fff;
-            padding: 20px 30px;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
             width: 90%;
-            max-width: 400px;
+            max-width: 500px;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         form {
@@ -52,46 +68,102 @@
         }
 
         form label {
-            font-weight: bold;
-            margin-bottom: 5px;
+            font-weight: 600;
+            margin-bottom: 10px;
             color: #555;
+            font-size: 14px;
         }
 
-        form input, form select, form textarea {
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
+        form input,
+        form select,
+        form textarea {
+            padding: 14px;
+            margin-bottom: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
             font-size: 14px;
             width: 100%;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        form input:focus,
+        form select:focus,
+        form textarea:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 8px rgba(52, 152, 219, 0.2);
+            outline: none;
+        }
+
+        form textarea {
+            resize: vertical;
+            min-height: 100px;
         }
 
         form button {
-            padding: 10px;
-            background-color: #4CAF50;
+            padding: 14px;
+            background-color: #3498db;
             color: white;
             font-size: 16px;
+            font-weight: 600;
             border: none;
-            border-radius: 5px;
+            border-radius: 10px;
             cursor: pointer;
-            transition: background 0.3s ease;
+            transition: background-color 0.3s ease, transform 0.2s ease;
         }
 
         form button:hover {
-            background-color: #388E3C;
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        form button:active {
+            transform: translateY(0);
+        }
+
+        /* Back Link Styling */
+        .back-link {
+            text-align: center;
+            margin-top: 25px;
+        }
+
+        .back-link a {
+            color: #3498db;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .back-link a:hover {
+            color: #2980b9;
+        }
+
+        /* Additional Enhancements */
+        .form-container:hover {
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        form input::placeholder,
+        form textarea::placeholder {
+            color: #999;
+        }
+
+        form input[type="date"] {
+            appearance: none;
+            background: url('data:image/svg+xml;utf8,<svg fill="%23333" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>') no-repeat right 10px center;
+            background-size: 20px;
         }
     </style>
 </head>
 <body>
     <div class="form-container">
-        <a href="{% url 'home' %}">Back to Task List</a>
         <h1>Add a New Task</h1>
         <form method="post">
             {% csrf_token %}
             {{ form.as_p }}
             <button type="submit">Add Task</button>
         </form>
-        <a href="{% url 'home' %}">Back to Task List</a>
+        <div class="back-link">
+            <a href="{% url 'home' %}">Back to Task List</a>
+        </div>
     </div>
 </body>
 </html>

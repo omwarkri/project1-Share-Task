@@ -25,9 +25,21 @@ from django.conf.urls.static import static
 from django.http import HttpResponse
 from django.core.management import call_command
 
+from django.contrib.auth import get_user_model
+from django.http import HttpResponse
+
 def create_superuser(request):
-    call_command('createsuperuser', interactive=False, username='Avatar', email='shantanuchavhan002@gmail.com', password='Chavhan123@')
-    return HttpResponse("Superuser created successfully.")
+    User = get_user_model()
+    username = "admin"
+    email = "admin@example.com"
+    password = "adminpass"
+
+    if not User.objects.filter(username=username).exists():
+        user = User.objects.create_superuser(username=username, email=email, password=password)
+        return HttpResponse("Superuser created successfully.")
+    else:
+        return HttpResponse("Superuser already exists.")
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),

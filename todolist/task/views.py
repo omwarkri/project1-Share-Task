@@ -72,11 +72,12 @@ def get_suggested_users(task, current_user):
 
 
 
-
+from .forms import TaskForm
 
 @login_required
 def home(request):
     tasks = Task.objects.filter(user=request.user)
+    form = TaskForm(request.POST)
     print(tasks)
     # Add suggested users to each task
     tasks_with_suggestions = []
@@ -84,16 +85,18 @@ def home(request):
 
         response = get_suggested_users(task, request.user)
 
-        print(response)
+        print(form)
         tasks_with_suggestions.append({
             'task': task,
             'users_in_progress': response.get("users_in_progress"),
             'users_completed': response.get("users_completed"),
+            
         })
 
     context = {
         'tasks_with_suggestions': tasks_with_suggestions,
-        'app_name': 'ToDo App',
+        'app_name': 'Share Task',
+        'form': form
     }
     return render(request, 'task/home.html', context)
 
@@ -103,12 +106,12 @@ def home(request):
 
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
-from .forms import TaskForm
+
 
 @login_required  # Ensure the user is authenticated
 def add_task(request):
     if request.method == 'POST':
-        form = TaskForm(request.POST)
+        
         if form.is_valid():
             task = form.save(commit=False)  # Don't save to database yet
             task.user = request.user       # Set the current user as the task owner
@@ -251,7 +254,7 @@ from user.models import CustomUser  # Import your models
 def suggested_users(request, task_id):
     task = Task.objects.get(id=task_id)
     task_data = get_suggested_users(task,request.user)
-    
+    print(task.id)
     return render(request, 'task/suggested_users.html', {
         'task': task,
         'task_data': task_data,

@@ -5,7 +5,7 @@
     <h1>Suggested Users for Task: {{ task.title }}</h1>
 
     <div class="container">
-        <h2>Suggested Users Currently Working on Similar Tasks</h2>
+        <h2>Currently Working on Similar Tasks</h2>
         <ul class="user-list">
             {% for user in task_data.users_in_progress %}
                 <li class="user-chat">
@@ -20,14 +20,15 @@
                             </li>
                         {% endfor %}
                     </ul>
-                    <a href="{% url 'chat' user.user_id %}" class="chat-button">Chat</a>
+                    <!-- Pass task details in the chat URL -->
+                    <a href="{% url 'chat' user.user_id %}?task_id={{ task.id }}&task_title={{ task.title|urlencode }}" class="chat-button">lets Chat</a>
                 </li>
             {% empty %}
                 <li class="no-users">No users currently working on similar tasks.</li>
             {% endfor %}
         </ul>
 
-        <h2>Suggested Users Who Have Completed Similar Tasks</h2>
+        <h2>Completed Task Users</h2>
         <ul class="user-list">
             {% for user in task_data.users_completed %}
                 <li class="user-chat">
@@ -42,7 +43,8 @@
                             </li>
                         {% endfor %}
                     </ul>
-                    <a href="{% url 'chat' user.user_id %}" class="chat-button">Chat</a>
+                    <!-- Pass task details in the chat URL -->
+                    <a href="{% url 'chat' user.user_id %}?task_id={{ task.id }}&task_title={{ task.title}}" class="chat-button">lets Chat</a>
                 </li>
             {% empty %}
                 <li class="no-users">No users have completed similar tasks.</li>

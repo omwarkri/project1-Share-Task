@@ -5,78 +5,201 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Task Details</title>
     <style>
+        /* General Styles */
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f9f9f9;
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa;
             color: #333;
-            padding: 20px;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
         }
 
         h1 {
             color: #4CAF50;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        h2 {
+            color: #2c3e50;
+            font-size: 1.8rem;
+            margin-bottom: 15px;
         }
 
         .task-detail {
             background: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            width: 60%;
-            margin: 0 auto;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 800px;
+            margin: 20px auto;
         }
 
         .task-detail p {
-            font-size: 18px;
+            font-size: 1.1rem;
             line-height: 1.6;
+            color: #555;
+            margin-bottom: 15px;
+        }
+
+        .task-detail strong {
+            color: #2c3e50;
         }
 
         .task-detail form {
             margin-top: 20px;
         }
 
-        .task-detail input, .task-detail textarea {
-            padding: 10px;
-            margin-bottom: 10px;
+        .task-detail input,
+        .task-detail textarea,
+        .task-detail select {
             width: 100%;
-            border-radius: 5px;
-            border: 1px solid #ccc;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .task-detail input:focus,
+        .task-detail textarea:focus,
+        .task-detail select:focus {
+            border-color: #4CAF50;
+            box-shadow: 0 0 8px rgba(76, 175, 80, 0.2);
+            outline: none;
         }
 
         button {
             background-color: #4CAF50;
             color: white;
             border: none;
-            padding: 10px;
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: 600;
             cursor: pointer;
-            border-radius: 5px;
+            border-radius: 8px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
         }
 
         button:hover {
             background-color: #45a049;
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
         }
 
         a {
             text-decoration: none;
-            color: #007BFF;
-            font-weight: bold;
+            color: #3498db;
+            font-weight: 600;
+            transition: color 0.3s ease;
         }
 
         a:hover {
-            color: #0056b3;
+            color: #2980b9;
         }
 
         .completion-detail {
-            margin-top: 20px;
+            margin-top: 25px;
             background: #e8f5e9;
-            padding: 15px;
-            border-radius: 10px;
+            padding: 20px;
+            border-radius: 12px;
         }
 
-        .completion-detail img, .completion-detail video {
+        .completion-detail img,
+        .completion-detail video {
             max-width: 100%;
             height: auto;
-            margin: 10px 0;
+            margin: 15px 0;
             border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .completion-detail h3 {
+            color: #2c3e50;
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+        }
+
+        .chat-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+
+        .chat-button:hover {
+            background-color: #2980b9;
+        }
+
+        #editForm {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        #editForm h2 {
+            color: #4CAF50;
+            font-size: 1.6rem;
+            margin-bottom: 15px;
+        }
+
+        .subscription-required {
+            margin-top: 20px;
+            padding: 20px;
+            background: #fff3cd;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .subscription-required h1 {
+            color: #e74c3c;
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+
+        .subscription-required a {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+
+        .subscription-required a:hover {
+            background-color: #45a049;
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .back-link a {
+            color: #4CAF50;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .back-link a:hover {
+            color: #45a049;
         }
     </style>
 </head>
@@ -130,14 +253,18 @@
                         </form>
                     </div>
                 {% else %}
-                    <h1>Subscription Required</h1>
-                    <p>You need an active subscription to edit tasks.</p>
-                    <a href="{% url 'create_subscription' %}">Subscribe Now</a>
+                    <div class="subscription-required">
+                        <h1>Subscription Required</h1>
+                        <p>You need an active subscription to edit tasks.</p>
+                        <a href="{% url 'create_subscription' %}">Subscribe Now</a>
+                    </div>
                 {% endif %}
             {% endif %}
         {% endif %}
 
-        <a href="{% url 'home' %}">Back to Task List</a>
+        <div class="back-link">
+            <a href="{% url 'home' %}">Back to Task List</a>
+        </div>
     </div>
 
     <script>

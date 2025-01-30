@@ -8,3 +8,9 @@ class TaskForm(forms.ModelForm):
         widgets = {
             'due_date': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
         }
+    
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field_name, field in self.fields.items():
+            field.label_suffix = " *" if field.required else ""

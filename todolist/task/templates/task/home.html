@@ -82,6 +82,18 @@
             <label for="uploaded_file">Upload Video/File (optional):</label>
             <input type="file" name="uploaded_file" id="uploaded_file" accept="video/*,.pdf,.doc,.docx">
 
+            {% if task_data.task.task_partner %}
+            <div class="partner-feedback">
+                <h4>Rate and Comment on the Task Partner</h4>
+                <label for="partner_rating">Rating (1-5):</label>
+                <input type="number" name="partner_rating" id="partner_rating" min="1" max="5" required>
+                
+                <label for="partner_comment">Comment:</label>
+                <textarea name="partner_comment" id="partner_comment" rows="3"></textarea>
+            </div>
+            {% endif %}
+
+            
             <!-- Checkbox for skipping sharing -->
             <div class="skip-sharing">
                 <label>

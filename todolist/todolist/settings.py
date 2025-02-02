@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',
     'subscription',
-    'chat'
+    'chat',
+    'leaderboard'
     
 ]
 
@@ -110,28 +111,28 @@ WSGI_APPLICATION = 'todolist.wsgi.application'
 # }
 
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'share_task',
-#         'USER': 'share_task_user',
-#         'PASSWORD': 'hZrrRKws2LV2pDSvgOMgfnfZRCFrdAQQ',
-#         'HOST': 'dpg-cud6k0in91rc73epr120-a.oregon-postgres.render.com',  # or your server IP
-#         'PORT': '5432',       # default PostgreSQL port
-#     }
-# }
-
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'share_task',
         'USER': 'share_task_user',
         'PASSWORD': 'hZrrRKws2LV2pDSvgOMgfnfZRCFrdAQQ',
-        'HOST': 'dpg-cud6k0in91rc73epr120-a',  # or your server IP
+        'HOST': 'dpg-cud6k0in91rc73epr120-a.oregon-postgres.render.com',  # or your server IP
         'PORT': '5432',       # default PostgreSQL port
     }
 }
+
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'share_task',
+#         'USER': 'share_task_user',
+#         'PASSWORD': 'hZrrRKws2LV2pDSvgOMgfnfZRCFrdAQQ',
+#         'HOST': 'dpg-cud6k0in91rc73epr120-a',  # or your server IP
+#         'PORT': '5432',       # default PostgreSQL port
+#     }
+# }
 
 
 USE_TZ = False

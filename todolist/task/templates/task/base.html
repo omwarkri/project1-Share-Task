@@ -161,6 +161,7 @@ header, main, footer {
     <header class="header-div">
         <h1>{{ app_name }}</h1>
         <div>
+            <a href="{% url 'leaderboard' %}">View Leaderboard</a>
             {% if user.is_authenticated %}
                 <span>Welcome, <a href="{% url 'profile' %}">{{ user.username }}</a>!</span>
                 <form method="post" action="{% url 'logout' %}" style="display: inline;">

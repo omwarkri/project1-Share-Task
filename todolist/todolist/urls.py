@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path,include
-from task.views import home,add_task, change_task_status,delete_task,task_detail,edit_task,complete_task,suggested_users
+from task.views import home,add_task, change_task_status,delete_task,task_detail,edit_task,complete_task,suggested_users,add_subtask,toggle_subtask,add_allowed_user,remove_allowed_user,add_task_partner,remove_task_partner
 from rest_framework_simplejwt import views as jwt_views
 from user.views import ProtectedView 
 from django.contrib.auth.views import LogoutView
@@ -57,8 +57,15 @@ urlpatterns = [
     path('protected/', ProtectedView.as_view(), name='protected'),
     path('',include('subscription.urls')),
     path('',include('chat.urls')),
+    path('',include('leaderboard.urls')),
     path('share-task/<int:task_id>/', complete_task, name='complete_task'),
     path('task/<int:task_id>/suggested_users/', suggested_users, name='suggested_users'),
+    path('task/<int:task_id>/add_subtask/', add_subtask, name='add_subtask'),
+    path('subtask/<int:subtask_id>/toggle/', toggle_subtask, name='toggle_subtask'),
+    path('task/<int:task_id>/add-allowed-user/<int:user_id>/', add_allowed_user, name='add_allowed_user'),
+    path('task/<int:task_id>/remove-allowed-user/<int:user_id>/', remove_allowed_user, name='remove_allowed_user'),
+    path('task/<int:task_id>/add_task_partner/<int:user_id>/', add_task_partner, name='add_task_partner'),
+    path('task/<int:task_id>/remove_task_partner/', remove_task_partner, name='remove_task_partner'),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 

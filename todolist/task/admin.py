@@ -1,14 +1,51 @@
 from django.contrib import admin
-from .models import Task,TaskCompletionDetails
+from .models import (
+    Task,
+    PartnerFeedback,
+    TaskCompletionDetails,
+    Comment,
+    SubTask,
+    ActivityLog,
+)
 
+# Register Task model
 @admin.register(Task)
 class TaskAdmin(admin.ModelAdmin):
-    list_display = ('title', 'status', 'user', 'created_at')  # Ensure 'user' is a field or method on Task
-    list_filter = ('status', 'user')  # Make sure 'user' is a valid filter field
-    search_fields = ('title', 'user__username')  # Use '__' to search through related fields like ForeignKey
+    list_display = ('title', 'user', 'status', 'priority', 'due_date', 'created_at')
+    list_filter = ('status', 'priority', 'created_at')
+    search_fields = ('title', 'description')
+    filter_horizontal = ('allowed_users',)  # For easier management of ManyToManyField
 
+# Register PartnerFeedback model
+@admin.register(PartnerFeedback)
+class PartnerFeedbackAdmin(admin.ModelAdmin):
+    list_display = ('task', 'partner', 'rating', 'created_at')
+    list_filter = ('rating', 'created_at')
+    search_fields = ('task__title', 'partner__username')
 
+# Register TaskCompletionDetails model
+@admin.register(TaskCompletionDetails)
+class TaskCompletionDetailsAdmin(admin.ModelAdmin):
+    list_display = ('task', 'created_at')
+    search_fields = ('task__title',)
 
-# @admin.register(TaskCompletionDetails)
-# class TaskAdmin(admin.ModelAdmin):
-#     list_display = ('task')  # Ensure 'user' is a field or method on Task
+# Register Comment model
+@admin.register(Comment)
+class CommentAdmin(admin.ModelAdmin):
+    list_display = ('task', 'user', 'created_at')
+    list_filter = ('created_at',)
+    search_fields = ('task__title', 'user__username', 'text')
+
+# Register SubTask model
+@admin.register(SubTask)
+class SubTaskAdmin(admin.ModelAdmin):
+    list_display = ('task', 'title', 'completed')
+    list_filter = ('completed',)
+    search_fields = ('task__title', 'title')
+
+# Register ActivityLog model
+@admin.register(ActivityLog)
+class ActivityLogAdmin(admin.ModelAdmin):
+    list_display = ('task', 'user', 'action', 'timestamp')
+    list_filter = ('action', 'timestamp')
+    search_fields = ('task__title', 'user__username', 'details')

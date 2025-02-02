@@ -158,6 +158,42 @@
                 font-size: 1.5em;
             }
         }
+        .rating-reviews {
+            margin-top: 30px;
+        }
+
+        .rating-reviews h2 {
+            font-size: 1.8em;
+            margin-bottom: 20px;
+        }
+
+        .review-card {
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+
+        .review-card p {
+            margin: 5px 0;
+            color: #555;
+        }
+
+        .review-card .rating {
+            font-weight: bold;
+            color: #FFD700; /* Gold color for ratings */
+        }
+
+        .review-card .comment {
+            font-style: italic;
+            margin-top: 10px;
+        }
+
+        .review-card .timestamp {
+            font-size: 0.9em;
+            color: #888;
+        }
     </style>
 </head>
 <body>
@@ -185,6 +221,22 @@
                     title="{{ date }}">
                 </div>
             {% endfor %}
+        </div>
+
+        <!-- Rating and Reviews Section -->
+        <div class="rating-reviews">
+            <h2>Your Ratings and Reviews</h2>
+            {% if feedbacks %}
+                {% for feedback in feedbacks %}
+                    <div class="review-card">
+                        <p class="rating">Rating: {{ feedback.rating }}/5</p>
+                        <p class="comment">Comment: {{ feedback.comment }}</p>
+                        <p class="timestamp">Date: {{ feedback.created_at|date:"F j, Y" }}</p>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>No ratings or reviews yet.</p>
+            {% endif %}
         </div>
 
         <form method="post" action="{% url 'logout' %}" style="display: inline;">

@@ -201,6 +201,38 @@
         .back-link a:hover {
             color: #45a049;
         }
+
+        /* tasks/static/tasks/styles.css */
+.activity-log {
+    margin-top: 25px;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 12px;
+}
+
+.activity-log h3 {
+    color: #2c3e50;
+    font-size: 1.4rem;
+    margin-bottom: 15px;
+}
+
+.activity-log ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.activity-log li {
+    background: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.activity-log small {
+    color: #777;
+    font-size: 0.9rem;
+}
     </style>
 </head>
 <body>
@@ -211,6 +243,67 @@
         <p><strong>Priority:</strong> {{ task.get_priority_display }}</p>   
         <p><strong>Due Date:</strong> {{ task.due_date }}</p>  
         <p><strong>Created At:</strong> {{ task.created_at }}</p>
+
+        <div class="subtask">
+            <h3>Subtasks</h3>
+            <ul>
+                {% for subtask in subtasks %}
+                    <li>
+                        <form method="post" action="{% url 'toggle_subtask' subtask.id %}">
+                            {% csrf_token %}
+                            <input type="checkbox" onchange="this.form.submit();" {% if subtask.completed %}checked{% endif %}>
+                            {{ subtask.title }}
+                        </form>
+                    </li>
+                {% empty %}
+                    <li>No subtasks added yet.</li>
+                {% endfor %}
+            </ul>
+        
+            <h4>Add Subtask</h4>
+            <form method="post" action="{% url 'add_subtask' task.id %}">
+                {% csrf_token %}
+                {{ subtask_form.as_p }}
+                <button type="submit">Add Subtask</button>
+            </form>
+        </div>
+
+        <!-- tasks/task_detail.html -->
+        <div class="activity-log">
+            <h3>Activity Log</h3>
+            <ul>
+                {% for log in task.activity_logs.all %}
+                    <li>
+                        <strong>{{ log.user.username }}</strong> {{ log.action }}:
+                        <span>{{ log.details }}</span>
+                        <small>{{ log.timestamp }}</small>
+                    </li>
+                {% empty %}
+                    <li>No activity yet.</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="comments-section">
+            <h2>Comments</h2>
+            <ul>
+                {% for comment in comments %}
+                    <li>
+                        <strong>{{ comment.user.username }}</strong>: {{ comment.text }}
+                        <br><small>{{ comment.created_at }}</small>
+                    </li>
+                {% empty %}
+                    <li>No comments yet.</li>
+                {% endfor %}
+            </ul>
+    
+            <!-- Add Comment Form -->
+            <form method="post">
+                {% csrf_token %}
+                {{ comment_form.as_p }}
+                <button type="submit" name="add_comment">Add Comment</button>
+            </form>
+        </div>
 
         {% if task.status == "completed" %}
             <!-- Display task completion details -->
@@ -234,7 +327,7 @@
                 {% if task.user %}
                     <h3>Task Completed By: {{ task.user.username }}</h3>
                     <!-- Chat Button -->
-                    <a href="{% url 'chat' task.user.id %}" class="chat-button">Chat with {{ task.user.username }}</a>
+                    <a href="{% url 'chat' task.id task.user.id %}" class="chat-button">Chat with {{ task.user.username }}</a>
                 {% endif %}
             </div>
             
@@ -249,7 +342,7 @@
                         <form method="post">
                             {% csrf_token %}
                             {{ form.as_p }}
-                            <button type="submit">Save Changes</button>
+                            <button type="submit" name="edit_task">Save Changes</button>
                         </form>
                     </div>
                 {% else %}

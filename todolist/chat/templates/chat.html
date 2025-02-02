@@ -175,12 +175,107 @@
             font-weight: 600;
             transition: color 0.3s ease;
             text-decoration: none;
-           
         }
 
         .back-link a:hover {
             color: #276d9c;
         }
+
+        .add-user-section {
+            text-align: center;
+            margin: 20px;
+        }
+
+        .add-user-btn {
+            padding: 12px 20px;
+            background-color: #34a853;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .add-user-btn:hover {
+            background-color: #2c8a45;
+        }
+
+
+        .add-remove-user-section {
+            text-align: center;
+            margin: 20px;
+        }
+
+        .add-user-btn {
+    padding: 12px 20px;
+    background-color: #34a853;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 1em;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .add-user-btn:hover {
+        background-color: #2c8a45;
+    }
+
+    .remove-user-btn {
+        padding: 12px 20px;
+        background-color: #e74c3c;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 1em;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .remove-user-btn:hover {
+        background-color: #c0392b;
+    }
+
+    .add-task-partner-section {
+    text-align: center;
+    margin: 20px;
+}
+
+.add-task-partner-btn {
+    padding: 12px 20px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.add-task-partner-btn:hover {
+    background-color: #2980b9;
+}
+
+.remove-task-partner-btn {
+    padding: 12px 20px;
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.remove-task-partner-btn:hover {
+    background-color: #c0392b;
+}
 
         /* Animations */
         @keyframes fadeIn {
@@ -203,10 +298,10 @@
     <script>
         // Form validation to prevent empty messages
         document.addEventListener("DOMContentLoaded", function () {
-            const form = document.querySelector("form");
-            const textarea = document.querySelector("textarea[name='content']");
+            const chatForm = document.querySelector("#chat-form");  // Target only the chat form
+            const textarea = chatForm.querySelector("textarea[name='content']");
 
-            form.onsubmit = function (event) {
+            chatForm.onsubmit = function (event) {
                 if (!textarea.value.trim()) {
                     event.preventDefault();
                     alert("Please type a message before sending.");
@@ -220,7 +315,45 @@
         <div class="back-link">
             <a href="{% url 'task_detail' task.id %}">View Task</a>
         </div>
-        
+
+        <!-- Add/Remove User to/from Allowed Users Buttons -->
+        {% if task.user == request.user and receiver != request.user %}
+        <div class="add-remove-user-section">
+            {% if receiver in task.allowed_users.all %}
+                <!-- Remove User Button -->
+                <form method="post" action="{% url 'remove_allowed_user' task.id receiver.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="remove-user-btn">Remove {{ receiver.username }} from Allowed Users</button>
+                </form>
+            {% else %}
+                <!-- Add User Button -->
+                <form method="post" action="{% url 'add_allowed_user' task.id receiver.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="add-user-btn">Add {{ receiver.username }} to Allowed Users</button>
+                </form>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- Add Task Partner Button -->
+        {% if task.user == request.user and receiver != request.user %}
+        <div class="add-task-partner-section">
+            {% if task.task_partner == receiver %}
+                <!-- Remove Task Partner Button -->
+                <form method="post" action="{% url 'remove_task_partner' task.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="remove-task-partner-btn">Remove {{ receiver.username }} as Task Partner</button>
+                </form>
+            {% else %}
+                <!-- Add Task Partner Button -->
+                <form method="post" action="{% url 'add_task_partner' task.id receiver.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="add-task-partner-btn">Add {{ receiver.username }} as Task Partner</button>
+                </form>
+            {% endif %}
+        </div>
+        {% endif %}
+
         <h2>Chat with {{ receiver.username }}</h2>
 
         <!-- Messages Section -->
@@ -243,8 +376,8 @@
             {% endfor %}
         </div>
 
-        <!-- Chat Input -->
-        <form method="post" enctype="multipart/form-data" class="chat-input">
+        <!-- Chat Input Form -->
+        <form id="chat-form" method="post" enctype="multipart/form-data" class="chat-input">
             {% csrf_token %}
             <textarea name="content" rows="2" placeholder="Type your message here..."></textarea>
             <label for="file-upload" aria-label="Attach File">📎</label>

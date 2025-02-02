@@ -53,33 +53,41 @@ import datetime
 
 from django.db.models import Count
 
+from datetime import date, timedelta, datetime
+from django.db.models import Count
+from django.shortcuts import render
+from django.utils import timezone
+from .models import UserActivity
+from task.models import Task, PartnerFeedback
+from django.contrib.auth.decorators import login_required
+
+@login_required
 def profile_view(request):
     today = date.today()
-    dates = [(today - timedelta(days=i)) for i in range(363, -1, -1)]
+    dates = [(today - timedelta(days=i)) for i in range(364, -1, -1)]  # Ensure full year (365 days)
 
-    current_month = datetime.datetime.now()
-    previous_month = current_month - timedelta(days=365)  # Adjust logic for 11 month
-    # Get all user activities within the past 365 days
+    # Get the current month and previous year for reference
+    current_month = timezone.now()
+    previous_month = current_month - timedelta(days=365)
+
+    # Fetch user activities within the past year
     task_activities = UserActivity.objects.filter(user=request.user, activity_date__in=dates)
 
-    # Initialize the activity_map and color_map
+    # Initialize activity and color maps
     activity_map = {}
     color_map = {}
 
-    # Create a map of activities to track task completion, creation, and updates
+    # Populate activity map with task data
     for activity in task_activities:
-        # Convert the activity_date to datetime object with midnight time (00:00:00)
-        activity_datetime = datetime.datetime.combine(activity.activity_date, datetime.time.min)
+        # Use timezone-aware dates
+        activity_date_aware = timezone.make_aware(datetime.combine(activity.activity_date, datetime.min.time()))
 
-        # Make the datetime object timezone aware
-        activity_date_aware = timezone.make_aware(activity_datetime)
+        # Fetch task counts for the specific activity date
+        task_counts = Task.objects.filter(
+            user=request.user, created_at__date=activity_date_aware.date()
+        ).values('status').annotate(status_count=Count('id'))
 
-        # Count tasks with different statuses on the same date as the activity date
-        task_counts = Task.objects.filter(user=request.user, created_at__date=activity_date_aware.date()) \
-            .values('status') \
-            .annotate(status_count=Count('id'))
-
-        # Initialize date entry if not already present
+        # Ensure the date has an entry in the activity map
         if activity.activity_date not in activity_map:
             activity_map[activity.activity_date] = {"completed": 0, "created": 0, "updated": 0}
 
@@ -103,7 +111,7 @@ def profile_view(request):
         elif activity.activity_type == 'Task Updated':
             activity_map[activity.activity_date]["updated"] += 1
 
-    # Color logic: Dark Green for more than 2 completed tasks, Green for completed tasks, Yellow for created/updated
+    # Set color logic for task activities
     for activity_date, tasks in activity_map.items():
         if tasks["completed"] > 2:
             color_map[activity_date] = "dark_green"
@@ -112,13 +120,17 @@ def profile_view(request):
         else:
             color_map[activity_date] = "yellow"
 
-    # Pass the data to the template
+    # Fetch partner feedbacks
+    feedbacks = PartnerFeedback.objects.filter(partner=request.user)
+
+    # Prepare context for the template
     context = {
         'user': request.user,
         'dates': dates,
-        'color_map': color_map,  # Pass the color map to the template
+        'color_map': color_map,
         'current_month': current_month,
         'previous_month': previous_month,
+        'feedbacks': feedbacks,
     }
 
     return render(request, 'user/profile.html', context)

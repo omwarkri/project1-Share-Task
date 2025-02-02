@@ -6,12 +6,13 @@ from task.models import Task
 from .models import Message
 
 @login_required
-def chat_view(request, user_id):
+def chat_view(request, task_id, receiver_id):
+    print(task_id,receiver_id)
     # Fetch the receiver user or return a 404 if not found
-    receiver = get_object_or_404(CustomUser, id=user_id)
+    receiver = get_object_or_404(CustomUser, id=receiver_id)
 
     # Get task-related details (optional task_id and task_title query parameters)
-    task_id = request.GET.get("task_id")
+
     task_title = request.GET.get("task_title")
     task = Task.objects.filter(id=task_id).first() if task_id else None
 

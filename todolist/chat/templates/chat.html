@@ -295,19 +295,9 @@
             }
         }
     </style>
+ 
     <script>
-        // Form validation to prevent empty messages
-        document.addEventListener("DOMContentLoaded", function () {
-            const chatForm = document.querySelector("#chat-form");  // Target only the chat form
-            const textarea = chatForm.querySelector("textarea[name='content']");
-
-            chatForm.onsubmit = function (event) {
-                if (!textarea.value.trim()) {
-                    event.preventDefault();
-                    alert("Please type a message before sending.");
-                }
-            };
-        });
+        // Your existing JavaScript
     </script>
 </head>
 <body>
@@ -354,18 +344,34 @@
         </div>
         {% endif %}
 
-        <h2>Chat with {{ receiver.username }}</h2>
+        <!-- Chat Header with Profile View Link -->
+        <h2>
+            Chat with {{ receiver.username }}
+            <a href="{% url 'view_profile_id' receiver.id %}" style="font-size: 0.8em; margin-left: 10px; color: #ffffff; text-decoration: none; background-color: #3498db; padding: 5px 10px; border-radius: 5px;">
+                View Profile
+            </a>
+        </h2>
 
-        <!-- Messages Section -->
+        <!-- Messages Section with Profile View Links -->
         <div class="messages">
             {% for message in messages %}
                 <div class="message {% if message.sender == request.user %}sent{% else %}received{% endif %}">
                     {% if message.content %}
-                        <p><strong>{{ message.sender.username }}</strong>: {{ message.content }}</p>
+                        <p>
+                            <strong>
+                                <a href="{% url 'view_profile_id' message.sender.id %}" style="color: inherit; text-decoration: none;">
+                                    {{ message.sender.username }}
+                                </a>
+                            </strong>: {{ message.content }}
+                        </p>
                     {% endif %}
                     {% if message.attachment %}
                         <p>
-                            <strong>{{ message.sender.username }}</strong>: 
+                            <strong>
+                                <a href="{% url 'view_profile_id' message.sender.id %}" style="color: inherit; text-decoration: none;">
+                                    {{ message.sender.username }}
+                                </a>
+                            </strong>: 
                             <a href="{{ message.attachment.url }}" target="_blank" style="color: inherit; text-decoration: underline;">
                                 Download Attachment
                             </a>

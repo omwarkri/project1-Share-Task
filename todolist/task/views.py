@@ -80,7 +80,7 @@ from .forms import TaskForm
 def home(request):
     tasks = Task.objects.filter(user=request.user)
     form = TaskForm(request.POST)
-    print(tasks[0].task_partner,"task partner ")
+    # print(tasks[0].task_partner,"task partner ")
     # Add suggested users to each task
     tasks_with_suggestions = []
     for task in tasks:

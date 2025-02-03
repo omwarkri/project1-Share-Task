@@ -60,9 +60,101 @@ from django.utils import timezone
 from .models import UserActivity
 from task.models import Task, PartnerFeedback
 from django.contrib.auth.decorators import login_required
+from .forms import ProfileUpdateForm
 
 @login_required
 def profile_view(request):
+
+    if request.method == 'POST':
+        form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user)
+        if form.is_valid():
+            form.save()
+            return redirect('profile')  # Redirect to the profile page after saving
+        
+    else:
+        today = date.today()
+        dates = [(today - timedelta(days=i)) for i in range(364, -1, -1)]  # Ensure full year (365 days)
+
+        # Get the current month and previous year for reference
+        current_month = timezone.now()
+        previous_month = current_month - timedelta(days=365)
+
+        # Fetch user activities within the past year
+        task_activities = UserActivity.objects.filter(user=request.user, activity_date__in=dates)
+
+        # Initialize activity and color maps
+        activity_map = {}
+        color_map = {}
+
+        # Populate activity map with task data
+        for activity in task_activities:
+            # Use timezone-aware dates
+            activity_date_aware = timezone.make_aware(datetime.combine(activity.activity_date, datetime.min.time()))
+
+            # Fetch task counts for the specific activity date
+            task_counts = Task.objects.filter(
+                user=request.user, created_at__date=activity_date_aware.date()
+            ).values('status').annotate(status_count=Count('id'))
+
+            # Ensure the date has an entry in the activity map
+            if activity.activity_date not in activity_map:
+                activity_map[activity.activity_date] = {"completed": 0, "created": 0, "updated": 0}
+
+            # Update activity map based on task statuses
+            for task_count in task_counts:
+                task_state = task_count['status']
+                count = task_count['status_count']
+
+                if task_state == "completed":
+                    activity_map[activity.activity_date]["completed"] += count
+                elif task_state == "pending":
+                    activity_map[activity.activity_date]["created"] += count
+                else:
+                    activity_map[activity.activity_date]["updated"] += count
+
+            # Track activity type (Task Created, Completed, or Updated)
+            if activity.activity_type == 'Task Created':
+                activity_map[activity.activity_date]["created"] += 1
+            elif activity.activity_type == 'Task Completed':
+                activity_map[activity.activity_date]["completed"] += 1
+            elif activity.activity_type == 'Task Updated':
+                activity_map[activity.activity_date]["updated"] += 1
+
+        # Set color logic for task activities
+        for activity_date, tasks in activity_map.items():
+            if tasks["completed"] > 2:
+                color_map[activity_date] = "dark_green"
+            elif tasks["completed"] > 0:
+                color_map[activity_date] = "green"
+            else:
+                color_map[activity_date] = "yellow"
+
+        # Fetch partner feedbacks
+        feedbacks = PartnerFeedback.objects.filter(partner=request.user)
+        user = CustomUser.objects.prefetch_related('user_badges__badge').get(id=request.user.id)
+
+        user_badges=user.user_badges.all()
+        # Accessing the badges
+        print(user.profile_picture)
+
+        # Prepare context for the template
+        context = {
+            'user': user,
+            'user_badges':user_badges,
+            'dates': dates,
+            'color_map': color_map,
+            'current_month': current_month,
+            'previous_month': previous_month,
+            'feedbacks': feedbacks,
+        }
+
+        return render(request, 'user/profile.html', context)
+
+
+
+def profile_view_id(request,user_id):
+    user=CustomUser.objects.get(id=user_id)
+    print(user)
     today = date.today()
     dates = [(today - timedelta(days=i)) for i in range(364, -1, -1)]  # Ensure full year (365 days)
 
@@ -71,7 +163,7 @@ def profile_view(request):
     previous_month = current_month - timedelta(days=365)
 
     # Fetch user activities within the past year
-    task_activities = UserActivity.objects.filter(user=request.user, activity_date__in=dates)
+    task_activities = UserActivity.objects.filter(user=user, activity_date__in=dates)
 
     # Initialize activity and color maps
     activity_map = {}
@@ -122,10 +214,16 @@ def profile_view(request):
 
     # Fetch partner feedbacks
     feedbacks = PartnerFeedback.objects.filter(partner=request.user)
+    user = CustomUser.objects.prefetch_related('user_badges__badge').get(id=user.id)
+
+    user_badges=user.user_badges.all()
+    # Accessing the badges
+    print(user_badges)
 
     # Prepare context for the template
     context = {
-        'user': request.user,
+        'user': user,
+        'user_badges':user_badges,
         'dates': dates,
         'color_map': color_map,
         'current_month': current_month,

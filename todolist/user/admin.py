@@ -1,28 +1,32 @@
 from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin
-from .models import CustomUser
+from .models import CustomUser, UserActivity, Badge, UserBadge
 
-class CustomUserAdmin(UserAdmin):
-    # Specify the fields to display in the admin panel
-    list_display = ('username', 'email', 'first_name', 'last_name', 'is_staff')
-    # Specify the fields available for filtering
-    list_filter = ('is_staff', 'is_superuser', 'is_active', 'groups')
-    # Specify the fields available for editing
-    fieldsets = (
-        (None, {'fields': ('username', 'password')}),
-        ('Personal info', {'fields': ('first_name', 'last_name', 'email', 'profile_picture')}),
-        ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
-        ('Important dates', {'fields': ('last_login', 'date_joined')}),
-    )
-    # Add fields for user creation in the admin panel
-    add_fieldsets = (
-        (None, {
-            'classes': ('wide',),
-            'fields': ('username', 'email', 'password1', 'password2'),
-        }),
-    )
-    search_fields = ('username', 'email')
-    ordering = ('username',)
+# Customize the display for CustomUser
+class CustomUserAdmin(admin.ModelAdmin):
+    list_display = ('username', 'email', 'phone_number', 'score')
+    search_fields = ('username', 'email', 'phone_number')
+    list_filter = ('is_staff', 'is_active')
 
-# Register the CustomUser model with the admin site
+# Customize the display for UserActivity
+class UserActivityAdmin(admin.ModelAdmin):
+    list_display = ('user', 'activity_type', 'activity_date')
+    search_fields = ('user__username', 'activity_type')
+    list_filter = ('activity_date',)
+
+# Customize the display for Badge
+class BadgeAdmin(admin.ModelAdmin):
+    list_display = ('name', 'description', 'min_score')
+    search_fields = ('name',)
+    list_filter = ('min_score',)
+
+# Customize the display for UserBadge
+class UserBadgeAdmin(admin.ModelAdmin):
+    list_display = ('user', 'badge', 'awarded_at')
+    search_fields = ('user__username', 'badge__name')
+    list_filter = ('awarded_at',)
+
+# Register models with admin site
 admin.site.register(CustomUser, CustomUserAdmin)
+admin.site.register(UserActivity, UserActivityAdmin)
+admin.site.register(Badge, BadgeAdmin)
+admin.site.register(UserBadge, UserBadgeAdmin)

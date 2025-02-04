@@ -5,37 +5,32 @@
     <div class="container">
         <h2>All Tasks</h2>
         
-        <!-- Filter Options -->
-        <div class="filter-options">
-            <form method="get" action="{% url 'home' %}">
-                <label for="status">Filter by Status:</label>
-                <select name="status" id="status">
-                    <option value="">All</option>
-                    <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Pending</option>
-                    <option value="in_progress" {% if status_filter == 'in_progress' %}selected{% endif %}>In Progress</option>
-                    <option value="completed" {% if status_filter == 'completed' %}selected{% endif %}>Completed</option>
-                    <option value="archived" {% if status_filter == 'archived' %}selected{% endif %}>Archived</option>
-                </select>
+        <!-- On-Click Filter Buttons for Status -->
+        <div class="filter-buttons">
+            <h4>Filter by Status:</h4>
+            <button onclick="filterTasks('all', 'all')" class="filter-button">All</button>
+            <button onclick="filterTasks('pending', 'all')" class="filter-button">Pending</button>
+            <button onclick="filterTasks('in_progress', 'all')" class="filter-button">In Progress</button>
+            <button onclick="filterTasks('completed', 'all')" class="filter-button">Completed</button>
+            <button onclick="filterTasks('archived', 'all')" class="filter-button">Archived</button>
+        </div>
 
-                <label for="priority">Filter by Priority:</label>
-                <select name="priority" id="priority">
-                    <option value="">All</option>
-                    <option value="low" {% if priority_filter == 'low' %}selected{% endif %}>Low</option>
-                    <option value="medium" {% if priority_filter == 'medium' %}selected{% endif %}>Medium</option>
-                    <option value="high" {% if priority_filter == 'high' %}selected{% endif %}>High</option>
-                    <option value="critical" {% if priority_filter == 'critical' %}selected{% endif %}>Critical</option>
-                </select>
-
-                <button type="submit" class="filter-button">Apply Filters</button>
-            </form>
+        <!-- On-Click Filter Buttons for Priority -->
+        <div class="filter-buttons">
+            <h4>Filter by Priority:</h4>
+            <button onclick="filterTasks('all', 'all')" class="filter-button">All</button>
+            <button onclick="filterTasks('all', 'low')" class="filter-button">Low</button>
+            <button onclick="filterTasks('all', 'medium')" class="filter-button">Medium</button>
+            <button onclick="filterTasks('all', 'high')" class="filter-button">High</button>
+            <button onclick="filterTasks('all', 'critical')" class="filter-button">Critical</button>
         </div>
 
         <a href="#" class="add-task" onclick="openAddTaskModal()">Add a New Task</a>
         <a href="#" class="view-chats-button" onclick="openChatModal()">View All Chats</a>
 
-        <ul class="task-list">
+        <ul class="task-list" id="task-list">
             {% for task_data in tasks_with_suggestions %}
-                <li class="task-item">
+                <li class="task-item" data-status="{{ task_data.task.status }}" data-priority="{{ task_data.task.priority }}">
                     <strong class="task-title">{{ task_data.task.title }}</strong>
                     <p class="task-status">Status: {{ task_data.task.status }}</p>
                     <p class="task-priority">Priority: {{ task_data.task.priority }}</p>
@@ -147,31 +142,34 @@
 
 <style>
     /* Add your CSS styles here */
-    .filter-options {
+    .filter-buttons {
         margin-bottom: 20px;
     }
 
-    .filter-options label {
-        margin-right: 10px;
-    }
-
-    .filter-options select {
-        padding: 5px;
-        border-radius: 4px;
-        border: 1px solid #ccc;
+    .filter-buttons h4 {
+        margin-bottom: 10px;
+        font-size: 16px;
+        color: var(--primary-color);
     }
 
     .filter-button {
-        padding: 5px 10px;
-        background-color: var(--primary-color);
+        padding: 8px 16px;
+        margin-right: 10px;
+        background-color: var(--secondary-color);
         color: white;
         border: none;
-        border-radius: 4px;
+        border-radius: var(--radius);
         cursor: pointer;
+        font-size: 14px;
+        transition: var(--transition);
     }
 
     .filter-button:hover {
-        background-color: #45a049;
+        background-color: #007B9E;
+    }
+
+    .filter-button.active {
+        background-color: var(--primary-color);
     }
      /* CSS Variables for Consistent Styling */
      :root {
@@ -438,6 +436,38 @@
 </style>
 
 <script>
+    // Function to filter tasks by status and priority
+    function filterTasks(status, priority) {
+        const taskItems = document.querySelectorAll('.task-item');
+
+        taskItems.forEach(task => {
+            const taskStatus = task.getAttribute('data-status');
+            const taskPriority = task.getAttribute('data-priority');
+
+            const statusMatch = status === 'all' || taskStatus === status;
+            const priorityMatch = priority === 'all' || taskPriority === priority;
+
+            if (statusMatch && priorityMatch) {
+                task.style.display = 'block'; // Show the task
+            } else {
+                task.style.display = 'none'; // Hide the task
+            }
+        });
+
+        // Highlight the active filter buttons
+        const filterButtons = document.querySelectorAll('.filter-button');
+        filterButtons.forEach(button => {
+            const buttonStatus = button.getAttribute('data-status') || 'all';
+            const buttonPriority = button.getAttribute('data-priority') || 'all';
+
+            if ((buttonStatus === status && buttonPriority === 'all') || (buttonPriority === priority && buttonStatus === 'all')) {
+                button.classList.add('active');
+            } else {
+                button.classList.remove('active');
+            }
+        });
+    }
+
     // JavaScript functions for modals
     function openAddTaskModal() {
         document.getElementById('addTaskModal').style.display = 'flex';
@@ -462,5 +492,8 @@
     function closeModal(taskId) {
         document.getElementById(`shareTaskModal-${taskId}`).style.display = 'none';
     }
+
+    // Initially show all tasks
+    filterTasks('all', 'all');
 </script>
 {% endblock %}

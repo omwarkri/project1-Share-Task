@@ -4,4 +4,4 @@ from .models import CustomUser
 class ProfileUpdateForm(forms.ModelForm):
     class Meta:
         model = CustomUser
-        fields = [ 'profile_picture']
+        fields = ['username', 'email', 'profile_picture']

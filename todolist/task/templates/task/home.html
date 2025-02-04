@@ -2,19 +2,46 @@
 
 {% block content %}
 <div>
-    
-
     <div class="container">
         <h2>All Tasks</h2>
-        <a href="#" class="add-task" onclick="openAddTaskModal()">Add a New Task</a> <!-- Updated to trigger modal -->
+        
+        <!-- Filter Options -->
+        <div class="filter-options">
+            <form method="get" action="{% url 'home' %}">
+                <label for="status">Filter by Status:</label>
+                <select name="status" id="status">
+                    <option value="">All</option>
+                    <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Pending</option>
+                    <option value="in_progress" {% if status_filter == 'in_progress' %}selected{% endif %}>In Progress</option>
+                    <option value="completed" {% if status_filter == 'completed' %}selected{% endif %}>Completed</option>
+                    <option value="archived" {% if status_filter == 'archived' %}selected{% endif %}>Archived</option>
+                </select>
+
+                <label for="priority">Filter by Priority:</label>
+                <select name="priority" id="priority">
+                    <option value="">All</option>
+                    <option value="low" {% if priority_filter == 'low' %}selected{% endif %}>Low</option>
+                    <option value="medium" {% if priority_filter == 'medium' %}selected{% endif %}>Medium</option>
+                    <option value="high" {% if priority_filter == 'high' %}selected{% endif %}>High</option>
+                    <option value="critical" {% if priority_filter == 'critical' %}selected{% endif %}>Critical</option>
+                </select>
+
+                <button type="submit" class="filter-button">Apply Filters</button>
+            </form>
+        </div>
+
+        <a href="#" class="add-task" onclick="openAddTaskModal()">Add a New Task</a>
+        <a href="#" class="view-chats-button" onclick="openChatModal()">View All Chats</a>
+
         <ul class="task-list">
             {% for task_data in tasks_with_suggestions %}
                 <li class="task-item">
                     <strong class="task-title">{{ task_data.task.title }}</strong>
                     <p class="task-status">Status: {{ task_data.task.status }}</p>
+                    <p class="task-priority">Priority: {{ task_data.task.priority }}</p>
 
                     <!-- Suggested Users Button -->
-                    <a href="{% url 'suggested_users' task_data.task.id %}" class="suggested-users-button">Find Task partner</a>
+                    <a href="{% url 'suggested_users' task_data.task.id %}" class="suggested-users-button">Find Task Partner</a>
 
                     <!-- Task Actions -->
                     <div class="button-group">
@@ -62,46 +89,56 @@
     </div>
 </div>
 
+<!-- Chat Modal -->
+<div id="chatModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeChatModal()">&times;</span>
+        <h3>All Chats</h3>
+        <div class="chat-list">
+            {% for chat in chats %}
+                <div class="chat-item">
+                    <a href="{% url 'chat' receiver_id=chat.receiver.id %}">
+                        <strong>{{ chat.receiver.username }}</strong>: {{ chat.message }}
+                        <small class="chat-time">{{ chat.timestamp }}</small>
+                    </a>
+                </div>
+            {% empty %}
+                <p>No chats available.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
 <!-- Share Task Modals -->
 {% for task_data in tasks_with_suggestions %}
 <div id="shareTaskModal-{{ task_data.task.id }}" class="modal" style="display: none;">
     <div class="modal-content">
-        <span class="close-modal" onclick="closeModal({{task_data.task.id }})">&times;</span>
+        <span class="close-modal" onclick="closeModal({{ task_data.task.id }})">&times;</span>
         <h3>Share Your Task Completion</h3>
         <p>Would you like to share how you completed this task?</p>
-        
-        <!-- Option to skip sharing -->
         <form method="post" enctype="multipart/form-data" action="{% url 'complete_task' task_data.task.id %}">
             {% csrf_token %}
             <label for="completion_details">How did you complete the task?</label>
             <textarea name="completion_details" id="completion_details" rows="4"></textarea>
-        
             <label for="uploaded_image">Upload Image (optional):</label>
             <input type="file" name="uploaded_image" id="uploaded_image" accept="image/*">
-        
             <label for="uploaded_file">Upload Video/File (optional):</label>
             <input type="file" name="uploaded_file" id="uploaded_file" accept="video/*,.pdf,.doc,.docx">
-
             {% if task_data.task.task_partner %}
             <div class="partner-feedback">
                 <h4>Rate and Comment on the Task Partner</h4>
                 <label for="partner_rating">Rating (1-5):</label>
                 <input type="number" name="partner_rating" id="partner_rating" min="1" max="5" required>
-                
                 <label for="partner_comment">Comment:</label>
                 <textarea name="partner_comment" id="partner_comment" rows="3"></textarea>
             </div>
             {% endif %}
-
-            
-            <!-- Checkbox for skipping sharing -->
             <div class="skip-sharing">
                 <label>
                     <input type="checkbox" name="skip_sharing" id="skip_sharing">
                     I do not want to share my completion details.
                 </label>
             </div>
-        
             <button type="submit" class="submit-button">Submit</button>
         </form>
     </div>
@@ -109,8 +146,35 @@
 {% endfor %}
 
 <style>
-    /* CSS Variables for Consistent Styling */
-    :root {
+    /* Add your CSS styles here */
+    .filter-options {
+        margin-bottom: 20px;
+    }
+
+    .filter-options label {
+        margin-right: 10px;
+    }
+
+    .filter-options select {
+        padding: 5px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+    }
+
+    .filter-button {
+        padding: 5px 10px;
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .filter-button:hover {
+        background-color: #45a049;
+    }
+     /* CSS Variables for Consistent Styling */
+     :root {
         --primary-color: #4CAF50; /* Green */
         --secondary-color: #008CBA; /* Blue */
         --danger-color: #f44336; /* Red */
@@ -331,28 +395,72 @@
     .submit-button:hover {
         background-color: #45a049;
     }
+    .view-chats-button {
+    display: inline-block;
+    margin-bottom: 15px;
+    padding: 8px 16px;
+    background-color: var(--secondary-color);
+    color: white;
+    text-decoration: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-size: 14px;
+    transition: var(--transition);
+}
+
+.view-chats-button:hover {
+    background-color: #007B9E;
+}
+
+/* Chat Modal */
+.chat-list {
+    max-height: 300px;
+    overflow-y: auto;
+    border-top: 1px solid var(--border-color);
+    margin-top: 10px;
+    padding-top: 10px;
+}
+
+.chat-item {
+    padding: 8px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.chat-item strong {
+    color: var(--primary-color);
+}
+
+.chat-time {
+    display: block;
+    font-size: 12px;
+    color: #777;
+}
 </style>
 
 <script>
-    // Function to open the Add Task Modal
+    // JavaScript functions for modals
     function openAddTaskModal() {
         document.getElementById('addTaskModal').style.display = 'flex';
     }
 
-    // Function to close the Add Task Modal
     function closeAddTaskModal() {
         document.getElementById('addTaskModal').style.display = 'none';
     }
 
-    // Function to open the Share Task Modal
+    function openChatModal() {
+        document.getElementById('chatModal').style.display = 'flex';
+    }
+
+    function closeChatModal() {
+        document.getElementById('chatModal').style.display = 'none';
+    }
+
     function openModal(taskId) {
         document.getElementById(`shareTaskModal-${taskId}`).style.display = 'flex';
     }
 
-    // Function to close the Share Task Modal
     function closeModal(taskId) {
         document.getElementById(`shareTaskModal-${taskId}`).style.display = 'none';
     }
 </script>
-
 {% endblock %}

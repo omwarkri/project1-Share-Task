@@ -5,256 +5,258 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chat with {{ receiver.username }}</title>
     <style>
-        /* Modern CSS Reset */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+    /* Modern CSS Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #f4f7fc, #e2e8f0);
-            background: -webkit-linear-gradient(135deg, #f4f7fc, #e2e8f0);
-            color: #2d3748;
-            line-height: 1.6;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
-        }
+/* General Styles */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #f4f7fc, #e2e8f0);
+    color: #2d3748;
+    line-height: 1.6;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+}
 
-        .chat-container {
-            max-width: 800px;
-            width: 100%;
-            background: #ffffff;
-            border-radius: 16px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
+/* Chat Container */
+.chat-container {
+    max-width: 800px;
+    width: 100%;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
 
-        h2 {
-            text-align: center;
-            padding: 20px;
-            background: linear-gradient(135deg, #007bff, #0056b3);
-            background: -webkit-linear-gradient(135deg, #007bff, #0056b3);
-            color: white;
-            margin: 0;
-            font-size: 1.5em;
-        }
+/* Chat Header */
+h2 {
+    text-align: center;
+    padding: 20px;
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+    margin: 0;
+    font-size: 1.5em;
+    position: relative;
+}
 
-        .messages {
-            flex: 1;
-            padding: 20px;
-            overflow-y: auto;
-            background: #f9fafb;
-            border-bottom: 1px solid #e2e8f0;
-        }
+h2 a {
+    font-size: 0.8em;
+    margin-left: 10px;
+    color: #ffffff;
+    text-decoration: none;
+    background-color: #3498db;
+    padding: 5px 10px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
 
-        .message {
-            margin-bottom: 15px;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-        }
+h2 a:hover {
+    background-color: #2980b9;
+}
 
-        .message.sent {
-            align-items: flex-end;
-        }
+/* Messages Section */
+.messages {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    background: #f9fafb;
+    border-bottom: 1px solid #e2e8f0;
+}
 
-        .message p {
-            max-width: 90%;
-            padding: 12px 16px;
-            border-radius: 12px;
-            background: #007bff;
-            color: white;
-            font-size: 0.95em;
-            word-wrap: break-word;
-            position: relative;
-            animation: fadeIn 0.3s ease;
-        }
+.message {
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
 
-        .message.received p {
-            background: #e2e8f0;
-            color: #2d3748;
-        }
+.message.sent {
+    align-items: flex-end;
+}
 
-        .message small {
-            font-size: 0.8em;
-            color: #718096;
-            margin-top: 4px;
-        }
+.message p {
+    max-width: 90%;
+    padding: 12px 16px;
+    border-radius: 12px;
+    background: #007bff;
+    color: white;
+    font-size: 0.95em;
+    word-wrap: break-word;
+    position: relative;
+    animation: fadeIn 0.3s ease;
+}
 
-        .chat-input {
-            display: flex;
-            gap: 10px;
-            padding: 20px;
-            background: #ffffff;
-            border-top: 1px solid #e2e8f0;
-        }
+.message.received p {
+    background: #e2e8f0;
+    color: #2d3748;
+}
 
-        .chat-input textarea {
-            flex: 1;
-            padding: 12px;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            font-size: 1em;
-            resize: none;
-            outline: none;
-            transition: border-color 0.3s ease;
-        }
+.message small {
+    font-size: 0.8em;
+    color: #718096;
+    margin-top: 4px;
+}
 
-        .chat-input textarea:focus {
-            border-color: #007bff;
-        }
+/* Chat Input Form */
+.chat-input {
+    display: flex;
+    gap: 10px;
+    padding: 20px;
+    background: #ffffff;
+    border-top: 1px solid #e2e8f0;
+}
 
-        .chat-input input[type="file"] {
-            display: none;
-        }
+.chat-input textarea {
+    flex: 1;
+    padding: 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 1em;
+    resize: none;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
 
-        .chat-input label {
-            padding: 12px 16px;
-            background: #e2e8f0;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background 0.3s ease;
-            display: inline-block;
-        }
+.chat-input textarea:focus {
+    border-color: #007bff;
+}
 
-        .chat-input label:hover {
-            background: #cbd5e0;
-        }
+.chat-input input[type="file"] {
+    display: none;
+}
 
-        .chat-input button {
-            padding: 12px 20px;
-            background: #007bff;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1em;
-            transition: background 0.3s ease;
-        }
+.chat-input label {
+    padding: 12px 16px;
+    background: #e2e8f0;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    display: inline-block;
+}
 
-        .chat-input button:hover {
-            background: #0056b3;
-        }
+.chat-input label:hover {
+    background: #cbd5e0;
+}
 
-        .google-meet-btn {
-            display: block;
-            text-align: center;
-            padding: 12px 20px;
-            background: #34a853;
-            color: white;
-            text-decoration: none;
-            border-radius: 8px;
-            margin: 20px;
-            font-size: 1em;
-            font-weight: bold;
-            transition: background 0.3s ease;
-        }
-
-        .google-meet-btn:hover {
-            background: #2c8a45;
-        }
-
-        .back-link {
-            text-align: center;
-            margin-top: 16px;
-            margin-bottom: 8px;
-        }
-
-        .back-link a {
-            color: #3498db;
-            background-color: #a9eabbe8;
-            padding: 8px;
-            border-radius: 8px;
-            font-weight: 600;
-            transition: color 0.3s ease;
-            text-decoration: none;
-        }
-
-        .back-link a:hover {
-            color: #276d9c;
-        }
-
-        .add-user-section {
-            text-align: center;
-            margin: 20px;
-        }
-
-        .add-user-btn {
-            padding: 12px 20px;
-            background-color: #34a853;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 1em;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        .add-user-btn:hover {
-            background-color: #2c8a45;
-        }
-
-
-        .add-remove-user-section {
-            text-align: center;
-            margin: 20px;
-        }
-
-        .add-user-btn {
+.chat-input button {
     padding: 12px 20px;
-    background-color: #34a853;
-        color: white;
-        border: none;
-        border-radius: 8px;
-        font-size: 1em;
-        font-weight: bold;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-    }
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background 0.3s ease;
+}
 
-    .add-user-btn:hover {
-        background-color: #2c8a45;
-    }
+.chat-input button:hover {
+    background: #0056b3;
+}
 
-    .remove-user-btn {
-        padding: 12px 20px;
-        background-color: #e74c3c;
-        color: white;
-        border: none;
-        border-radius: 8px;
-        font-size: 1em;
-        font-weight: bold;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-    }
+/* Google Meet Button */
+.google-meet-btn {
+    display: block;
+    text-align: center;
+    padding: 12px 20px;
+    background: #34a853;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    margin: 20px;
+    font-size: 1em;
+    font-weight: bold;
+    transition: background 0.3s ease;
+}
 
-    .remove-user-btn:hover {
-        background-color: #c0392b;
-    }
+.google-meet-btn:hover {
+    background: #2c8a45;
+}
 
-    .add-task-partner-section {
+/* Back Link */
+.back-link {
+    text-align: center;
+    margin-top: 16px;
+    margin-bottom: 8px;
+}
+
+.back-link a {
+    color: #3498db;
+    background-color: #a9eabbe8;
+    padding: 8px;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: color 0.3s ease;
+    text-decoration: none;
+}
+
+.back-link a:hover {
+    color: #276d9c;
+}
+
+/* Add/Remove User Buttons */
+.add-remove-user-section {
     text-align: center;
     margin: 20px;
 }
 
-.add-task-partner-btn {
+.add-user-btn,
+.remove-user-btn {
     padding: 12px 20px;
-    background-color: #3498db;
-    color: white;
     border: none;
     border-radius: 8px;
     font-size: 1em;
     font-weight: bold;
     cursor: pointer;
     transition: background-color 0.3s ease;
+}
+
+.add-user-btn {
+    background-color: #34a853;
+    color: white;
+}
+
+.add-user-btn:hover {
+    background-color: #2c8a45;
+}
+
+.remove-user-btn {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.remove-user-btn:hover {
+    background-color: #c0392b;
+}
+
+/* Add/Remove Task Partner Buttons */
+.add-task-partner-section {
+    text-align: center;
+    margin: 20px;
+}
+
+.add-task-partner-btn,
+.remove-task-partner-btn {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.add-task-partner-btn {
+    background-color: #3498db;
+    color: white;
 }
 
 .add-task-partner-btn:hover {
@@ -262,38 +264,44 @@
 }
 
 .remove-task-partner-btn {
-    padding: 12px 20px;
     background-color: #e74c3c;
     color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 1em;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
 }
 
 .remove-task-partner-btn:hover {
     background-color: #c0392b;
 }
 
-        /* Animations */
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
 
-        @media (max-width: 600px) {
-            .message p {
-                max-width: 100%;
-            }
-        }
+/* Responsive Design */
+@media (max-width: 600px) {
+    .message p {
+        max-width: 100%;
+    }
+
+    .chat-input {
+        flex-direction: column;
+    }
+
+    .chat-input textarea {
+        width: 100%;
+    }
+
+    .chat-input button {
+        width: 100%;
+    }
+}
     </style>
  
     <script>
@@ -302,9 +310,11 @@
 </head>
 <body>
     <div class="chat-container">
-        <div class="back-link">
-            <a href="{% url 'task_detail' task.id %}">View Task</a>
-        </div>
+        {% if task.id %}
+            <div class="back-link">
+                <a href="{% url 'task_detail' task.id %}">View Task</a>
+            </div>
+        {% endif %}
 
         <!-- Add/Remove User to/from Allowed Users Buttons -->
         {% if task.user == request.user and receiver != request.user %}

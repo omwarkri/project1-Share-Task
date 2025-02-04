@@ -24,7 +24,7 @@ from django.db.models import Q
 from django.contrib.auth import get_user_model
 from user.models import CustomUser
 from django.db.models import Q
-
+from chat.views import all_chats
 User = get_user_model()
 
 from django.contrib.auth import get_user_model
@@ -76,29 +76,74 @@ def get_suggested_users(task, current_user):
 
 from .forms import TaskForm
 
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from .models import Task
+from .forms import TaskForm
+
 @login_required
 def home(request):
+    # Get filter parameters from the request
+    status_filter = request.GET.get('status', None)
+    priority_filter = request.GET.get('priority', None)
+
+    # Start with tasks for the logged-in user
     tasks = Task.objects.filter(user=request.user)
-    form = TaskForm(request.POST)
-    # print(tasks[0].task_partner,"task partner ")
+
+    # Apply status filter if provided
+    if status_filter:
+        tasks = tasks.filter(status=status_filter)
+
+    # Apply priority filter if provided
+    if priority_filter:
+        tasks = tasks.filter(priority=priority_filter)
+
+    # Order tasks by status and priority
+    # Custom order for status: pending -> in_progress -> completed -> archived
+    status_order = {
+        'pending': 0,
+        'in_progress': 1,
+        'completed': 2,
+        'archived': 3,
+    }
+
+    # Custom order for priority: critical -> high -> medium -> low
+    priority_order = {
+        'critical': 0,
+        'high': 1,
+        'medium': 2,
+        'low': 3,
+    }
+
+    # Annotate tasks with custom ordering values
+    tasks = sorted(
+        tasks,
+        key=lambda task: (
+            status_order.get(task.status, 4),  # Sort by status first
+            priority_order.get(task.priority, 4),  # Then sort by priority
+        )
+    )
+
     # Add suggested users to each task
     tasks_with_suggestions = []
     for task in tasks:
-
         response = get_suggested_users(task, request.user)
-
-        print(form)
         tasks_with_suggestions.append({
             'task': task,
             'users_in_progress': response.get("users_in_progress"),
             'users_completed': response.get("users_completed"),
-            
         })
+
+    # Get all chats for the user
+    chats = all_chats(request)
 
     context = {
         'tasks_with_suggestions': tasks_with_suggestions,
         'app_name': 'Share Task',
-        'form': form
+        'form': TaskForm(),
+        'chats': chats,
+        'status_filter': status_filter,
+        'priority_filter': priority_filter,
     }
     return render(request, 'task/home.html', context)
 

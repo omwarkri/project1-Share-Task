@@ -135,7 +135,7 @@ def profile_view(request):
 
         user_badges=user.user_badges.all()
         # Accessing the badges
-        print(user.profile_picture)
+        print(user.profile_picture  )
 
         # Prepare context for the template
         context = {
@@ -151,7 +151,7 @@ def profile_view(request):
         return render(request, 'user/profile.html', context)
 
 
-
+from django.db.models import F
 def profile_view_id(request,user_id):
     user=CustomUser.objects.get(id=user_id)
     print(user)
@@ -212,6 +212,14 @@ def profile_view_id(request,user_id):
         else:
             color_map[activity_date] = "yellow"
 
+    completed_shareable_tasks = Task.objects.filter(
+        user=user,  # Tasks owned by the user
+        status='completed',  # Completed tasks
+        shareable=True  # Shareable tasks
+    ).select_related('completion_details').order_by(
+        F('completion_details__created_at').desc(nulls_last=True)
+    )   
+
     # Fetch partner feedbacks
     feedbacks = PartnerFeedback.objects.filter(partner=request.user)
     user = CustomUser.objects.prefetch_related('user_badges__badge').get(id=user.id)
@@ -220,9 +228,12 @@ def profile_view_id(request,user_id):
     # Accessing the badges
     print(user_badges)
 
+    
+
     # Prepare context for the template
     context = {
         'user': user,
+        'completed_shareable_tasks':completed_shareable_tasks,
         'user_badges':user_badges,
         'dates': dates,
         'color_map': color_map,
@@ -231,4 +242,4 @@ def profile_view_id(request,user_id):
         'feedbacks': feedbacks,
     }
 
-    return render(request, 'user/profile.html', context)
+    return render(request, 'user/profile_id.html', context)

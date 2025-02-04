@@ -28,6 +28,7 @@ class Task(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
     due_date = models.DateTimeField(blank=True, null=True)
+    category = models.CharField(max_length=100,blank=True, null=True)
     priority = models.CharField(
         max_length=10, 
         choices=PRIORITY_CHOICES, 
@@ -177,6 +178,5 @@ class ActivityLog(models.Model):
     def __str__(self):
         return f"{self.user.username} {self.action} on {self.task.title} at {self.timestamp}"
     
-
 
 

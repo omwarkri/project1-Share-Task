@@ -43,10 +43,16 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt.token_blacklist',
     'subscription',
     'chat',
-    'leaderboard'
-    
+    'leaderboard',
+
 ]
 
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',  # Enable JWT authentication
+    ],
+}
 
 
 import os
@@ -230,6 +236,15 @@ LOGOUT_REDIRECT_URL = '/'
 # settings.py
 LOGIN_URL = '/user/login/'  # Replace with your custom login URL
 
+
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),  # Access token lifetime
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),     # Refresh token lifetime
+    'ROTATE_REFRESH_TOKENS': True,                   # Rotate refresh tokens
+    'BLACKLIST_AFTER_ROTATION': True,                # Blacklist old refresh tokens
+}
 
 
 PAYPAL_MODE="sandbox"

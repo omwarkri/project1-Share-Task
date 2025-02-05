@@ -4,26 +4,15 @@
 <div>
     <div class="container">
         <h2>All Tasks</h2>
-        
-        <!-- On-Click Filter Buttons for Status -->
-        <div class="filter-buttons">
-            <h4>Filter by Status:</h4>
-            <button onclick="filterTasks('all', 'all')" class="filter-button">All</button>
-            <button onclick="filterTasks('pending', 'all')" class="filter-button">Pending</button>
-            <button onclick="filterTasks('in_progress', 'all')" class="filter-button">In Progress</button>
-            <button onclick="filterTasks('completed', 'all')" class="filter-button">Completed</button>
-            <button onclick="filterTasks('archived', 'all')" class="filter-button">Archived</button>
-        </div>
 
-        <!-- On-Click Filter Buttons for Priority -->
-        <div class="filter-buttons">
-            <h4>Filter by Priority:</h4>
-            <button onclick="filterTasks('all', 'all')" class="filter-button">All</button>
-            <button onclick="filterTasks('all', 'low')" class="filter-button">Low</button>
-            <button onclick="filterTasks('all', 'medium')" class="filter-button">Medium</button>
-            <button onclick="filterTasks('all', 'high')" class="filter-button">High</button>
-            <button onclick="filterTasks('all', 'critical')" class="filter-button">Critical</button>
-        </div>
+        <div class="filter-section">
+            <h3>Filters</h3>
+            <div class="filter-group">
+                <h4>Sort By:</h4>
+                
+
+        <!-- Button to Open Filter Modal -->
+        <button onclick="openFilterModal()" class="open-filter-modal-button">Open Filters</button>
 
         <a href="#" class="add-task" onclick="openAddTaskModal()">Add a New Task</a>
         <a href="#" class="view-chats-button" onclick="openChatModal()">View All Chats</a>
@@ -32,11 +21,19 @@
             {% for task_data in tasks_with_suggestions %}
                 <li class="task-item" data-status="{{ task_data.task.status }}" data-priority="{{ task_data.task.priority }}">
                     <strong class="task-title">{{ task_data.task.title }}</strong>
-                    <p class="task-status">Status: {{ task_data.task.status }}</p>
-                    <p class="task-priority">Priority: {{ task_data.task.priority }}</p>
+                    <p><strong>Priority:</strong> {{ task_data.task.get_priority_display }}</p>
+                    <p><strong>Status:</strong> {{ task_data.task.get_status_display }}</p>
+                    <p><strong>Due Date:</strong> {{ task_data.task.due_date|date:"F j, Y, g:i a" }}</p>
+
+                    {% if task_data.task.is_overdue %}
+                    <span class="badge badge-danger">Overdue</span>
+                {% elif task_data.task.is_approaching_due_date %}
+                    <span class="badge badge-warning">Approaching Due</span>
+                {% endif %}
 
                     <!-- Suggested Users Button -->
                     <a href="{% url 'suggested_users' task_data.task.id %}" class="suggested-users-button">Find Task Partner</a>
+                   
 
                     <!-- Task Actions -->
                     <div class="button-group">
@@ -140,37 +137,194 @@
 </div>
 {% endfor %}
 
+
+
+<!-- Filter Modal -->
+<div id="filterModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeFilterModal()">&times;</span>
+        <h3>Filters</h3>
+
+        <!-- Sorting Options -->
+        <div class="filter-group">
+            <h4>Sort By:</h4>
+            <div class="filter-options">
+                <select id="sort-by" class="modern-select" onchange="applySorting()">
+                    <option value="title">Title</option>
+                    <option value="due_date">Due Date</option>
+                    <option value="priority">Priority</option>
+                    <option value="status">Status</option>
+                </select>
+                <select id="sort-order" class="modern-select" onchange="applySorting()">
+                    <option value="asc">Ascending</option>
+                    <option value="desc">Descending</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Status Filters -->
+        <div class="filter-group">
+            <h4>Filter by Status:</h4>
+            <div class="filter-buttons">
+                <button onclick="filterTasks('all', 'all')" class="modern-button">All</button>
+                <button onclick="filterTasks('pending', 'all')" class="modern-button">Pending</button>
+                <button onclick="filterTasks('in_progress', 'all')" class="modern-button">In Progress</button>
+                <button onclick="filterTasks('completed', 'all')" class="modern-button">Completed</button>
+                <button onclick="filterTasks('archived', 'all')" class="modern-button">Archived</button>
+            </div>
+        </div>
+
+        <!-- Priority Filters -->
+        <div class="filter-group">
+            <h4>Filter by Priority:</h4>
+            <div class="filter-buttons">
+                <button onclick="filterTasks('all', 'all')" class="modern-button">All</button>
+                <button onclick="filterTasks('all', 'low')" class="modern-button">Low</button>
+                <button onclick="filterTasks('all', 'medium')" class="modern-button">Medium</button>
+                <button onclick="filterTasks('all', 'high')" class="modern-button">High</button>
+                <button onclick="filterTasks('all', 'critical')" class="modern-button">Critical</button>
+            </div>
+        </div>
+
+        <!-- Apply Filters Button -->
+        <!-- <button onclick="applyFilters()" class="apply-filters-button">Apply Filters</button> -->
+    </div>
+</div>
+
 <style>
     /* Add your CSS styles here */
-    .filter-buttons {
-        margin-bottom: 20px;
-    }
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
 
-    .filter-buttons h4 {
-        margin-bottom: 10px;
-        font-size: 16px;
-        color: var(--primary-color);
-    }
+.modal-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    position: relative;
+}
 
-    .filter-button {
-        padding: 8px 16px;
-        margin-right: 10px;
-        background-color: var(--secondary-color);
-        color: white;
-        border: none;
-        border-radius: var(--radius);
-        cursor: pointer;
-        font-size: 14px;
-        transition: var(--transition);
-    }
+.close-modal {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 24px;
+    cursor: pointer;
+    color: #333;
+    transition: all 0.3s ease;
+}
 
-    .filter-button:hover {
-        background-color: #007B9E;
-    }
+.close-modal:hover {
+    color: #007BFF;
+}
 
-    .filter-button.active {
-        background-color: var(--primary-color);
-    }
+/* Filter Section Styles */
+.filter-group {
+    margin-bottom: 20px;
+}
+
+.filter-group h4 {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 10px;
+    font-weight: 500;
+}
+
+.filter-options {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.modern-select {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #333;
+    background-color: #f9f9f9;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.modern-select:hover {
+    border-color: #007BFF;
+    background-color: #fff;
+}
+
+.filter-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.modern-button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 8px;
+    background-color: #f1f1f1;
+    color: #333;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.modern-button:hover {
+    background-color: #007BFF;
+    color: #fff;
+    transform: translateY(-2px);
+}
+
+.modern-button.active {
+    background-color: #007BFF;
+    color: #fff;
+}
+
+/* Apply Filters Button */
+.apply-filters-button {
+    width: 100%;
+    padding: 10px;
+    background-color: #007BFF;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.apply-filters-button:hover {
+    background-color: #0056b3;
+}
+
+/* Open Filter Modal Button */
+.open-filter-modal-button {
+    padding: 10px 20px;
+    background-color: #007BFF;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.open-filter-modal-button:hover {
+    background-color: #0056b3;
+}
      /* CSS Variables for Consistent Styling */
      :root {
         --primary-color: #4CAF50; /* Green */
@@ -182,6 +336,18 @@
         --shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         --radius: 6px;
         --transition: all 0.2s ease;
+    }
+
+    .badge-danger{
+        background-color: #e4706e;
+        color: #ddd;
+        padding: 6px;
+        border-radius: 8px  ;
+
+    }
+
+    .badge-warning{
+        background-color: rgb(255, 255, 176);
     }
 
     /* General Styles */
@@ -436,37 +602,93 @@
 </style>
 
 <script>
+    function openFilterModal() {
+    document.getElementById('filterModal').style.display = 'flex';
+}
+
+// Close Filter Modal
+function closeFilterModal() {
+    document.getElementById('filterModal').style.display = 'none';
+}
+function applyFilters() {
+    const sortBy = document.getElementById('sort-by').value;
+    const sortOrder = document.getElementById('sort-order').value;
+    applySorting(sortBy, sortOrder);
+    closeFilterModal();
+}
+
+function applySorting() {
+        const sortBy = document.getElementById('sort-by').value;
+        const order = document.getElementById('sort-order').value;
+
+
+        const taskItems = Array.from(document.querySelectorAll('.task-item'));
+
+        taskItems.sort((a, b) => {
+            let aValue, bValue;
+
+            switch (sortBy) {
+                case 'title':
+                    aValue = a.getAttribute('data-title').toLowerCase();
+                    bValue = b.getAttribute('data-title').toLowerCase();
+                    break;
+                case 'due_date':
+                    aValue = parseInt(a.getAttribute('data-due-date'));
+                    bValue = parseInt(b.getAttribute('data-due-date'));
+                    break;
+                case 'priority':
+                    aValue = a.getAttribute('data-priority');
+                    bValue = b.getAttribute('data-priority');
+                    break;
+                case 'status':
+                    aValue = a.getAttribute('data-status');
+                    bValue = b.getAttribute('data-status');
+                    break;
+                default:
+                    aValue = 0;
+                    bValue = 0;
+            }
+
+            if (order === 'asc') {
+                return aValue > bValue ? 1 : -1;
+            } else {
+                return aValue < bValue ? 1 : -1;
+            }
+        });
+
+        const taskList = document.getElementById('task-list');
+        taskList.innerHTML = '';
+        taskItems.forEach(task => taskList.appendChild(task));
+    }
     // Function to filter tasks by status and priority
     function filterTasks(status, priority) {
-        const taskItems = document.querySelectorAll('.task-item');
+            const taskItems = document.querySelectorAll('.task-item');
 
-        taskItems.forEach(task => {
-            const taskStatus = task.getAttribute('data-status');
-            const taskPriority = task.getAttribute('data-priority');
+            taskItems.forEach(task => {
+                const taskStatus = task.getAttribute('data-status');
+                const taskPriority = task.getAttribute('data-priority');
 
-            const statusMatch = status === 'all' || taskStatus === status;
-            const priorityMatch = priority === 'all' || taskPriority === priority;
+                const statusMatch = status === 'all' || taskStatus === status;
+                const priorityMatch = priority === 'all' || taskPriority === priority;
 
-            if (statusMatch && priorityMatch) {
-                task.style.display = 'block'; // Show the task
-            } else {
-                task.style.display = 'none'; // Hide the task
-            }
-        });
+                if (statusMatch && priorityMatch) {
+                    task.style.display = 'block';
+                } else {
+                    task.style.display = 'none';
+                }
+            });
 
-        // Highlight the active filter buttons
-        const filterButtons = document.querySelectorAll('.filter-button');
-        filterButtons.forEach(button => {
-            const buttonStatus = button.getAttribute('data-status') || 'all';
-            const buttonPriority = button.getAttribute('data-priority') || 'all';
-
-            if ((buttonStatus === status && buttonPriority === 'all') || (buttonPriority === priority && buttonStatus === 'all')) {
-                button.classList.add('active');
-            } else {
+            // Highlight active filter buttons
+            const filterButtons = document.querySelectorAll('.modern-button');
+            filterButtons.forEach(button => {
                 button.classList.remove('active');
-            }
-        });
-    }
+            });
+
+            const activeButtons = document.querySelectorAll(`.modern-button[onclick*="'${status}'"], .modern-button[onclick*="'${priority}'"]`);
+            activeButtons.forEach(button => {
+                button.classList.add('active');
+            });
+        }
 
     // JavaScript functions for modals
     function openAddTaskModal() {

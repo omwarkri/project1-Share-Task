@@ -81,6 +81,12 @@ from django.contrib.auth.decorators import login_required
 from .models import Task
 from .forms import TaskForm
 
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from .models import Task
+from .forms import TaskForm  # Ensure you have the TaskForm for creating tasks
+
+
 @login_required
 def home(request):
     # Get filter parameters from the request
@@ -146,6 +152,7 @@ def home(request):
         'priority_filter': priority_filter,
     }
     return render(request, 'task/home.html', context)
+
 
 
 

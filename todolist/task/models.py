@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth import get_user_model  # Dynamically fetches the user model
 from user.models import CustomUser
+from datetime import timedelta
 from django.utils import timezone
 
 
@@ -58,8 +59,23 @@ class Task(models.Model):
     def __str__(self):
         return self.title
 
+
+
+    def is_overdue(self):
+        if self.due_date and self.due_date < timezone.now():
+            return True
+        return False
+
+    def is_approaching_due_date(self):
+        if self.due_date and self.due_date - timezone.now() <= timedelta(days=2):
+            return True
+        return False
+
     class Meta:
-        ordering = ['-created_at']  # Orders tasks by creation date (newest first)
+        ordering = ['-created_at'] 
+
+
+
 
 class PartnerFeedback(models.Model):
     task = models.ForeignKey(

@@ -64,6 +64,7 @@ from .forms import ProfileUpdateForm
 
 @login_required
 def profile_view(request):
+    print("hii")
 
     if request.method == 'POST':
         form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user)
@@ -243,3 +244,34 @@ def profile_view_id(request,user_id):
     }
 
     return render(request, 'user/profile_id.html', context)
+
+
+
+
+# views.py
+
+from rest_framework import generics, permissions
+from rest_framework.response import Response
+from rest_framework_simplejwt.views import TokenObtainPairView
+from .serializers import UserRegistrationSerializer, CustomTokenObtainPairSerializer
+from .models import CustomUser
+
+class UserRegistrationView(generics.CreateAPIView):
+    queryset = CustomUser.objects.all()
+    serializer_class = UserRegistrationSerializer
+    permission_classes = [permissions.AllowAny]
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
+
+# views.py
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+
+class ProtectedView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        return Response({"message": "This is a protected view!"})

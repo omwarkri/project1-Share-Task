@@ -23,19 +23,21 @@
             font-size: 2.5rem;
             margin-bottom: 20px;
             text-align: center;
+            font-weight: 700;
         }
 
         h2 {
             color: #2c3e50;
             font-size: 1.8rem;
             margin-bottom: 15px;
+            font-weight: 600;
         }
 
         .task-detail {
             background: #fff;
             padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
             width: 90%;
             max-width: 800px;
             margin: 20px auto;
@@ -50,6 +52,7 @@
 
         .task-detail strong {
             color: #2c3e50;
+            font-weight: 600;
         }
 
         .task-detail form {
@@ -110,7 +113,7 @@
 
         .completion-detail {
             margin-top: 25px;
-            background: #e8f5e9;
+            background: linear-gradient(135deg, #e8f5e9, #d4edda);
             padding: 20px;
             border-radius: 12px;
         }
@@ -202,37 +205,103 @@
             color: #45a049;
         }
 
-        /* tasks/static/tasks/styles.css */
-.activity-log {
-    margin-top: 25px;
-    padding: 20px;
-    background: #f8f9fa;
-    border-radius: 12px;
-}
+        /* Subtasks Section */
+        .subtask {
+            margin-top: 25px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+        }
 
-.activity-log h3 {
-    color: #2c3e50;
-    font-size: 1.4rem;
-    margin-bottom: 15px;
-}
+        .subtask h3 {
+            color: #2c3e50;
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+        }
 
-.activity-log ul {
-    list-style-type: none;
-    padding: 0;
-}
+        .subtask ul {
+            list-style-type: none;
+            padding: 0;
+        }
 
-.activity-log li {
-    background: #fff;
-    padding: 15px;
-    border-radius: 8px;
-    margin-bottom: 10px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
+        .subtask li {
+            background: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
-.activity-log small {
-    color: #777;
-    font-size: 0.9rem;
-}
+        .subtask input[type="checkbox"] {
+            cursor: pointer;
+        }
+
+        /* Activity Log Section */
+        .activity-log {
+            margin-top: 25px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+        }
+
+        .activity-log h3 {
+            color: #2c3e50;
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+        }
+
+        .activity-log ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .activity-log li {
+            background: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .activity-log small {
+            color: #777;
+            font-size: 0.9rem;
+        }
+
+        /* Comments Section */
+        .comments-section {
+            margin-top: 25px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+        }
+
+        .comments-section h2 {
+            color: #2c3e50;
+            font-size: 1.6rem;
+            margin-bottom: 15px;
+        }
+
+        .comments-section ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .comments-section li {
+            background: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .comments-section small {
+            color: #777;
+            font-size: 0.9rem;
+        }
     </style>
 </head>
 <body>
@@ -268,7 +337,6 @@
             </form>
         </div>
 
-        <!-- tasks/task_detail.html -->
         <div class="activity-log">
             <h3>Activity Log</h3>
             <ul>
@@ -324,19 +392,19 @@
                     </video>
                 {% endif %}
             
-                {% if task.user %}
+                {% if task.user and task.user != request.user %}
                     <h3>Task Completed By: {{ task.user.username }}</h3>
                     <!-- Chat Button -->
-                    <a href="{% url 'chat' task.id task.user.id %}" class="chat-button">Chat with {{ task.user.username }}</a>
+                    <a href="{% url 'chat' task.user.id %}?task_id={{task.id}}&task_title={{ task.title}}" class="chat-button">Chat with {{ task.user.username }}</a>
                 {% endif %}
             </div>
             
         {% else %}
             <!-- Show Edit Button if user is the creator -->
-            {% if task.user == user %}
+            {% if task.user == request.user %}
                 <button id="editBtn" onclick="toggleEditForm()">Edit Task</button>
 
-                {% if user.subscription.is_subscription_valid %}
+                {% if request.user.subscription.is_subscription_valid %}
                     <div id="editForm" style="display:none;">
                         <h2>Edit Task</h2>
                         <form method="post">

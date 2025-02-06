@@ -648,3 +648,48 @@ def update_task_dependencies(request, task_id):
         form = TaskDependenciesForm(instance=task)
     
     return render(request, 'task/task_detail.html', {'form': form, 'task': task})
+
+
+# views.py
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+from .models import Task, TaskNotes
+from .forms import TaskNotesForm
+
+@login_required
+def add_task_note(request, task_id):
+    task = get_object_or_404(Task, id=task_id)
+    if request.method == 'POST':
+        form = TaskNotesForm(request.POST)
+        if form.is_valid():
+            note = form.save(commit=False)
+            note.task = task
+            note.user = request.user
+            note.save()
+            return redirect('task_detail', task_id=task.id)
+    else:
+        form = TaskNotesForm()
+    return render(request, 'task/task_detail.html', {'form': form, 'task': task})   
+
+
+
+# views.py
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+from .models import Task, TaskNotes
+from .forms import TaskNotesForm
+
+@login_required
+def add_task_note(request, task_id):
+    task = get_object_or_404(Task, id=task_id)
+    if request.method == 'POST':
+        form = TaskNotesForm(request.POST)
+        if form.is_valid():
+            note = form.save(commit=False)
+            note.task = task
+            note.user = request.user
+            note.save()
+            return redirect('task_detail', task_id=task.id)
+    else:
+        form = TaskNotesForm()
+    return render(request, 'task/task_detail.html', {'form': form, 'task': task})

@@ -337,6 +337,33 @@
             </form>
         </div>
 
+
+        <div class="add-note-section">
+            <h3>Add a Note</h3>
+            <form method="POST" action="{% url 'add_task_note' task.id %}">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="submit-button">Add Note</button>
+            </form>
+        </div>
+    
+        <!-- Display Existing Notes -->
+        <div class="notes-section">
+            <h3>Notes</h3>
+            {% if task.task_notes.all %}
+                <ul class="notes-list">
+                    {% for note in task.task_notes.all %}
+                        <li class="note-item">
+                            <p>{{ note.note_text }}</p>
+                            <small>Added by {{ note.user.username }} on {{ note.created_at|date:"F j, Y, g:i a" }}</small>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No notes added yet.</p>
+            {% endif %}
+        </div>
+
         <div class="activity-log">
             <h3>Activity Log</h3>
             <ul>

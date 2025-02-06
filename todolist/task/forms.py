@@ -53,3 +53,16 @@ class SubTaskForm(forms.ModelForm):
             }),
         }
 
+
+
+# forms.py
+from django import forms
+from .models import TaskNotes
+
+class TaskNotesForm(forms.ModelForm):
+    class Meta:
+        model = TaskNotes
+        fields = ['note_text']
+        widgets = {
+            'note_text': forms.Textarea(attrs={'rows': 4, 'placeholder': 'Add a note...'}),
+        }

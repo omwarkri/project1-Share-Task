@@ -28,6 +28,11 @@ from django.core.management import call_command
 from django.contrib.auth import get_user_model
 from django.http import HttpResponse
 
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
+
 def create_superuser(request):
     User = get_user_model()
     username = "admin"
@@ -58,6 +63,7 @@ urlpatterns = [
     path('',include('subscription.urls')),
     path('',include('chat.urls')),
     path('',include('leaderboard.urls')),
+    path('',include('task.urls')),
     path('share-task/<int:task_id>/', complete_task, name='complete_task'),
     path('task/<int:task_id>/suggested_users/', suggested_users, name='suggested_users'),
     path('task/<int:task_id>/add_subtask/', add_subtask, name='add_subtask'),
@@ -66,6 +72,8 @@ urlpatterns = [
     path('task/<int:task_id>/remove-allowed-user/<int:user_id>/', remove_allowed_user, name='remove_allowed_user'),
     path('task/<int:task_id>/add_task_partner/<int:user_id>/', add_task_partner, name='add_task_partner'),
     path('task/<int:task_id>/remove_task_partner/', remove_task_partner, name='remove_task_partner'),
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),  # Obtain JWT token
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 

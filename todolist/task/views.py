@@ -79,22 +79,28 @@ from .forms import TaskForm
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from .models import Task
-from .forms import TaskForm
+from .forms import TaskForm,TaskDependenciesForm
 
-from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
-from .models import Task
-from .forms import TaskForm  # Ensure you have the TaskForm for creating tasks
+    
+
 
 
 @login_required
 def home(request):
-    # Get filter parameters from the request
+    # Get filter and sorting parameters from the request
     status_filter = request.GET.get('status', None)
     priority_filter = request.GET.get('priority', None)
-
+    sort_by = request.GET.get('sort_by', 'created_at')  # Default: Sort by creation date
+    order = request.GET.get('order', 'desc')  # Default: Descending order
+    search_query = request.GET.get('q', None)  # Search query for tasks
     # Start with tasks for the logged-in user
     tasks = Task.objects.filter(user=request.user)
+
+    if search_query:
+        tasks = tasks.filter(
+            Q(title__icontains=search_query) |
+            Q(description__icontains=search_query)
+        )
 
     # Apply status filter if provided
     if status_filter:
@@ -104,31 +110,27 @@ def home(request):
     if priority_filter:
         tasks = tasks.filter(priority=priority_filter)
 
-    # Order tasks by status and priority
-    # Custom order for status: pending -> in_progress -> completed -> archived
-    status_order = {
-        'pending': 0,
-        'in_progress': 1,
-        'completed': 2,
-        'archived': 3,
+    # Define sorting fields
+    sorting_fields = {
+        'title': 'title',
+        'created_at': 'created_at',
+        'due_date': 'due_date',
+        'priority': 'priority',
+        'status': 'status',
     }
 
-    # Custom order for priority: critical -> high -> medium -> low
-    priority_order = {
-        'critical': 0,
-        'high': 1,
-        'medium': 2,
-        'low': 3,
-    }
+    # Validate sorting field
+    if sort_by not in sorting_fields:
+        sort_by = 'created_at'  # Default to sorting by creation date if invalid
 
-    # Annotate tasks with custom ordering values
-    tasks = sorted(
-        tasks,
-        key=lambda task: (
-            status_order.get(task.status, 4),  # Sort by status first
-            priority_order.get(task.priority, 4),  # Then sort by priority
-        )
-    )
+    # Determine the sorting order
+    if order == 'desc':
+        sort_by = f'-{sorting_fields[sort_by]}'  # Add '-' for descending order
+    else:
+        sort_by = sorting_fields[sort_by]  # Ascending order
+
+    # Apply sorting to the tasks
+    tasks = tasks.order_by(sort_by)
 
     # Add suggested users to each task
     tasks_with_suggestions = []
@@ -143,6 +145,8 @@ def home(request):
     # Get all chats for the user
     chats = all_chats(request)
 
+    TaskDependencies = TaskDependenciesForm(instance=task)
+
     context = {
         'tasks_with_suggestions': tasks_with_suggestions,
         'app_name': 'Share Task',
@@ -150,8 +154,36 @@ def home(request):
         'chats': chats,
         'status_filter': status_filter,
         'priority_filter': priority_filter,
+        'sort_by': sort_by.lstrip('-'),  # Remove '-' for display purposes
+        'order': order,
+        'search_query': search_query,
+        'TaskDependenciesForm':TaskDependencies
     }
     return render(request, 'task/home.html', context)
+
+
+from django.http import JsonResponse
+from django.views.decorators.http import require_GET
+from django.contrib.auth.decorators import login_required
+
+@login_required
+@require_GET
+def search_tasks(request):
+    query = request.GET.get('q', '')
+    tasks = Task.objects.filter(user=request.user, title__icontains=query) if query else Task.objects.filter(user=request.user)
+    
+    task_data = [
+        {
+            "id": task.id,
+            "title": task.title,
+            "priority": task.get_priority_display(),
+            "status": task.get_status_display(),
+            "due_date": task.due_date.strftime("%B %d, %Y, %I:%M %p") if task.due_date else "N/A",
+        }
+        for task in tasks
+    ]
+    
+    return JsonResponse({"tasks": task_data})
 
 
 
@@ -449,75 +481,85 @@ from .models import Task, TaskCompletionDetails, PartnerFeedback, ActivityLog
 def complete_task(request, task_id):
     task = get_object_or_404(Task, id=task_id)
 
-    if request.method == 'POST':
-        skip_sharing = request.POST.get('skip_sharing')
+    
 
-        if skip_sharing:
+
+    if request.method == 'POST':
+
+        if task.can_be_completed():
+            skip_sharing = request.POST.get('skip_sharing')
+
+            if skip_sharing:
+                task.status = 'completed'
+                task.save()
+
+                # Log the task completion
+                ActivityLog.objects.create(
+                    task=task,
+                    user=request.user,
+                    action='completed',
+                    details=f"Task '{task.title}' was marked as completed without sharing details."
+                )
+
+                # Increment user score
+                task.user.score += 1
+                task.user.save()
+
+                messages.success(request, 'Task marked as completed without sharing completion details.')
+                return redirect('task_detail', task_id=task.id)
+
+            # Save completion details
+            completion_details = request.POST.get('completion_details')
+            uploaded_image = request.FILES.get('uploaded_image')
+            uploaded_file = request.FILES.get('uploaded_file')
+
+            completion = TaskCompletionDetails.objects.create(
+                task=task,
+                completion_details=completion_details,
+                uploaded_image=uploaded_image,
+                uploaded_file=uploaded_file
+            )
+
             task.status = 'completed'
             task.save()
+
+            # Save partner feedback if provided
+            partner_rating = request.POST.get('partner_rating')
+            partner_comment = request.POST.get('partner_comment')
+            if partner_rating and partner_comment and task.task_partner:
+                partner_feedback = PartnerFeedback.objects.create(
+                    task=task,
+                    partner=task.task_partner,
+                    rating=partner_rating,
+                    comment=partner_comment
+                )
+                completion.partner_feedback = partner_feedback
+                completion.save()
+
+            # Award points to the task partner (if any)
+            if task.task_partner:
+                task.task_partner.score += 5  # Example: 5 points for helping
+                task.task_partner.save()
 
             # Log the task completion
             ActivityLog.objects.create(
                 task=task,
                 user=request.user,
                 action='completed',
-                details=f"Task '{task.title}' was marked as completed without sharing details."
+                details=f"Task '{task.title}' was completed with details shared."
             )
 
             # Increment user score
             task.user.score += 1
             task.user.save()
 
-            messages.success(request, 'Task marked as completed without sharing completion details.')
+            messages.success(request, 'Task completed and details shared successfully.')
             return redirect('task_detail', task_id=task.id)
-
-        # Save completion details
-        completion_details = request.POST.get('completion_details')
-        uploaded_image = request.FILES.get('uploaded_image')
-        uploaded_file = request.FILES.get('uploaded_file')
-
-        completion = TaskCompletionDetails.objects.create(
-            task=task,
-            completion_details=completion_details,
-            uploaded_image=uploaded_image,
-            uploaded_file=uploaded_file
-        )
-
-        task.status = 'completed'
-        task.save()
-
-        # Save partner feedback if provided
-        partner_rating = request.POST.get('partner_rating')
-        partner_comment = request.POST.get('partner_comment')
-        if partner_rating and partner_comment and task.task_partner:
-            partner_feedback = PartnerFeedback.objects.create(
-                task=task,
-                partner=task.task_partner,
-                rating=partner_rating,
-                comment=partner_comment
-            )
-            completion.partner_feedback = partner_feedback
-            completion.save()
-
-         # Award points to the task partner (if any)
-        if task.task_partner:
-            task.task_partner.score += 5  # Example: 5 points for helping
-            task.task_partner.save()
-
-        # Log the task completion
-        ActivityLog.objects.create(
-            task=task,
-            user=request.user,
-            action='completed',
-            details=f"Task '{task.title}' was completed with details shared."
-        )
-
-        # Increment user score
-        task.user.score += 1
-        task.user.save()
-
-        messages.success(request, 'Task completed and details shared successfully.')
-        return redirect('task_detail', task_id=task.id)
+        
+        else:
+            # Inform the user that task cannot be completed due to pending dependencies
+            messages.error(request, "Cannot complete this task as some dependencies are not yet completed.")
+        
 
     return render(request, 'task/task_detail.html', {'task': task})
 
@@ -564,3 +606,45 @@ def remove_task_partner(request, task_id):
         task.save()
 
     return redirect('chat', task_id=task_id, receiver_id=task.task_partner.id if task.task_partner else None)
+
+
+
+from django.shortcuts import render, get_object_or_404
+from django.http import HttpResponseRedirect
+from .forms import TaskDependenciesForm
+from .models import Task
+from django.urls import reverse
+
+
+
+
+from django.http import JsonResponse
+from .models import Task
+
+def get_task_dependencies(request, task_id):
+    task = Task.objects.get(id=task_id)
+    dependencies = task.dependencies.all()
+    all_tasks = Task.objects.exclude(id=task_id)  # Exclude the current task
+
+    data = {
+        'dependencies': [{'id': dep.id, 'title': dep.title} for dep in dependencies],
+        'all_tasks': [{'id': task.id, 'title': task.title} for task in all_tasks],
+    }
+    return JsonResponse(data)
+
+
+from django.shortcuts import get_object_or_404, redirect
+from .models import Task
+
+def update_task_dependencies(request, task_id):
+    print(task_id)
+    task = get_object_or_404(Task, id=task_id)
+    if request.method == 'POST':
+        form = TaskDependenciesForm(request.POST, instance=task)
+        if form.is_valid():
+            form.save()
+            return redirect('home')
+    else:
+        form = TaskDependenciesForm(instance=task)
+    
+    return render(request, 'task/task_detail.html', {'form': form, 'task': task})

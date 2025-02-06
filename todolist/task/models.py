@@ -21,45 +21,26 @@ class Task(models.Model):
     ]
 
     user = models.ForeignKey(
-        CustomUser, 
-        related_name='task_user', 
-        on_delete=models.CASCADE, 
+        CustomUser,
+        related_name='task_user',
+        on_delete=models.CASCADE,
         default=1
     )
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
     due_date = models.DateTimeField(blank=True, null=True)
-    category = models.CharField(max_length=100,blank=True, null=True)
-    priority = models.CharField(
-        max_length=10, 
-        choices=PRIORITY_CHOICES, 
-        default='medium'
-    )
-    status = models.CharField(
-        max_length=15, 
-        choices=STATUS_CHOICES, 
-        default='pending'
-    )
-    allowed_users = models.ManyToManyField(
-        CustomUser, 
-        related_name='allowed_tasks', 
-        blank=True
-    )  # Users allowed to access the task
-    task_partner = models.ForeignKey(
-        CustomUser, 
-        related_name='partnered_tasks', 
-        on_delete=models.SET_NULL, 
-        null=True, 
-        blank=True
-    )  # User who partnered to complete the task
-    shareable = models.BooleanField(default=True)  # Flag to indicate if the task is shareable
+    category = models.CharField(max_length=100, blank=True, null=True)
+    priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default='medium')
+    status = models.CharField(max_length=15, choices=STATUS_CHOICES, default='pending')
+    allowed_users = models.ManyToManyField(CustomUser, related_name='allowed_tasks', blank=True)
+    task_partner = models.ForeignKey(CustomUser, related_name='partnered_tasks', on_delete=models.SET_NULL, null=True, blank=True)
+    shareable = models.BooleanField(default=True)
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
+    dependencies = models.ManyToManyField('self', through='TaskDependency', symmetrical=False, related_name='dependent_tasks')
 
     def __str__(self):
         return self.title
-
-
 
     def is_overdue(self):
         if self.due_date and self.due_date < timezone.now():
@@ -70,9 +51,18 @@ class Task(models.Model):
         if self.due_date and self.due_date - timezone.now() <= timedelta(days=2):
             return True
         return False
+    
+
+    def can_be_completed(self):
+        if self.dependencies.exists():
+            for dependency in self.dependencies.all():
+                if dependency.status != 'completed':
+                    return False  # Block completion if any dependency is not completed
+        return True
+
 
     class Meta:
-        ordering = ['-created_at'] 
+        ordering = ['-created_at']
 
 
 
@@ -196,3 +186,23 @@ class ActivityLog(models.Model):
     
 
 
+class TaskNotes(models.Model):
+    task = models.ForeignKey(Task, related_name='task_notes', on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True)
+    note_text = models.TextField()
+    created_at = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f"Note for {self.task.title} by {self.user.username if self.user else 'N/A'}"
+
+
+class TaskDependency(models.Model):
+    task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name='task_dependencies')
+    dependent_on = models.ForeignKey(Task, on_delete=models.CASCADE, related_name='dependent_task_dependencies')
+    created_at = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f"{self.task.title} depends on {self.dependent_on.title}"
+
+    class Meta:
+        unique_together = ('task', 'dependent_on')  # Prevents duplicate dependencies

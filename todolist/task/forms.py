@@ -1,19 +1,28 @@
 from django import forms
 from .models import Task
 
+
 class TaskForm(forms.ModelForm):
     class Meta:
         model = Task
-        fields = ['title', 'description', 'due_date', 'priority', 'status','category']
-        widgets = {
-            'due_date': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
-        }
-    
-    
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        for field_name, field in self.fields.items():
-            field.label_suffix = " *" if field.required else ""
+        fields = ['title', 'description', 'due_date', 'priority', 'category', 'status', 'dependencies']
+
+    dependencies = forms.ModelMultipleChoiceField(
+        queryset=Task.objects.all(), 
+        widget=forms.CheckboxSelectMultiple,
+        required=False
+    )
+
+class TaskDependenciesForm(forms.ModelForm):
+    class Meta:
+        model = Task
+        fields = ['dependencies']
+
+    dependencies = forms.ModelMultipleChoiceField(
+        queryset=Task.objects.all(), 
+        widget=forms.CheckboxSelectMultiple,
+        required=False
+    )
 
 
 
@@ -43,3 +52,4 @@ class SubTaskForm(forms.ModelForm):
                 'class': 'form-control',
             }),
         }
+

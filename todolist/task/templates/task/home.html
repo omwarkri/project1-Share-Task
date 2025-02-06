@@ -9,52 +9,82 @@
             <h3>Filters</h3>
             <div class="filter-group">
                 <h4>Sort By:</h4>
-                
+                <!-- Sorting options will be dynamically populated here -->
+            </div>
 
-        <!-- Button to Open Filter Modal -->
-        <button onclick="openFilterModal()" class="open-filter-modal-button">Open Filters</button>
+            <!-- Button to Open Filter Modal -->
+            <button onclick="openFilterModal()" class="open-filter-modal-button">Open Filters</button>
 
-        <a href="#" class="add-task" onclick="openAddTaskModal()">Add a New Task</a>
-        <a href="#" class="view-chats-button" onclick="openChatModal()">View All Chats</a>
+            <a href="#" class="add-task" onclick="openAddTaskModal()">Add a New Task</a>
+            <a href="#" class="view-chats-button" onclick="openChatModal()">View All Chats</a>
 
-        <ul class="task-list" id="task-list">
-            {% for task_data in tasks_with_suggestions %}
-                <li class="task-item" data-status="{{ task_data.task.status }}" data-priority="{{ task_data.task.priority }}">
-                    <strong class="task-title">{{ task_data.task.title }}</strong>
-                    <p><strong>Priority:</strong> {{ task_data.task.get_priority_display }}</p>
-                    <p><strong>Status:</strong> {{ task_data.task.get_status_display }}</p>
-                    <p><strong>Due Date:</strong> {{ task_data.task.due_date|date:"F j, Y, g:i a" }}</p>
+            <input class="search-bar" type="text" id="task-search" placeholder="Search tasks..." oninput="searchTasks()" />
 
-                    {% if task_data.task.is_overdue %}
-                    <span class="badge badge-danger">Overdue</span>
-                {% elif task_data.task.is_approaching_due_date %}
-                    <span class="badge badge-warning">Approaching Due</span>
-                {% endif %}
+            <ul class="task-list" id="task-list">
+                {% for task_data in tasks_with_suggestions %}
+                    <li class="task-item" data-status="{{ task_data.task.status }}" data-priority="{{ task_data.task.priority }}">
+                        <strong class="task-title">{{ task_data.task.title }}</strong>
+                        <p><strong>Priority:</strong> {{ task_data.task.get_priority_display }}</p>
+                        <p><strong>Status:</strong> {{ task_data.task.get_status_display }}</p>
+                        <p><strong>Due Date:</strong> {{ task_data.task.due_date|date:"F j, Y, g:i a" }}</p>
 
-                    <!-- Suggested Users Button -->
-                    <a href="{% url 'suggested_users' task_data.task.id %}" class="suggested-users-button">Find Task Partner</a>
-                   
-
-                    <!-- Task Actions -->
-                    <div class="button-group">
-                        {% if task_data.task.status != 'completed' %}
-                            <a href="#" onclick="openModal({{ task_data.task.id }})" class="task-action">Completed</a>
-
-                            {% if task_data.task.status != 'in_progress' %}
-                                <a href="{% url 'change_task_status' task_data.task.id 'in_progress' %}" class="task-action">In Progress</a>
-                            {% endif %}
-
-                            {% if task_data.task.status != 'pending' and task_data.task.status != 'in_progress' %}
-                                <a href="{% url 'change_task_status' task_data.task.id 'pending' %}" class="task-action">Pending</a>
-                            {% endif %}
+                        {% if task_data.task.is_overdue %}
+                        <span class="badge badge-danger">Overdue</span>
+                        {% elif task_data.task.is_approaching_due_date %}
+                        <span class="badge badge-warning">Approaching Due</span>
                         {% endif %}
 
-                        <a href="{% url 'task_detail' task_data.task.id %}" class="task-action">View Task Details</a>
-                        <a href="{% url 'delete_task' task_data.task.id %}" class="task-action delete-task" onclick="return confirm('Are you sure you want to delete this task?');">Delete</a>
-                    </div>
-                </li>
-            {% endfor %}
-        </ul>
+                        <a href="#" class="view-chats-button" onclick="openViewDependencyModal({{ task_data.task.id }})">View Dependencies</a>
+                        <!-- View Task Dependencies Modal -->
+<div id="viewTaskDependencies" class="modal" style="display: none;">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeViewDependencyModal()">&times;</span>
+        <h3>Task Dependencies</h3>
+        
+        <!-- Display Current Dependencies -->
+        <div class="task-dependencies">
+            <h4>Current Dependencies</h4>
+            <ul id="dependency-list">
+                <!-- Dependencies will be dynamically populated here -->
+            </ul>
+        </div>
+
+        <!-- Form to Update Dependencies -->
+        <form method="POST" action="{% url 'update_task_dependencies' task_id=task_data.task.id %}" id="update-dependencies-form">
+            {% csrf_token %}
+            <h4>Update Dependencies</h4>
+            <select id="dependency-select" name="dependencies" multiple class="form-control">
+                <!-- Options will be dynamically populated here -->
+            </select>
+            <button type="submit" class="submit-button">Update Dependencies</button>
+        </form>
+    </div>
+</div>
+
+                        <!-- Suggested Users Button -->
+                        <a href="{% url 'suggested_users' task_data.task.id %}" class="suggested-users-button">Find Task Partner</a>
+
+                        <!-- Task Actions -->
+                        <div class="button-group">
+                            {% if task_data.task.status != 'completed' %}
+                                <a href="#" onclick="openModal({{ task_data.task.id }})" class="task-action">Completed</a>
+
+                                {% if task_data.task.status != 'in_progress' %}
+                                    <a href="{% url 'change_task_status' task_data.task.id 'in_progress' %}" class="task-action">In Progress</a>
+                                {% endif %}
+
+                                {% if task_data.task.status != 'pending' and task_data.task.status != 'in_progress' %}
+                                    <a href="{% url 'change_task_status' task_data.task.id 'pending' %}" class="task-action">Pending</a>
+                                {% endif %}
+                            {% endif %}
+
+                            <a href="{% url 'task_detail' task_data.task.id %}" class="task-action">View Task Details</a>
+                            <a href="{% url 'delete_task' task_data.task.id %}" class="task-action delete-task" onclick="return confirm('Are you sure you want to delete this task?');">Delete</a>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
     </div>
 </div>
 
@@ -80,6 +110,8 @@
         </form>
     </div>
 </div>
+
+
 
 <!-- Chat Modal -->
 <div id="chatModal" class="modal" style="display: none;">
@@ -137,8 +169,6 @@
 </div>
 {% endfor %}
 
-
-
 <!-- Filter Modal -->
 <div id="filterModal" class="modal">
     <div class="modal-content">
@@ -185,9 +215,6 @@
                 <button onclick="filterTasks('all', 'critical')" class="modern-button">Critical</button>
             </div>
         </div>
-
-        <!-- Apply Filters Button -->
-        <!-- <button onclick="applyFilters()" class="apply-filters-button">Apply Filters</button> -->
     </div>
 </div>
 
@@ -594,6 +621,27 @@
     color: var(--primary-color);
 }
 
+.search-form {
+    margin-bottom: 20px;
+}
+
+.search-bar {
+    padding: 10px;
+    width: 250px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.search-button {
+    padding: 10px 15px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+
 .chat-time {
     display: block;
     font-size: 12px;
@@ -690,14 +738,96 @@ function applySorting() {
             });
         }
 
+        function searchTasks() {
+    const query = document.getElementById('task-search').value;
+    const taskList = document.getElementById('task-list');
+
+    fetch(`/search-tasks/?q=${encodeURIComponent(query)}`, {
+        headers: { "X-Requested-With": "XMLHttpRequest" }
+    })
+        .then(response => response.json())
+        .then(data => {
+            taskList.innerHTML = '';
+            if (data.tasks.length === 0) {
+                taskList.innerHTML = '<li>No tasks found.</li>';
+            } else {
+                data.tasks.forEach(task => {
+                    taskList.innerHTML += `
+                        <li class="task-item">
+                            <strong class="task-title">${task.title}</strong>
+                            <p><strong>Priority:</strong> ${task.priority}</p>
+                            <p><strong>Status:</strong> ${task.status}</p>
+                            <p><strong>Due Date:</strong> ${task.due_date}</p>
+                        </li>`;
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching tasks:', error);
+        });
+}
+
+
+function openViewDependencyModal(taskId) {
+    // Fetch task details and dependencies
+    fetch(`/get-task-dependencies/${taskId}/`)
+        .then(response => response.json())
+        .then(data => {
+            const dependencyList = document.getElementById('dependency-list');
+            const dependencySelect = document.getElementById('dependency-select');
+
+            // Clear existing content
+            dependencyList.innerHTML = '';
+            dependencySelect.innerHTML = '';
+
+            // Populate current dependencies
+            if (data.dependencies.length > 0) {
+                data.dependencies.forEach(dep => {
+                    const li = document.createElement('li');
+                    li.textContent = dep.title;
+                    dependencyList.appendChild(li);
+                });
+            } else {
+                dependencyList.innerHTML = '<li>No dependencies set for this task.</li>';
+            }
+
+            // Populate available tasks for updating dependencies
+            data.all_tasks.forEach(task => {
+                const option = document.createElement('option');
+                option.value = task.id;
+                option.textContent = task.title;
+                dependencySelect.appendChild(option);
+            });
+
+            // Set the form action URL
+            document.getElementById('update-dependencies-form').action = `/update-task-dependencies/${taskId}/`;
+
+            // Display the modal
+            document.getElementById('viewTaskDependencies').style.display = 'flex';
+        })
+        .catch(error => {
+            console.error('Error fetching task dependencies:', error);
+        });
+}
+
+
+
     // JavaScript functions for modals
     function openAddTaskModal() {
         document.getElementById('addTaskModal').style.display = 'flex';
     }
+    
 
     function closeAddTaskModal() {
         document.getElementById('addTaskModal').style.display = 'none';
     }
+
+   
+
+    function closeViewDependencyModal() {
+        document.getElementById('viewTaskDependencies').style.display = 'none';
+    }
+
 
     function openChatModal() {
         document.getElementById('chatModal').style.display = 'flex';

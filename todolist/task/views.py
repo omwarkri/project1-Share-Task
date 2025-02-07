@@ -145,7 +145,7 @@ def home(request):
     # Get all chats for the user
     chats = all_chats(request)
 
-    TaskDependencies = TaskDependenciesForm(instance=task)
+    TaskDependencies = TaskDependenciesForm()
 
     context = {
         'tasks_with_suggestions': tasks_with_suggestions,

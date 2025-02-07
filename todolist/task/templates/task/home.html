@@ -1,94 +1,99 @@
 {% extends 'task/base.html' %}
 
 {% block content %}
-<div>
-    <div class="container">
-        <h2>All Tasks</h2>
+<div class="dashboard-container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h2>Task Manager</h2>
+        <ul class="sidebar-menu">
+            <li><button onclick="filterTasks('all', 'all')" class=" active">All</button></li>
+            <li><button onclick="filterTasks('pending', 'all')" class="">Pending</button></li>
+            <li><button onclick="filterTasks('in_progress', 'all')" class="">In Progress</button></li>
+            <li><button onclick="filterTasks('completed', 'all')" class="">Completed</button></li>
+            <li><button onclick="filterTasks('archived', 'all')" class="">Archived</button></li>   
+        </ul>
+        <div class="sidebar-footer">
+            <button class="add-task" onclick="openAddTaskModal()">+ Add Task</button>
+        </div>
+    </div>
 
-        <div class="filter-section">
-            <h3>Filters</h3>
-            <div class="filter-group">
-                <h4>Sort By:</h4>
-                <button onclick="openFilterModal()" class="open-filter-modal-button">Open Filters</button>
-                <!-- Sorting options will be dynamically populated here -->
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <div class="header">
+            <h1>All Tasks</h1>
+            <div class="header-actions">
+                <input type="text" class="search-bar" placeholder="Search tasks..." oninput="searchTasks()" />
+                <button class="filter-button" onclick="openFilterModal()">Filters</button>
+                <button class="view-chats-button" onclick="openChatModal()">View Chats</button>
             </div>
+        </div>
 
-            <!-- Button to Open Filter Modal -->
-           
-
-            <a href="#" class="add-task" onclick="openAddTaskModal()">Add a New Task</a>
-            <a href="#" class="view-chats-button" onclick="openChatModal()">View All Chats</a>
-
-            <input class="search-bar" type="text" id="task-search" placeholder="Search tasks..." oninput="searchTasks()" />
-
-            <ul class="task-list" id="task-list">
-                {% for task_data in tasks_with_suggestions %}
-                    <li class="task-item" data-status="{{ task_data.task.status }}" data-priority="{{ task_data.task.priority }}">
+        <!-- Task List -->
+        <div class="task-grid ">
+            {% for task_data in tasks_with_suggestions %}
+                <div class="task-card task-item" data-status="{{ task_data.task.status }}" data-priority="{{ task_data.task.priority }}">
+                    <div class="task-header">
                         <strong class="task-title">{{ task_data.task.title }}</strong>
-                        <p><strong>Priority:</strong> {{ task_data.task.get_priority_display }}</p>
+                        <span class="task-priority {{ task_data.task.priority }}">{{ task_data.task.get_priority_display }}</span>
+                    </div>
+                    <div class="task-body">
                         <p><strong>Status:</strong> {{ task_data.task.get_status_display }}</p>
                         <p><strong>Due Date:</strong> {{ task_data.task.due_date|date:"F j, Y, g:i a" }}</p>
 
-                        {% if task_data.task.is_overdue %}
-                        <span class="badge badge-danger">Overdue</span>
-                        {% elif task_data.task.is_approaching_due_date %}
-                        <span class="badge badge-warning">Approaching Due</span>
-                        {% endif %}
-
-                        <a href="#" class="view-chats-button" onclick="openViewDependencyModal({{ task_data.task.id }})">View Dependencies</a>
-                        <!-- View Task Dependencies Modal -->
-<div id="viewTaskDependencies" class="modal" style="display: none;">
-    <div class="modal-content">
-        <span class="close-modal" onclick="closeViewDependencyModal()">&times;</span>
-        <h3>Task Dependencies</h3>
-        
-        <!-- Display Current Dependencies -->
-        <div class="task-dependencies">
-            <h4>Current Dependencies</h4>
-            <ul id="dependency-list">
-                <!-- Dependencies will be dynamically populated here -->
-            </ul>
-        </div>
-
-        <!-- Form to Update Dependencies -->
-        <form method="POST" action="{% url 'update_task_dependencies' task_id=task_data.task.id %}" id="update-dependencies-form">
-            {% csrf_token %}
-            <h4>Update Dependencies</h4>
-            <select id="dependency-select" name="dependencies" multiple class="form-control">
-                <!-- Options will be dynamically populated here -->
-            </select>
-            <button type="submit" class="submit-button">Update Dependencies</button>
-        </form>
-    </div>
-</div>
-
-                        <!-- Suggested Users Button -->
                         <a href="{% url 'suggested_users' task_data.task.id %}" class="suggested-users-button">Find Task Partner</a>
-
-                        <!-- Task Actions -->
-                        <div class="button-group">
-                            {% if task_data.task.status != 'completed' %}
-                                <a href="#" onclick="openModal({{ task_data.task.id }})" class="task-action">Completed</a>
-
-                                {% if task_data.task.status != 'in_progress' %}
-                                    <a href="{% url 'change_task_status' task_data.task.id 'in_progress' %}" class="task-action">In Progress</a>
-                                {% endif %}
-
-                                {% if task_data.task.status != 'pending' and task_data.task.status != 'in_progress' %}
-                                    <a href="{% url 'change_task_status' task_data.task.id 'pending' %}" class="task-action">Pending</a>
-                                {% endif %}
-                            {% endif %}
-
-                            <a href="{% url 'task_detail' task_data.task.id %}" class="task-action">View Task Details</a>
-                            <a href="{% url 'delete_task' task_data.task.id %}" class="task-action delete-task" onclick="return confirm('Are you sure you want to delete this task?');">Delete</a>
+                        {% if task_data.task.is_overdue %}
+                            <span class="badge badge-danger">Overdue</span>
+                        {% elif task_data.task.is_approaching_due_date %}
+                            <span class="badge badge-warning">Approaching Due</span>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="task-footer">
+                        <button class="task-action" onclick="openViewDependencyModal({{ task_data.task.id }})">Dependencies</button>
+                        <!-- <div id="viewTaskDependencies" class="modal" style="display: none;"></div> -->
+                        <!-- View Task Dependencies Modal -->
+                        
+                        <button class="task-action" onclick="openModal({{ task_data.task.id }})">Complete</button>
+                        <a href="{% url 'task_detail' task_data.task.id %}" class="task-action">Details</a>
+                    </div>
+                </div>  
+                <div id="viewTaskDependencies"  style="display: none;">
+                    <div class="modal-content">
+                        <span class="close-modal" onclick="closeViewDependencyModal()">&times;</span>
+                        <h3>Task Dependencies</h3>
+                        
+                        <!-- Display Current Dependencies -->
+                        <div class="task-dependencies">
+                            <h4>Current Dependencies</h4>
+                            <ul id="dependency-list" class="dependency-list">
+                                <!-- Dependencies will be dynamically populated here -->
+                                <li class="no-dependencies">No dependencies set for this task.</li>
+                            </ul>
                         </div>
-                    </li>
-                {% endfor %}
-            </ul>
+
+                        <!-- Form to Update Dependencies -->
+                        <form method="POST" id="update-dependencies-form" class="dependency-form">
+                            {% csrf_token %}
+                            <h4>Update Dependencies</h4>
+                            <select id="dependency-select" name="dependencies" multiple class="dependency-select">
+                                <!-- Options will be dynamically populated here -->
+                            </select>
+                            <button type="submit" class="submit-button">Update Dependencies</button>
+                        </form>
+                    </div>
+                </div>  
+            {% endfor %}
         </div>
     </div>
 </div>
 
+
+<!-- View Task Dependencies Modal -->
+
+
+
+<!-- Modals (Add Task, Filter, Chat, etc.) -->
 <!-- Add Task Modal -->
 <div id="addTaskModal" class="modal" style="display: none;">
     <div class="modal-content">
@@ -111,8 +116,6 @@
         </form>
     </div>
 </div>
-
-
 
 <!-- Chat Modal -->
 <div id="chatModal" class="modal" style="display: none;">
@@ -197,11 +200,7 @@
         <div class="filter-group">
             <h4>Filter by Status:</h4>
             <div class="filter-buttons">
-                <button onclick="filterTasks('all', 'all')" class="modern-button">All</button>
-                <button onclick="filterTasks('pending', 'all')" class="modern-button">Pending</button>
-                <button onclick="filterTasks('in_progress', 'all')" class="modern-button">In Progress</button>
-                <button onclick="filterTasks('completed', 'all')" class="modern-button">Completed</button>
-                <button onclick="filterTasks('archived', 'all')" class="modern-button">Archived</button>
+               
             </div>
         </div>
 
@@ -219,8 +218,213 @@
     </div>
 </div>
 
+
 <style>
-    /* Add your CSS styles here */
+    /* Dashboard Layout */
+    .dashboard-container {
+        display: flex;
+        min-height: 100vh;
+        background-color: #f5f5f5;
+
+    }
+
+    .sidebar {
+        width: 250px;
+        background-color: #2c3e50;
+        color: #fff;
+        padding: 20px;
+        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .sidebar h2 {
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+
+    .sidebar-menu {
+        list-style: none;
+        padding: 0;
+    }
+
+    .sidebar-menu li {
+        margin: 15px 0;
+    }
+
+    .sidebar-menu button {
+        color: #fff;
+        text-decoration: none;
+        font-size: 16px;
+        transition: color 0.3s ease;
+        background-color: transparent;
+        border: none;
+    }
+
+    .sidebar-menu button.active {
+        color: #1abc9c;
+    }
+
+    .sidebar-menu button:hover {
+        color: #1abc9c;
+    }
+
+    .sidebar-footer {
+        margin-top: 30px;
+    }
+
+    .add-task {
+        width: 100%;
+        padding: 10px;
+        background-color: #1abc9c;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background-color 0.3s ease;
+    }
+
+    .add-task:hover {
+        background-color: #16a085;
+    }
+
+    .main-content {
+        flex: 1;
+        padding: 20px;
+        background-color: #fff;
+    }
+
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .header h1 {
+        font-size: 24px;
+        color: #2c3e50;
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    .search-bar {
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        width: 200px;
+    }
+
+    .filter-button, .view-chats-button {
+        padding: 8px 12px;
+        background-color: #3498db;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .filter-button:hover, .view-chats-button:hover {
+        background-color: #2980b9;
+    }
+
+    /* Task Grid */
+    .task-grid {
+    display: grid;
+    position: relative;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.task-card {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+    .task-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .task-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .task-title {
+        font-size: 18px;
+        color: #2c3e50;
+    }
+
+    .task-priority {
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: bold;
+    }
+
+    .task-priority.low {
+        background-color: #d4efdf;
+        color: #28a745;
+    }
+
+    .task-priority.medium {
+        background-color: #fcf3cf;
+        color: #f39c12;
+    }
+
+    .task-priority.high {
+        background-color: #f5b7b1;
+        color: #e74c3c;
+    }
+
+    .task-body {
+        margin-bottom: 10px;
+    }
+
+    .task-footer {
+        display: flex;
+        gap: 10px;
+    }
+
+    .task-action {
+        padding: 6px 12px;
+        background-color: #3498db;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background-color 0.3s ease;
+    }
+
+    .task-action:hover {
+        background-color: #2980b9;
+    }
+
+    .badge-danger {
+        background-color: #e74c3c;
+        color: #fff;
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 12px;
+    }
+
+    .badge-warning {
+        background-color: #f39c12;
+        color: #fff;
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 12px;
+    }
+    /* Modal Styles */
 /* Modal Styles */
 .modal {
     display: none;
@@ -233,30 +437,224 @@
     justify-content: center;
     align-items: center;
     z-index: 1000;
+    overflow-y: auto; /* Enable scrolling for the modal */
+    padding: 20px; /* Add padding to prevent content from touching the edges */
 }
 
 .modal-content {
     background-color: #fff;
-    padding: 20px;
+    padding: 25px;
     border-radius: 12px;
     width: 90%;
-    max-width: 400px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    max-width: 500px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
     position: relative;
+    animation: modalFadeIn 0.3s ease;
+    max-height: 90vh; /* Limit modal height to 90% of the viewport height */
+    overflow-y: auto; /* Enable scrolling for the modal content */
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .close-modal {
     position: absolute;
-    top: 10px;
-    right: 15px;
+    top: 15px;
+    right: 20px;
     font-size: 24px;
     cursor: pointer;
-    color: #333;
-    transition: all 0.3s ease;
+    color: #666;
+    transition: color 0.3s ease;
 }
 
 .close-modal:hover {
-    color: #007BFF;
+    color: #333;
+}
+
+.modal-content h3 {
+    margin-top: 0;
+    font-size: 22px;
+    color: #2c3e50;
+    margin-bottom: 20px;
+}
+
+.modal-content p {
+    margin-bottom: 15px;
+    font-size: 16px;
+    color: #555;
+}
+
+.modal-content label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    font-size: 14px;
+    color: #333;
+}
+
+.modal-content input[type="text"],
+.modal-content input[type="file"],
+.modal-content textarea,
+.modal-content select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #333;
+    background-color: #f9f9f9;
+    transition: border-color 0.3s ease;
+}
+
+.modal-content input[type="text"]:focus,
+.modal-content input[type="file"]:focus,
+.modal-content textarea:focus,
+.modal-content select:focus {
+    border-color: #3498db;
+    outline: none;
+}
+
+.modal-content textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.modal-content .submit-button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #3498db;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.modal-content .submit-button:hover {
+    background-color: #2980b9;
+}
+
+.modal-content .skip-sharing {
+    margin-bottom: 15px;
+}
+
+.modal-content .skip-sharing label {
+    font-size: 14px;
+    color: #555;
+}
+
+.modal-content .skip-sharing input[type="checkbox"] {
+    margin-right: 8px;
+}
+
+/* Chat Modal Specific Styles */
+.chat-list {
+    max-height: 300px;
+    overflow-y: auto;
+    border-top: 1px solid #eee;
+    margin-top: 10px;
+    padding-top: 10px;
+}
+
+.suggested-users-button{
+    background-color: #007B9E;
+    padding: 4px;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+}
+
+.chat-item {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    transition: background-color 0.3s ease;
+}
+
+.chat-item:hover {
+    background-color: #f9f9f9;
+}
+
+.chat-item strong {
+    color: #3498db;
+    font-size: 14px;
+}
+
+.chat-item .chat-time {
+    display: block;
+    font-size: 12px;
+    color: #777;
+    margin-top: 4px;
+}
+
+/* Filter Modal Specific Styles */
+.filter-group {
+    margin-bottom: 20px;
+}
+
+.filter-group h4 {
+    font-size: 16px;
+    color: #2c3e50;
+    margin-bottom: 10px;
+}
+
+.filter-options {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.modern-select {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #333;
+    background-color: #f9f9f9;
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+}
+
+.suggested-users-button:hover {
+        background-color: #007B9E;
+    }
+
+.modern-select:hover {
+    border-color: #3498db;
+}
+
+.filter-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.modern-button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    background-color: #3498db;
+    color: #fff;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.modern-button:hover {
+    background-color: #2980b9;
+}
+
+.modern-button.active {
+    background-color: #2c3e50;
 }
 
 /* Filter Section Styles */
@@ -351,303 +749,124 @@
 }
 
 .open-filter-modal-button:hover {
-    background-color: #0056b3;
-}
-     /* CSS Variables for Consistent Styling */
-     :root {
-        --primary-color: #4CAF50; /* Green */
-        --secondary-color: #008CBA; /* Blue */
-        --danger-color: #f44336; /* Red */
-        --background-color: #f8f9fa; /* Light Gray */
-        --text-color: #333; /* Dark Gray */
-        --border-color: #e0e0e0; /* Light Gray */
-        --shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        --radius: 6px;
-        --transition: all 0.2s ease;
-    }
-
-    .badge-danger{
-        background-color: #e4706e;
-        color: #ddd;
-        padding: 6px;
-        border-radius: 8px  ;
-
-    }
-
-    .badge-warning{
-        background-color: rgb(255, 255, 176);
-    }
-
-    /* General Styles */
-    body {
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        background-color: var(--background-color);
-        color: var(--text-color);
-        margin: 0;
-        padding: 20px;
-    }
-
-    .container {
-        max-width: 800px;
-        margin: 0 auto;
-        background-color: #fff;
-        border-radius: var(--radius);
-        box-shadow: var(--shadow);
-        padding: 20px;
-    }
-
-    h1, h2 {
-        color: var(--primary-color);
-        margin-bottom: 15px;
-    }
-
-    h1 {
-        font-size: 24px;
-        text-align: center;
-    }
-
-    h2 {
-        font-size: 20px;
-    }
-
-    /* Add Task Button */
-    .add-task {
-        display: inline-block;
-        margin-bottom: 15px;
-        padding: 8px 16px;
-        background-color: var(--primary-color);
-        color: white;
-        text-decoration: none;
-        border-radius: var(--radius);
-        cursor: pointer;
-        font-size: 14px;
-        transition: var(--transition);
-    }
-
-    .add-task:hover {
-        background-color: #45a049;
-    }
-
-    /* Task List */
-    .task-list {
-        list-style-type: none;
-        padding: 0;
-    }
-
-    .task-item {
-        border-bottom: 1px solid var(--border-color);
-        padding: 15px 0;
-        transition: var(--transition);
-    }
-
-    .task-item:hover {
-        background-color: #fafafa;
-    }
-
-    .task-title {
-        font-size: 16px;
-        color: var(--text-color);
-        margin-bottom: 5px;
-    }
-
-    .task-status {
-        color: #666;
-        font-size: 14px;
-    }
-
-    /* Suggested Users Button */
-    .suggested-users-button {
-        display: inline-block;
-        padding: 6px 12px;
-        background-color: var(--secondary-color);
-        color: white;
-        text-decoration: none;
-        border-radius: var(--radius);
-        margin: 8px 0;
-        font-size: 14px;
-        transition: var(--transition);
-    }
-
-    .suggested-users-button:hover {
-        background-color: #007B9E;
-    }
-
-    /* Task Actions */
-    .button-group {
-        margin-top: 10px;
-    }
-
-    .task-action {
-        display: inline-block;
-        padding: 6px 12px;
-        margin-right: 8px;
-        background-color: #f1f1f1;
-        color: var(--text-color);
-        text-decoration: none;
-        border-radius: var(--radius);
-        font-size: 14px;
-        transition: var(--transition);
-    }
-
-    .task-action:hover {
-        background-color: #ddd;
-    }
-
-    .delete-task {
-        background-color: var(--danger-color);
-        color: white;
-    }
-
-    .delete-task:hover {
-        background-color: #e53935;
-    }
-
-    /* Modal Styles */
-    .modal {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        justify-content: center;
-        align-items: center;
-        z-index: 1000;
-    }
-
-    .modal-content {
-        background-color: #fff;
-        padding: 20px;
-        border-radius: var(--radius);
-        width: 90%;
-        max-width: 500px;
-        box-shadow: var(--shadow);
-        position: relative;
-    }
-
-    .close-modal {
-        position: absolute;
-        top: 10px;
-        right: 15px;
-        font-size: 24px;
-        cursor: pointer;
-        color: var(--text-color);
-        transition: var(--transition);
-    }
-
-    .close-modal:hover {
-        color: var(--danger-color);
-    }
-
-    .modal-content h3 {
-        margin-top: 0;
-        color: var(--primary-color);
-        font-size: 18px;
-    }
-
-    .modal-content p {
-        margin-bottom: 15px;
-        font-size: 14px;
-    }
-
-    .modal-content label {
-        display: block;
-        margin-bottom: 5px;
-        font-weight: bold;
-        font-size: 14px;
-    }
-
-    .modal-content textarea,
-    .modal-content input[type="file"] {
-        width: 100%;
-        padding: 8px;
-        margin-bottom: 10px;
-        border: 1px solid var(--border-color);
-        border-radius: var(--radius);
-        font-size: 14px;
-    }
-
-    .skip-sharing {
-        margin-bottom: 10px;
-    }
-
-    .submit-button {
-        display: inline-block;
-        padding: 8px 16px;
-        background-color: var(--primary-color);
-        color: white;
-        border: none;
-        border-radius: var(--radius);
-        cursor: pointer;
-        font-size: 14px;
-        transition: var(--transition);
-    }
-
-    .submit-button:hover {
-        background-color: #45a049;
-    }
-    .view-chats-button {
-    display: inline-block;
-    margin-bottom: 15px;
-    padding: 8px 16px;
-    background-color: var(--secondary-color);
-    color: white;
-    text-decoration: none;
-    border-radius: var(--radius);
-    cursor: pointer;
-    font-size: 14px;
-    transition: var(--transition);
+    background-color: #0056b3;  
 }
 
-.view-chats-button:hover {
-    background-color: #007B9E;
+/* View Task Dependencies Modal Styles */
+#viewTaskDependencies {
+    display: none; /* Hidden by default */
+    position: fixed; /* Position relative to the viewport */
+    top: 0;
+    left: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    background-color: white; /* Semi-transparent overlay */
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
+    z-index: 10; /* Ensure it's on top of other elements */
 }
 
-/* Chat Modal */
-.chat-list {
-    max-height: 300px;
-    overflow-y: auto;
-    border-top: 1px solid var(--border-color);
-    margin-top: 10px;
-    padding-top: 10px;
+#viewTaskDependencies .modal-content {
+    background-color: #ffffff;
+    color: rgb(0, 0, 0);
+    padding: 20px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 500px; /* Adjust the maximum width as needed */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add a shadow for better visibility */
 }
 
-.chat-item {
-    padding: 8px;
-    border-bottom: 1px solid var(--border-color);
-}
 
-.chat-item strong {
-    color: var(--primary-color);
-}
-
-.search-form {
+/* #viewTaskDependencies h3 {
+    margin-top: 0;
+    font-size: 22px;
+    color: #ffffff;
     margin-bottom: 20px;
+} */
+
+/* #viewTaskDependencies .task-dependencies h4 {
+    font-size: 18px;
+    color: #333;
+    margin-bottom: 10px;
 }
 
-.search-bar {
+#viewTaskDependencies .dependency-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 150px;
+    overflow-y: auto;
+    border: 1px solid #eee;
+    border-radius: 8px;
     padding: 10px;
-    width: 250px;
+    background-color: #f9f9f9;
+}
+
+#viewTaskDependencies .dependency-list li {
+    padding: 8px;
+    margin-bottom: 5px;
+    background-color: #fff;
     border: 1px solid #ddd;
-    border-radius: 4px;
+    border-radius: 6px;
+    font-size: 14px;
+    color: #333;
+    transition: background-color 0.3s ease;
 }
 
-.search-button {
-    padding: 10px 15px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-
-.chat-time {
-    display: block;
-    font-size: 12px;
+#viewTaskDependencies .dependency-list li.no-dependencies {
     color: #777;
+    font-style: italic;
+    background-color: transparent;
+    border: none;
+    text-align: center;
+} */
+/* 
+#viewTaskDependencies .dependency-list li:hover {
+    background-color: #f1f1f1;
 }
+
+#viewTaskDependencies .dependency-form {
+    margin-top: 20px;
+}
+
+#viewTaskDependencies .dependency-form h4 {
+    font-size: 18px;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+#viewTaskDependencies .dependency-select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #333;
+    background-color: #f9f9f9;
+    margin-bottom: 15px;
+    transition: border-color 0.3s ease;
+}
+
+#viewTaskDependencies .dependency-select:focus {
+    border-color: #3498db;
+    outline: none;
+}
+
+#viewTaskDependencies .submit-button {
+    width: 100%;
+    padding: 10px;
+    background-color: #3498db;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#viewTaskDependencies .submit-button:hover {
+    background-color: #2980b9;
+} */
 </style>
 
 <script>
@@ -711,33 +930,34 @@ function applySorting() {
     }
     // Function to filter tasks by status and priority
     function filterTasks(status, priority) {
-            const taskItems = document.querySelectorAll('.task-item');
+    // Filter tasks based on status and priority
+    const taskItems = document.querySelectorAll('.task-item');
+    taskItems.forEach(task => {
+        const taskStatus = task.getAttribute('data-status');
+        const taskPriority = task.getAttribute('data-priority');
 
-            taskItems.forEach(task => {
-                const taskStatus = task.getAttribute('data-status');
-                const taskPriority = task.getAttribute('data-priority');
+        const statusMatch = status === 'all' || taskStatus === status;
+        const priorityMatch = priority === 'all' || taskPriority === priority;
 
-                const statusMatch = status === 'all' || taskStatus === status;
-                const priorityMatch = priority === 'all' || taskPriority === priority;
-
-                if (statusMatch && priorityMatch) {
-                    task.style.display = 'block';
-                } else {
-                    task.style.display = 'none';
-                }
-            });
-
-            // Highlight active filter buttons
-            const filterButtons = document.querySelectorAll('.modern-button');
-            filterButtons.forEach(button => {
-                button.classList.remove('active');
-            });
-
-            const activeButtons = document.querySelectorAll(`.modern-button[onclick*="'${status}'"], .modern-button[onclick*="'${priority}'"]`);
-            activeButtons.forEach(button => {
-                button.classList.add('active');
-            });
+        if (statusMatch && priorityMatch) {
+            task.style.display = 'block'; // Show the task
+        } else {
+            task.style.display = 'none'; // Hide the task
         }
+    });
+
+    // Update the active class on sidebar buttons
+    const sidebarButtons = document.querySelectorAll('.sidebar-menu button');
+    sidebarButtons.forEach(button => {
+        button.classList.remove('active'); // Remove active class from all buttons
+    });
+
+    // Add active class to the clicked button
+    const activeButton = document.querySelector(`.sidebar-menu button[onclick*="'${status}'"]`);
+    if (activeButton) {
+        activeButton.classList.add('active');
+    }
+}
 
         function searchTasks() {
     const query = document.getElementById('task-search').value;
@@ -768,7 +988,6 @@ function applySorting() {
         });
 }
 
-
 function openViewDependencyModal(taskId) {
     // Fetch task details and dependencies
     fetch(`/get-task-dependencies/${taskId}/`)
@@ -789,7 +1008,10 @@ function openViewDependencyModal(taskId) {
                     dependencyList.appendChild(li);
                 });
             } else {
-                dependencyList.innerHTML = '<li>No dependencies set for this task.</li>';
+                const li = document.createElement('li');
+                li.textContent = 'No dependencies set for this task.';
+                li.classList.add('no-dependencies');
+                dependencyList.appendChild(li);
             }
 
             // Populate available tasks for updating dependencies
@@ -811,6 +1033,9 @@ function openViewDependencyModal(taskId) {
         });
 }
 
+function closeViewDependencyModal() {
+    document.getElementById('viewTaskDependencies').style.display = 'none';
+}
 
 
     // JavaScript functions for modals
@@ -849,4 +1074,5 @@ function openViewDependencyModal(taskId) {
     // Initially show all tasks
     filterTasks('all', 'all');
 </script>
+
 {% endblock %}

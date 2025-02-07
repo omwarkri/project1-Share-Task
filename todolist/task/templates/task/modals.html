@@ -1,0 +1,119 @@
+<!-- Add Task Modal -->
+<div id="addTaskModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeAddTaskModal()">&times;</span>
+        <h3>Add a New Task</h3>
+        <form method="post" action="{% url 'add_task' %}">
+            {% csrf_token %}
+            {% for field in form %}
+                <div>
+                    <label for="{{ field.id_for_label }}">
+                        {{ field.label }}{% if field.field.required %} *{% endif %}
+                    </label>
+                    {{ field }}
+                    {% if field.errors %}
+                        <small class="error">{{ field.errors|striptags }}</small>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            <button type="submit" class="submit-button">Add Task</button>
+        </form>
+    </div>
+</div>
+
+<!-- Chat Modal -->
+<div id="chatModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeChatModal()">&times;</span>
+        <h3>All Chats</h3>
+        <div class="chat-list">
+            {% for chat in chats %}
+                <div class="chat-item">
+                    <a href="{% url 'chat' receiver_id=chat.receiver.id %}">
+                        <strong>{{ chat.receiver.username }}</strong>: {{ chat.message }}
+                        <small class="chat-time">{{ chat.timestamp }}</small>
+                    </a>
+                </div>
+            {% empty %}
+                <p>No chats available.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Share Task Modals -->
+{% for task_data in tasks_with_suggestions %}
+<div id="shareTaskModal-{{ task_data.task.id }}" class="modal" style="display: none;">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeModal({{ task_data.task.id }})">&times;</span>
+        <h3>Share Your Task Completion</h3>
+        <p>Would you like to share how you completed this task?</p>
+        <form method="post" enctype="multipart/form-data" action="{% url 'complete_task' task_data.task.id %}">
+            {% csrf_token %}
+            <label for="completion_details">How did you complete the task?</label>
+            <textarea name="completion_details" id="completion_details" rows="4"></textarea>
+            <label for="uploaded_image">Upload Image (optional):</label>
+            <input type="file" name="uploaded_image" id="uploaded_image" accept="image/*">
+            <label for="uploaded_file">Upload Video/File (optional):</label>
+            <input type="file" name="uploaded_file" id="uploaded_file" accept="video/*,.pdf,.doc,.docx">
+            {% if task_data.task.task_partner %}
+            <div class="partner-feedback">
+                <h4>Rate and Comment on the Task Partner</h4>
+                <label for="partner_rating">Rating (1-5):</label>
+                <input type="number" name="partner_rating" id="partner_rating" min="1" max="5" required>
+                <label for="partner_comment">Comment:</label>
+                <textarea name="partner_comment" id="partner_comment" rows="3"></textarea>
+            </div>
+            {% endif %}
+            <div class="skip-sharing">
+                <label>
+                    <input type="checkbox" name="skip_sharing" id="skip_sharing">
+                    I do not want to share my completion details.
+                </label>
+            </div>
+            <button type="submit" class="submit-button">Submit</button>
+        </form>
+    </div>
+</div>
+{% endfor %}
+
+<!-- Filter Modal -->
+<div id="filterModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeFilterModal()">&times;</span>
+        <h3>Filters</h3>
+        <div class="filter-group">
+            <h4>Sort By:</h4>
+            <select id="sort-by" class="modern-select" onchange="applySorting()">
+                <option value="title">Title</option>
+                <option value="due_date">Due Date</option>
+                <option value="priority">Priority</option>
+                <option value="status">Status</option>
+            </select>
+            <select id="sort-order" class="modern-select" onchange="applySorting()">
+                <option value="asc">Ascending</option>
+                <option value="desc">Descending</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <h4>Filter by Status:</h4>
+            <div class="filter-buttons">
+                <button onclick="filterTasks('all', 'all')" class="modern-button">All</button>
+                <button onclick="filterTasks('pending', 'all')" class="modern-button">Pending</button>
+                <button onclick="filterTasks('in_progress', 'all')" class="modern-button">In Progress</button>
+                <button onclick="filterTasks('completed', 'all')" class="modern-button">Completed</button>
+                <button onclick="filterTasks('archived', 'all')" class="modern-button">Archived</button>
+            </div>
+        </div>
+        <div class="filter-group">
+            <h4>Filter by Priority:</h4>
+            <div class="filter-buttons">
+                <button onclick="filterTasks('all', 'all')" class="modern-button">All</button>
+                <button onclick="filterTasks('all', 'low')" class="modern-button">Low</button>
+                <button onclick="filterTasks('all', 'medium')" class="modern-button">Medium</button>
+                <button onclick="filterTasks('all', 'high')" class="modern-button">High</button>
+                <button onclick="filterTasks('all', 'critical')" class="modern-button">Critical</button>
+            </div>
+        </div>
+    </div>
+</div>

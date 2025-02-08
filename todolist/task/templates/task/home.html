@@ -4,21 +4,36 @@
 <div class="dashboard-container">
     <!-- Sidebar -->
     <!-- Sidebar Toggle Button (Visible on Mobile) -->
-<button class="sidebar-toggle" onclick="toggleSidebar()">☰ Menu</button>
+<button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
 
 <!-- Sidebar -->
 <div class="sidebar" id="sidebar">
-    <h2>Share Task</h2>
+    <div>
+        <h2>Share Task</h2>
     <ul class="sidebar-menu">
         <li><button onclick="filterTasks('all', 'all')" class="active">All</button></li>
         <li><button onclick="filterTasks('pending', 'all')">Pending</button></li>
         <li><button onclick="filterTasks('in_progress', 'all')">In Progress</button></li>
         <li><button onclick="filterTasks('completed', 'all')">Completed</button></li>
         <li><button onclick="filterTasks('archived', 'all')">Archived</button></li>   
-    </ul>
-    <div class="sidebar-footer">
         <button class="add-task" onclick="openAddTaskModal()">+ Add Task</button>
+    </ul>
     </div>
+    <div class="sidebar-footer">
+        
+        <div class="logout">
+            {% if user.is_authenticated %}
+                
+                <form method="post" action="{% url 'logout' %}" style="display: inline;">
+                    {% csrf_token %}
+                    <button class="button" type="submit">Logout</button>
+                </form>
+            {% else %}
+                <a class="button" href="{% url 'login' %}">Login</a>
+            {% endif %}
+        </div>
+    </div>
+   
 </div>
 
 
@@ -241,6 +256,9 @@
     overflow-y: auto;
     transition: transform 0.3s ease-in-out;
     z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 .sidebar h2 {
@@ -271,18 +289,34 @@
 }
 
 .sidebar-menu button:hover {
-    color: #1abc9c;
+    
 }
 
 .sidebar-footer {
     margin-top: 30px;
 }
+.sidebar-footer .button{
+    width: 100%;
+    padding: 10px;
+    background-color: transparent;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+.sidebar-menu .button:hover {
+    background-color: #1abc9c;
+}
+
+
 
 .add-task {
     width: 100%;
     padding: 10px;
-    background-color: #1abc9c;
-    color: #fff;
+    background-color: #b1e8dd;
+    color: #a15353;
     border: none;
     border-radius: 5px;
     cursor: pointer;
@@ -714,8 +748,8 @@
 .sidebar-toggle {
     display: none; /* Hidden by default */
     position: fixed;
-    top: 15px;
-    left: 15px;
+    top: 20px;
+    right: 24px;
     background: #1abc9c;
     color: white;
     border: none;
@@ -794,6 +828,18 @@
 </style>
 
 <script>
+
+function toggleSidebar() {
+    const sidebar = document.getElementById("sidebar");
+    sidebar.classList.toggle("show");
+
+    const mainContent = document.querySelector(".main-content");
+    if (sidebar.classList.contains("show")) {
+        mainContent.style.marginLeft = "250px"; /* Adjust for sidebar width */
+    } else {
+        mainContent.style.marginLeft = "0";
+    }
+}
     function openFilterModal() {
     document.getElementById('filterModal').style.display = 'flex';
 }
@@ -995,9 +1041,7 @@ function closeViewDependencyModal() {
         document.getElementById(`shareTaskModal-${taskId}`).style.display = 'none';
     }
 
-    function toggleSidebar() {
-    document.getElementById("sidebar").classList.toggle("show");
-}
+
 
 
     // Initially show all tasks

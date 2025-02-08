@@ -111,25 +111,29 @@ footer {
 @media (max-width: 768px) {
     .header-div {
         flex-direction: column;
-        align-items: flex-end;
+        gap:3;
+        align-items: flex-start;
+        padding: 4;
+  
+        
     }
 
     header h1 {
-        margin-bottom: 10px;
+        margin-top: -8px;
     }
 
     header a, header button {
         margin-left: 0;
-        margin-bottom: 10px;
+        margin-bottom: 8px;
     }
 
     main {
-        padding: 20px 10px;
-        margin: 10px;
+        padding: 16px 8px;
+        margin: 8px;
     }
 
     footer {
-        padding: 15px;
+        padding: 16px;
     }
 }
     </style>
@@ -139,15 +143,7 @@ footer {
         <h1>{{ app_name }}</h1>
         <div>
             <a href="{% url 'leaderboard' %}">View Leaderboard</a>
-            {% if user.is_authenticated %}
-                <span>Welcome, <a href="{% url 'profile' %}">{{ user.username }}</a>!</span>
-                <form method="post" action="{% url 'logout' %}" style="display: inline;">
-                    {% csrf_token %}
-                    <button type="submit">Logout</button>
-                </form>
-            {% else %}
-                <a href="{% url 'login' %}">Login</a>
-            {% endif %}
+            <span>Welcome, <a href="{% url 'profile' %}">{{ user.username }}</a>!</span>
         </div>
     </header>
     

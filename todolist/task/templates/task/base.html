@@ -64,6 +64,23 @@ header a:hover {
     color: #16a085;
 }
 
+header button {
+    background-color: #1abc9c;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+    margin-left: 15px;
+}
+
+header button:hover {
+    background-color: #16a085;
+}
+
 /* Dashboard Layout */
 main {
     width: 100%;
@@ -73,7 +90,6 @@ main {
     background-color: white;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     border-radius: 12px;
-    
     min-height: calc(100vh - 100px); /* Ensures it fills available space */
     overflow-y: auto; /* Enables vertical scrolling if content overflows */
     display: flex;
@@ -95,7 +111,7 @@ footer {
 @media (max-width: 768px) {
     .header-div {
         flex-direction: column;
-        align-items: flex-start;
+        align-items: flex-end;
     }
 
     header h1 {
@@ -116,7 +132,6 @@ footer {
         padding: 15px;
     }
 }
-
     </style>
 </head>
 <body>

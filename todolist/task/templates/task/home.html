@@ -16,8 +16,9 @@
         <li><button onclick="filterTasks('in_progress', 'all')">In Progress</button></li>
         <li><button onclick="filterTasks('completed', 'all')">Completed</button></li>
         <li><button onclick="filterTasks('archived', 'all')">Archived</button></li>   
-        <button class="add-task" onclick="openAddTaskModal()">+ Add Task</button>
+        
     </ul>
+    <button class="add-task" onclick="openAddTaskModal()">+ Add Task</button>
     </div>
     <div class="sidebar-footer">
         
@@ -26,10 +27,10 @@
                 
                 <form method="post" action="{% url 'logout' %}" style="display: inline;">
                     {% csrf_token %}
-                    <button class="button" type="submit">Logout</button>
+                    <button class="accountbutton" type="submit">Logout</button>
                 </form>
             {% else %}
-                <a class="button" href="{% url 'login' %}">Login</a>
+                <a class="accountbutton" href="{% url 'login' %}">Login</a>
             {% endif %}
         </div>
     </div>
@@ -42,6 +43,8 @@
         <!-- Header -->
         <div class="header">
             <h1>All Tasks</h1>
+            <!-- Floating Add Task Button -->
+            <button class="floating-add-task-button wave" onclick="openAddTaskModal()">+</button>
             <div class="header-actions">
                 <input type="text" class="search-bar" placeholder="Search tasks..." oninput="searchTasks()" />
                 <button class="filter-button" onclick="openFilterModal()">Filters</button>
@@ -282,6 +285,7 @@
     transition: color 0.3s ease;
     background-color: transparent;
     border: none;
+    cursor: pointer;
 }
 
 .sidebar-menu button.active {
@@ -295,18 +299,19 @@
 .sidebar-footer {
     margin-top: 30px;
 }
-.sidebar-footer .button{
+.sidebar-footer .accountbutton{
     width: 100%;
     padding: 10px;
     background-color: transparent;
     color: #fff;
-    border: none;
+
+    border: 1px solid  white;
     border-radius: 5px;
     cursor: pointer;
     font-size: 16px;
     transition: background-color 0.3s ease;
 }
-.sidebar-menu .button:hover {
+.sidebar-footer  .accountbutton:hover {
     background-color: #1abc9c;
 }
 
@@ -315,8 +320,8 @@
 .add-task {
     width: 100%;
     padding: 10px;
-    background-color: #b1e8dd;
-    color: #a15353;
+    background-color: #1abc9c;
+    color: #ffffff;
     border: none;
     border-radius: 5px;
     cursor: pointer;
@@ -789,6 +794,48 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add a shadow for better visibility */
 }
 
+/* Floating Add Task Button */
+.floating-add-task-button {
+    position: fixed;
+    bottom: 60px;
+    right: 60px;
+    width: 60px;
+    height: 60px;
+    background-color: #1abc9c;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    font-size: 24px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000; /* Ensure it's above other content */
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.floating-add-task-button:hover {
+    background-color: #16a085;
+    transform: scale(1.1); /* Slightly enlarge on hover */
+}
+
+/* Wave Animation */
+@keyframes wave {
+    0% {
+        box-shadow: 0 0 0 0 rgba(26, 188, 156, 0.4);
+    }
+    100% {
+        box-shadow: 0 0 0 20px rgba(26, 188, 156, 0);
+    }
+}
+
+.floating-add-task-button.wave {
+    animation: wave 1.5s infinite; /* Continuous wave animation */
+}
+
+
+
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
     .sidebar {
@@ -823,6 +870,14 @@
 
     .task-grid {
         grid-template-columns: 1fr; /* Single column layout on mobile */
+    }
+
+    .floating-add-task-button {
+        bottom: 15px;
+        right: 15px;
+        width: 50px;
+        height: 50px;
+        font-size: 20px;
     }
 }
 </style>

@@ -309,10 +309,18 @@
         <h1>{{ task.title }}</h1>
         <p><strong>Status:</strong> {{ task.status }}</p>
         <p><strong>Description:</strong> {{ task.description }}</p>
+        <button onclick="getAiProcedure({{ task.id }})">AI Procedure</button>
+        <p id="procedure-{{ task.id }}"></p>
+        <form action="{% url 'ai_task_management' task.id %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="task_id" value="{{ task.id }}">
+            <textarea name="procedure" placeholder="Enter procedure details here" value="{{ task.procedure }}"></textarea>
+            <button type="submit">Manage task with ai</button>
+        </form>
         <p><strong>Priority:</strong> {{ task.get_priority_display }}</p>   
         <p><strong>Due Date:</strong> {{ task.due_date }}</p>  
         <p><strong>Created At:</strong> {{ task.created_at }}</p>
-
+ 
         <div class="subtask">
             <h3>Subtasks</h3>
             <ul>
@@ -456,6 +464,17 @@
     </div>
 
     <script>
+        function getAiProcedure(taskId) {
+    fetch(`/generate-ai-procedure/${taskId}/`)
+      .then(response => response.json())
+      .then(data => {
+        document.getElementById(`procedure-${taskId}`).innerText = data.procedure;
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Failed to generate procedure.');
+      });
+  }
         function toggleEditForm() {
             var editForm = document.getElementById("editForm");
             var editBtn = document.getElementById("editBtn");

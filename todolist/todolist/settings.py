@@ -45,6 +45,8 @@ INSTALLED_APPS = [
     'chat',
     'leaderboard',
 
+    'ai_task_management'
+
 ]
 
 

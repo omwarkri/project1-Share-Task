@@ -693,3 +693,44 @@ def add_task_note(request, task_id):
     else:
         form = TaskNotesForm()
     return render(request, 'task/task_detail.html', {'form': form, 'task': task})
+
+
+
+# from google import genai
+
+
+
+from google import generativeai  # Note the capital 'C' in Client
+
+from dotenv import load_dotenv
+import os
+
+# Load environment variables from .env file
+load_dotenv()
+ai_key = os.getenv("AI_KEY")
+
+from chat.models import ChatAIMessage
+
+def generate_ai_procedure(request, task_id):
+    client =  generativeai.configure(api_key=ai_key)
+    model=generativeai.GenerativeModel('gemini-1.5-flash')
+    if request.method == "GET":
+        task = get_object_or_404(Task, id=task_id)  # Assuming Task is your model
+        title = task.title
+        description = task.description
+        
+        # Example prompt to fetch procedure
+        prompt = f"Provide a step-by-step procedure to accomplish the task '{title}''{description}"
+        try:
+            response = model.generate_content(
+                prompt
+            )
+            print(response.text)
+            procedure = response.text
+            ChatAIMessage.objects.create(task_id=task_id, sender="AI", message=f"These is Procedure :- {procedure}")
+            task.procedure=procedure
+            task.save()
+        except Exception as e:
+            procedure = f"Error generating procedure: {str(e)}"
+        
+        return JsonResponse({"procedure": procedure})

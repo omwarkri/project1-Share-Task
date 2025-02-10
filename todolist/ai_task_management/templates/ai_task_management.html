@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Chat with Task Procedure</title>
+  <style>
+    /* General Styles */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f0f4f8;
+      color: #333;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .container {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      max-width: 1200px;
+      width: 100%;
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      height: 90vh;
+    }
+
+    /* Left Section (Task Procedure) */
+    .left-section {
+      background: #dceefb;
+      color: #333;
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow-y: auto;
+      position: relative;
+    }
+
+    .left-section h3 {
+      font-size: 20px;
+      margin-bottom: 10px;
+    }
+
+    .left-section p {
+      font-size: 14px;
+      color: #555;
+      line-height: 1.5;
+    }
+
+    /* Right Section (Chat Box) */
+    .right-section {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background: #ffffff;
+      overflow: hidden;
+    }
+
+    .chat-header {
+      background: #b3d7ff;
+      color: #333;
+      padding: 20px;
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .chat-box {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      background: #e9f5ff;
+      border-top: 1px solid #e0e0e0;
+    }
+
+    .chat-message {
+      margin: 10px 0;
+      padding: 10px 15px;
+      border-radius: 8px;
+      max-width: 70%;
+      word-wrap: break-word;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .chat-message.user {
+      background: #d5e7fc;
+      color: #333;
+      margin-left: auto;
+    }
+
+    .chat-message.ai {
+      background: #d6f6db;
+      color: #333;
+      margin-right: auto;
+    }
+
+    /* Chat Input Form */
+    form {
+      display: flex;
+      gap: 10px;
+      padding: 20px;
+      background: #ffffff;
+      border-top: 1px solid #e0e0e0;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.3s ease;
+    }
+
+    input[type="text"]:focus {
+      border-color: #64b5f6;
+    }
+
+    button {
+      padding: 10px 20px;
+      background: #64b5f6;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background: #42a5f5;
+    }
+
+    /* + Sign and Options */
+    .add-options {
+      position: fixed;
+      left: 20px;
+      top: 20px;
+      display: inline-block;
+    }
+
+    .add-button {
+      background: #64b5f6;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      font-size: 24px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.3s ease;
+    }
+
+    .add-button:hover {
+      background: #42a5f5;
+    }
+
+    #noteFormContainer {
+      display: none; /* Initially hide the form container */
+    }
+
+    .options-dropdown {
+      position: absolute;
+      top: 50px;
+      right: 0;
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      display: none;
+      z-index: 10;
+    }
+
+    .options-dropdown button {
+      display: block;
+      width: 100%;
+      padding: 10px 20px;
+      text-align: left;
+      background: none;
+      border: none;
+      color: #333;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .options-dropdown button:hover {
+      background: #f0f4f8;
+    }
+
+    #noteFormContainer.show {
+      display: block; /* Show the form when the 'show' class is added */
+      position: absolute; /* Position the form over the content */
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent white background */
+      padding: 20px;
+      z-index: 2; /* Ensure form is on top */
+      overflow-y: auto; /* Handle potential overflow */
+    }
+
+    #noteFormContainer form {
+      background-color: white; /* Optional: Set background for the form itself */
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .show {
+      display: block;
+    }
+
+    /* Disable procedure section when form is visible */
+    .left-section.disabled {
+      pointer-events: none; /* Disable interactions */
+      opacity: 0.5; /* Reduce opacity to indicate it's disabled */
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Left Section (Procedure Info) -->
+    <div class="left-section">
+      <h3>Task Procedure:</h3>
+      <p id="procedure-content">{{ procedure }}</p>
+      <!-- Container for the form -->
+      <div id="noteFormContainer">
+        <form method="POST" action="{% url 'add_task_note' task.id %}">
+          <div>
+            {% csrf_token %}
+            {{ notes_form.as_p }}
+          </div>
+            <div>
+                <button type="submit" class="submit-button">Add Note</button>
+                <button type="button" onclick="closeForm()">Close</button>
+            </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Right Section (Chat Box) -->
+    <div class="right-section">
+      <div class="chat-header">
+        AI Chat
+        <div class="add-options">
+          <button class="add-button" onclick="toggleOptions()">+</button>
+          <div class="options-dropdown" id="optionsDropdown">
+            <button onclick="addNotes()">Add Notes</button>
+            <button onclick="addSubTask()">Add Sub Task</button>
+          </div>
+        </div>
+      </div>
+      <div class="chat-box">
+        {% for message in messages %}
+          <div class="chat-message {{ message.sender|lower }}">
+            <strong>{{ message.sender }}:</strong> <span class="message-content">{{ message.message }}</span>
+          </div>
+        {% empty %}
+          <p>No messages yet.</p>
+        {% endfor %}
+      </div>
+
+      <!-- Chat Input -->
+      <form method="post" action="{% url 'ai_task_management' task.id %}">
+        {% csrf_token %}
+        <input type="text" name="user_message" placeholder="Ask AI..." required />
+        <button type="submit">Send</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Function to replace **text** with <strong>text</strong>
+    function formatBoldText(element) {
+      element.innerHTML = element.innerHTML.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    }
+
+    // Function to add line breaks after periods, excluding specific cases
+    function addLineBreaksAfterPeriods(element) {
+      // Replace numbers followed by a period and space (e.g., "2. ") with a line break
+      element.innerHTML = element.innerHTML.replace(
+        /(\d+\. )/g, // Match numbers followed by a period and space
+        '<br>$1' // Add a line break before the number
+      );
+
+      // Replace regular sentence-ending periods with line breaks
+      element.innerHTML = element.innerHTML.replace(
+        /(?<!\d|\.\S)\. /g, // Match periods not preceded by a digit or part of an abbreviation
+        '.<br>'
+      );
+    }
+
+    // Function to format headings and structure content
+    function formatProcedureContent(element) {
+      // Replace "Phase X:" with bold headings
+      element.innerHTML = element.innerHTML.replace(
+        /Phase \d+:.*?(?=<br>|$)/g, // Match "Phase X:" and its content until the next line break or end
+        (match) => `<strong>${match}</strong>`
+      );
+
+      // Replace numbered lists with proper line breaks
+      element.innerHTML = element.innerHTML.replace(
+        /(\d+\. .*?(?=<br>|$))/g, // Match numbered lists and their content
+        (match) => `<br>${match}`
+      );
+    }
+
+    // Apply to procedure content
+    const procedureContent = document.getElementById('procedure-content');
+    if (procedureContent) {
+      formatBoldText(procedureContent);
+      addLineBreaksAfterPeriods(procedureContent);
+      formatProcedureContent(procedureContent);
+    }
+
+    // Apply to all chat messages
+    const messageContents = document.querySelectorAll('.message-content');
+    messageContents.forEach(message => {
+      formatBoldText(message);
+      addLineBreaksAfterPeriods(message);
+    });
+
+    // Toggle options dropdown
+    function toggleOptions() {
+      const dropdown = document.getElementById('optionsDropdown');
+      dropdown.classList.toggle('show');
+    }
+
+    // Close dropdown if clicked outside
+    window.onclick = function(event) {
+      if (!event.target.matches('.add-button')) {
+        const dropdowns = document.getElementsByClassName('options-dropdown');
+        for (let dropdown of dropdowns) {
+          if (dropdown.classList.contains('show')) {
+            dropdown.classList.remove('show');
+          }
+        }
+      }
+    };
+
+    // Show the form and disable the procedure section
+    function addNotes() {
+      const noteFormContainer = document.getElementById('noteFormContainer');
+      const leftSection = document.querySelector('.left-section');
+
+      noteFormContainer.classList.add('show'); // Show the form
+      leftSection.classList.add('disabled'); // Disable the procedure section
+    }
+
+    // Close the form and re-enable the procedure section
+    function closeForm() {
+      const noteFormContainer = document.getElementById('noteFormContainer');
+      const leftSection = document.querySelector('.left-section');
+
+      noteFormContainer.classList.remove('show'); // Hide the form
+      leftSection.classList.remove('disabled'); // Re-enable the procedure section
+    }
+
+    // Add Sub Task
+    function addSubTask() {
+      alert('Add Sub Task functionality here.');
+      // You can replace this with actual logic to add sub tasks.
+    }
+  </script>
+</body>
+</html>

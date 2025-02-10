@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Message
+from .models import Message, ChatAIMessage
 
 @admin.register(Message)
 class MessageAdmin(admin.ModelAdmin):
@@ -19,3 +19,10 @@ class MessageAdmin(admin.ModelAdmin):
             'classes': ('collapse',),
         }),
     )
+
+
+@admin.register(ChatAIMessage)
+class ChatAIMessageAdmin(admin.ModelAdmin):
+    list_display = ('id', 'task_id', 'sender', 'message', 'timestamp')
+
+

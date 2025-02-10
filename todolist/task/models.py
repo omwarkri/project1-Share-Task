@@ -38,7 +38,7 @@ class Task(models.Model):
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
     dependencies = models.ManyToManyField('self', through='TaskDependency', symmetrical=False, related_name='dependent_tasks')
-
+    procedure = models.TextField(blank=True, null=True) 
     def __str__(self):
         return self.title
 

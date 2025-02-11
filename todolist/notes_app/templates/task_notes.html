@@ -1,0 +1,21 @@
+<h2>Task: {{ task.title }}</h2>
+
+<h3>Notes:</h3>
+<ul>
+  {% for note in notes %}
+    <li>
+      <strong>{{ note.user.username if note.user else 'Anonymous' }}:</strong> {{ note.note_text }}
+      <br>
+      <small>Added on {{ note.created_at }}</small>
+    </li>
+  {% empty %}
+    <li>No notes available for this task.</li>
+  {% endfor %}
+</ul>
+
+<h3>Add a Note:</h3>
+<form method="POST">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit">Add Note</button>
+</form>

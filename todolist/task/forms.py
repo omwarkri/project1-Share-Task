@@ -57,7 +57,7 @@ class SubTaskForm(forms.ModelForm):
 
 # forms.py
 from django import forms
-from .models import TaskNotes
+from notes_app.models import TaskNotes
 
 class TaskNotesForm(forms.ModelForm):
     class Meta:

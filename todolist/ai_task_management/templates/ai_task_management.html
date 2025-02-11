@@ -39,12 +39,19 @@
     .left-section {
       background: #dceefb;
       color: #333;
-      padding: 30px;
+ 
       display: flex;
+      overflow: hidden;
       flex-direction: column;
       justify-content: space-between;
-      overflow-y: auto;
-      position: relative;
+      height: 100%; /* Ensure it takes full height */
+    }
+
+    .procedureSection {
+      flex: 1; /* Take up remaining space */
+      overflow-y: auto; /* Enable vertical scrolling */
+      padding-right: 10px; /* Add padding to avoid scrollbar overlap */
+      padding: 30px;
     }
 
     .left-section h3 {
@@ -65,6 +72,7 @@
       justify-content: space-between;
       background: #ffffff;
       overflow: hidden;
+      height: 100%; /* Ensure it takes full height */
     }
 
     .chat-header {
@@ -171,7 +179,17 @@
     }
 
     #noteFormContainer {
-      display: none; /* Initially hide the form container */
+      display: none; 
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      margin-top: 20px;
+      overflow: scroll;
+    }
+
+    #noteFormContainer.show {
+      display: block; /* Show the form when the 'show' class is added */
     }
 
     .options-dropdown {
@@ -202,37 +220,11 @@
       background: #f0f4f8;
     }
 
-    #noteFormContainer.show {
-      display: block; /* Show the form when the 'show' class is added */
-      position: absolute; /* Position the form over the content */
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent white background */
-      padding: 20px;
-      z-index: 2; /* Ensure form is on top */
-      overflow-y: auto; /* Handle potential overflow */
-    }
-
-    #noteFormContainer form {
-      background-color: white; /* Optional: Set background for the form itself */
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
     .show {
       display: block;
     }
-
-    /* Disable procedure section when form is visible */
-    .left-section.disabled {
-      pointer-events: none; /* Disable interactions */
-      opacity: 0.5; /* Reduce opacity to indicate it's disabled */
+    .hide {
+      display: none;
     }
   </style>
 </head>
@@ -240,20 +232,13 @@
   <div class="container">
     <!-- Left Section (Procedure Info) -->
     <div class="left-section">
-      <h3>Task Procedure:</h3>
-      <p id="procedure-content">{{ procedure }}</p>
+      <div class="procedureSection">
+        <h3>Task Procedure:</h3>
+        <p id="procedure-content">{{ procedure }}</p>
+      </div>
       <!-- Container for the form -->
       <div id="noteFormContainer">
-        <form method="POST" action="{% url 'add_task_note' task.id %}">
-          <div>
-            {% csrf_token %}
-            {{ notes_form.as_p }}
-          </div>
-            <div>
-                <button type="submit" class="submit-button">Add Note</button>
-                <button type="button" onclick="closeForm()">Close</button>
-            </div>
-        </form>
+        {% include 'notes_section.html' %}
       </div>
     </div>
 
@@ -360,19 +345,19 @@
     // Show the form and disable the procedure section
     function addNotes() {
       const noteFormContainer = document.getElementById('noteFormContainer');
-      const leftSection = document.querySelector('.left-section');
+      const leftSection = document.querySelector('.procedureSection');
 
       noteFormContainer.classList.add('show'); // Show the form
-      leftSection.classList.add('disabled'); // Disable the procedure section
+      leftSection.classList.add('hide'); // Hide the procedure section
     }
 
     // Close the form and re-enable the procedure section
     function closeForm() {
       const noteFormContainer = document.getElementById('noteFormContainer');
-      const leftSection = document.querySelector('.left-section');
+      const leftSection = document.querySelector('.procedureSection');
 
       noteFormContainer.classList.remove('show'); // Hide the form
-      leftSection.classList.remove('disabled'); // Re-enable the procedure section
+      leftSection.classList.remove('hide'); // Show the procedure section
     }
 
     // Add Sub Task

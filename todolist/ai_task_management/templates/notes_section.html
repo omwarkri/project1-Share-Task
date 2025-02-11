@@ -1,0 +1,225 @@
+<style>
+    /* Notes Section Styles */
+    #noteList {
+        list-style-type: none;
+        padding: 0;
+        margin: 0 0 20px 0;
+    }
+
+    #noteList li {
+        background: #f9f9f9;
+        padding: 15px;
+        margin-bottom: 10px;
+        border-radius: 8px;
+        border: 1px solid #e0e0e0;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    #noteList li strong {
+        color: #333;
+        font-weight: bold;
+    }
+
+    #noteList li small {
+        color: #777;
+        font-size: 12px;
+        display: block;
+        margin-top: 5px;
+    }
+
+    #noteFormWrapper {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        background: #f5f5f5;
+        display: none;
+        padding: 20px;
+    }
+
+    #noteForm {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    #noteText {
+        flex-grow: 1;
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 14px;
+        outline: none;
+        resize: none;
+    }
+
+    #noteHeader {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    #backButton {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background: #64b5f6;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    #submitNote {
+        padding: 10px 20px;
+        background: #64b5f6;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        cursor: pointer;
+    }
+
+    #addNoteButton {
+        position: fixed; /* Fixed positioning */
+        bottom: 20px; /* Distance from the bottom */
+        right: 20px; /* Distance from the right */
+        background: #64b5f6;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        font-size: 24px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.3s ease;
+        z-index: 1000; /* Ensure it's above other elements */
+    }
+
+    #addNoteButton:hover {
+        background: #42a5f5;
+    }
+</style>
+
+<!-- Notes Section -->
+<div class="notesapp">
+    <h3>Notes:</h3>
+    <ul id="noteList"></ul>
+
+    <button id="addNoteButton">+</button>
+
+    <div id="noteFormWrapper">
+        <div id="noteHeader">
+            <button id="backButton">&#8592;</button>
+        </div>
+        <div id="noteForm">
+            <textarea id="noteText" placeholder="Enter your note..."></textarea>
+            <button id="submitNote" onclick="submitNote()">Save Note</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Load notes from the server
+    function loadNotes() {
+        fetch("{% url 'get_task_notes' task.id %}", {
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            const noteList = document.getElementById('noteList');
+            noteList.innerHTML = ''; // Clear previous notes
+
+            if (data.status === 'success') {
+                data.notes.forEach(note => {
+                    const noteItem = document.createElement('li');
+                    noteItem.innerHTML = `
+                        <strong>${note.username}</strong>: ${note.note_text}
+                        <br>
+                        <small>Added on ${note.created_at}</small>
+                    `;
+                    noteList.appendChild(noteItem);
+                });
+            } else {
+                noteList.innerHTML = '<li>No notes available for this task.</li>';
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    // Show the note form
+    function showNoteForm() {
+        document.getElementById('noteList').style.display = 'none';
+        document.getElementById('addNoteButton').style.display = 'none';
+        document.getElementById('noteFormWrapper').style.display = 'block';
+    }
+
+    // Hide the note form
+    function hideNoteForm() {
+        const noteText = document.getElementById('noteText').value.trim();
+        if (noteText) {
+            submitNote();
+        } else {
+            document.getElementById('noteFormWrapper').style.display = 'none';
+            document.getElementById('noteList').style.display = 'block';
+            document.getElementById('addNoteButton').style.display = 'block';
+        }
+    }
+
+    // Submit a new note
+    function submitNote() {
+        const noteText = document.getElementById('noteText').value.trim();
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+        if (!noteText) {
+            alert('Please enter a note.');
+            return;
+        }
+
+        fetch("{% url 'add_task_note' task.id %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken,
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+            body: JSON.stringify({ note_text: noteText }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                document.getElementById('noteText').value = ''; // Clear the textarea
+                document.getElementById('noteFormWrapper').style.display = 'none';
+                document.getElementById('noteList').style.display = 'block';
+                document.getElementById('addNoteButton').style.display = 'block';
+                loadNotes(); // Reload notes after saving
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while adding the note.');
+        });
+    }
+
+    document.getElementById('addNoteButton').addEventListener('click', showNoteForm);
+    document.getElementById('backButton').addEventListener('click', hideNoteForm);
+
+    // Load notes when the page loads
+    document.addEventListener('DOMContentLoaded', loadNotes);
+</script>

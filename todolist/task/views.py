@@ -2,7 +2,7 @@
 from django.shortcuts import render
 from .models import Task
 
-
+from notes_app.models import TaskNotes
 
 from django.shortcuts import render, redirect
 from .models import Task
@@ -653,7 +653,7 @@ def update_task_dependencies(request, task_id):
 # views.py
 from django.shortcuts import get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
-from .models import Task, TaskNotes
+from .models import Task
 from .forms import TaskNotesForm
 
 @login_required
@@ -676,7 +676,7 @@ def add_task_note(request, task_id):
 # views.py
 from django.shortcuts import get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
-from .models import Task, TaskNotes
+from .models import Task
 from .forms import TaskNotesForm
 
 @login_required

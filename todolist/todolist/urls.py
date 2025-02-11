@@ -65,6 +65,7 @@ urlpatterns = [
     path('',include('leaderboard.urls')),
     path('',include('task.urls')),
     path('',include('ai_task_management.urls')),
+    path('',include('notes_app.urls')),
     path('share-task/<int:task_id>/', complete_task, name='complete_task'),
     path('task/<int:task_id>/suggested_users/', suggested_users, name='suggested_users'),
     path('task/<int:task_id>/add_subtask/', add_subtask, name='add_subtask'),

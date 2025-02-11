@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'subscription',
     'chat',
     'leaderboard',
+    'notes_app',
 
     'ai_task_management'
 

@@ -5,288 +5,294 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AI Chat with Task Procedure</title>
   <style>
-    /* General Styles */
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      font-family: 'Arial', sans-serif;
-      background-color: #f0f4f8;
-      color: #333;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      overflow: hidden;
-    }
-
-    .container {
-      display: grid;
-      grid-template-columns: 1fr 2fr;
-      max-width: 1200px;
-      width: 100%;
-      background: #ffffff;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      overflow: hidden;
-      height: 90vh;
-    }
-
-    /* Left Section (Task Procedure) */
-    .left-section {
-      background: #dceefb;
-      color: #333;
- 
-      display: flex;
-      overflow: hidden;
-      flex-direction: column;
-      justify-content: space-between;
-      height: 100%; /* Ensure it takes full height */
-    }
-
-    .procedureSection {
-      flex: 1; /* Take up remaining space */
-      overflow-y: auto; /* Enable vertical scrolling */
-      padding-right: 10px; /* Add padding to avoid scrollbar overlap */
-      padding: 30px;
-    }
-
-    .left-section h3 {
-      font-size: 20px;
-      margin-bottom: 10px;
-    }
-
-    .left-section p {
-      font-size: 14px;
-      color: #555;
-      line-height: 1.5;
-    }
-
-    /* Right Section (Chat Box) */
-    .right-section {
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      background: #ffffff;
-      overflow: hidden;
-      height: 100%; /* Ensure it takes full height */
-    }
-
-    .chat-header {
-      background: #b3d7ff;
-      color: #333;
-      padding: 20px;
-      text-align: center;
-      font-size: 24px;
-      font-weight: bold;
-    }
-
-    .chat-box {
-      flex: 1;
-      padding: 20px;
-      overflow-y: auto;
-      background: #e9f5ff;
-      border-top: 1px solid #e0e0e0;
-    }
-
-    .chat-message {
-      margin: 10px 0;
-      padding: 10px 15px;
-      border-radius: 8px;
-      max-width: 70%;
-      word-wrap: break-word;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-
-    .chat-message.user {
-      background: #d5e7fc;
-      color: #333;
-      margin-left: auto;
-    }
-
-    .chat-message.ai {
-      background: #d6f6db;
-      color: #333;
-      margin-right: auto;
-    }
-
-    /* Chat Input Form */
-    form {
-      display: flex;
-      gap: 10px;
-      padding: 20px;
-      background: #ffffff;
-      border-top: 1px solid #e0e0e0;
-    }
-
-    input[type="text"] {
-      flex: 1;
-      padding: 10px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      font-size: 14px;
-      outline: none;
-      transition: border-color 0.3s ease;
-    }
-
-    input[type="text"]:focus {
-      border-color: #64b5f6;
-    }
-
-    button {
-      padding: 10px 20px;
-      background: #64b5f6;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 14px;
-      cursor: pointer;
-      transition: background 0.3s ease;
-    }
-
-    button:hover {
-      background: #42a5f5;
-    }
-
-    /* + Sign and Options */
-    .add-options {
-      position: fixed;
-      left: 20px;
-      top: 20px;
-      display: inline-block;
-    }
-
-    .add-button {
-      background: #64b5f6;
-      color: white;
-      border: none;
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      font-size: 24px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background 0.3s ease;
-    }
-
-    .add-button:hover {
-      background: #42a5f5;
-    }
-
-    #noteFormContainer {
-      display: none; 
-      background: #ffffff;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      margin-top: 20px;
-      overflow: scroll;
-      height: 100%;
-      position: relative;
-    }
-    #subTaskFormCOntainer {
-      display: none; 
-      background: #ffffff;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      margin-top: 20px;
-      overflow: scroll;
-      height: 100%;
-      position: relative;
-    }
-
-    #noteFormContainer.show {
-      display: block; /* Show the form when the 'show' class is added */
-    }
-    #subTaskFormCOntainer.show {
-  display: block; /* Ensure the container is visible when the 'show' class is added */
+/* General Styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-    .options-dropdown {
-      position: absolute;
-      top: 50px;
-      right: 0;
-      background: white;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      display: none;
-      z-index: 10;
-    }
+body {
+  font-family: 'Arial', sans-serif;
+  background-color: #f0f4f8;
+  color: #333;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  overflow: hidden;
+}
 
-    .options-dropdown button {
-      display: block;
-      width: 100%;
-      padding: 10px 20px;
-      text-align: left;
-      background: none;
-      border: none;
-      color: #333;
-      cursor: pointer;
-      transition: background 0.3s ease;
-    }
+.container {
+  display: grid;
+  grid-template-columns: 1fr; /* Single column for mobile */
+  max-width: 100%; /* Full width for mobile */
+  width: 100%;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  height: 100vh; /* Full height for mobile */
+}
 
-    .options-dropdown button:hover {
-      background: #f0f4f8;
-    }
+/* Left Section (Task Procedure) */
+.left-section {
+  background: #dceefb;
+  color: #333;
+  display: flex;
+  overflow: hidden;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
 
-    .show {
-      display: block;
-    }
-    .hide {
-      display: none;
-    }
-    @media (max-width: 768px) {
+.procedureSection {
+  flex: 1;
+  overflow-y: auto;
+  padding: 15px; /* Reduced padding for mobile */
+  position: relative;
+}
+
+.left-section h3 {
+  font-size: 18px; /* Smaller font size for mobile */
+  margin-bottom: 8px; /* Reduced margin for mobile */
+}
+
+.left-section p {
+  font-size: 12px; /* Smaller font size for mobile */
+  color: #555;
+  line-height: 1.5;
+}
+
+/* Right Section (Chat Box) */
+.right-section {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: #ffffff;
+  overflow: hidden;
+  height: 100%;
+}
+
+.chat-header {
+  background: #b3d7ff;
+  color: #333;
+  padding: 15px; /* Reduced padding for mobile */
+  text-align: center;
+  font-size: 20px; /* Smaller font size for mobile */
+  font-weight: bold;
+}
+
+.chat-box {
+  flex: 1;
+  padding: 15px; /* Reduced padding for mobile */
+  overflow-y: auto;
+  background: #e9f5ff;
+  border-top: 1px solid #e0e0e0;
+}
+
+.chat-message {
+  margin: 8px 0; /* Reduced margin for mobile */
+  padding: 8px 12px; /* Reduced padding for mobile */
+  border-radius: 8px;
+  max-width: 80%; /* Adjusted width for mobile */
+  word-wrap: break-word;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.chat-message.user {
+  background: #d5e7fc;
+  color: #333;
+  margin-left: auto;
+}
+
+.chat-message.ai {
+  background: #d6f6db;
+  color: #333;
+  margin-right: auto;
+}
+
+/* Chat Input Form */
+form {
+  display: flex;
+  gap: 8px; /* Reduced gap for mobile */
+  padding: 15px; /* Reduced padding for mobile */
+  background: #ffffff;
+  border-top: 1px solid #e0e0e0;
+}
+
+input[type="text"] {
+  flex: 1;
+  padding: 8px; /* Reduced padding for mobile */
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 12px; /* Smaller font size for mobile */
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+input[type="text"]:focus {
+  border-color: #64b5f6;
+}
+
+button {
+  padding: 8px 16px; /* Reduced padding for mobile */
+  background: #64b5f6;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 12px; /* Smaller font size for mobile */
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+button:hover {
+  background: #42a5f5;
+}
+
+/* + Sign and Options */
+.add-options {
+  position: fixed;
+  left: 10px; /* Adjusted position for mobile */
+  top: 10px; /* Adjusted position for mobile */
+  display: inline-block;
+}
+
+.add-button {
+  background: #64b5f6;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 36px; /* Smaller button size for mobile */
+  height: 36px; /* Smaller button size for mobile */
+  font-size: 20px; /* Smaller font size for mobile */
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.3s ease;
+}
+
+.add-button:hover {
+  background: #42a5f5;
+}
+
+#noteFormContainer {
+  display: none;
+  background: #ffffff;
+  padding: 15px; /* Reduced padding for mobile */
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin-top: 15px; /* Reduced margin for mobile */
+  overflow: hidden;
+  height: 100%;
+  position: relative;
+}
+
+#subTaskFormCOntainer {
+  display: none;
+  background: #ffffff;
+  padding: 15px; /* Reduced padding for mobile */
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin-top: 15px; /* Reduced margin for mobile */
+  overflow: scroll;
+  height: 100%;
+  position: relative;
+}
+
+#noteFormContainer.show,
+#subTaskFormCOntainer.show {
+  display: block;
+}
+
+.options-dropdown {
+  position: absolute;
+  top: 40px; /* Adjusted position for mobile */
+  right: 0;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  display: none;
+  z-index: 10;
+}
+
+.options-dropdown button {
+  display: block;
+  width: 100%;
+  padding: 8px 16px; /* Reduced padding for mobile */
+  text-align: left;
+  background: none;
+  border: none;
+  color: #333;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.options-dropdown button:hover {
+  background: #f0f4f8;
+}
+
+.show {
+  display: block;
+}
+
+.hide {
+  display: none;
+}
+
+/* Media Queries for Mobile Devices */
+@media (max-width: 600px) {
   .container {
-    grid-template-columns: 1fr; /* Stack sections on top of each other */
-    height: auto; /* Allow height to adjust dynamically */
+    grid-template-columns: 1fr; /* Single column for mobile */
+    height: 100vh; /* Full height for mobile */
   }
 
-  .left-section, .right-section {
-    width: 100%; /* Full width for mobile */
+  .left-section{
+    height: 35vh;
+  }
+  .right-section {
+    height: 50vh; /* Split height for mobile */
+  }
+
+  .procedureSection,
+  .chat-box {
+    padding: 10px; /* Further reduced padding for mobile */
+  }
+
+  .left-section h3 {
+    font-size: 16px; /* Smaller font size for mobile */
+  }
+
+  .left-section p {
+    font-size: 10px; /* Smaller font size for mobile */
   }
 
   .chat-header {
-    font-size: 20px; /* Slightly smaller font */
-    padding: 15px;
+    font-size: 18px; /* Smaller font size for mobile */
+    padding: 10px; /* Further reduced padding for mobile */
   }
 
-  .chat-box {
-    padding: 15px;
+  .chat-message {
+    font-size: 12px; /* Smaller font size for mobile */
+    padding: 6px 10px; /* Further reduced padding for mobile */
   }
 
-  input[type="text"], button {
-    font-size: 14px;
-    padding: 12px;
+  input[type="text"] {
+    font-size: 10px; /* Smaller font size for mobile */
   }
 
-  .add-options {
-    left: 50%;
-    transform: translateX(-50%);
-    top: auto;
-    bottom: 20px;
+  button {
+    font-size: 10px; /* Smaller font size for mobile */
   }
 
   .add-button {
-    width: 50px;
-    height: 50px;
-    font-size: 28px;
-  }
-
-  .options-dropdown {
-    left: 50%;
-    transform: translateX(-50%);
-    bottom: 60px;
-    right: auto;
+    width: 32px; /* Smaller button size for mobile */
+    height: 32px; /* Smaller button size for mobile */
+    font-size: 18px; /* Smaller font size for mobile */
   }
 }
-
   </style>
 </head>
 <body>
@@ -302,7 +308,6 @@
         {% include 'notes_section.html' %}
       </div>
       <div id="subTaskFormCOntainer">
-
         {% include 'sub_task.html' %}
       </div>
     </div>
@@ -408,38 +413,37 @@
     };
 
     // Show the form and disable the procedure section
-    // Show the form and disable the procedure section
-function addNotes() {
-  const noteFormContainer = document.getElementById('noteFormContainer');
-  const subTaskFormContainer = document.getElementById('subTaskFormCOntainer');
-  const leftSection = document.querySelector('.procedureSection');
+    function addNotes() {
+      const noteFormContainer = document.getElementById('noteFormContainer');
+      const subTaskFormContainer = document.getElementById('subTaskFormCOntainer');
+      const leftSection = document.querySelector('.procedureSection');
 
-  noteFormContainer.classList.add('show'); // Show the notes form
-  subTaskFormContainer.classList.remove('show'); // Hide the sub-task form if it's open
-  leftSection.classList.add('hide'); // Hide the procedure section
-}
+      noteFormContainer.classList.add('show'); // Show the notes form
+      subTaskFormContainer.classList.remove('show'); // Hide the sub-task form if it's open
+      leftSection.classList.add('hide'); // Hide the procedure section
+    }
 
-// Show the sub-task form and disable the procedure section
-function addSubTask() {
-  const noteFormContainer = document.getElementById('noteFormContainer');
-  const subTaskFormContainer = document.getElementById('subTaskFormCOntainer');
-  const leftSection = document.querySelector('.procedureSection');
+    // Show the sub-task form and disable the procedure section
+    function addSubTask() {
+      const noteFormContainer = document.getElementById('noteFormContainer');
+      const subTaskFormContainer = document.getElementById('subTaskFormCOntainer');
+      const leftSection = document.querySelector('.procedureSection');
 
-  subTaskFormContainer.classList.add('show'); // Show the sub-task form
-  noteFormContainer.classList.remove('show'); // Hide the notes form if it's open
-  leftSection.classList.add('hide'); // Hide the procedure section
-}
+      subTaskFormContainer.classList.add('show'); // Show the sub-task form
+      noteFormContainer.classList.remove('show'); // Hide the notes form if it's open
+      leftSection.classList.add('hide'); // Hide the procedure section
+    }
 
-// Close the form and re-enable the procedure section
-function closeForm() {
-  const noteFormContainer = document.getElementById('noteFormContainer');
-  const subTaskFormContainer = document.getElementById('subTaskFormCOntainer');
-  const leftSection = document.querySelector('.procedureSection');
+    // Close the form and re-enable the procedure section
+    function closeForm() {
+      const noteFormContainer = document.getElementById('noteFormContainer');
+      const subTaskFormContainer = document.getElementById('subTaskFormCOntainer');
+      const leftSection = document.querySelector('.procedureSection');
 
-  noteFormContainer.classList.remove('show'); // Hide the notes form
-  subTaskFormContainer.classList.remove('show'); // Hide the sub-task form
-  leftSection.classList.remove('hide'); // Show the procedure section
-}
+      noteFormContainer.classList.remove('show'); // Hide the notes form
+      subTaskFormContainer.classList.remove('show'); // Hide the sub-task form
+      leftSection.classList.remove('hide'); // Show the procedure section
+    }
   </script>
 </body>
 </html>

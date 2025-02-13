@@ -242,6 +242,51 @@
     .hide {
       display: none;
     }
+    @media (max-width: 768px) {
+  .container {
+    grid-template-columns: 1fr; /* Stack sections on top of each other */
+    height: auto; /* Allow height to adjust dynamically */
+  }
+
+  .left-section, .right-section {
+    width: 100%; /* Full width for mobile */
+  }
+
+  .chat-header {
+    font-size: 20px; /* Slightly smaller font */
+    padding: 15px;
+  }
+
+  .chat-box {
+    padding: 15px;
+  }
+
+  input[type="text"], button {
+    font-size: 14px;
+    padding: 12px;
+  }
+
+  .add-options {
+    left: 50%;
+    transform: translateX(-50%);
+    top: auto;
+    bottom: 20px;
+  }
+
+  .add-button {
+    width: 50px;
+    height: 50px;
+    font-size: 28px;
+  }
+
+  .options-dropdown {
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 60px;
+    right: auto;
+  }
+}
+
   </style>
 </head>
 <body>

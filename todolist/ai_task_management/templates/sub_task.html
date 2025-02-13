@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Subtasks</title>
+  <style>
+    /* General Styles */
+    body {
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(135deg, #f5f7fa, #e6e9ef);
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .custom-subtask-container {
+      max-width: 600px;
+      width: 100%;
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+      padding: 30px;
+    }
+
+    .custom-subtask-title {
+      color: #2c3e50;
+      font-size: 28px;
+      margin-bottom: 20px;
+      font-weight: 600;
+    }
+
+    .custom-subtask-heading {
+      color: #34495e;
+      font-size: 22px;
+      margin-bottom: 20px;
+      font-weight: 500;
+    }
+
+    /* Subtask List */
+    .custom-subtask-list {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .custom-subtask-item {
+      background: #ffffff;
+      margin-bottom: 12px;
+      padding: 16px;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: all 0.3s ease;
+    }
+
+    .custom-subtask-item:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .custom-completed {
+      text-decoration: line-through;
+      color: #95a5a6;
+    }
+
+    /* Toggle Button */
+    .custom-toggle-button {
+      background: none;
+      border: 2px solid #64b5f6;
+      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .custom-toggle-button.custom-completed {
+      background: #64b5f6;
+      border-color: #64b5f6;
+    }
+
+    .custom-toggle-button.custom-completed::before {
+      content: "✔";
+      color: white;
+      font-size: 14px;
+    }
+
+    /* Subtask Text */
+    .custom-subtask-text {
+      flex: 1;
+      margin: 0 16px;
+      font-size: 16px;
+      color: #333;
+    }
+
+    /* Add Subtask Form */
+    .custom-subtask-form {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .custom-subtask-form input {
+      flex: 1;
+      padding: 12px;
+      border: 2px solid #ddd;
+      border-radius: 12px;
+      font-size: 16px;
+      outline: none;
+      transition: border-color 0.3s ease;
+    }
+
+    .custom-subtask-form input:focus {
+      border-color: #64b5f6;
+      box-shadow: 0 0 8px rgba(100, 181, 246, 0.3);
+    }
+
+    .custom-subtask-form button {
+      background: linear-gradient(135deg, #64b5f6, #42a5f5);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 12px 24px;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .custom-subtask-form button:hover {
+      background: linear-gradient(135deg, #42a5f5, #64b5f6);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Empty State */
+    .custom-empty-state {
+      text-align: center;
+      color: #95a5a6;
+      font-size: 16px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="custom-subtask-container">
+    <h2 class="custom-subtask-title">Task: {{ task.title }}</h2>
+    <h3 class="custom-subtask-heading">Subtasks</h3>
+
+    <!-- Subtask List -->
+    <ul class="custom-subtask-list" id="subtask-list"></ul>
+    <p id="empty-message" class="custom-empty-state" style="display: none;">No subtasks yet.</p>
+
+    <!-- Add Subtask Form -->
+    <div class="custom-subtask-form">
+      <input type="text" id="new-subtask" placeholder="Add a new subtask">
+      <button onclick="addSubtask()">Add</button>
+    </div>
+
+    <!-- CSRF Token (Hidden) -->
+    <input type="hidden" id="csrf-token" value="{{ csrf_token }}">
+  </div>
+
+  <script>
+    const taskId = {{ task.id }};
+    const csrfToken = document.getElementById("csrf-token").value;
+
+    // Fetch and display subtasks
+    async function fetchSubtasks() {
+      const response = await fetch(`/api/tasks/${taskId}/subtasks/`);
+      const subtasks = await response.json();
+      const subtaskList = document.getElementById("subtask-list");
+      subtaskList.innerHTML = "";
+
+      if (subtasks.length === 0) {
+        document.getElementById("empty-message").style.display = "block";
+      } else {
+        document.getElementById("empty-message").style.display = "none";
+        subtasks.forEach(subtask => {
+          const li = document.createElement("li");
+          li.className = `custom-subtask-item ${subtask.completed ? "custom-completed" : ""}`;
+          li.innerHTML = `
+            <div class="custom-toggle-button ${subtask.completed ? "custom-completed" : ""}" onclick="toggleSubtask(${subtask.id})"></div>
+            <p class="custom-subtask-text">${subtask.title}</p>
+          `;
+          subtaskList.appendChild(li);
+        });
+      }
+    }
+
+    // Add a new subtask
+    async function addSubtask() {
+      const title = document.getElementById("new-subtask").value;
+      if (!title) return alert("Subtask title is required!");
+
+      const response = await fetch(`/api/tasks/${taskId}/subtasks/add/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": csrfToken
+        },
+        body: JSON.stringify({ title })
+      });
+
+      if (response.ok) {
+        document.getElementById("new-subtask").value = "";
+        fetchSubtasks();
+      } else {
+        alert("Error adding subtask!");
+      }
+    }
+
+    // Toggle subtask completion
+    async function toggleSubtask(subtaskId) {
+      const response = await fetch(`/api/subtasks/${subtaskId}/toggle/`, {
+        method: "POST",
+        headers: { "X-CSRFToken": csrfToken }
+      });
+
+      if (response.ok) fetchSubtasks();
+    }
+
+    // Load subtasks on page load
+    fetchSubtasks();
+  </script>
+</body>
+</html>

@@ -427,6 +427,31 @@ def toggle_subtask(request, subtask_id):
     return redirect('task_detail', task_id=subtask.task.id)
 
 
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import json
+from .models import Task, SubTask
+
+def get_subtasks(request, task_id):
+    subtasks = SubTask.objects.filter(task_id=task_id).values("id", "title", "completed")
+    return JsonResponse(list(subtasks), safe=False)
+
+@csrf_exempt
+def add_subtask(request, task_id):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        task = Task.objects.get(id=task_id)
+        subtask = SubTask.objects.create(task=task, title=data["title"], completed=False)
+        return JsonResponse({"id": subtask.id, "title": subtask.title, "completed": subtask.completed})
+
+@csrf_exempt
+def toggle_subtask(request, subtask_id):
+    subtask = SubTask.objects.get(id=subtask_id)
+    subtask.completed = not subtask.completed
+    subtask.save()
+    return JsonResponse({"id": subtask.id, "completed": subtask.completed})
+
+
 
 
 from django.shortcuts import render, get_object_or_404, redirect
@@ -673,26 +698,6 @@ def add_task_note(request, task_id):
 
 
 
-# views.py
-from django.shortcuts import get_object_or_404, redirect
-from django.contrib.auth.decorators import login_required
-from .models import Task
-from .forms import TaskNotesForm
-
-@login_required
-def add_task_note(request, task_id):
-    task = get_object_or_404(Task, id=task_id)
-    if request.method == 'POST':
-        form = TaskNotesForm(request.POST)
-        if form.is_valid():
-            note = form.save(commit=False)
-            note.task = task
-            note.user = request.user
-            note.save()
-            return redirect('task_detail', task_id=task.id)
-    else:
-        form = TaskNotesForm()
-    return render(request, 'task/task_detail.html', {'form': form, 'task': task})
 
 
 

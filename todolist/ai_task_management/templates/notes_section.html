@@ -119,20 +119,46 @@
     }
 
     /* Loading styles */
-    #loadingSpinner {
-        display: none;
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        font-size: 24px;
-        color: #64b5f6;
-    }
+    /* Loading Spinner */
+#loadingSpinner {
+  display: none;
+
+  height:100%;
+  width: 100%;
+  background-color: rgb(127, 74, 74);
+
+ 
+
+}
+
+#loadingSpinner div{
+
+
+  height:50px;
+  width: 50px;
+    border: 5px solid #f3f3f3;
+  border-top: 5px solid #64b5f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+    
+}
+
+/* Spinner Animation */
+@keyframes spin {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+
+
 
 </style>
 
 <!-- Notes Section -->
 <div class="notesapp">
+    <div id="loadingSpinner">
+        <div id="spinner"></div>
+    </div>
     <h3>Notes:</h3>
     <ul id="noteList"></ul>
 
@@ -148,7 +174,7 @@
         </div>
     </div>
 
-    <div id="loadingSpinner">Loading...</div>
+    
 </div>
 
 <script>
@@ -340,3 +366,4 @@ document.getElementById('submitNote').addEventListener('click', () => {
 // Load notes when the page loads
 document.addEventListener('DOMContentLoaded', loadNotes);
 </script>
+

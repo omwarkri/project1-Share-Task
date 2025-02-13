@@ -189,10 +189,24 @@
       height: 100%;
       position: relative;
     }
+    #subTaskFormCOntainer {
+      display: none; 
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      margin-top: 20px;
+      overflow: scroll;
+      height: 100%;
+      position: relative;
+    }
 
     #noteFormContainer.show {
       display: block; /* Show the form when the 'show' class is added */
     }
+    #subTaskFormCOntainer.show {
+  display: block; /* Ensure the container is visible when the 'show' class is added */
+}
 
     .options-dropdown {
       position: absolute;
@@ -241,6 +255,10 @@
       <!-- Container for the form -->
       <div id="noteFormContainer">
         {% include 'notes_section.html' %}
+      </div>
+      <div id="subTaskFormCOntainer">
+
+        {% include 'sub_task.html' %}
       </div>
     </div>
 
@@ -345,28 +363,38 @@
     };
 
     // Show the form and disable the procedure section
-    function addNotes() {
-      const noteFormContainer = document.getElementById('noteFormContainer');
-      const leftSection = document.querySelector('.procedureSection');
+    // Show the form and disable the procedure section
+function addNotes() {
+  const noteFormContainer = document.getElementById('noteFormContainer');
+  const subTaskFormContainer = document.getElementById('subTaskFormCOntainer');
+  const leftSection = document.querySelector('.procedureSection');
 
-      noteFormContainer.classList.add('show'); // Show the form
-      leftSection.classList.add('hide'); // Hide the procedure section
-    }
+  noteFormContainer.classList.add('show'); // Show the notes form
+  subTaskFormContainer.classList.remove('show'); // Hide the sub-task form if it's open
+  leftSection.classList.add('hide'); // Hide the procedure section
+}
 
-    // Close the form and re-enable the procedure section
-    function closeForm() {
-      const noteFormContainer = document.getElementById('noteFormContainer');
-      const leftSection = document.querySelector('.procedureSection');
+// Show the sub-task form and disable the procedure section
+function addSubTask() {
+  const noteFormContainer = document.getElementById('noteFormContainer');
+  const subTaskFormContainer = document.getElementById('subTaskFormCOntainer');
+  const leftSection = document.querySelector('.procedureSection');
 
-      noteFormContainer.classList.remove('show'); // Hide the form
-      leftSection.classList.remove('hide'); // Show the procedure section
-    }
+  subTaskFormContainer.classList.add('show'); // Show the sub-task form
+  noteFormContainer.classList.remove('show'); // Hide the notes form if it's open
+  leftSection.classList.add('hide'); // Hide the procedure section
+}
 
-    // Add Sub Task
-    function addSubTask() {
-      alert('Add Sub Task functionality here.');
-      // You can replace this with actual logic to add sub tasks.
-    }
+// Close the form and re-enable the procedure section
+function closeForm() {
+  const noteFormContainer = document.getElementById('noteFormContainer');
+  const subTaskFormContainer = document.getElementById('subTaskFormCOntainer');
+  const leftSection = document.querySelector('.procedureSection');
+
+  noteFormContainer.classList.remove('show'); // Hide the notes form
+  subTaskFormContainer.classList.remove('show'); // Hide the sub-task form
+  leftSection.classList.remove('hide'); // Show the procedure section
+}
   </script>
 </body>
 </html>

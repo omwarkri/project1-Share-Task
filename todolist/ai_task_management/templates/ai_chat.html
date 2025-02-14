@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Chat</title>
+  <style>
+    .chat-box {
+      height: 300px;
+      overflow-y: auto;
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+    .chat-message {
+      margin-bottom: 10px;
+    }
+    .chat-message.user {
+      text-align: right;
+      color: blue;
+    }
+    .chat-message.ai {
+      text-align: left;
+      color: green;
+    }
+    .chat-input-container {
+      display: flex;
+      gap: 10px;
+    }
+    #message-input {
+      flex: 1;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    #send-button {
+      padding: 8px 16px;
+      background: #64b5f6;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    #send-button:hover {
+      background: #42a5f5;
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-box" id="chat-box">
+    <!-- Messages will be loaded here dynamically -->
+  </div>
+  
+  <form class="chat-input-container" onsubmit="sendMessageHandler(event)">
+    <input type="text" id="message-input" placeholder="Type your message..." required />
+    <button id="send-button" type="submit">Send</button>
+  </form>
+
+  <script>
+    // Ensure task ID is safely retrieved from Django template
+    const taskId = "{{ task.id }}";
+    const csrftoken = "{{ csrf_token }}"; // Get CSRF token from Django
+
+    // Function to load messages from the server
+    async function loadMessages() {
+      try {
+        const response = await fetch(`/chat_ai_view/${taskId}/`);
+        const messages = await response.json();
+
+        const chatBox = document.getElementById('chat-box');
+        chatBox.innerHTML = ''; // Clear existing messages
+
+        messages.forEach(message => {
+          const messageElement = document.createElement('div');
+          messageElement.classList.add('chat-message', message.sender.toLowerCase());
+          messageElement.innerHTML = `
+            <strong>${message.sender}:</strong> ${message.message}
+            <br><small>${message.timestamp}</small>
+          `;
+          chatBox.appendChild(messageElement);
+        });
+
+        // Scroll to the bottom of the chat box
+        chatBox.scrollTop = chatBox.scrollHeight;
+      } catch (error) {
+        console.error('Error loading messages:', error);
+      }
+    }
+
+    // Function to send a message to the server
+    async function sendMessage(message) {
+      console.log("Sending message:", message); // Debugging
+      try {
+        const response = await fetch(`/chat_ai_view/${taskId}/`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrftoken, // Use the global CSRF token
+          },
+          body: JSON.stringify({
+            user_message: message,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const result = await response.json();
+        console.log("Server response:", result); // Debugging
+
+        if (result.status === 'success') {
+          console.log('AI Response:', result.ai_response);
+          loadMessages(); // Reload messages after sending
+        } else {
+          console.error('Failed to send message:', result.message);
+        }
+      } catch (error) {
+        console.error('Error sending message:', error);
+      }
+    }
+
+    // Function to handle form submission and prevent page refresh
+    function sendMessageHandler(event) {
+      event.preventDefault(); // Prevent form submission from refreshing the page
+      const messageInput = document.getElementById('message-input');
+      const message = messageInput.value.trim();
+
+      if (message) {
+        sendMessage(message);
+        messageInput.value = ''; // Clear the input field
+      }
+    }
+
+    // Load messages when the page loads
+    window.onload = loadMessages;
+  </script>
+</body>
+</html>

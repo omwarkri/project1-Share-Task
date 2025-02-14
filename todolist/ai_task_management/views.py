@@ -46,7 +46,7 @@ from chat.models import ChatAIMessage
 from notes_app.forms import TaskNoteForm
 
 @csrf_exempt
-def chat_ai_view(request, task_id):
+def ai_taskmanagement_view(request, task_id):
     task = get_object_or_404(Task, id=task_id)
     messages = ChatAIMessage.objects.filter(task_id=task_id).order_by('timestamp')
     notes_form = TaskNoteForm()
@@ -83,3 +83,49 @@ def chat_ai_view(request, task_id):
     })
 
 
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt  # Add this import
+from django.shortcuts import get_object_or_404
+from task.models import Task
+# from chat.models import ChatAIMessage
+import json
+
+@csrf_exempt
+def chat_ai_view(request, task_id):
+    task = get_object_or_404(Task, id=task_id)
+
+    if request.method == 'POST':
+        # Parse the JSON data from the request
+        data = json.loads(request.body)
+        user_message = data.get('user_message')
+
+        if user_message:
+            # Save user message to the database
+            ChatAIMessage.objects.create(task_id=task_id, sender="User", message=user_message)
+
+            # Generate AI response
+            ai_response = generate_ai_response(task_id, user_message)
+
+            # Save AI response to the database
+            ChatAIMessage.objects.create(task_id=task_id, sender="AI", message=ai_response)
+
+            # Return the AI response as JSON
+            return JsonResponse({
+                'status': 'success',
+                'ai_response': ai_response
+            })
+
+    elif request.method == 'GET':
+        # Fetch all messages for the task
+        messages = ChatAIMessage.objects.filter(task_id=task_id).order_by('timestamp')
+        messages_list = [
+            {
+                'sender': message.sender,
+                'message': message.message,
+                'timestamp': message.timestamp.strftime("%Y-%m-%d %H:%M:%S")
+            }
+            for message in messages
+        ]
+        return JsonResponse(messages_list, safe=False)
+
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method'})

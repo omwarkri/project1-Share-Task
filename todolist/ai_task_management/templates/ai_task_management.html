@@ -371,15 +371,15 @@
       .container {
         grid-template-columns: 1fr;
         height: 98vh;
-        max-width: 98%;
+        max-width: 100%;
       }
 
       .left-section {
-        height: 45vh;
+        height: 35vh;
       }
 
       .right-section {
-        height: 55vh;
+        height: 65vh;
         padding-bottom: 20px;
       }
 
@@ -404,6 +404,11 @@
       .chat-message {
         font-size: 12px;
         padding: 6px 10px;
+        margin-bottom: 16px;
+      }
+
+      .message-send{
+        margin-bottom: 40px;
       }
 
       input[type="text"] {
@@ -426,10 +431,11 @@
   <div class="container">
  <!-- Left Section (Procedure Info) -->
 <div class="left-section">
+  <button class="maximize-button" onclick="toggleMaximize(document.querySelector('.left-section'), document.querySelector('.right-section'), this)"></button>
   <div class="procedureSection">
     <h3 class="Header">
       Task Procedure:
-      <button class="maximize-button" onclick="toggleMaximize(document.querySelector('.left-section'), document.querySelector('.right-section'), this)">
+      
         Maximize
       </button>
     </h3>
@@ -470,7 +476,7 @@
   </div>
 
   <!-- Chat Input -->
-  <form method="post" action="{% url 'ai_task_management' task.id %}">
+  <form method="post" class="message-send" action="{% url 'ai_task_management' task.id %}">
     {% csrf_token %}
     <input type="text" name="user_message" placeholder="Ask AI..." required />
     <button type="submit">Send</button>

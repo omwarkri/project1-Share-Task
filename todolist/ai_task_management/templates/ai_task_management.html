@@ -5,310 +5,379 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AI Chat with Task Procedure</title>
   <style>
-/* General Styles */
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+    /* General Styles */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-body {
-  font-family: 'Arial', sans-serif;
-  background-color: #f0f4f8;
-  color: #333;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  overflow: hidden;
-}
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f0f4f8;
+      color: #333;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
 
-.container {
-  display: grid;
-  grid-template-columns: 2fr 3fr; /* Divide into 2 equal rows */
-  max-width: 80%; /* Full width for mobile */
-  width: 100%;
-  background: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-  height: 90vh; /* Full height for mobile */
-}
+    .container {
+      display: grid;
+      grid-template-columns: 2fr 3fr; /* Divide into 2 equal rows */
+      max-width: 80%; /* Full width for mobile */
+      width: 100%;
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      height: 90vh; /* Full height for mobile */
+      animation: fadeIn 0.5s ease-in-out;
+    }
 
-/* Left Section (Task Procedure) */
-.left-section {
-  background: #dceefb;
-  color: #333;
-  display: flex;
-  overflow: hidden;
-  flex-direction: column;
-  justify-content: space-between;
-  height: 100%;
-}
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
 
-.procedureSection {
+    /* Left Section (Task Procedure) */
+    .left-section {
+      background: #dceefb;
+      color: #333;
+      display: flex;
+      overflow: hidden;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 100%;
+      transition: all 0.3s ease;
+    }
+
+    .procedureSection {
   flex: 1;
   position: relative;
   max-height: 100%; /* Ensure it doesn’t overflow */
-}
-
-#procedure-content {
-  overflow-y: auto; /* Enable vertical scrolling */
-  max-height: 100%; /* Ensure it does not exceed its container */
-}
-
-.left-section h3 {
-  font-size: 18px; /* Smaller font size for mobile */
-  margin-bottom: 8px; /* Reduced margin for mobile */
-}
-
-.left-section p {
-  font-size: 12px; /* Smaller font size for mobile */
-  color: #555;
-  line-height: 1.5;
-}
-
-/* Right Section (Chat Box) */
-.right-section {
+  overflow: hidden; /* Hide overflow from parent */
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  background: #ffffff;
-  overflow: hidden;
-  height: 100%;
+  padding:24px;
 }
 
-.chat-header {
-  background: #b3d7ff;
-  color: #333;
-  padding: 15px; /* Reduced padding for mobile */
-  text-align: center;
-  font-size: 20px; /* Smaller font size for mobile */
-  font-weight: bold;
+
+
+
+
+
+    
+
+    #procedure-content {
+      
+  overflow-y: auto; /* Enable vertical scrolling */
+  max-height: calc(100% - 40px); /* Adjust height to account for header */
+  padding: 10px; /* Add some padding */
+  box-sizing: border-box; /* Ensure padding is included in height */
 }
 
-.chat-box {
-  flex: 1;
-  padding: 15px; /* Reduced padding for mobile */
-  overflow-y: auto;
-  background: #e9f5ff;
-  border-top: 1px solid #e0e0e0;
-}
+    .left-section h3 {
+      font-size: 18px; /* Smaller font size for mobile */
+      margin-bottom: 8px; /* Reduced margin for mobile */
+    }
 
-.chat-message {
-  margin: 8px 0; /* Reduced margin for mobile */
-  padding: 8px 12px; /* Reduced padding for mobile */
-  border-radius: 8px;
-  max-width: 80%; /* Adjusted width for mobile */
-  word-wrap: break-word;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
+    .left-section p {
+      font-size: 12px; /* Smaller font size for mobile */
+      color: #555;
+      line-height: 1.5;
+    }
 
-.chat-message.user {
-  background: #d5e7fc;
-  color: #333;
-  margin-left: auto;
-}
+    /* Right Section (Chat Box) */
+    .right-section {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background: #ffffff;
+      overflow: hidden;
+      height: 100%;
+      transition: all 0.3s ease;
+    }
 
-.chat-message.ai {
-  background: #d6f6db;
-  color: #333;
-  margin-right: auto;
-}
+    .chat-header {
+      background: #b3d7ff;
+      color: #333;
+      padding: 15px; /* Reduced padding for mobile */
+      text-align: center;
+      font-size: 20px; /* Smaller font size for mobile */
+      font-weight: bold;
+      animation: slideDown 0.3s ease-in-out;
+    }
 
-/* Chat Input Form */
-form {
-  display: flex;
-  gap: 8px; /* Reduced gap for mobile */
-  padding: 15px; /* Reduced padding for mobile */
-  background: #ffffff;
-  border-top: 1px solid #e0e0e0;
-}
+    @keyframes slideDown {
+      from {
+        transform: translateY(-20px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
 
-input[type="text"] {
-  flex: 1;
-  padding: 8px; /* Reduced padding for mobile */
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  font-size: 12px; /* Smaller font size for mobile */
-  outline: none;
-  transition: border-color 0.3s ease;
-}
+    .chat-box {
+      flex: 1;
+      padding: 15px; /* Reduced padding for mobile */
+      overflow-y: auto;
+      background: #e9f5ff;
+      border-top: 1px solid #e0e0e0;
+      transition: all 0.3s ease;
+    }
 
-input[type="text"]:focus {
-  border-color: #64b5f6;
-}
+    .chat-message {
+      margin: 8px 0; /* Reduced margin for mobile */
+      padding: 8px 12px; /* Reduced padding for mobile */
+      border-radius: 8px;
+      max-width: 80%; /* Adjusted width for mobile */
+      word-wrap: break-word;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      animation: fadeInMessage 0.3s ease-in-out;
+    }
 
-button {
-  padding: 8px 16px; /* Reduced padding for mobile */
-  background: #64b5f6;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 12px; /* Smaller font size for mobile */
-  cursor: pointer;
-  transition: background 0.3s ease;
-}
+    @keyframes fadeInMessage {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
 
-button:hover {
-  background: #42a5f5;
-}
+    .chat-message.user {
+      background: #d5e7fc;
+      color: #333;
+      margin-left: auto;
+    }
 
-/* + Sign and Options */
-.add-options {
-  position: fixed;
-  left: 10px; /* Adjusted position for mobile */
-  top: 10px; /* Adjusted position for mobile */
-  display: inline-block;
-}
+    .chat-message.ai {
+      background: #d6f6db;
+      color: #333;
+      margin-right: auto;
+    }
 
-.add-button {
-  background: #64b5f6;
-  color: white;
-  border: none;
-  border-radius: 50%;
-  width: 36px; /* Smaller button size for mobile */
-  height: 36px; /* Smaller button size for mobile */
-  font-size: 20px; /* Smaller font size for mobile */
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.3s ease;
-}
+    /* Chat Input Form */
+    form {
+      display: flex;
+      gap: 8px; /* Reduced gap for mobile */
+      padding: 15px; /* Reduced padding for mobile */
+      background: #ffffff;
+      border-top: 1px solid #e0e0e0;
+      animation: slideUp 0.3s ease-in-out;
+    }
 
-.add-button:hover {
-  background: #42a5f5;
-}
+    @keyframes slideUp {
+      from {
+        transform: translateY(20px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
 
-#noteFormContainer {
-  display: none;
-  background: #ffffff;
-  padding: 8px; /* Reduced padding for mobile */
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  margin-top: 15px; /* Reduced margin for mobile */
-  overflow: hidden;
-  height: 100%;
-  position: relative;
-}
+    input[type="text"] {
+      flex: 1;
+      padding: 8px; /* Reduced padding for mobile */
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 12px; /* Smaller font size for mobile */
+      outline: none;
+      transition: border-color 0.3s ease;
+    }
 
-#subTaskFormCOntainer {
-  display: none;
-  background: #ffffff;
-  padding: 15px; /* Reduced padding for mobile */
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  margin-top: 15px; /* Reduced margin for mobile */
-  overflow: scroll;
-  height: 100%;
-  position: relative;
-}
+    input[type="text"]:focus {
+      border-color: #64b5f6;
+    }
 
-#noteFormContainer.show,
-#subTaskFormCOntainer.show {
-  display: block;
-}
+    button {
+      padding: 8px 16px; /* Reduced padding for mobile */
+      background: #64b5f6;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 12px; /* Smaller font size for mobile */
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
 
-.options-dropdown {
-  position: absolute;
-  top: 40px; /* Adjusted position for mobile */
-  right: 0;
-  background: white;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  display: none;
-  z-index: 10;
-}
+    button:hover {
+      background: #42a5f5;
+    }
 
-.options-dropdown button {
-  display: block;
-  width: 100%;
-  padding: 8px 16px; /* Reduced padding for mobile */
-  text-align: left;
-  background: none;
-  border: none;
-  color: #333;
-  cursor: pointer;
-  transition: background 0.3s ease;
-}
+    /* + Sign and Options */
+    .add-options {
+      position: fixed;
+      left: 10px; /* Adjusted position for mobile */
+      top: 10px; /* Adjusted position for mobile */
+      display: inline-block;
+    }
 
-.options-dropdown button:hover {
-  background: #f0f4f8;
-}
+    .add-button {
+      background: #64b5f6;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 36px; /* Smaller button size for mobile */
+      height: 36px; /* Smaller button size for mobile */
+      font-size: 20px; /* Smaller font size for mobile */
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.3s ease, transform 0.3s ease;
+    }
 
-.show {
-  display: block;
-}
+    .add-button:hover {
+      background: #42a5f5;
+      transform: scale(1.1);
+    }
 
-.hide {
-  display: none;
-}
+    #noteFormContainer {
+      display: none;
+      background: #ffffff;
+      padding: 8px; /* Reduced padding for mobile */
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      margin-top: 15px; /* Reduced margin for mobile */
+      overflow: hidden;
+      height: 100%;
+      position: relative;
+      animation: fadeIn 0.3s ease-in-out;
+    }
 
-/* Media Queries for Mobile Devices */
-@media (max-width: 600px) {
-  .container {
-    grid-template-columns: 1fr; /* Single column for mobile */
-    height: 98vh; /* Full height for mobile */
-    max-width: 98%; /* Full width for mobile */
-  }
+    #subTaskFormCOntainer {
+      display: none;
+      background: #ffffff;
+      padding: 15px; /* Reduced padding for mobile */
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      margin-top: 15px; /* Reduced margin for mobile */
+      overflow: scroll;
+      height: 100%;
+      position: relative;
+      animation: fadeIn 0.3s ease-in-out;
+    }
 
-  .left-section{
-    height: 45vh;
-  }
-  .right-section {
-    height: 55vh; /* Split height for mobile */
-    padding-bottom: 20px;
-  }
+    #noteFormContainer.show,
+    #subTaskFormCOntainer.show {
+      display: block;
+    }
 
-  .procedureSection,
-  .chat-box {
-    padding: 10px; /* Further reduced padding for mobile */
-  }
+    .options-dropdown {
+      position: absolute;
+      top: 40px; /* Adjusted position for mobile */
+      right: 0;
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      display: none;
+      z-index: 10;
+      animation: fadeIn 0.3s ease-in-out;
+    }
 
-  .left-section h3 {
-    font-size: 16px; /* Smaller font size for mobile */
-  }
+    .options-dropdown button {
+      display: block;
+      width: 100%;
+      padding: 8px 16px; /* Reduced padding for mobile */
+      text-align: left;
+      background: none;
+      border: none;
+      color: #333;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
 
-  .left-section p {
-    font-size: 10px; /* Smaller font size for mobile */
-  }
+    .options-dropdown button:hover {
+      background: #f0f4f8;
+    }
 
-  .chat-header {
-    font-size: 18px; /* Smaller font size for mobile */
-    padding: 10px; /* Further reduced padding for mobile */
-  }
+    .show {
+      display: block;
+    }
 
-  .chat-message {
-    font-size: 12px; /* Smaller font size for mobile */
-    padding: 6px 10px; /* Further reduced padding for mobile */
-  }
+    .hide {
+      display: none;
+    }
 
-  input[type="text"] {
-    font-size: 10px; /* Smaller font size for mobile */
-  }
+    /* Media Queries for Mobile Devices */
+    @media (max-width: 600px) {
+      .container {
+        grid-template-columns: 1fr; /* Single column for mobile */
+        height: 98vh; /* Full height for mobile */
+        max-width: 98%; /* Full width for mobile */
+      }
 
-  button {
-    font-size: 10px; /* Smaller font size for mobile */
-  }
+      .left-section {
+        height: 45vh;
+      }
 
-  .add-button {
-    width: 32px; /* Smaller button size for mobile */
-    height: 32px; /* Smaller button size for mobile */
-    font-size: 18px; /* Smaller font size for mobile */
-  }
-  #noteFormContainer{
-    /* overflow-y: scroll; */
-  }
-}
+      .right-section {
+        height: 55vh; /* Split height for mobile */
+        padding-bottom: 20px;
+      }
+
+      .procedureSection,
+      .chat-box {
+        padding: 10px; /* Further reduced padding for mobile */
+      }
+
+      .left-section h3 {
+        font-size: 16px; /* Smaller font size for mobile */
+      }
+
+      .left-section p {
+        font-size: 10px; /* Smaller font size for mobile */
+      }
+
+      .chat-header {
+        font-size: 18px; /* Smaller font size for mobile */
+        padding: 10px; /* Further reduced padding for mobile */
+      }
+
+      .chat-message {
+        font-size: 12px; /* Smaller font size for mobile */
+        padding: 6px 10px; /* Further reduced padding for mobile */
+      }
+
+      input[type="text"] {
+        font-size: 10px; /* Smaller font size for mobile */
+      }
+
+      button {
+        font-size: 10px; /* Smaller font size for mobile */
+      }
+
+      .add-button {
+        width: 32px; /* Smaller button size for mobile */
+        height: 32px; /* Smaller button size for mobile */
+        font-size: 18px; /* Smaller font size for mobile */
+      }
+
+      #noteFormContainer {
+        /* overflow-y: scroll; */
+      }
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <!-- Left Section (Procedure In
-     
-    fo) -->
+    <!-- Left Section (Procedure Info) -->
     <div class="left-section">
       <div class="procedureSection">
         <h3 class="Header">Task Procedure:</h3>

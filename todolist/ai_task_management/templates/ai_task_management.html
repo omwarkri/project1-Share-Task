@@ -25,14 +25,14 @@
 
     .container {
       display: grid;
-      grid-template-columns: 2fr 3fr; /* Divide into 2 equal rows */
-      max-width: 80%; /* Full width for mobile */
+      grid-template-columns: 2fr 3fr;
+      max-width: 80%;
       width: 100%;
       background: #ffffff;
       border-radius: 12px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
       overflow: hidden;
-      height: 90vh; /* Full height for mobile */
+      height: 90vh;
       animation: fadeIn 0.5s ease-in-out;
     }
 
@@ -60,37 +60,28 @@
     }
 
     .procedureSection {
-  flex: 1;
-  position: relative;
-  max-height: 100%; /* Ensure it doesn’t overflow */
-  overflow: hidden; /* Hide overflow from parent */
-  display: flex;
-  flex-direction: column;
-  padding:24px;
-}
-
-
-
-
-
-
-    
+      flex: 1;
+      position: relative;
+      max-height: 100%;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
 
     #procedure-content {
-      
-  overflow-y: auto; /* Enable vertical scrolling */
-  max-height: calc(100% - 40px); /* Adjust height to account for header */
-  padding: 10px; /* Add some padding */
-  box-sizing: border-box; /* Ensure padding is included in height */
-}
+      overflow-y: auto;
+      max-height: calc(100% - 40px);
+      padding: 10px;
+      box-sizing: border-box;
+    }
 
     .left-section h3 {
-      font-size: 18px; /* Smaller font size for mobile */
-      margin-bottom: 8px; /* Reduced margin for mobile */
+      font-size: 18px;
+      margin-bottom: 8px;
     }
 
     .left-section p {
-      font-size: 12px; /* Smaller font size for mobile */
+      font-size: 12px;
       color: #555;
       line-height: 1.5;
     }
@@ -106,12 +97,31 @@
       transition: all 0.3s ease;
     }
 
+    /* Maximized State for Chat Section */
+.right-section.maximized {
+  height: 100vh;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  background: #ffffff;
+}
+
+.right-section.maximized .chat-box {
+  height: calc(100% - 100px); /* Adjust for header and input form */
+}
+
+.right-section.maximized + .left-section {
+  display: none;
+}
+
     .chat-header {
       background: #b3d7ff;
       color: #333;
-      padding: 15px; /* Reduced padding for mobile */
+      padding: 15px;
       text-align: center;
-      font-size: 20px; /* Smaller font size for mobile */
+      font-size: 20px;
       font-weight: bold;
       animation: slideDown 0.3s ease-in-out;
     }
@@ -129,7 +139,7 @@
 
     .chat-box {
       flex: 1;
-      padding: 15px; /* Reduced padding for mobile */
+      padding: 15px;
       overflow-y: auto;
       background: #e9f5ff;
       border-top: 1px solid #e0e0e0;
@@ -137,10 +147,10 @@
     }
 
     .chat-message {
-      margin: 8px 0; /* Reduced margin for mobile */
-      padding: 8px 12px; /* Reduced padding for mobile */
+      margin: 8px 0;
+      padding: 8px 12px;
       border-radius: 8px;
-      max-width: 80%; /* Adjusted width for mobile */
+      max-width: 80%;
       word-wrap: break-word;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
       animation: fadeInMessage 0.3s ease-in-out;
@@ -172,8 +182,8 @@
     /* Chat Input Form */
     form {
       display: flex;
-      gap: 8px; /* Reduced gap for mobile */
-      padding: 15px; /* Reduced padding for mobile */
+      gap: 8px;
+      padding: 15px;
       background: #ffffff;
       border-top: 1px solid #e0e0e0;
       animation: slideUp 0.3s ease-in-out;
@@ -192,10 +202,10 @@
 
     input[type="text"] {
       flex: 1;
-      padding: 8px; /* Reduced padding for mobile */
+      padding: 8px;
       border: 1px solid #ddd;
       border-radius: 8px;
-      font-size: 12px; /* Smaller font size for mobile */
+      font-size: 12px;
       outline: none;
       transition: border-color 0.3s ease;
     }
@@ -205,12 +215,12 @@
     }
 
     button {
-      padding: 8px 16px; /* Reduced padding for mobile */
+      padding: 8px 16px;
       background: #64b5f6;
       color: white;
       border: none;
       border-radius: 8px;
-      font-size: 12px; /* Smaller font size for mobile */
+      font-size: 12px;
       cursor: pointer;
       transition: background 0.3s ease;
     }
@@ -219,13 +229,47 @@
       background: #42a5f5;
     }
 
-    /* + Sign and Options */
-    .add-options {
-      position: fixed;
-      left: 10px; /* Adjusted position for mobile */
-      top: 10px; /* Adjusted position for mobile */
-      display: inline-block;
+    /* Maximize Button */
+    .maximize-button {
+      background: #64b5f6;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 4px 8px;
+      font-size: 12px;
+      cursor: pointer;
+      margin-left: 10px;
+      transition: background 0.3s ease;
     }
+
+    .maximize-button:hover {
+      background: #42a5f5;
+    }
+
+    /* Maximized State */
+    .left-section.maximized {
+      height: 100vh;
+      width: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1000;
+      background: #dceefb;
+    }
+
+    .left-section.maximized .procedureSection {
+      height: calc(100% - 40px);
+    }
+
+    .left-section.maximized #procedure-content {
+      max-height: calc(100% - 60px);
+    }
+
+    /* Hide right section when left is maximized */
+    .left-section.maximized + .right-section {
+      display: none;
+    }
+
 
     .add-button {
       background: #64b5f6;
@@ -278,6 +322,13 @@
       display: block;
     }
 
+    .add-options {
+      position: fixed;
+      left: 10px; /* Adjusted position for mobile */
+      top: 10px; /* Adjusted position for mobile */
+      display: inline-block;
+    }
+
     .options-dropdown {
       position: absolute;
       top: 40px; /* Adjusted position for mobile */
@@ -318,9 +369,9 @@
     /* Media Queries for Mobile Devices */
     @media (max-width: 600px) {
       .container {
-        grid-template-columns: 1fr; /* Single column for mobile */
-        height: 98vh; /* Full height for mobile */
-        max-width: 98%; /* Full width for mobile */
+        grid-template-columns: 1fr;
+        height: 98vh;
+        max-width: 98%;
       }
 
       .left-section {
@@ -328,100 +379,103 @@
       }
 
       .right-section {
-        height: 55vh; /* Split height for mobile */
+        height: 55vh;
         padding-bottom: 20px;
       }
 
       .procedureSection,
       .chat-box {
-        padding: 10px; /* Further reduced padding for mobile */
+        padding: 10px;
       }
 
       .left-section h3 {
-        font-size: 16px; /* Smaller font size for mobile */
+        font-size: 16px;
       }
 
       .left-section p {
-        font-size: 10px; /* Smaller font size for mobile */
+        font-size: 10px;
       }
 
       .chat-header {
-        font-size: 18px; /* Smaller font size for mobile */
-        padding: 10px; /* Further reduced padding for mobile */
+        font-size: 18px;
+        padding: 10px;
       }
 
       .chat-message {
-        font-size: 12px; /* Smaller font size for mobile */
-        padding: 6px 10px; /* Further reduced padding for mobile */
+        font-size: 12px;
+        padding: 6px 10px;
       }
 
       input[type="text"] {
-        font-size: 10px; /* Smaller font size for mobile */
+        font-size: 10px;
       }
 
       button {
-        font-size: 10px; /* Smaller font size for mobile */
+        font-size: 10px;
       }
 
-      .add-button {
-        width: 32px; /* Smaller button size for mobile */
-        height: 32px; /* Smaller button size for mobile */
-        font-size: 18px; /* Smaller font size for mobile */
-      }
-
-      #noteFormContainer {
-        /* overflow-y: scroll; */
+      .maximize-button {
+        width: 32px;
+        height: 32px;
+        font-size: 18px;
       }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <!-- Left Section (Procedure Info) -->
-    <div class="left-section">
-      <div class="procedureSection">
-        <h3 class="Header">Task Procedure:</h3>
-        <p id="procedure-content">{{ procedure }}</p>
-      </div>
-      <!-- Container for the form -->
-      <div id="noteFormContainer">
-        {% include 'notes_section.html' %}
-      </div>
-      <div id="subTaskFormCOntainer">
-        {% include 'sub_task.html' %}
-      </div>
-    </div>
-
-    <!-- Right Section (Chat Box) -->
-    <div class="right-section">
-      <div class="chat-header">
-        AI Chat
-        <div class="add-options">
-          <button class="add-button" onclick="toggleOptions()">+</button>
-          <div class="options-dropdown" id="optionsDropdown">
-            <button onclick="addNotes()">Add Notes</button>
-            <button onclick="addSubTask()">Add Sub Task</button>
-          </div>
-        </div>
-      </div>
-      <div class="chat-box">
-        {% for message in messages %}
-          <div class="chat-message {{ message.sender|lower }}">
-            <strong>{{ message.sender }}:</strong> <span class="message-content">{{ message.message }}</span>
-          </div>
-        {% empty %}
-          <p>No messages yet.</p>
-        {% endfor %}
-      </div>
-
-      <!-- Chat Input -->
-      <form method="post" action="{% url 'ai_task_management' task.id %}">
-        {% csrf_token %}
-        <input type="text" name="user_message" placeholder="Ask AI..." required />
-        <button type="submit">Send</button>
-      </form>
-    </div>
+ <!-- Left Section (Procedure Info) -->
+<div class="left-section">
+  <div class="procedureSection">
+    <h3 class="Header">
+      Task Procedure:
+      <button class="maximize-button" onclick="toggleMaximize(document.querySelector('.left-section'), document.querySelector('.right-section'), this)">
+        Maximize
+      </button>
+    </h3>
+    <p id="procedure-content">{{ procedure }}</p>
   </div>
+  <!-- Container for the form -->
+  <div id="noteFormContainer">
+    {% include 'notes_section.html' %}
+  </div>
+  <div id="subTaskFormCOntainer">
+    {% include 'sub_task.html' %}
+  </div>
+</div>
+
+<!-- Right Section (Chat Box) -->
+<div class="right-section">
+  <div class="chat-header">
+    AI Chat
+    <div class="add-options">
+      <button class="add-button" onclick="toggleOptions()">+</button>
+      <div class="options-dropdown" id="optionsDropdown">
+        <button onclick="addNotes()">Add Notes</button>
+        <button onclick="addSubTask()">Add Sub Task</button>
+      </div>
+    </div>
+    <button class="maximize-button" onclick="toggleMaximize(document.querySelector('.right-section'), document.querySelector('.left-section'), this)">
+      Maximize
+    </button>
+  </div>
+  <div class="chat-box">
+    {% for message in messages %}
+      <div class="chat-message {{ message.sender|lower }}">
+        <strong>{{ message.sender }}:</strong> <span class="message-content">{{ message.message }}</span>
+      </div>
+    {% empty %}
+      <p>No messages yet.</p>
+    {% endfor %}
+  </div>
+
+  <!-- Chat Input -->
+  <form method="post" action="{% url 'ai_task_management' task.id %}">
+    {% csrf_token %}
+    <input type="text" name="user_message" placeholder="Ask AI..." required />
+    <button type="submit">Send</button>
+  </form>
+</div>
 
   <script>
     // Function to replace **text** with <strong>text</strong>
@@ -431,30 +485,24 @@
 
     // Function to add line breaks after periods, excluding specific cases
     function addLineBreaksAfterPeriods(element) {
-      // Replace numbers followed by a period and space (e.g., "2. ") with a line break
       element.innerHTML = element.innerHTML.replace(
-        /(\d+\. )/g, // Match numbers followed by a period and space
-        '<br>$1' // Add a line break before the number
+        /(\d+\. )/g,
+        '<br>$1'
       );
-
-      // Replace regular sentence-ending periods with line breaks
       element.innerHTML = element.innerHTML.replace(
-        /(?<!\d|\.\S)\. /g, // Match periods not preceded by a digit or part of an abbreviation
+        /(?<!\d|\.\S)\. /g,
         '.<br>'
       );
     }
 
     // Function to format headings and structure content
     function formatProcedureContent(element) {
-      // Replace "Phase X:" with bold headings
       element.innerHTML = element.innerHTML.replace(
-        /Phase \d+:.*?(?=<br>|$)/g, // Match "Phase X:" and its content until the next line break or end
+        /Phase \d+:.*?(?=<br>|$)/g,
         (match) => `<strong>${match}</strong>`
       );
-
-      // Replace numbered lists with proper line breaks
       element.innerHTML = element.innerHTML.replace(
-        /(\d+\. .*?(?=<br>|$))/g, // Match numbered lists and their content
+        /(\d+\. .*?(?=<br>|$))/g,
         (match) => `<br>${match}`
       );
     }
@@ -498,9 +546,9 @@
       const subTaskFormContainer = document.getElementById('subTaskFormCOntainer');
       const leftSection = document.querySelector('.procedureSection');
 
-      noteFormContainer.classList.add('show'); // Show the notes form
-      subTaskFormContainer.classList.remove('show'); // Hide the sub-task form if it's open
-      leftSection.classList.add('hide'); // Hide the procedure section
+      noteFormContainer.classList.add('show');
+      subTaskFormContainer.classList.remove('show');
+      leftSection.classList.add('hide');
     }
 
     // Show the sub-task form and disable the procedure section
@@ -509,9 +557,9 @@
       const subTaskFormContainer = document.getElementById('subTaskFormCOntainer');
       const leftSection = document.querySelector('.procedureSection');
 
-      subTaskFormContainer.classList.add('show'); // Show the sub-task form
-      noteFormContainer.classList.remove('show'); // Hide the notes form if it's open
-      leftSection.classList.add('hide'); // Hide the procedure section
+      subTaskFormContainer.classList.add('show');
+      noteFormContainer.classList.remove('show');
+      leftSection.classList.add('hide');
     }
 
     // Close the form and re-enable the procedure section
@@ -520,10 +568,27 @@
       const subTaskFormContainer = document.getElementById('subTaskFormCOntainer');
       const leftSection = document.querySelector('.procedureSection');
 
-      noteFormContainer.classList.remove('show'); // Hide the notes form
-      subTaskFormContainer.classList.remove('show'); // Hide the sub-task form
-      leftSection.classList.remove('hide'); // Show the procedure section
+      noteFormContainer.classList.remove('show');
+      subTaskFormContainer.classList.remove('show');
+      leftSection.classList.remove('hide');
     }
+
+    // Toggle maximize for left section
+   // Single function to toggle maximize/minimize
+function toggleMaximize(sectionToMaximize, sectionToHide, button) {
+  // Toggle the "maximized" class on the section to maximize
+  sectionToMaximize.classList.toggle('maximized');
+
+  // Toggle the "hidden" class on the section to hide
+  sectionToHide.classList.toggle('hidden');
+
+  // Update the button text
+  if (sectionToMaximize.classList.contains('maximized')) {
+    button.textContent = 'Minimize';
+  } else {
+    button.textContent = 'Maximize';
+  }
+}
   </script>
 </body>
 </html>

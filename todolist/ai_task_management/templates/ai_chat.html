@@ -156,6 +156,33 @@
   }
 </style>
 <script>
+  function formatBoldAiresponse(element) {
+      element = element.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    }
+
+    // Function to add line breaks after periods, excluding specific cases
+    function addLineBreaksAfterAiresponse(element) {
+      element = element.replace(
+        /(\d+\. )/g,
+        '<br>$1'
+      );
+      element = element.replace(
+        /(?<!\d|\.\S)\. /g,
+        '.<br>'
+      );
+    }
+
+    // Function to format headings and structure content
+    function formatProcedureAiresponse(element) {
+      element = element.replace(
+        /Phase \d+:.*?(?=<br>|$)/g,
+        (match) => `<strong>${match}</strong>`
+      );
+      element = element.replace(
+        /(\d+\. .*?(?=<br>|$))/g,
+        (match) => `<br>${match}`
+      );
+    }
   // Function to load messages from the server
   async function loadMessages() {
     try {
@@ -182,32 +209,72 @@
     }
   }
 
-  // Function to send a message to the server
-  async function sendMessage(message) {
-    try {
-      const taskId = {{ task.id }}; // Pass the task ID from Django template
-      const response = await fetch(`/chat_ai_view/${taskId}/`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRFToken': '{{ csrf_token }}', // Add CSRF token for Django
-        },
-        body: JSON.stringify({
-          user_message: message,
-        }),
-      });
-
-      const result = await response.json();
-      if (result.status === 'success') {
-        console.log('AI Response:', result.ai_response);
-        loadMessages(); // Reload messages after sending
-      } else {
-        console.error('Failed to send message:', result.message);
-      }
-    } catch (error) {
-      console.error('Error sending message:', error);
+  function typeWriterEffect(element, text, speed = 50) {
+    let i = 0;
+    function type() {
+        if (i < text.length) {
+            element.innerHTML += text.charAt(i);
+            i++;
+            scrollToBottom();  // Scroll as each letter is printed
+            setTimeout(type, speed);
+        }
     }
-  }
+    type();
+}
+
+// Scroll to bottom function
+function scrollToBottom() {
+    const chatBox = document.getElementById('chat-box');
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+async function sendMessage(message) {
+    try {
+        const chatBox = document.getElementById('chat-box');
+
+        // Append user message instantly
+        const userMessageDiv = document.createElement('div');
+        userMessageDiv.className = 'chat-message user';
+        userMessageDiv.innerHTML = `<strong>You:</strong> <span class="message-content">${message}</span>`;
+        chatBox.appendChild(userMessageDiv);
+        scrollToBottom();
+        
+
+        const taskId = {{ task.id }}; // Django template variable
+        const response = await fetch(`/chat_ai_view/${taskId}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}',
+            },
+            body: JSON.stringify({ user_message: message }),
+        });
+
+        const result = await response.json();
+        if (result.status === 'success') {
+            console.log('AI Response:', result.ai_response);
+
+
+
+            // Append AI response with typewriter effect
+            const aiMessageDiv = document.createElement('div');
+            aiMessageDiv.className = 'chat-message ai';
+            aiMessageDiv.innerHTML = `<strong>AI:</strong> <span class="message-content"></span>`;
+            chatBox.appendChild(aiMessageDiv);
+            scrollToBottom();
+
+
+
+            // Apply typewriter effect with auto-scroll
+            typeWriterEffect(aiMessageDiv.querySelector('.message-content'), result.ai_response, 50);
+        } else {
+            console.error('Failed to send message:', result.message);
+        }
+    } catch (error) {
+        console.error('Error sending message:', error);
+    }
+}
+
 
   // Event listener for the chat form
   document.getElementById('chat-form').addEventListener('submit', async (event) => {

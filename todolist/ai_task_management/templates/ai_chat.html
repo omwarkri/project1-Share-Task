@@ -1,139 +1,233 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI Chat</title>
-  <style>
-    .chat-box {
-      height: 300px;
-      overflow-y: auto;
-      border: 1px solid #ccc;
-      padding: 10px;
-      margin-bottom: 10px;
-    }
-    .chat-message {
-      margin-bottom: 10px;
-    }
-    .chat-message.user {
-      text-align: right;
-      color: blue;
-    }
-    .chat-message.ai {
-      text-align: left;
-      color: green;
-    }
-    .chat-input-container {
-      display: flex;
-      gap: 10px;
-    }
-    #message-input {
-      flex: 1;
-      padding: 8px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
-    #send-button {
-      padding: 8px 16px;
-      background: #64b5f6;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    #send-button:hover {
-      background: #42a5f5;
-    }
-  </style>
-</head>
-<body>
-  <div class="chat-box" id="chat-box">
-    <!-- Messages will be loaded here dynamically -->
+<!-- AI Chat Component -->
+<div class="chat">
+  <div class="chat-header">
+    AI Chat
+    <div class="add-options">
+      <button class="add-button" onclick="toggleOptions()">+</button>
+      <div class="options-dropdown" id="optionsDropdown">
+        <button onclick="addNotes()">Add Notes</button>
+        <button onclick="addSubTask()">Add Sub Task</button>
+        <button onclick="viewProcedure()">View Procedure</button>
+      </div>
+    </div>
   </div>
-  
-  <form class="chat-input-container" onsubmit="sendMessageHandler(event)">
-    <input type="text" id="message-input" placeholder="Type your message..." required />
-    <button id="send-button" type="submit">Send</button>
+  <div class="chat-box" id="chat-box">
+    {% for message in messages %}
+      <div class="chat-message {{ message.sender|lower }}">
+        <strong>{{ message.sender }}:</strong> <span class="message-content">{{ message.message }}</span>
+      </div>
+    {% empty %}
+      <p>No messages yet.</p>
+    {% endfor %}
+  </div>
+
+  <!-- Chat Input -->
+  <form id="chat-form" class="message-send">
+    {% csrf_token %}
+    <input type="text" id="message-input" placeholder="Ask AI..." required />
+    <button type="submit">Send</button>
   </form>
+</div>
 
-  <script>
-    // Ensure task ID is safely retrieved from Django template
-    const taskId = "{{ task.id }}";
-    const csrftoken = "{{ csrf_token }}"; // Get CSRF token from Django
+<style>
+  .chat {
+    display: flex;
+    flex-direction: column;
+    height: 100vh; /* Full viewport height */
+    overflow: hidden;
+}
 
-    // Function to load messages from the server
-    async function loadMessages() {
-      try {
-        const response = await fetch(`/chat_ai_view/${taskId}/`);
-        const messages = await response.json();
+  .chat-header {
+    background: #b3d7ff;
+    color: #333;
+    padding: 15px;
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold;
+    animation: slideDown 0.3s ease-in-out;
+    
+  }
 
+  @keyframes slideDown {
+    from {
+      transform: translateY(-20px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  .chat-box {
+    flex: 1;
+    padding: 15px;
+   
+    background: #e9f5ff;
+    border-top: 1px solid #e0e0e0;
+    transition: all 0.3s ease;
+    overflow-y: auto;
+
+  }
+
+  .chat-message {
+    margin: 8px 0;
+    padding: 8px 12px;
+    border-radius: 8px;
+    max-width: 80%;
+    word-wrap: break-word;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    animation: fadeInMessage 0.3s ease-in-out;
+    
+  }
+
+  @keyframes fadeInMessage {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .chat-message.user {
+    background: #d5e7fc;
+    color: #333;
+    margin-left: auto;
+  }
+
+  .chat-message.ai {
+    background: #d6f6db;
+    color: #333;
+    margin-right: auto;
+  }
+
+  /* Chat Input Form */
+  #chat-form {
+    display: flex;
+    gap: 8px;
+    padding: 15px;
+    background: #ffffff;
+    border-top: 1px solid #e0e0e0;
+    animation: slideUp 0.3s ease-in-out;
+  }
+
+  @keyframes slideUp {
+    from {
+      transform: translateY(20px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  #message-input {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 12px;
+    outline: none;
+    transition: border-color 0.3s ease;
+  }
+
+  #message-input:focus {
+    border-color: #64b5f6;
+  }
+
+  #chat-form button {
+    padding: 8px 16px;
+    background: #64b5f6;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+
+  #chat-form button:hover {
+    background: #42a5f5;
+  }
+</style>
+<script>
+  // Function to load messages from the server
+  async function loadMessages() {
+    try {
+      const taskId = {{ task.id }}; // Pass the task ID from Django template
+      const response = await fetch(`/chat_ai_view/${taskId}/`);
+      const messages = await response.json();
+
+      
+
+
+      messages.forEach(message => {
         const chatBox = document.getElementById('chat-box');
-        chatBox.innerHTML = ''; // Clear existing messages
+        
+        document.getElementById("chat-box").style.opacity=1;
+        const messageElement = document.createElement('div');
+        messageElement.classList.add('chat-message', message.sender.toLowerCase());
+        messageElement.innerHTML = `
+          <strong>${message.sender}:</strong> ${message.message}
+          <br><small>${message.timestamp}</small>
+        `;
+  
+        chatBox.appendChild(messageElement);
+       
 
-        messages.forEach(message => {
-          const messageElement = document.createElement('div');
-          messageElement.classList.add('chat-message', message.sender.toLowerCase());
-          messageElement.innerHTML = `
-            <strong>${message.sender}:</strong> ${message.message}
-            <br><small>${message.timestamp}</small>
-          `;
-          chatBox.appendChild(messageElement);
-        });
+      });
+     
+      // Scroll to the bottom of the chat box
+      chatBox.scrollTop = chatBox.scrollHeight;
 
-        // Scroll to the bottom of the chat box
-        chatBox.scrollTop = chatBox.scrollHeight;
-      } catch (error) {
-        console.error('Error loading messages:', error);
-      }
+    } catch (error) {
+      console.error('Error loading messages:', error);
     }
+  }
 
-    // Function to send a message to the server
-    async function sendMessage(message) {
-      console.log("Sending message:", message); // Debugging
-      try {
-        const response = await fetch(`/chat_ai_view/${taskId}/`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': csrftoken, // Use the global CSRF token
-          },
-          body: JSON.stringify({
-            user_message: message,
-          }),
-        });
+  // Function to send a message to the server
+  async function sendMessage(message) {
+    try {
+      const taskId = {{ task.id }}; // Pass the task ID from Django template
+      const response = await fetch(`/chat_ai_view/${taskId}/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': '{{ csrf_token }}', // Add CSRF token for Django
+        },
+        body: JSON.stringify({
+          user_message: message,
+        }),
+      });
 
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
-        const result = await response.json();
-        console.log("Server response:", result); // Debugging
-
-        if (result.status === 'success') {
-          console.log('AI Response:', result.ai_response);
-          loadMessages(); // Reload messages after sending
-        } else {
-          console.error('Failed to send message:', result.message);
-        }
-      } catch (error) {
-        console.error('Error sending message:', error);
+      const result = await response.json();
+      if (result.status === 'success') {
+        console.log('AI Response:', result.ai_response);
+        loadMessages(); // Reload messages after sending
+      } else {
+        console.error('Failed to send message:', result.message);
       }
+    } catch (error) {
+      console.error('Error sending message:', error);
     }
+  }
 
-    // Function to handle form submission and prevent page refresh
-    function sendMessageHandler(event) {
-      event.preventDefault(); // Prevent form submission from refreshing the page
-      const messageInput = document.getElementById('message-input');
-      const message = messageInput.value.trim();
+  // Event listener for the chat form
+  document.getElementById('chat-form').addEventListener('submit', async (event) => {
+    event.preventDefault(); // Prevent form submission
+    const messageInput = document.getElementById('message-input');
+    const message = messageInput.value.trim();
 
-      if (message) {
-        sendMessage(message);
-        messageInput.value = ''; // Clear the input field
-      }
+    if (message) {
+      await sendMessage(message);
+      messageInput.value = ''; // Clear the input field
     }
+  });
 
-    // Load messages when the page loads
-    window.onload = loadMessages;
-  </script>
-</body>
-</html>
+  // Load messages when the page loads
+  window.onload = loadMessages;
+</script>

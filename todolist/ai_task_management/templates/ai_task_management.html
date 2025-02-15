@@ -56,6 +56,7 @@
       flex-direction: column;
       justify-content: space-between;
       height: 100%;
+      width: 100%;
       transition: all 0.3s ease;
       position: relative;
     }
@@ -97,7 +98,7 @@
       overflow: hidden;
       height: 100%;
       transition: all 0.3s ease;
-      position:relative
+      position:relative;
     }
 
     /* Maximized State for Chat Section */
@@ -119,78 +120,7 @@
       display: none;
     }
 
-    .chat-header {
-      background: #b3d7ff;
-      color: #333;
-      padding: 15px;
-      text-align: center;
-      font-size: 20px;
-      font-weight: bold;
-      animation: slideDown 0.3s ease-in-out;
-    }
 
-    @keyframes slideDown {
-      from {
-        transform: translateY(-20px);
-        opacity: 0;
-      }
-      to {
-        transform: translateY(0);
-        opacity: 1;
-      }
-    }
-
-    .chat-box {
-      flex: 1;
-      padding: 15px;
-      overflow-y: auto;
-      background: #e9f5ff;
-      border-top: 1px solid #e0e0e0;
-      transition: all 0.3s ease;
-    }
-
-    .chat-message {
-      margin: 8px 0;
-      padding: 8px 12px;
-      border-radius: 8px;
-      max-width: 80%;
-      word-wrap: break-word;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      animation: fadeInMessage 0.3s ease-in-out;
-    }
-
-    @keyframes fadeInMessage {
-      from {
-        opacity: 0;
-        transform: translateY(10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .chat-message.user {
-      background: #d5e7fc;
-      color: #333;
-      margin-left: auto;
-    }
-
-    .chat-message.ai {
-      background: #d6f6db;
-      color: #333;
-      margin-right: auto;
-    }
-
-    /* Chat Input Form */
-    form {
-      display: flex;
-      gap: 8px;
-      padding: 15px;
-      background: #ffffff;
-      border-top: 1px solid #e0e0e0;
-      animation: slideUp 0.3s ease-in-out;
-    }
 
     @keyframes slideUp {
       from {
@@ -235,6 +165,7 @@
     /* Maximize Button */
     .maximize-button {
       background: #64b5f6;
+      z-index: 500;
       color: white;
       border: none;
       border-radius: 8px;
@@ -341,7 +272,7 @@
     .options-dropdown {
       position: absolute;
       top: 40px; /* Adjusted position for mobile */
-      left: 10px;
+      right: 0;
       background: white;
       border: 1px solid #ddd;
       border-radius: 8px;
@@ -442,7 +373,9 @@
  <!-- Left Section (Procedure Info) -->
 <div class="left-section">
   <button class="maximize-button" onclick="toggleMaximize(document.querySelector('.left-section'), document.querySelector('.right-section'), this)"> Maximize</button>
+  
   <div class="procedureSection">
+    
     {% include 'task_procedure.html' %}
   </div>
   <!-- Container for the form -->
@@ -456,36 +389,12 @@
 
 <!-- Right Section (Chat Box) -->
 <div class="right-section">
-  <div class="chat-header">
-    AI Chat
-    <div class="add-options">
-      <button class="add-button" onclick="toggleOptions()">+</button>
-      <div class="options-dropdown" id="optionsDropdown">
-        <button onclick="addNotes()">Add Notes</button>
-        <button onclick="addSubTask()">Add Sub Task</button>
-        <button onclick="viewProcedure()">View Procedure</button>
-      </div>
-    </div>
-    <button class="maximize-button" onclick="toggleMaximize(document.querySelector('.right-section'), document.querySelector('.left-section'), this)">
-      Maximize
-    </button>
-  </div>
-  <div class="chat-box">
-    {% for message in messages %}
-      <div class="chat-message {{ message.sender|lower }}">
-        <strong>{{ message.sender }}:</strong> <span class="message-content">{{ message.message }}</span>
-      </div>
-    {% empty %}
-      <p>No messages yet.</p>
-    {% endfor %}
-  </div>
-
-  <!-- Chat Input -->
-  <form method="post" class="message-send" action="{% url 'ai_task_management' task.id %}">
-    {% csrf_token %}
-    <input type="text" name="user_message" placeholder="Ask AI..." required />
-    <button type="submit">Send</button>
-  </form>
+  <button class="maximize-button" onclick="toggleMaximize(document.querySelector('.right-section'), document.querySelector('.left-section'), this)">
+    Maximize
+  </button>
+ 
+  {% include 'ai_chat.html' %}
+ 
 </div>
 
   <script>
@@ -574,25 +483,21 @@
     }
 
     function viewProcedure() {
-  console.log("view Procedure");
+      console.log("view Procedure");
 
-  const noteFormContainer = document.getElementById('noteFormContainer');
-  const subTaskFormContainer = document.getElementById('subTaskFormCOntainer'); // Corrected ID
-  const procedureSection = document.querySelector('.procedureSection');
+      const noteFormContainer = document.getElementById('noteFormContainer');
+      const subTaskFormContainer = document.getElementById('subTaskFormCOntainer'); // Corrected ID
+      const procedureSection = document.querySelector('.procedureSection');
 
-  console.log("Note Form Container:", noteFormContainer);
-  console.log("Sub Task Form Container:", subTaskFormContainer);
-  console.log("Procedure Section:", procedureSection);
+      // Hide other sections
+      noteFormContainer.classList.add('hide');
+      noteFormContainer.classList.remove('show');
+      subTaskFormContainer.classList.add('hide');
+      subTaskFormContainer.classList.remove('show');
 
-  // Hide other sections
-  if (noteFormContainer) noteFormContainer.classList.add('hide');
-  if (noteFormContainer) noteFormContainer.classList.remove('show');
-  if (subTaskFormContainer) subTaskFormContainer.classList.add('hide');
-  if (subTaskFormContainer) subTaskFormContainer.classList.remove('show');
-
-  // Show procedure section
-  if (procedureSection) procedureSection.classList.remove('hide');
-}
+      // Show procedure section
+      procedureSection.classList.remove('hide');
+    }
 
     // Close the form and re-enable the procedure section
     function closeForm() {
@@ -608,6 +513,7 @@
     // Toggle maximize for left section
    // Single function to toggle maximize/minimize
 function toggleMaximize(sectionToMaximize, sectionToHide, button) {
+  console.log("maximizing")
   // Toggle the "maximized" class on the section to maximize
   sectionToMaximize.classList.toggle('maximized');
 

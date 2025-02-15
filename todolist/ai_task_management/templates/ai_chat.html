@@ -130,9 +130,10 @@
 </style>
 
 <script>
-  function formatBoldAiresponse(text) {
-    return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'); // Convert **bold text** to <strong>
+function formatBoldAiresponse(text) {
+    return text.replace(/\*\*(.*?)\*\*|\*(.*?)\*/g, '<strong>$1$2</strong>'); // Supports **bold** & *bold*
 }
+
 
 
 function addLineBreaksAfterAiresponse(text) {
@@ -163,16 +164,13 @@ function typeWriterEffect(element, text, speed) {
             }
 
             index++;
-            setTimeout(type, isTag ? speed / 10 : speed); // Speed up HTML tags
-        } else {
-            element.innerHTML = element.innerHTML.replace(/\*/g, ""); // Remove * if any
+            setTimeout(type, isTag ? speed / 4 : speed); // Speed up HTML tags
         }
     }
 
     element.innerHTML = ""; // Clear previous content
     type();
 }
-
 
 
 

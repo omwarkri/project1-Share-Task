@@ -11,7 +11,7 @@
       </div>
     </div>
   </div>
-  <div class="chat-box" id="chat-box">
+  <div class="chat-box" id="chat-box" data-task-id="{{ task.id }}">
     {% for message in messages %}
       <div class="chat-message {{ message.sender|lower }}">
         <strong>{{ message.sender }}:</strong> <span class="message-content">{{ message.message }}</span>
@@ -33,9 +33,9 @@
   .chat {
     display: flex;
     flex-direction: column;
-    height: 100vh; /* Full viewport height */
+    height: 100vh;
     overflow: hidden;
-}
+  }
 
   .chat-header {
     background: #b3d7ff;
@@ -45,30 +45,21 @@
     font-size: 20px;
     font-weight: bold;
     animation: slideDown 0.3s ease-in-out;
-    
   }
 
   @keyframes slideDown {
-    from {
-      transform: translateY(-20px);
-      opacity: 0;
-    }
-    to {
-      transform: translateY(0);
-      opacity: 1;
-    }
+    from { transform: translateY(-20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
   }
 
   .chat-box {
     flex: 1;
     padding: 15px;
-   
     background: #e9f5ff;
     border-top: 1px solid #e0e0e0;
     transition: all 0.3s ease;
     overflow-y: auto;
     animation: fadeInMessage 0.3s ease-in-out;
-
   }
 
   .chat-message {
@@ -78,19 +69,11 @@
     max-width: 80%;
     word-wrap: break-word;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-   
-    
   }
 
   @keyframes fadeInMessage {
-    from {
-      opacity: 0;
-      transform: translateY(10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 
   .chat-message.user {
@@ -116,14 +99,8 @@
   }
 
   @keyframes slideUp {
-    from {
-      transform: translateY(20px);
-      opacity: 0;
-    }
-    to {
-      transform: translateY(0);
-      opacity: 1;
-    }
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
   }
 
   #message-input {
@@ -136,9 +113,7 @@
     transition: border-color 0.3s ease;
   }
 
-  #message-input:focus {
-    border-color: #64b5f6;
-  }
+  #message-input:focus { border-color: #64b5f6; }
 
   #chat-form button {
     padding: 8px 16px;
@@ -151,143 +126,116 @@
     transition: background 0.3s ease;
   }
 
-  #chat-form button:hover {
-    background: #42a5f5;
-  }
+  #chat-form button:hover { background: #42a5f5; }
 </style>
+
 <script>
-  function formatBoldAiresponse(element) {
-      element = element.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-    }
-
-    // Function to add line breaks after periods, excluding specific cases
-    function addLineBreaksAfterAiresponse(element) {
-      element = element.replace(
-        /(\d+\. )/g,
-        '<br>$1'
-      );
-      element = element.replace(
-        /(?<!\d|\.\S)\. /g,
-        '.<br>'
-      );
-    }
-
-    // Function to format headings and structure content
-    function formatProcedureAiresponse(element) {
-      element = element.replace(
-        /Phase \d+:.*?(?=<br>|$)/g,
-        (match) => `<strong>${match}</strong>`
-      );
-      element = element.replace(
-        /(\d+\. .*?(?=<br>|$))/g,
-        (match) => `<br>${match}`
-      );
-    }
-  // Function to load messages from the server
-  async function loadMessages() {
-    try {
+  function formatBoldAiresponse(text) {
+    return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'); // Convert **bold text** to <strong>
+}
 
 
-      
+function addLineBreaksAfterAiresponse(text) {
+    return text.replace(/\n/g, '<br>'); // Replace newlines with <br>
+}
 
-      const chatBox = document.getElementById('chat-box');
-        
+function typeWriterEffect(element, text, speed) {
+    let index = 0;
+    let isTag = false;
+    let buffer = "";
 
-     
-      // Scroll to the bottom of the chat box
-      
-      const messageContents = document.querySelectorAll('.message-content');
-    messageContents.forEach(message => {
-      formatBoldText(message);
-      addLineBreaksAfterPeriods(message);
-    });
-
-    chatBox.scrollTop = chatBox.scrollHeight;
-
-    } catch (error) {
-      console.error('Error loading messages:', error);
-    }
-  }
-
-  function typeWriterEffect(element, text, speed = 50) {
-    let i = 0;
     function type() {
-        if (i < text.length) {
-            element.innerHTML += text.charAt(i);
-            i++;
-            scrollToBottom();  // Scroll as each letter is printed
-            setTimeout(type, speed);
+        if (index < text.length) {
+            let char = text[index];
+
+            if (char === "<") {
+                isTag = true; // Entering an HTML tag
+                buffer += char;
+            } else if (char === ">") {
+                isTag = false; // Closing an HTML tag
+                buffer += char;
+                element.innerHTML += buffer; // Append full tag at once
+                buffer = "";
+            } else if (isTag) {
+                buffer += char; // Keep adding to tag buffer
+            } else {
+                element.innerHTML += char; // Normal text, type normally
+            }
+
+            index++;
+            setTimeout(type, isTag ? speed / 10 : speed); // Speed up HTML tags
+        } else {
+            element.innerHTML = element.innerHTML.replace(/\*/g, ""); // Remove * if any
         }
     }
+
+    element.innerHTML = ""; // Clear previous content
     type();
 }
 
-// Scroll to bottom function
-function scrollToBottom() {
+
+
+
+  function scrollToBottom() {
     const chatBox = document.getElementById('chat-box');
     chatBox.scrollTop = chatBox.scrollHeight;
-}
+  }
 
-async function sendMessage(message) {
+  async function sendMessage(message) {
     try {
-        const chatBox = document.getElementById('chat-box');
+      const chatBox = document.getElementById('chat-box');
+      const taskId = chatBox.getAttribute('data-task-id');
 
-        // Append user message instantly
-        const userMessageDiv = document.createElement('div');
-        userMessageDiv.className = 'chat-message user';
-        userMessageDiv.innerHTML = `<strong>You:</strong> <span class="message-content">${message}</span>`;
-        chatBox.appendChild(userMessageDiv);
+      // Append user message instantly
+      const userMessageDiv = document.createElement('div');
+      userMessageDiv.className = 'chat-message user';
+      userMessageDiv.innerHTML = `<strong>You:</strong> <span class="message-content">${message}</span>`;
+      chatBox.appendChild(userMessageDiv);
+      scrollToBottom();
+
+      const response = await fetch(`/chat_ai_view/${taskId}/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': '{{ csrf_token }}',
+        },
+        body: JSON.stringify({ user_message: message }),
+      });
+
+      const result = await response.json();
+      if (result.status === 'success') {
+        let aiResponse = result.ai_response;
+        aiResponse = formatBoldAiresponse(aiResponse);
+        aiResponse = addLineBreaksAfterAiresponse(aiResponse);
+
+        // Append AI response with typewriter effect
+        const aiMessageDiv = document.createElement('div');
+        aiMessageDiv.className = 'chat-message ai';
+        aiMessageDiv.innerHTML = `<strong>AI:</strong> <span class="message-content"></span>`;
+        chatBox.appendChild(aiMessageDiv);
         scrollToBottom();
-        
 
-        const taskId = {{ task.id }}; // Django template variable
-        const response = await fetch(`/chat_ai_view/${taskId}/`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token }}',
-            },
-            body: JSON.stringify({ user_message: message }),
-        });
-
-        const result = await response.json();
-        if (result.status === 'success') {
-            console.log('AI Response:', result.ai_response);
-
-
-
-            // Append AI response with typewriter effect
-            const aiMessageDiv = document.createElement('div');
-            aiMessageDiv.className = 'chat-message ai';
-            aiMessageDiv.innerHTML = `<strong>AI:</strong> <span class="message-content"></span>`;
-            chatBox.appendChild(aiMessageDiv);
-            scrollToBottom();
-
-
-
-            // Apply typewriter effect with auto-scroll
-            typeWriterEffect(aiMessageDiv.querySelector('.message-content'), result.ai_response, 50);
-        } else {
-            console.error('Failed to send message:', result.message);
-        }
+        typeWriterEffect(aiMessageDiv.querySelector('.message-content'), aiResponse, 10);
+      } else {
+        console.error('Failed to send message:', result.message);
+      }
     } catch (error) {
-        console.error('Error sending message:', error);
+      console.error('Error sending message:', error);
     }
-}
+  }
 
-
-  // Event listener for the chat form
   document.getElementById('chat-form').addEventListener('submit', async (event) => {
-    event.preventDefault(); // Prevent form submission
+    event.preventDefault();
     const messageInput = document.getElementById('message-input');
     const message = messageInput.value.trim();
 
     if (message) {
       await sendMessage(message);
-      messageInput.value = ''; // Clear the input field
+      messageInput.value = '';
     }
   });
 
-  // Load messages when the page loads
-  window.onload = loadMessages;
+  window.onload = () => {
+    scrollToBottom();
+  };
 </script>

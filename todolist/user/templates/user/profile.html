@@ -1,5 +1,3 @@
-
-
 {% extends 'task/base.html' %}
 
 {% block content %}
@@ -13,10 +11,8 @@
     {% load custom_filters %}
     <style>
         /* General Styles */
-        
-
         h1, h2 {
-            color: #1abc9c; /* Updated to match base template */
+            color: #1abc9c;
             margin-bottom: 10px;
             font-weight: 600;
         }
@@ -41,7 +37,6 @@
         .card {
             background: white;
             padding: 24px;
-            max-width: 1000px;
             width: 100%;
             margin: 8px 0;
             text-align: center;
@@ -49,6 +44,8 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
         /* Profile Picture Styles */
@@ -61,12 +58,97 @@
             height: 150px;
             border-radius: 50%;
             object-fit: cover;
-            border: 4px solid #1abc9c; /* Updated to match base template */
+            border: 4px solid #1abc9c;
             transition: transform 0.3s ease;
         }
 
         .profile-picture:hover {
             transform: scale(1.05);
+        }
+
+        /* Edit Button Styles */
+        .edit-button {
+            background-color: #1abc9c;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 500;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            margin-top: 20px;
+        }
+
+        .edit-button:hover {
+            background-color: #16a085;
+            transform: translateY(-2px);
+        }
+
+        .edit-button:active {
+            transform: translateY(0);
+        }
+
+        /* Modal Styles */
+        /* Modal Styles */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+    justify-content: center;
+    align-items: center;
+    z-index: 3000; /* Ensure it's on top of other elements */
+}
+
+.modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Animation for modal */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 1.5em;
+            color: #1abc9c;
+        }
+
+        .close-button {
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            cursor: pointer;
+            color: #555;
+        }
+
+        .close-button:hover {
+            color: #1abc9c;
         }
 
         /* Form Group Styles */
@@ -79,7 +161,7 @@
             display: block;
             font-weight: 600;
             margin-bottom: 8px;
-            color: #1abc9c; /* Updated to match base template */
+            color: #1abc9c;
         }
 
         .form-input {
@@ -93,21 +175,14 @@
         }
 
         .form-input:focus {
-            border-color: #1abc9c; /* Updated to match base template */
-            box-shadow: 0 0 8px rgba(26, 188, 156, 0.3); /* Updated to match base template */
+            border-color: #1abc9c;
+            box-shadow: 0 0 8px rgba(26, 188, 156, 0.3);
             outline: none;
-        }
-
-        /* File Input Styles */
-        .form-input[type="file"] {
-            padding: 8px;
-            background-color: #f9f9f9;
-            cursor: pointer;
         }
 
         /* Submit Button Styles */
         .submit-button {
-            background-color: #1abc9c; /* Updated to match base template */
+            background-color: #1abc9c;
             color: white;
             border: none;
             padding: 12px 24px;
@@ -121,38 +196,11 @@
         }
 
         .submit-button:hover {
-            background-color: #16a085; /* Updated to match base template */
+            background-color: #16a085;
             transform: translateY(-2px);
         }
 
         .submit-button:active {
-            transform: translateY(0);
-        }
-
-        /* Form Styles */
-        form {
-            margin: 20px 0;
-        }
-
-        form button {
-            background-color: #1abc9c; /* Updated to match base template */
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1em;
-            font-weight: 500;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-            margin-top: 20px;
-        }
-
-        form button:hover {
-            background-color: #16a085; /* Updated to match base template */
-            transform: translateY(-2px);
-        }
-
-        form button:active {
             transform: translateY(0);
         }
 
@@ -172,7 +220,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            background-color: #1abc9c; /* Updated to match base template */
+            background-color: #1abc9c;
             color: white;
             font-size: 1.2em;
             font-weight: bold;
@@ -231,8 +279,8 @@
         }
 
         /* Color Classes */
-        .green { background-color: #1abc9c; } /* Updated to match base template */
-        .dark-green { background-color: #16a085; } /* Updated to match base template */
+        .green { background-color: #1abc9c; }
+        .dark-green { background-color: #16a085; }
         .yellow { background-color: #FFEB3B; }
 
         /* Rating and Reviews Section */
@@ -261,7 +309,7 @@
 
         .review-card .rating {
             font-weight: bold;
-            color: #FFD700; /* Gold color for ratings */
+            color: #FFD700;
         }
 
         .review-card .comment {
@@ -295,6 +343,18 @@
 
         .logout-button:active {
             transform: translateY(0);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         /* Responsive Design */
@@ -338,7 +398,32 @@
             {% endif %}
         </div>
 
-        <!-- Profile Update Form -->
+        <!-- Edit Button -->
+        <button class="edit-button" onclick="openProfileEditModal()">Edit Profile</button>
+
+        <p>Score: {{ user.score }}</p>
+
+        <!-- Display Badges -->
+        <div class="badges">
+            {% if user.user_badges %}
+                {% for user_badge in user_badges %}
+                    <div class="badge" title="{{ user_badge.badge.name }}">
+                        <img class="badge_icon" src="http://127.0.0.1:8000/media/{{ user_badge.badge.icon }}" alt="{{ user_badge.badge.name }}">
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>No badges earned yet.</p>
+            {% endif %}
+        </div>
+
+        <!-- Modal for Profile Update -->
+        <!-- Modal for Profile Update -->
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Edit Profile</h2>
+            <button class="close-button" onclick="closeProfileEditModal()">&times;</button>
+        </div>
         <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
             <div class="form-group">
@@ -355,21 +440,9 @@
             </div>
             <button type="submit" class="submit-button">Update Profile</button>
         </form>
+    </div>
+</div>
 
-        <p>Score: {{ user.score }}</p>
-
-        <!-- Display Badges -->
-        <div class="badges">
-            {% if user.user_badges %}
-                {% for user_badge in user_badges %}
-                    <div class="badge" title="{{ user_badge.badge.name }}">
-                        <img class="badge_icon" src="http://127.0.0.1:8000/media/{{ user_badge.badge.icon }}" alt="{{ user_badge.badge.name }}">
-                    </div>
-                {% endfor %}
-            {% else %}
-                <p>No badges earned yet.</p>
-            {% endif %}
-        </div>
 
         <h2>Your Activity Calendar</h2>
         <div class="calendar">
@@ -408,12 +481,39 @@
             {% endif %}
         </div>
 
+
         <!-- Logout Button -->
         <form method="post" action="{% url 'logout' %}" style="display: inline;">
             {% csrf_token %}
             <button class="logout-button" type="submit">Logout</button>
         </form>
     </div>
+
+    <script>    // Function to open the modal
+        function openProfileEditModal() {
+            const modal = document.getElementById('editModal');
+            if (modal) {
+                modal.style.display = 'flex'; // Ensure the modal is visible
+                console.log('Modal opened!'); // Debugging: Log to confirm the function is called
+            } else {
+                console.error('Modal not found!');
+            }
+        }
+
+        // Function to close the modal
+        function closeProfileEditModal() {
+            console.log("closiing model")
+            const modal = document.getElementById('editModal');
+            if (modal) {
+                console.log("get models")
+                modal.style.display = 'none'; // Hide the modal
+                console.log('Modal closed!'); // Debugging: Log to confirm the function is called
+            }
+        }
+
+        // Close modal when clicking outside the modal content
+    
+    </script>
 </body>
 </html>
 {% endblock %}

@@ -67,8 +67,11 @@ def profile_view(request):
     print("hii")
 
     if request.method == 'POST':
+        print(request.POST)
         form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user)
+        print(form)
         if form.is_valid():
+            print("updating profile")
             form.save()
             return redirect('profile')  # Redirect to the profile page after saving
         

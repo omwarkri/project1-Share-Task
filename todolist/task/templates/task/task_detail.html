@@ -1,3 +1,6 @@
+{% extends 'task/base.html' %}
+
+{% block content %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,303 +8,341 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Task Details</title>
     <style>
-        /* General Styles */
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f8f9fa;
-            color: #333;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
+/* General Styles */
+.task-container * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
 
-        h1 {
-            color: #4CAF50;
-            font-size: 2.5rem;
-            margin-bottom: 20px;
-            text-align: center;
-            font-weight: 700;
-        }
+.task-title {
+    color: #1abc9c;
+    font-size: 2rem;
+    margin-bottom: 20px;
+    text-align: center;
+    font-weight: 700;
+}
 
-        h2 {
-            color: #2c3e50;
-            font-size: 1.8rem;
-            margin-bottom: 15px;
-            font-weight: 600;
-        }
+.task-subtitle {
+    color: #1abc9c;
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+    font-weight: 600;
+}
 
-        .task-detail {
-            background: #fff;
-            padding: 30px;
-            border-radius: 16px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-            width: 90%;
-            max-width: 800px;
-            margin: 20px auto;
-        }
+.task-detail-box {
+    background: #fff;
+    padding: 20px;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 800px;
+    margin: 20px auto;
+}
 
-        .task-detail p {
-            font-size: 1.1rem;
-            line-height: 1.6;
-            color: #555;
-            margin-bottom: 15px;
-        }
+.task-text {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #555;
+    margin-bottom: 15px;
+}
 
-        .task-detail strong {
-            color: #2c3e50;
-            font-weight: 600;
-        }
+.task-highlight {
+    color: #1abc9c;
+    font-weight: 600;
+}
 
-        .task-detail form {
-            margin-top: 20px;
-        }
+.task-form {
+    margin-top: 20px;
+}
 
-        .task-detail input,
-        .task-detail textarea,
-        .task-detail select {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 15px;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: border-color 0.3s ease, box-shadow 0.3s ease;
-        }
+.task-input,
+.task-textarea,
+.task-select {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
 
-        .task-detail input:focus,
-        .task-detail textarea:focus,
-        .task-detail select:focus {
-            border-color: #4CAF50;
-            box-shadow: 0 0 8px rgba(76, 175, 80, 0.2);
-            outline: none;
-        }
+.task-input:focus,
+.task-textarea:focus,
+.task-select:focus {
+    border-color: #1abc9c;
+    box-shadow: 0 0 8px rgba(26, 188, 156, 0.2);
+    outline: none;
+}
 
-        button {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            border-radius: 8px;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-        }
+.task-button {
+    background-color: #1abc9c;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
 
-        button:hover {
-            background-color: #45a049;
-            transform: translateY(-2px);
-        }
+.task-button:hover {
+    background-color: #16a085;
+    transform: translateY(-2px);
+}
 
-        button:active {
-            transform: translateY(0);
-        }
+.task-button:active {
+    transform: translateY(0);
+}
 
-        a {
-            text-decoration: none;
-            color: #3498db;
-            font-weight: 600;
-            transition: color 0.3s ease;
-        }
+.task-link {
+    text-decoration: none;
+    color: #1abc9c;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
 
-        a:hover {
-            color: #2980b9;
-        }
+.task-link:hover {
+    color: #16a085;
+}
 
-        .completion-detail {
-            margin-top: 25px;
-            background: linear-gradient(135deg, #e8f5e9, #d4edda);
-            padding: 20px;
-            border-radius: 12px;
-        }
+.task-completion-box {
+    margin-top: 25px;
+    background: linear-gradient(135deg, #e8f5e9, #d4edda);
+    padding: 20px;
+    border-radius: 12px;
+}
 
-        .completion-detail img,
-        .completion-detail video {
-            max-width: 100%;
-            height: auto;
-            margin: 15px 0;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
+.task-media {
+    max-width: 100%;
+    height: auto;
+    margin: 15px 0;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
 
-        .completion-detail h3 {
-            color: #2c3e50;
-            font-size: 1.4rem;
-            margin-bottom: 10px;
-        }
+.task-completion-title {
+    color: #1abc9c;
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+}
 
-        .chat-button {
-            display: inline-block;
-            padding: 10px 20px;
-            background-color: #3498db;
-            color: white;
-            border-radius: 8px;
-            font-weight: 600;
-            transition: background-color 0.3s ease;
-        }
+.task-chat-button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #1abc9c;
+    color: white;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+}
 
-        .chat-button:hover {
-            background-color: #2980b9;
-        }
+.task-chat-button:hover {
+    background-color: #16a085;
+}
 
-        #editForm {
-            margin-top: 20px;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
+.task-edit-form {
+    margin-top: 20px;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
 
-        #editForm h2 {
-            color: #4CAF50;
-            font-size: 1.6rem;
-            margin-bottom: 15px;
-        }
+.task-edit-title {
+    color: #1abc9c;
+    font-size: 1.4rem;
+    margin-bottom: 15px;
+}
 
-        .subscription-required {
-            margin-top: 20px;
-            padding: 20px;
-            background: #fff3cd;
-            border-radius: 12px;
-            text-align: center;
-        }
+.task-subscription-alert {
+    margin-top: 20px;
+    padding: 20px;
+    background: #fff3cd;
+    border-radius: 12px;
+    text-align: center;
+}
 
-        .subscription-required h1 {
-            color: #e74c3c;
-            font-size: 1.8rem;
-            margin-bottom: 10px;
-        }
+.task-subscription-alert-title {
+    color: #e74c3c;
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
 
-        .subscription-required a {
-            display: inline-block;
-            margin-top: 10px;
-            padding: 10px 20px;
-            background-color: #4CAF50;
-            color: white;
-            border-radius: 8px;
-            font-weight: 600;
-            transition: background-color 0.3s ease;
-        }
+.task-subscription-link {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 10px 20px;
+    background-color: #1abc9c;
+    color: white;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+}
 
-        .subscription-required a:hover {
-            background-color: #45a049;
-        }
+.task-subscription-link:hover {
+    background-color: #16a085;
+}
 
-        .back-link {
-            text-align: center;
-            margin-top: 20px;
-        }
+.task-back-link {
+    text-align: center;
+    margin-top: 20px;
+}
 
-        .back-link a {
-            color: #4CAF50;
-            font-weight: 600;
-            transition: color 0.3s ease;
-        }
+.task-back-link a {
+    color: #1abc9c;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
 
-        .back-link a:hover {
-            color: #45a049;
-        }
+.task-back-link a:hover {
+    color: #16a085;
+}
 
-        /* Subtasks Section */
-        .subtask {
-            margin-top: 25px;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 12px;
-        }
+/* Subtasks Section */
+.task-subtask-box {
+    margin-top: 25px;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 12px;
+}
 
-        .subtask h3 {
-            color: #2c3e50;
-            font-size: 1.4rem;
-            margin-bottom: 15px;
-        }
+.task-subtask-title {
+    color: #1abc9c;
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+}
 
-        .subtask ul {
-            list-style-type: none;
-            padding: 0;
-        }
+.task-subtask-list {
+    list-style-type: none;
+    padding: 0;
+}
 
-        .subtask li {
-            background: #fff;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+.task-subtask-item {
+    background: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
 
-        .subtask input[type="checkbox"] {
-            cursor: pointer;
-        }
+.task-subtask-checkbox {
+    cursor: pointer;
+}
 
-        /* Activity Log Section */
-        .activity-log {
-            margin-top: 25px;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 12px;
-        }
+/* Activity Log Section */
+.task-activity-box {
+    margin-top: 25px;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 12px;
+}
 
-        .activity-log h3 {
-            color: #2c3e50;
-            font-size: 1.4rem;
-            margin-bottom: 15px;
-        }
+.task-activity-title {
+    color: #1abc9c;
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+}
 
-        .activity-log ul {
-            list-style-type: none;
-            padding: 0;
-        }
+.task-activity-list {
+    list-style-type: none;
+    padding: 0;
+}
 
-        .activity-log li {
-            background: #fff;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
+.task-activity-item {
+    background: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
 
-        .activity-log small {
-            color: #777;
-            font-size: 0.9rem;
-        }
+.task-activity-time {
+    color: #777;
+    font-size: 0.9rem;
+}
 
-        /* Comments Section */
-        .comments-section {
-            margin-top: 25px;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 12px;
-        }
+/* Comments Section */
+.task-comments-box {
+    margin-top: 25px;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 12px;
+}
 
-        .comments-section h2 {
-            color: #2c3e50;
-            font-size: 1.6rem;
-            margin-bottom: 15px;
-        }
+.task-comments-title {
+    color: #1abc9c;
+    font-size: 1.4rem;
+    margin-bottom: 15px;
+}
 
-        .comments-section ul {
-            list-style-type: none;
-            padding: 0;
-        }
+.task-comments-list {
+    list-style-type: none;
+    padding: 0;
+}
 
-        .comments-section li {
-            background: #fff;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
+.task-comments-item {
+    background: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
 
-        .comments-section small {
-            color: #777;
-            font-size: 0.9rem;
-        }
+.task-comments-time {
+    color: #777;
+    font-size: 0.9rem;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .task-container {
+        padding: 10px;
+    }
+
+    .task-title {
+        font-size: 1.8rem;
+    }
+
+    .task-subtitle {
+        font-size: 1.3rem;
+    }
+
+    .task-detail-box {
+        padding: 15px;
+    }
+
+    .task-text {
+        font-size: 0.9rem;
+    }
+
+    .task-input,
+    .task-textarea,
+    .task-select {
+        padding: 10px;
+        font-size: 0.9rem;
+    }
+
+    .task-button {
+        padding: 10px 20px;
+        font-size: 0.9rem;
+    }
+
+    .task-completion-title {
+        font-size: 1rem;
+    }
+
+    .task-chat-button {
+        padding: 8px 16px;
+        font-size: 0.9rem;
+    }
+}
+
     </style>
 </head>
 <body>
@@ -315,12 +356,12 @@
             {% csrf_token %}
             <input type="hidden" name="task_id" value="{{ task.id }}">
             <textarea name="procedure" placeholder="Enter procedure details here" value="{{ task.procedure }}"></textarea>
-            <button type="submit">Manage task with ai</button>
+            <button type="submit">Manage task with AI</button>
         </form>
         <p><strong>Priority:</strong> {{ task.get_priority_display }}</p>   
         <p><strong>Due Date:</strong> {{ task.due_date }}</p>  
         <p><strong>Created At:</strong> {{ task.created_at }}</p>
- 
+
         <div class="subtask">
             <h3>Subtasks</h3>
             <ul>
@@ -344,7 +385,6 @@
                 <button type="submit">Add Subtask</button>
             </form>
         </div>
-
 
         <div class="add-note-section">
             <h3>Add a Note</h3>
@@ -465,16 +505,17 @@
 
     <script>
         function getAiProcedure(taskId) {
-    fetch(`/generate-ai-procedure/${taskId}/`)
-      .then(response => response.json())
-      .then(data => {
-        document.getElementById(`procedure-${taskId}`).innerText = data.procedure;
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        alert('Failed to generate procedure.');
-      });
-  }
+            fetch(`/generate-ai-procedure/${taskId}/`)
+              .then(response => response.json())
+              .then(data => {
+                document.getElementById(`procedure-${taskId}`).innerText = data.procedure;
+              })
+              .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to generate procedure.');
+              });
+        }
+
         function toggleEditForm() {
             var editForm = document.getElementById("editForm");
             var editBtn = document.getElementById("editBtn");
@@ -490,3 +531,4 @@
     </script>
 </body>
 </html>
+{% endblock %}

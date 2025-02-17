@@ -93,7 +93,83 @@ main {
     min-height: calc(100vh - 100px); /* Ensures it fills available space */
     overflow-y: auto; /* Enables vertical scrolling if content overflows */
     display: flex;
+    margin-left: 250px; /* Offset for sidebar */
+    position: relative;
     flex-direction: column;
+
+}
+
+/* Sidebar */
+.sidebar {
+    width: 250px;
+    padding: 20px;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    overflow-y: auto;
+    transition: transform 0.3s ease-in-out;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-color: #ffffff; /* White background */
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+.sidebar h2 {
+    color: #1abc9c; /* Keep the accent color for headings */
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.sidebar-menu {
+    list-style: none;
+    padding: 0;
+}
+
+.sidebar-menu li {
+    margin: 15px 0;
+}
+
+.sidebar-menu button {
+    color: #555; /* Darker text for buttons */
+    background-color: transparent;
+    border: none;
+    text-decoration: none;
+    font-size: 16px;
+    transition: color 0.3s ease;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+.sidebar-menu button.active {
+    color: #1abc9c;;
+}
+
+.sidebar-menu button:hover {
+    color: #1abc9c;
+}
+
+.sidebar-footer {
+    margin-top: 30px;
+}
+.sidebar-footer .accountbutton{
+    width: 100%;
+    padding: 10px;
+    background-color: transparent;
+    color: #555; /* Darker text for logout/login button */
+    border: 1px solid #ddd; /* Light border */
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+.sidebar-footer  .accountbutton:hover {
+    background-color: #1abc9c; /* Accent color on hover */
+    color: white;
 }
 
 /* Footer Styles */
@@ -107,6 +183,25 @@ footer {
     width: 100%;
 }
 
+
+.add-task {
+    width: 100%;
+    padding: 10px;
+    background-color: #ffffff; /* White background */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+.add-task:hover {
+    background-color: #16a085;
+}
+
+
 /* Responsive Fixes */
 @media (max-width: 768px) {
     .header-div {
@@ -116,6 +211,21 @@ footer {
         padding: 4;
   
         
+    }
+    .sidebar {
+        transform: translateX(-100%); /* Hide sidebar by default */
+    }
+
+    .sidebar.show {
+        transform: translateX(0); /* Show sidebar when toggled */
+    }
+
+    .main-content {
+        margin-left: 0; /* Remove sidebar offset */
+    }
+
+    .sidebar-toggle {
+        display: block; /* Show toggle button on mobile */
     }
 
     header h1 {
@@ -142,13 +252,45 @@ footer {
     <header class="header-div">
         <h1>{{ app_name }}</h1>
         <div>
-            <a href="{% url 'leaderboard' %}">View Leaderboard</a>
+          
             <span>Welcome, <a href="{% url 'profile' %}">{{ user.username }}</a>!</span>
         </div>
     </header>
+    <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+    <!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+    <div>
+        <h2>Share Task</h2>
+    <ul class="sidebar-menu">
+        <li><a href="{% url 'home' %}">All Tasks</a></li>
+        <li>  <a href="{% url 'leaderboard' %}">Leaderboard</a></li>
+        <li><button onclick="filterTasks('in_progress', 'all')">In Progress</button></li>
+        <li><button onclick="filterTasks('completed', 'all')">Completed</button></li>
+        <li><button onclick="filterTasks('archived', 'all')">Archived</button></li>   
+        
+    </ul>
+    <button class="add-task" onclick="openAddTaskModal()">+ Add Task</button>
+    </div>
+    <div class="sidebar-footer">
+        
+        <div class="logout">
+            {% if user.is_authenticated %}
+                
+                <form method="post" action="{% url 'logout' %}" style="display: inline;">
+                    {% csrf_token %}
+                    <button class="accountbutton" type="submit">Logout</button>
+                </form>
+            {% else %}
+                <a class="accountbutton" href="{% url 'login' %}">Login</a>
+            {% endif %}
+        </div>
+    </div>
+   
+</div>
+
     
 
-    <main>
+    <main class="main">
         {% block content %}
         {% endblock %}
     </main>
@@ -157,4 +299,21 @@ footer {
         &copy; {{ year }} {{ app_name }}. All rights reserved.
     </footer>
 </body>
+<script>
+    
+    function toggleSidebar() {
+    const sidebar = document.getElementById("sidebar");
+    sidebar.classList.toggle("show");
+
+    const mainContent = document.querySelector("main");
+    if (sidebar.classList.contains("show")) {
+        mainContent.classList.add("show-sidebar");
+    } else {
+        mainContent.classList.remove("show-sidebar");
+    }
+}
+    function openFilterModal() {
+    document.getElementById('filterModal').style.display = 'flex';
+}
+</script>
 </html>

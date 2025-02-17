@@ -1,33 +1,4 @@
-<!-- AI Chat Component -->
-<div class="chat">
-  <div class="chat-header">
-    AI Chat
-    <div class="add-options">
-      <button class="add-button" onclick="toggleOptions()">+</button>
-      <div class="options-dropdown" id="optionsDropdown">
-        <button onclick="addNotes()">Add Notes</button>
-        <button onclick="addSubTask()">Add Sub Task</button>
-        <button onclick="viewProcedure()">View Procedure</button>
-      </div>
-    </div>
-  </div>
-  <div class="chat-box" id="chat-box" data-task-id="{{ task.id }}">
-    {% for message in messages %}
-      <div class="chat-message {{ message.sender|lower }}">
-        <strong>{{ message.sender }}:</strong> <span class="message-content">{{ message.message }}</span>
-      </div>
-    {% empty %}
-      <p>No messages yet.</p>
-    {% endfor %}
-  </div>
 
-  <!-- Chat Input -->
-  <form id="chat-form" class="message-send">
-    {% csrf_token %}
-    <input type="text" id="message-input" placeholder="Ask AI..." required />
-    <button type="submit">Send</button>
-  </form>
-</div>
 
 <style>
   .chat {
@@ -126,41 +97,113 @@
     transition: background 0.3s ease;
   }
 
+  .loading-spinner {
+    position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  background-color: transparent
+  ;
+  height:80%
+}                          
+
+  .spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #64b5f6;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.hide {
+  display: none;
+}
+
   #chat-form button:hover { background: #42a5f5; }
+
+
+
 </style>
 
+<!-- AI Chat Component -->
+<div class="chat">
+  <div class="chat-header">
+    AI Chat
+    <div class="add-options">
+      <button class="add-button" onclick="toggleOptions()">+</button>
+      <div class="options-dropdown" id="optionsDropdown">
+        <button onclick="addNotes()">Add Notes</button>
+        <button onclick="addSubTask()">Add Sub Task</button>
+        <button onclick="viewProcedure()">View Procedure</button>
+      </div>
+    </div>
+  </div>
+  <div class="chat-box" id="chat-box">
+    {% for message in messages %}
+      <div class="chat-message {{ message.sender|lower }}">
+        <strong>{{ message.sender }}:</strong> <span class="message-content">{{ message.message }}</span>
+      </div>
+    {% empty %}
+      <p>No messages yet.</p>
+    {% endfor %}
+    <!-- Loading Spinner -->
+  
+  </div>
+
+  <div id="loading-spinner" class="loading-spinner hide">
+    <div class="spinner"></div>
+  </div>
+
+ 
+
+  <!-- Chat Input -->
+  <form id="chat-form" class="message-send">
+    {% csrf_token %}
+    <input type="text" id="message-input" placeholder="Ask AI..." required />
+    <button type="submit">Send</button>
+  </form>
+</div>
+
 <script>
-function formatBoldAiresponse(text) {
-    return text.replace(/\*\*(.*?)\*\*|\*(.*?)\*/g, '<strong>$1$2</strong>'); // Supports **bold** & *bold*
-}
+
 
 
 
 function addLineBreaksAfterAiresponse(text) {
     return text.replace(/\n/g, '<br>'); // Replace newlines with <br>
 }
-
 function typeWriterEffect(element, text, speed) {
     let index = 0;
     let isTag = false;
     let buffer = "";
+
+    // Preformat text for bold and line breaks
+    text = formatBoldAiresponse(text); // Convert **bold** to <strong>
+    text = addLineBreaksAfterAiresponse(text); // Convert newlines to <br>
 
     function type() {
         if (index < text.length) {
             let char = text[index];
 
             if (char === "<") {
-                isTag = true; // Entering an HTML tag
+                isTag = true; // Start HTML tag
                 buffer += char;
             } else if (char === ">") {
-                isTag = false; // Closing an HTML tag
+                isTag = false; // End HTML tag
                 buffer += char;
-                element.innerHTML += buffer; // Append full tag at once
+                element.innerHTML += buffer; // Append full HTML tag instantly
                 buffer = "";
             } else if (isTag) {
-                buffer += char; // Keep adding to tag buffer
+                buffer += char; // Buffer HTML content
             } else {
-                element.innerHTML += char; // Normal text, type normally
+                element.innerHTML += char; // Type normal text
             }
 
             index++;
@@ -170,6 +213,11 @@ function typeWriterEffect(element, text, speed) {
 
     element.innerHTML = ""; // Clear previous content
     type();
+}
+
+// Helper functions for formatting
+function formatBoldAiresponse(text) {
+    return text.replace(/\*\*(.*?)\*\*|\*(.*?)\*/g, '<strong>$1$2</strong>'); // Supports **bold** & *bold*
 }
 
 
@@ -184,12 +232,15 @@ function typeWriterEffect(element, text, speed) {
       const chatBox = document.getElementById('chat-box');
       const taskId = chatBox.getAttribute('data-task-id');
 
+      const loadingSpinner = document.getElementById('loading-spinner');
       // Append user message instantly
       const userMessageDiv = document.createElement('div');
       userMessageDiv.className = 'chat-message user';
       userMessageDiv.innerHTML = `<strong>You:</strong> <span class="message-content">${message}</span>`;
       chatBox.appendChild(userMessageDiv);
       scrollToBottom();
+
+      loadingSpinner.classList.remove('hide');
 
       const response = await fetch(`/chat_ai_view/${taskId}/`, {
         method: 'POST',
@@ -205,16 +256,20 @@ function typeWriterEffect(element, text, speed) {
         let aiResponse = result.ai_response;
         aiResponse = formatBoldAiresponse(aiResponse);
         aiResponse = addLineBreaksAfterAiresponse(aiResponse);
+        
 
         // Append AI response with typewriter effect
         const aiMessageDiv = document.createElement('div');
         aiMessageDiv.className = 'chat-message ai';
         aiMessageDiv.innerHTML = `<strong>AI:</strong> <span class="message-content"></span>`;
         chatBox.appendChild(aiMessageDiv);
+        loadingSpinner.classList.add('hide');
         scrollToBottom();
 
         typeWriterEffect(aiMessageDiv.querySelector('.message-content'), aiResponse, 10);
       } else {
+        
+        loadingSpinner.classList.add('hide');
         console.error('Failed to send message:', result.message);
       }
     } catch (error) {

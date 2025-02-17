@@ -64,7 +64,10 @@
                         <p><strong>Status:</strong> {{ task_data.task.get_status_display }}</p>
                         <p><strong>Due Date:</strong> {{ task_data.task.due_date|date:"F j, Y, g:i a" }}</p>
 
+
+                        <a href="{% url 'ai_task_management' task_data.task.id %}" class="suggested-users-button">Manage task with AI</a>
                         <a href="{% url 'suggested_users' task_data.task.id %}" class="suggested-users-button">Find Task Partner</a>
+                     
                         {% if task_data.task.is_overdue %}
                             <span class="badge badge-danger">Overdue</span>
                         {% elif task_data.task.is_approaching_due_date %}
@@ -268,7 +271,7 @@ body {
     flex: 1;
     padding: 20px;
     background-color: #fff;
-    margin-left: 250px; /* Offset for sidebar */
+    overflow: hidden;
     transition: margin-left 0.3s ease-in-out;
 }
 
@@ -276,10 +279,10 @@ body {
 .header {
     display: flex;
     justify-content: space-between;
+    padding: 8px;
     align-items: center;
     margin-bottom: 20px;
     background-color: #ffffff; /* White background */
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
 }
 
 .header h1 {

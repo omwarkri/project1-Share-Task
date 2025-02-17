@@ -1,534 +1,201 @@
 {% extends 'task/base.html' %}
 
 {% block content %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Task Details</title>
-    <style>
-/* General Styles */
-.task-container * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
+<div class="suggested-users-container">
+    <h1>Suggested Users for Task: {{ task.title }}</h1>
 
-.task-title {
-    color: #1abc9c;
-    font-size: 2rem;
-    margin-bottom: 20px;
-    text-align: center;
-    font-weight: 700;
-}
-
-.task-subtitle {
-    color: #1abc9c;
-    font-size: 1.5rem;
-    margin-bottom: 15px;
-    font-weight: 600;
-}
-
-.task-detail-box {
-    background: #fff;
-    padding: 20px;
-    border-radius: 16px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    max-width: 800px;
-    margin: 20px auto;
-}
-
-.task-text {
-    font-size: 1rem;
-    line-height: 1.6;
-    color: #555;
-    margin-bottom: 15px;
-}
-
-.task-highlight {
-    color: #1abc9c;
-    font-weight: 600;
-}
-
-.task-form {
-    margin-top: 20px;
-}
-
-.task-input,
-.task-textarea,
-.task-select {
-    width: 100%;
-    padding: 12px;
-    margin-bottom: 15px;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    font-size: 1rem;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-.task-input:focus,
-.task-textarea:focus,
-.task-select:focus {
-    border-color: #1abc9c;
-    box-shadow: 0 0 8px rgba(26, 188, 156, 0.2);
-    outline: none;
-}
-
-.task-button {
-    background-color: #1abc9c;
-    color: white;
-    border: none;
-    padding: 12px 24px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    border-radius: 8px;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-}
-
-.task-button:hover {
-    background-color: #16a085;
-    transform: translateY(-2px);
-}
-
-.task-button:active {
-    transform: translateY(0);
-}
-
-.task-link {
-    text-decoration: none;
-    color: #1abc9c;
-    font-weight: 600;
-    transition: color 0.3s ease;
-}
-
-.task-link:hover {
-    color: #16a085;
-}
-
-.task-completion-box {
-    margin-top: 25px;
-    background: linear-gradient(135deg, #e8f5e9, #d4edda);
-    padding: 20px;
-    border-radius: 12px;
-}
-
-.task-media {
-    max-width: 100%;
-    height: auto;
-    margin: 15px 0;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.task-completion-title {
-    color: #1abc9c;
-    font-size: 1.2rem;
-    margin-bottom: 10px;
-}
-
-.task-chat-button {
-    display: inline-block;
-    padding: 10px 20px;
-    background-color: #1abc9c;
-    color: white;
-    border-radius: 8px;
-    font-weight: 600;
-    transition: background-color 0.3s ease;
-}
-
-.task-chat-button:hover {
-    background-color: #16a085;
-}
-
-.task-edit-form {
-    margin-top: 20px;
-    padding: 20px;
-    background: #f8f9fa;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.task-edit-title {
-    color: #1abc9c;
-    font-size: 1.4rem;
-    margin-bottom: 15px;
-}
-
-.task-subscription-alert {
-    margin-top: 20px;
-    padding: 20px;
-    background: #fff3cd;
-    border-radius: 12px;
-    text-align: center;
-}
-
-.task-subscription-alert-title {
-    color: #e74c3c;
-    font-size: 1.5rem;
-    margin-bottom: 10px;
-}
-
-.task-subscription-link {
-    display: inline-block;
-    margin-top: 10px;
-    padding: 10px 20px;
-    background-color: #1abc9c;
-    color: white;
-    border-radius: 8px;
-    font-weight: 600;
-    transition: background-color 0.3s ease;
-}
-
-.task-subscription-link:hover {
-    background-color: #16a085;
-}
-
-.task-back-link {
-    text-align: center;
-    margin-top: 20px;
-}
-
-.task-back-link a {
-    color: #1abc9c;
-    font-weight: 600;
-    transition: color 0.3s ease;
-}
-
-.task-back-link a:hover {
-    color: #16a085;
-}
-
-/* Subtasks Section */
-.task-subtask-box {
-    margin-top: 25px;
-    padding: 20px;
-    background: #f8f9fa;
-    border-radius: 12px;
-}
-
-.task-subtask-title {
-    color: #1abc9c;
-    font-size: 1.2rem;
-    margin-bottom: 15px;
-}
-
-.task-subtask-list {
-    list-style-type: none;
-    padding: 0;
-}
-
-.task-subtask-item {
-    background: #fff;
-    padding: 15px;
-    border-radius: 8px;
-    margin-bottom: 10px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.task-subtask-checkbox {
-    cursor: pointer;
-}
-
-/* Activity Log Section */
-.task-activity-box {
-    margin-top: 25px;
-    padding: 20px;
-    background: #f8f9fa;
-    border-radius: 12px;
-}
-
-.task-activity-title {
-    color: #1abc9c;
-    font-size: 1.2rem;
-    margin-bottom: 15px;
-}
-
-.task-activity-list {
-    list-style-type: none;
-    padding: 0;
-}
-
-.task-activity-item {
-    background: #fff;
-    padding: 15px;
-    border-radius: 8px;
-    margin-bottom: 10px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.task-activity-time {
-    color: #777;
-    font-size: 0.9rem;
-}
-
-/* Comments Section */
-.task-comments-box {
-    margin-top: 25px;
-    padding: 20px;
-    background: #f8f9fa;
-    border-radius: 12px;
-}
-
-.task-comments-title {
-    color: #1abc9c;
-    font-size: 1.4rem;
-    margin-bottom: 15px;
-}
-
-.task-comments-list {
-    list-style-type: none;
-    padding: 0;
-}
-
-.task-comments-item {
-    background: #fff;
-    padding: 15px;
-    border-radius: 8px;
-    margin-bottom: 10px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.task-comments-time {
-    color: #777;
-    font-size: 0.9rem;
-}
-
-/* Mobile Responsiveness */
-@media (max-width: 768px) {
-    .task-container {
-        padding: 10px;
-    }
-
-    .task-title {
-        font-size: 1.8rem;
-    }
-
-    .task-subtitle {
-        font-size: 1.3rem;
-    }
-
-    .task-detail-box {
-        padding: 15px;
-    }
-
-    .task-text {
-        font-size: 0.9rem;
-    }
-
-    .task-input,
-    .task-textarea,
-    .task-select {
-        padding: 10px;
-        font-size: 0.9rem;
-    }
-
-    .task-button {
-        padding: 10px 20px;
-        font-size: 0.9rem;
-    }
-
-    .task-completion-title {
-        font-size: 1rem;
-    }
-
-    .task-chat-button {
-        padding: 8px 16px;
-        font-size: 0.9rem;
-    }
-}
-
-    </style>
-</head>
-<body>
-    <div class="task-detail">
-        <h1>{{ task.title }}</h1>
-        <p><strong>Status:</strong> {{ task.status }}</p>
-        <p><strong>Description:</strong> {{ task.description }}</p>
-        <button onclick="getAiProcedure({{ task.id }})">AI Procedure</button>
-        <p id="procedure-{{ task.id }}"></p>
-        <form action="{% url 'ai_task_management' task.id %}" method="post">
-            {% csrf_token %}
-            <input type="hidden" name="task_id" value="{{ task.id }}">
-            <textarea name="procedure" placeholder="Enter procedure details here" value="{{ task.procedure }}"></textarea>
-            <button type="submit">Manage task with AI</button>
-        </form>
-        <p><strong>Priority:</strong> {{ task.get_priority_display }}</p>   
-        <p><strong>Due Date:</strong> {{ task.due_date }}</p>  
-        <p><strong>Created At:</strong> {{ task.created_at }}</p>
-
-        <div class="subtask">
-            <h3>Subtasks</h3>
-            <ul>
-                {% for subtask in subtasks %}
-                    <li>
-                        <form method="post" action="{% url 'toggle_subtask' subtask.id %}">
-                            {% csrf_token %}
-                            <input type="checkbox" onchange="this.form.submit();" {% if subtask.completed %}checked{% endif %}>
-                            {{ subtask.title }}
-                        </form>
-                    </li>
-                {% empty %}
-                    <li>No subtasks added yet.</li>
-                {% endfor %}
-            </ul>
-        
-            <h4>Add Subtask</h4>
-            <form method="post" action="{% url 'add_subtask' task.id %}">
-                {% csrf_token %}
-                {{ subtask_form.as_p }}
-                <button type="submit">Add Subtask</button>
-            </form>
-        </div>
-
-        <div class="add-note-section">
-            <h3>Add a Note</h3>
-            <form method="POST" action="{% url 'add_task_note' task.id %}">
-                {% csrf_token %}
-                {{ form.as_p }}
-                <button type="submit" class="submit-button">Add Note</button>
-            </form>
-        </div>
-    
-        <!-- Display Existing Notes -->
-        <div class="notes-section">
-            <h3>Notes</h3>
-            {% if task.task_notes.all %}
-                <ul class="notes-list">
-                    {% for note in task.task_notes.all %}
-                        <li class="note-item">
-                            <p>{{ note.note_text }}</p>
-                            <small>Added by {{ note.user.username }} on {{ note.created_at|date:"F j, Y, g:i a" }}</small>
-                        </li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <p>No notes added yet.</p>
-            {% endif %}
-        </div>
-
-        <div class="activity-log">
-            <h3>Activity Log</h3>
-            <ul>
-                {% for log in task.activity_logs.all %}
-                    <li>
-                        <strong>{{ log.user.username }}</strong> {{ log.action }}:
-                        <span>{{ log.details }}</span>
-                        <small>{{ log.timestamp }}</small>
-                    </li>
-                {% empty %}
-                    <li>No activity yet.</li>
-                {% endfor %}
-            </ul>
-        </div>
-
-        <div class="comments-section">
-            <h2>Comments</h2>
-            <ul>
-                {% for comment in comments %}
-                    <li>
-                        <strong>{{ comment.user.username }}</strong>: {{ comment.text }}
-                        <br><small>{{ comment.created_at }}</small>
-                    </li>
-                {% empty %}
-                    <li>No comments yet.</li>
-                {% endfor %}
-            </ul>
-    
-            <!-- Add Comment Form -->
-            <form method="post">
-                {% csrf_token %}
-                {{ comment_form.as_p }}
-                <button type="submit" name="add_comment">Add Comment</button>
-            </form>
-        </div>
-
-        {% if task.status == "completed" %}
-            <!-- Display task completion details -->
-            <div class="completion-detail">
-                <h2>Task Completion Details</h2>
-                <p><strong>Details:</strong> {{ task.completion_details.completion_details }}</p>
-            
-                {% if task.completion_details.uploaded_image %}
-                    <h3>Uploaded Image</h3>
-                    <img src="{{ task.completion_details.uploaded_image.url }}" alt="Completion Image">
-                {% endif %}
-            
-                {% if task.completion_details.uploaded_file %}
-                    <h3>Uploaded Video/File</h3>
-                    <video controls>
-                        <source src="{{ task.completion_details.uploaded_file.url }}" type="video/mp4">
-                        Your browser does not support the video tag.
-                    </video>
-                {% endif %}
-            
-                {% if task.user and task.user != request.user %}
-                    <h3>Task Completed By: {{ task.user.username }}</h3>
-                    <!-- Chat Button -->
-                    <a href="{% url 'chat' task.user.id %}?task_id={{task.id}}&task_title={{ task.title}}" class="chat-button">Chat with {{ task.user.username }}</a>
-                {% endif %}
-            </div>
-            
-        {% else %}
-            <!-- Show Edit Button if user is the creator -->
-            {% if task.user == request.user %}
-                <button id="editBtn" onclick="toggleEditForm()">Edit Task</button>
-
-                {% if request.user.subscription.is_subscription_valid %}
-                    <div id="editForm" style="display:none;">
-                        <h2>Edit Task</h2>
-                        <form method="post">
-                            {% csrf_token %}
-                            {{ form.as_p }}
-                            <button type="submit" name="edit_task">Save Changes</button>
-                        </form>
+    <div class="container">
+        <!-- Users Currently Working on Similar Tasks -->
+        <h2>Currently Working on Similar Tasks</h2>
+        <ul class="user-list">
+            {% for user in task_data.users_in_progress %}
+                <li class="user-chat">
+                    <div class="user-info">
+                        <strong>{{ user.username }}</strong>
                     </div>
-                {% else %}
-                    <div class="subscription-required">
-                        <h1>Subscription Required</h1>
-                        <p>You need an active subscription to edit tasks.</p>
-                        <a href="{% url 'create_subscription' %}">Subscribe Now</a>
-                    </div>
-                {% endif %}
-            {% endif %}
-        {% endif %}
+                    <ul class="task-sub-list">
+                        {% for user_task in user.tasks %}
+                            <li class="task-item">
+                                <strong>Task Title:</strong> {{ user_task.task_title }}
+                                <a href="{% url 'task_detail' user_task.task_id %}" class="task-details-button">View Task Details</a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                    <!-- Chat Button with Task Details -->
+                    <a href="{% url 'chat' user.user_id %}?task_id={{task.id}}&task_title={{ task.title}}" class="chat-button">Let's Chat</a>
+                </li>
+            {% empty %}
+                <li class="no-users">No users currently working on similar tasks.</li>
+            {% endfor %}
+        </ul>
 
-        <div class="back-link">
-            <a href="{% url 'home' %}">Back to Task List</a>
-        </div>
+        <!-- Users Who Completed Similar Tasks -->
+        <h2>Completed Task Users</h2>
+        <ul class="user-list">
+            {% for user in task_data.users_completed %}
+                <li class="user-chat">
+                    <div class="user-info">
+                        <strong>{{ user.username }}</strong>
+                    </div>
+                    <ul class="task-sub-list">
+                        {% for user_task in user.tasks %}
+                            <li class="task-item">
+                                <strong>Task Title:</strong> {{ user_task.task_title }}
+                                <a href="{% url 'task_detail' user_task.task_id %}" class="task-details-button">View Task Details</a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                    <!-- Chat Button with Task Details -->
+                    <a href="{% url 'chat' user.user_id %}?task_id={{task.id}}&task_title={{ task.title}}" class="chat-button">Let's Chat</a>
+                </li>
+            {% empty %}
+                <li class="no-users">No users have completed similar tasks.</li>
+            {% endfor %}
+        </ul>
     </div>
+</div>
 
-    <script>
-        function getAiProcedure(taskId) {
-            fetch(`/generate-ai-procedure/${taskId}/`)
-              .then(response => response.json())
-              .then(data => {
-                document.getElementById(`procedure-${taskId}`).innerText = data.procedure;
-              })
-              .catch(error => {
-                console.error('Error:', error);
-                alert('Failed to generate procedure.');
-              });
+<style>
+    /* General Styles */
+    body {
+        font-family: 'Inter', sans-serif;
+        background-color: #f8f9fa;
+        color: #333;
+        margin: 0;
+        padding: 0;
+    }
+
+    .suggested-users-container {
+        padding: 20px;
+    }
+
+    h1 {
+        text-align: center;
+        color: #4CAF50;
+        font-size: 2rem;
+        margin-bottom: 20px;
+    }
+
+    h2 {
+        color: #2c3e50;
+        font-size: 1.5rem;
+        margin-bottom: 15px;
+        border-bottom: 2px solid #4CAF50;
+        padding-bottom: 5px;
+    }
+
+    .container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .user-list {
+        list-style-type: none;
+        padding: 0;
+    }
+
+    .user-chat {
+        background-color: #fff;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 15px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .user-info {
+        font-size: 1.1rem;
+        color: #2c3e50;
+        margin-bottom: 10px;
+    }
+
+    .task-sub-list {
+        list-style-type: none;
+        padding-left: 20px;
+        margin-top: 10px;
+    }
+
+    .task-item {
+        background-color: #f8f9fa;
+        padding: 10px;
+        border-radius: 8px;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+    }
+
+    .task-item strong {
+        color: #2c3e50;
+    }
+
+    .task-details-button {
+        display: inline-block;
+        padding: 8px 16px;
+        background-color: #4CAF50;
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        transition: background-color 0.3s ease;
+    }
+
+    .task-details-button:hover {
+        background-color: #45a049;
+    }
+
+    .chat-button {
+        display: inline-block;
+        padding: 8px 16px;
+        background-color: #3498db;
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        transition: background-color 0.3s ease;
+    }
+
+    .chat-button:hover {
+        background-color: #2980b9;
+    }
+
+    .no-users {
+        color: #777;
+        font-style: italic;
+        text-align: center;
+    }
+
+    /* Mobile Responsiveness */
+    @media (max-width: 768px) {
+        h1 {
+            font-size: 1.8rem;
         }
 
-        function toggleEditForm() {
-            var editForm = document.getElementById("editForm");
-            var editBtn = document.getElementById("editBtn");
-            
-            if (editForm.style.display === "none") {
-                editForm.style.display = "block";
-                editBtn.innerHTML = "Cancel Edit";  // Change button text
-            } else {
-                editForm.style.display = "none";
-                editBtn.innerHTML = "Edit Task";  // Reset button text
-            }
+        h2 {
+            font-size: 1.3rem;
         }
-    </script>
-</body>
-</html>
+
+        .container {
+            padding: 15px;
+        }
+
+        .task-item {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .task-details-button,
+        .chat-button {
+            width: 100%;
+            text-align: center;
+            margin-top: 10px;
+        }
+    }
+</style>
+
 {% endblock %}

@@ -86,14 +86,14 @@ main {
     width: 100%;
     max-width: 1600px;
     margin: 0 auto;
-    padding: 20px;
-    background-color: white;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  background-color: white;
     border-radius: 12px;
     min-height: calc(100vh - 100px); /* Ensures it fills available space */
     overflow-y: auto; /* Enables vertical scrolling if content overflows */
     display: flex;
-    margin-left: 250px; /* Offset for sidebar */
+
+
+    padding-left: 250px; /* Offset for sidebar */
     position: relative;
     flex-direction: column;
 
@@ -133,7 +133,7 @@ main {
     margin: 15px 0;
 }
 
-.sidebar-menu button {
+.sidebar-menu a {
     color: #555; /* Darker text for buttons */
     background-color: transparent;
     border: none;
@@ -145,11 +145,11 @@ main {
     cursor: pointer;
 }
 
-.sidebar-menu button.active {
+.sidebar-menu a.active {
     color: #1abc9c;;
 }
 
-.sidebar-menu button:hover {
+.sidebar-menu a:hover {
     color: #1abc9c;
 }
 
@@ -170,6 +170,12 @@ main {
 .sidebar-footer  .accountbutton:hover {
     background-color: #1abc9c; /* Accent color on hover */
     color: white;
+}
+
+.sidebar li a{
+    text-decoration: none;
+    color: #333;
+
 }
 
 /* Footer Styles */
@@ -262,11 +268,9 @@ footer {
     <div>
         <h2>Share Task</h2>
     <ul class="sidebar-menu">
-        <li><a href="{% url 'home' %}">All Tasks</a></li>
+        <li><a class="active" href="{% url 'home' %}">All Tasks</a></li>
         <li>  <a href="{% url 'leaderboard' %}">Leaderboard</a></li>
-        <li><button onclick="filterTasks('in_progress', 'all')">In Progress</button></li>
-        <li><button onclick="filterTasks('completed', 'all')">Completed</button></li>
-        <li><button onclick="filterTasks('archived', 'all')">Archived</button></li>   
+  
         
     </ul>
     <button class="add-task" onclick="openAddTaskModal()">+ Add Task</button>

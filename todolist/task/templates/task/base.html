@@ -207,6 +207,27 @@ footer {
     background-color: #16a085;
 }
 
+/* Sidebar Toggle Button */
+.sidebar-toggle {
+    display: none; /* Hidden by default */
+    position: fixed;
+    top: 20px;
+    right: 24px;
+    background: #1abc9c;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    font-size: 18px;
+    cursor: pointer;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    z-index: 1100;
+}
+
+.sidebar-toggle:hover {
+    background: #16a085;
+}
+
 
 /* Responsive Fixes */
 @media (max-width: 768px) {
@@ -256,7 +277,7 @@ footer {
 </head>
 <body>
     <header class="header-div">
-        <h1>{{ app_name }}</h1>
+        <h1>Share Task</h1>
         <div>
           
             <span>Welcome, <a href="{% url 'profile' %}">{{ user.username }}</a>!</span>
@@ -267,12 +288,11 @@ footer {
 <div class="sidebar" id="sidebar">
     <div>
         <h2>Share Task</h2>
-    <ul class="sidebar-menu">
-        <li><a class="active" href="{% url 'home' %}">All Tasks</a></li>
-        <li>  <a href="{% url 'leaderboard' %}">Leaderboard</a></li>
-  
+        <ul class="sidebar-menu">
+            <li><a id="all-tasks-link" href="{% url 'home' %}">All Tasks</a></li>
+            <li><a id="leaderboard-link" href="{% url 'leaderboard' %}">Leaderboard</a></li>
+        </ul>
         
-    </ul>
     <button class="add-task" onclick="openAddTaskModal()">+ Add Task</button>
     </div>
     <div class="sidebar-footer">
@@ -319,5 +339,31 @@ footer {
     function openFilterModal() {
     document.getElementById('filterModal').style.display = 'flex';
 }
+
+
+    // Function to set the active class based on the current URL
+    function setActiveLink() {
+        // Get the current URL path
+        const currentPath = window.location.pathname;
+
+        // Get the links
+        const allTasksLink = document.getElementById('all-tasks-link');
+        const leaderboardLink = document.getElementById('leaderboard-link');
+
+        // Remove the 'active' class from all links
+        allTasksLink.classList.remove('active');
+        leaderboardLink.classList.remove('active');
+
+        // Add the 'active' class to the link that matches the current URL
+        if (currentPath === "{% url 'home' %}") {
+            allTasksLink.classList.add('active');
+        } else if (currentPath === "{% url 'leaderboard' %}") {
+            leaderboardLink.classList.add('active');
+        }
+    }
+
+    // Call the function when the page loads
+    document.addEventListener('DOMContentLoaded', setActiveLink);
+
 </script>
 </html>

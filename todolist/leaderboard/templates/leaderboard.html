@@ -1,12 +1,6 @@
-
-
-
-
 {% extends 'task/base.html' %}
 
 {% block content %}
-
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -15,33 +9,90 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Leaderboard</title>
     <style>
-        
         h1 {
             text-align: center;
-            color: #2c3e50;
+            color: #16a085;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
         }
+
         table {
-            width: 80%;
+            width: 90%;
+            max-width: 800px;
             margin: 20px auto;
             border-collapse: collapse;
-            background-color: #fff;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            background-color: #16a085;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            overflow: hidden;
+            animation: fadeIn 1s ease-in-out;
         }
+
         th, td {
-            padding: 12px;
+            padding: 15px;
             text-align: left;
-            border-bottom: 1px solid #ddd;
+            border-bottom: 1px solid #e0e0e0;
         }
+
         th {
-            background-color: #3498db;
+            background-color: #16a085;
             color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-transform: uppercase;
         }
+
         tr:hover {
-            background-color: #f1f1f1;
+            background-color: #f8f9fa;
+            transform: scale(1.02);
+            transition: transform 0.3s ease, background-color 0.3s ease;
         }
+
         .rank {
             font-weight: bold;
             color: #2c3e50;
+            font-size: 1.2rem;
+        }
+
+        tbody tr:nth-child(odd) {
+            background-color: #f8f9fa;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #ffffff;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            table {
+                width: 95%;
+            }
+
+            th, td {
+                padding: 10px;
+            }
+
+            .rank {
+                font-size: 1rem;
+            }
         }
     </style>
 </head>
@@ -58,7 +109,17 @@
         <tbody>
             {% for user in top_users %}
             <tr>
-                <td class="rank">{{ forloop.counter }}</td>
+                <td class="rank">
+                    {% if forloop.counter == 1 %}
+                        👑 <!-- King emoji for 1st place -->
+                    {% elif forloop.counter == 2 %}
+                        👸 <!-- Queen emoji for 2nd place -->
+                    {% elif forloop.counter == 3 %}
+                        🎖️ <!-- Medal emoji for 3rd place -->
+                    {% else %}
+                        {{ forloop.counter }}
+                    {% endif %}
+                </td>
                 <td>{{ user.username }}</td>
                 <td>{{ user.score }}</td>
             </tr>

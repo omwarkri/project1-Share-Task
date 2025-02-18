@@ -1,7 +1,81 @@
 <h3 class="Header">
-    Task Procedure:
-    
+  Task Procedure:
 
-    </button>
-  </h3>
-  <p id="procedure-content">{{ procedure }}</p>
+</h3>
+<p id="procedure-content">{{ procedure }}</p>
+
+<style>
+  /* General Styles */
+  .Header {
+    color: #2c3e50; /* Dark text for contrast */
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  #toggle-procedure {
+    background: #1abc9c; /* Primary color */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+
+  #toggle-procedure:hover {
+    background: #16a085; /* Darker shade for hover */
+    transform: translateY(-2px);
+  }
+
+  #toggle-procedure:active {
+    transform: translateY(0);
+  }
+
+  #procedure-content {
+    background: #f8f9fa; /* Light background */
+    padding: 16px;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    color: #333;
+    font-size: 16px;
+    line-height: 1.6;
+    margin-top: 12px;
+    transition: opacity 0.3s ease, max-height 0.3s ease;
+    overflow: auto;
+  }
+
+  /* Hidden state for procedure content */
+  #procedure-content.hidden {
+    opacity: 0;
+    max-height: 0;
+    padding: 0;
+    margin: 0;
+    border: none;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 600px) {
+    .Header {
+      font-size: 20px;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    #toggle-procedure {
+      margin-top: 8px;
+      width: 100%;
+      text-align: center;
+    }
+
+    #procedure-content {
+      font-size: 14px;
+      padding: 12px;
+    }
+  }
+</style>
+

@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Subtasks</title>
   <style>
+
     /* General Styles */
     body {
       font-family: 'Arial', sans-serif;
@@ -72,7 +73,7 @@
     /* Toggle Button */
     .custom-toggle-button {
       background: none;
-      border: 2px solid #64b5f6;
+      border: 2px solid #1abc9c;
       border-radius: 50%;
       width: 28px;
       height: 28px;
@@ -84,8 +85,8 @@
     }
 
     .custom-toggle-button.custom-completed {
-      background: #64b5f6;
-      border-color: #64b5f6;
+      background: #1abc9c;
+      border-color: #1abc9c;
     }
 
     .custom-toggle-button.custom-completed::before {
@@ -120,12 +121,12 @@
     }
 
     .custom-subtask-form input:focus {
-      border-color: #64b5f6;
-      box-shadow: 0 0 8px rgba(100, 181, 246, 0.3);
+      border-color: #1abc9c;
+      box-shadow: 0 0 8px rgba(26, 188, 156, 0.3);
     }
 
     .custom-subtask-form button {
-      background: linear-gradient(135deg, #64b5f6, #42a5f5);
+      background: linear-gradient(135deg, #1abc9c, #16a085);
       color: white;
       border: none;
       border-radius: 12px;
@@ -137,7 +138,7 @@
     }
 
     .custom-subtask-form button:hover {
-      background: linear-gradient(135deg, #42a5f5, #64b5f6);
+      background: linear-gradient(135deg, #16a085, #1abc9c);
       transform: translateY(-2px);
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     }
@@ -149,7 +150,35 @@
       font-size: 16px;
       margin-top: 20px;
     }
+
+    /* Responsive Design */
+    @media (max-width: 600px) {
+      .custom-subtask-container {
+        padding: 20px;
+      }
+
+      .custom-subtask-title {
+        font-size: 24px;
+      }
+
+      .custom-subtask-heading {
+        font-size: 20px;
+      }
+
+      .custom-subtask-form {
+        flex-direction: column;
+      }
+
+      .custom-subtask-form input {
+        width: 100%;
+      }
+
+      .custom-subtask-form button {
+        width: 100%;
+      }
+    }
   </style>
+
 </head>
 <body>
   <div class="custom-subtask-container">

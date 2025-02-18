@@ -471,9 +471,10 @@ body {
     background-color: rgba(0, 0, 0, 0.5);
     justify-content: center;
     align-items: center;
-    z-index: 1000;
+
     overflow-y: auto; /* Enable scrolling for the modal */
     padding: 20px; /* Add padding to prevent content from touching the edges */
+    z-index: 3000;
 }
 
 .modal-content {
@@ -487,6 +488,7 @@ body {
     animation: modalFadeIn 0.3s ease;
     max-height: 90vh; /* Limit modal height to 90% of the viewport height */
     overflow-y: auto; /* Enable scrolling for the modal content */
+   
 }
 
 .filter-buttons {

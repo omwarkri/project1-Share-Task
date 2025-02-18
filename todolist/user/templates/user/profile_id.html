@@ -1,3 +1,7 @@
+{% extends 'task/base.html' %}
+
+{% block content %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,21 +11,8 @@
     {% load custom_filters %}
 
     <style>
-        /* Existing Styles */
-        /* Add new styles for badges */
-          /* General Styles */
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
-            color: #333;
-            margin: 0;
-            padding: 20px;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
+        /* General Styles */
+  
 
         h1, h2 {
             color: #2c3e50;
@@ -53,7 +44,6 @@
             padding: 30px;
             max-width: 1000px;
             width: 100%;
-            margin: 20px 0;
         }
 
         /* Calendar Styles */
@@ -98,11 +88,11 @@
 
         /* Color Classes */
         .green {
-            background-color: #4CAF50; /* Green */
+            background-color: #16a085; /* Green */
         }
 
         .dark-green {
-            background-color: #388E3C; /* Darker Green */
+            background-color: #12876f; /* Darker Green */
         }
 
         .yellow {
@@ -111,7 +101,7 @@
 
         /* Button Styles */
         button {
-            background-color: #3498db;
+            background-color: #16a085;
             color: white;
             border: none;
             padding: 10px 20px;
@@ -124,7 +114,7 @@
         }
 
         button:hover {
-            background-color: #2980b9;
+            background-color: #12876f;
             transform: translateY(-2px);
         }
 
@@ -160,6 +150,7 @@
                 font-size: 1.5em;
             }
         }
+
         .rating-reviews {
             margin-top: 30px;
         }
@@ -197,8 +188,7 @@
             color: #888;
         }
 
-
-        .badge_icon{
+        .badge_icon {
             border-radius: 50%;
             width: 50px;
             height: 50px;
@@ -210,19 +200,12 @@
             font-weight: bold;
             color: #fff;
             transition: transform 0.3s ease;
-
         }
 
         .badge:hover {
             transform: scale(1.1);
         }
 
-        /* .green { background-color: #4CAF50; }
-        .dark-green { background-color: #388E3C; }
-        .yellow { background-color: #FFEB3B; }
-        .blue { background-color: #3498db; } */
-        
-        /* Add other badge colors as needed */
         .tasks-section {
             margin-top: 30px;
         }
@@ -253,19 +236,31 @@
 
         .task-card .status {
             font-weight: bold;
-            color: #4CAF50; /* Green for completed tasks */
+            color: #16a085; /* Green for completed tasks */
         }
 
         .task-card .task-partner {
             font-style: italic;
-            color: #3498db; /* Blue for task partner */
+            color: #1abc9c; /* Blue for task partner */
+        }
+
+        /* Link Styles */
+        .task-action {
+            color: #16a085;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .task-action:hover {
+            color: #12876f;
         }
     </style>
 
 </head>
 <body>
     <div class="card">
-        <h1>Welcome, {{ user.username }}!</h1>
+        <h1>{{ user.username }}!</h1>
         <p>Email: {{ user.email }}</p>
         <p>Score: {{ user.score }}</p>
 
@@ -342,3 +337,4 @@
     </div>
 </body>
 </html>
+{% endblock %}

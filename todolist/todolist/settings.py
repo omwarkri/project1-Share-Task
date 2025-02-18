@@ -234,7 +234,7 @@ SIMPLE_JWT = {
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': False,
 }
-LOGOUT_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/task/'
 
 # settings.py
 LOGIN_URL = '/user/login/'  # Replace with your custom login URL

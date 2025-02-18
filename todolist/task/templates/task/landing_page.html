@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Share Task - Collaborate, Organize, Succeed</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      background-color: #f8f9fa;
+      color: #333;
+      line-height: 1.6;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    header {
+      background: linear-gradient(135deg, #16a085, #1abc9c);
+      color: white;
+      padding: 60px 20px;
+      text-align: center;
+    }
+
+    header h1 {
+      font-size: 3rem;
+      margin-bottom: 15px;
+      font-weight: 700;
+    }
+
+    header p {
+      font-size: 1.25rem;
+      margin-bottom: 30px;
+      opacity: 0.9;
+    }
+
+    .cta-button {
+      background: white;
+      color: #16a085;
+      padding: 14px 28px;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      transition: background 0.3s ease, transform 0.3s ease;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .cta-button:hover {
+      background: #f0f4f8;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+    }
+
+    .features, .how-it-works {
+      padding: 60px 20px;
+      background: white;
+      text-align: center;
+    }
+
+    .features h2, .how-it-works h2 {
+      font-size: 2.5rem;
+      margin-bottom: 30px;
+      color: #2c3e50;
+      font-weight: 700;
+    }
+
+    .feature-cards, .steps {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 30px;
+      margin-top: 30px;
+    }
+
+    .feature-card, .step-card {
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      padding: 30px;
+      width: 300px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .feature-card:hover, .step-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    }
+
+    .feature-card img, .step-card img {
+      width: 80px;
+      height: 80px;
+      margin-bottom: 20px;
+      object-fit: contain;
+      background-color: #f0f4f8; /* Fallback background */
+      border-radius: 12px; /* Rounded corners for fallback */
+    }
+
+    .feature-card h3, .step-card h3 {
+      font-size: 1.5rem;
+      margin-bottom: 15px;
+      color: #2c3e50;
+      font-weight: 600;
+    }
+
+    .feature-card p, .step-card p {
+      font-size: 1rem;
+      color: #555;
+      line-height: 1.6;
+    }
+
+    .cta-section {
+      background: linear-gradient(135deg, #16a085, #1abc9c);
+      color: white;
+      padding: 60px 20px;
+      text-align: center;
+    }
+
+    .cta-section h2 {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+      font-weight: 700;
+    }
+
+    footer {
+      background: #2c3e50;
+      color: white;
+      padding: 30px;
+      text-align: center;
+    }
+
+    footer p {
+      font-size: 0.9rem;
+      opacity: 0.8;
+    }
+
+    @media (max-width: 768px) {
+      header h1 {
+        font-size: 2.5rem;
+      }
+
+      header p {
+        font-size: 1.1rem;
+      }
+
+      .features h2, .how-it-works h2, .cta-section h2 {
+        font-size: 2rem;
+      }
+
+      .feature-cards, .steps {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .feature-card, .step-card {
+        width: 100%;
+        max-width: 400px;
+      }
+    }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header>
+    <h1>Share Task</h1>
+    <p>Collaborate, Organize, and Succeed with Ease</p>
+    <a href="/user/register/" class="cta-button">Get Started for Free</a>
+  </header>
+
+  <section class="features">
+    <h2>Why Choose Share Task?</h2>
+    <div class="feature-cards">
+      <div class="feature-card">
+        <img src="https://via.placeholder.com/80" alt="AI Assistance">
+        <h3>Smart AI Assistance</h3>
+        <p>Get step-by-step task guidance with AI-powered insights.</p>
+      </div>
+      <div class="feature-card">
+        <img src="https://via.placeholder.com/80" alt="Task Sharing">
+        <h3>Seamless Task Sharing</h3>
+        <p>Assign and share tasks with experienced users in real-time.</p>
+      </div>
+      <div class="feature-card">
+        <img src="https://via.placeholder.com/80" alt="Collaboration">
+        <h3>Real-Time Collaboration</h3>
+        <p>Chat, share files, and track progress effortlessly.</p>
+      </div>
+      <div class="feature-card">
+        <img src="https://via.placeholder.com/80" alt="Reminders">
+        <h3>Reminders & Notifications</h3>
+        <p>Never miss a deadline with instant alerts.</p>
+      </div>
+      <div class="feature-card">
+        <img src="https://via.placeholder.com/80" alt="Cross-Device Sync">
+        <h3>Cross-Device Sync</h3>
+        <p>Access your tasks anywhere, anytime.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="how-it-works">
+    <h2>How It Works?</h2>
+    <div class="steps">
+      <div class="step-card">
+        <img src="https://via.placeholder.com/80" alt="Sign Up">
+        <h3>Sign Up</h3>
+        <p>Create your account in seconds.</p>
+      </div>
+      <div class="step-card">
+        <img src="https://via.placeholder.com/80" alt="Add Tasks">
+        <h3>Add Tasks</h3>
+        <p>Easily create and assign tasks.</p>
+      </div>
+      <div class="step-card">
+        <img src="https://via.placeholder.com/80" alt="Collaborate">
+        <h3>Collaborate</h3>
+        <p>Work together with your team efficiently.</p>
+      </div>
+      <div class="step-card">
+        <img src="https://via.placeholder.com/80" alt="Track Progress">
+        <h3>Track Progress</h3>
+        <p>Get real-time updates & complete tasks faster!</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-section">
+    <h2>Start Managing Your Tasks Smarter Today!</h2>
+    <a href="/user/register/" class="cta-button">Sign Up Now</a>
+  </section>
+
+  <footer>
+    <p>&copy; 2023 Share Task. All rights reserved.</p>
+  </footer>
+</body>
+</html>

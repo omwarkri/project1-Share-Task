@@ -441,6 +441,7 @@ def add_subtask(request, task_id):
     if request.method == "POST":
         data = json.loads(request.body)
         task = Task.objects.get(id=task_id)
+        print(task,)
         subtask = SubTask.objects.create(task=task, title=data["title"], completed=False)
         return JsonResponse({"id": subtask.id, "title": subtask.title, "completed": subtask.completed})
 
@@ -452,7 +453,13 @@ def toggle_subtask(request, subtask_id):
     return JsonResponse({"id": subtask.id, "completed": subtask.completed})
 
 
+from django.shortcuts import render
 
+def landing_page(request):
+    """
+    Renders the landing page for the Share Task app.
+    """
+    return render(request, 'task/landing_page.html')
 
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Task

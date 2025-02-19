@@ -45,11 +45,11 @@ INSTALLED_APPS = [
     'chat',
     'leaderboard',
     'notes_app',
-
+    'channels',
     'ai_task_management'
 
 ]
-
+ASGI_APPLICATION = 'todolist.asgi.application'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [

@@ -399,9 +399,11 @@
       </button>
       {% include 'ai_chat.html' %}
     </div>
+    
   </div>
 
   <script>
+    
     // Function to replace **text** with <strong>text</strong>
     function formatBoldText(element) {
       element.innerHTML = element.innerHTML.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');

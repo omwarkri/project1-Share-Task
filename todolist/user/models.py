@@ -8,6 +8,7 @@ class CustomUser(AbstractUser):
     profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
     tasks = models.ManyToManyField('task.Task', related_name='users', blank=True)
     score = models.IntegerField(default=0)
+    
 
     # Custom related names to avoid conflicts
     groups = models.ManyToManyField(

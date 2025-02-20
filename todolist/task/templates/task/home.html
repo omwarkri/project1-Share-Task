@@ -116,15 +116,25 @@
         <h3>All Chats</h3>
         <div class="chat-list">
             {% for chat in chats %}
-                <div class="chat-item">
-                    <a href="{% url 'chat' receiver_id=chat.receiver.id %}">
-                        <strong>{{ chat.receiver.username }}</strong>: {{ chat.message }}
+            <div class="chat-item">
+                {% if chat.task %}
+                    <a href="{% url 'chat' task_id=chat.task.id %}?receiver_id={{ chat.sender.id }}">
+                        <strong>
+                            {% if chat.sender.id == request.user.id %}
+                                {{ chat.receiver.username }}
+                            {% else %}
+                                {{ chat.sender.username }}
+                            {% endif %}
+                            {{ chat.task.id }}
+                        </strong>: {{ chat.content }}
                         <small class="chat-time">{{ chat.timestamp }}</small>
                     </a>
-                </div>
-            {% empty %}
-                <p>No chats available.</p>
-            {% endfor %}
+                {% endif %}
+            </div>
+{% empty %}
+    <p>No chats available.</p>
+{% endfor %}
+
         </div>
     </div>
 </div>

@@ -1,17 +1,16 @@
-import os
-from django.core.asgi import get_asgi_application
+from django.urls import re_path
 from channels.routing import ProtocolTypeRouter, URLRouter
 from channels.auth import AuthMiddlewareStack
-from django.urls import path
-from chat import consumers
+from chat.consumers import ChatConsumer
+from django.core.asgi import get_asgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'todolist.settings')
-
+websocket_urlpatterns = [
+    re_path(r"ws/chat/(?P<task_id>\d+)/(?P<receiver_id>\d+)/$", ChatConsumer.as_asgi()),
+]
+# Make sure HTTP requests are handled correctly
 application = ProtocolTypeRouter({
-    "http": get_asgi_application(),
+    "http": get_asgi_application(),  # Fix for handling HTTP requests
     "websocket": AuthMiddlewareStack(
-        URLRouter([
-            path("ws/chat/<int:task_id>/", consumers.ChatConsumer.as_asgi()),
-        ])
+        URLRouter(websocket_urlpatterns)
     ),
 })

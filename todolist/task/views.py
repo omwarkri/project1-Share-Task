@@ -144,6 +144,7 @@ def home(request):
 
     # Get all chats for the user
     chats = all_chats(request)
+    print(chats[0])
 
     TaskDependencies = TaskDependenciesForm()
 
@@ -371,7 +372,11 @@ def add_allowed_user(request, task_id, user_id):
         details=f"User '{user_to_add.username}' was added to the allowed users list."
     )
 
-    return redirect('chat', task_id=task.id, receiver_id=user_to_add.id)
+        # Construct the URL with query parameters
+    url = reverse('chat', args=[task.id]) + f"?receiver_id={user_to_add.id}"
+
+    # Redirect to the constructed URL
+    return HttpResponseRedirect(url)
 
 @login_required
 def remove_allowed_user(request, task_id, user_id):
@@ -391,7 +396,12 @@ def remove_allowed_user(request, task_id, user_id):
         details=f"User '{user_to_remove.username}' was removed from the allowed users list."
     )
 
-    return redirect('chat', task_id=task.id, receiver_id=user_to_remove.id)
+  
+    # Construct the URL with query parameters
+    url = reverse('chat', args=[task.id]) + f"?receiver_id={user_to_remove.id}"
+
+    # Redirect to the constructed URL
+    return HttpResponseRedirect(url)
 
 def add_subtask(request, task_id):
     task = get_object_or_404(Task, id=task_id)
@@ -626,7 +636,9 @@ def add_task_partner(request, task_id, user_id):
         task.task_partner = user
         task.save()
 
-    return redirect('chat', task_id=task_id, receiver_id=user_id)
+    url = reverse('chat', args=[task_id]) + f"?receiver_id={user_id}"
+    # Redirect to the constructed URL
+    return HttpResponseRedirect(url)
 
 @login_required
 def remove_task_partner(request, task_id):
@@ -637,7 +649,15 @@ def remove_task_partner(request, task_id):
         task.task_partner = None
         task.save()
 
-    return redirect('chat', task_id=task_id, receiver_id=task.task_partner.id if task.task_partner else None)
+    receiver_id = task.task_partner.id if task.task_partner else None
+    if receiver_id:
+        url = reverse('chat', args=[task_id]) + f"?receiver_id={receiver_id}"
+    else:
+        # Handle the case where task_partner is None
+        url = reverse('chat', args=[task_id])  # No receiver_id in the query parameters
+    
+    # Redirect to the constructed URL
+    return HttpResponseRedirect(url)
 
 
 

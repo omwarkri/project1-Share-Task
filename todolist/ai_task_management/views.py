@@ -29,7 +29,7 @@ def generate_ai_response(task_id, user_message):
 
     # Extract AI response text
     ai_response = response.text
-
+    
     # Save AI response in the database
     ChatAIMessage.objects.create(task_id=task_id, sender="AI", message=ai_response)
 
@@ -47,7 +47,9 @@ from notes_app.forms import TaskNoteForm
 
 @csrf_exempt
 def ai_taskmanagement_view(request, task_id):
+    print("ai task manegement")
     task = get_object_or_404(Task, id=task_id)
+    print(task.id,"these is task id")
     messages = ChatAIMessage.objects.filter(task_id=task_id).order_by('timestamp')
     notes_form = TaskNoteForm()
 
@@ -72,6 +74,9 @@ def ai_taskmanagement_view(request, task_id):
     # For debugging: print all messages
     for message in messages:
         print(message)
+
+
+   
 
     # Render the template and pass the notes as well
     return render(request, 'ai_task_management.html', {

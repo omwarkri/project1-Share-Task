@@ -5,20 +5,21 @@ from user.models import CustomUser
 from task.models import Task
 from .models import Message
 from django.http import HttpResponseBadRequest
-
+from django.http import JsonResponse
 
 
 @login_required
-def chat_view(request, receiver_id):
+def chat_view(request, task_id):
     # Validate the receiver ID
-    if not receiver_id:
+    if not task_id:
         return HttpResponseBadRequest("Receiver ID is missing or invalid.")
-
+    receiver_id = request.GET.get('receiver_id')
     # Fetch the receiver user or return 404 if not found
     receiver = get_object_or_404(CustomUser, id=receiver_id)
 
     # Get optional task parameters from query strings
-    task_id = request.GET.get('task_id')
+    
+    print(task_id)
     task_title = request.GET.get('task_title')
 
     # Fetch the task if task_id is provided and valid
@@ -32,20 +33,16 @@ def chat_view(request, receiver_id):
 
     # Handle message sending
     if request.method == "POST":
-        content = request.POST.get("content", "").strip()
-        attachment = request.FILES.get("attachment")
+        message_text = request.POST.get("message")
+        receiver = CustomUser.objects.get(id=receiver_id)
+        attachment = request.FILES.get('attachment')
 
-        # Save message only if content or attachment is provided
-        if content or attachment:
-            Message.objects.create(
-                sender=request.user,
-                receiver=receiver,
-                content=content,
-                attachment=attachment
-            )
-        # Redirect to maintain query params after sending a message
-        if task_id :
-            return redirect(f"{request.path}?task_id={task_id or ''}&task_title={task_title or ''}")
+
+        if message_text.strip() or attachment:
+            message = Message.objects.create(sender=request.user, task=task, receiver=receiver,  content=message_text,attachment=attachment)
+            print(message,"these is message")
+            return JsonResponse({"success": True, "message": message.content})
+
         return redirect(f"{request.path}")
 
     # Render the chat template
@@ -62,25 +59,42 @@ from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import Message
 from django.db.models import Q 
+from django.contrib.auth.decorators import login_required
+from django.db.models import Q
+from .models import Message
 
 @login_required
 def all_chats(request):
     user = request.user
     
-    # Fetch distinct conversations by grouping messages
+    # Fetch messages involving the current user
     conversations = Message.objects.filter(
-        Q(sender=user) | Q(receiver=user)  # ✅ No need for models.Q, just Q
+        Q(sender=user) | Q(receiver=user)  
     ).order_by('-timestamp')
 
-    # Group by unique chat participants
+    # Group by (contact, task_id) to separate conversations by task
     grouped_chats = {}
     for message in conversations:
         contact = message.receiver if message.sender == user else message.sender
-        if contact not in grouped_chats:
-            grouped_chats[contact] = message
+        task_id = message.task.id if message.task else None  # Handle messages with no task
 
-    context = grouped_chats.values()
-    for i in context:
-        print(i.receiver.id)
+        chat_key = (contact.id, task_id)  # Unique key: (User ID, Task ID)
+        
+        if chat_key not in grouped_chats:
+            grouped_chats[chat_key] = message  # Store latest message for this chat
 
-    return grouped_chats.values()
+    context = list(grouped_chats.values())
+    
+    # Debugging output
+    for msg in context:
+        print(f"Chat with User {msg.receiver.id if msg.sender == user else msg.sender.id}, Task ID: {msg.task.id if msg.task else 'No Task'}")
+
+    return context
+
+
+
+
+
+
+
+

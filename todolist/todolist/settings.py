@@ -31,6 +31,7 @@ ALLOWED_HOSTS = ['share-task.onrender.com','127.0.0.1']
 # Application definition
 
 INSTALLED_APPS = [
+    "daphne",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -46,16 +47,20 @@ INSTALLED_APPS = [
     'leaderboard',
     'notes_app',
     'channels',
-    'ai_task_management'
+    'ai_task_management',
+    
 
 ]
-ASGI_APPLICATION = 'todolist.asgi.application'
+ASGI_APPLICATION = "todolist.asgi.application"
+
 
 CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels.layers.InMemoryChannelLayer',
     },
 }
+
+
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [

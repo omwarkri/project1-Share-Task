@@ -5,409 +5,562 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chat with {{ receiver.username }}</title>
     <style>
-    /* Modern CSS Reset */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+        /* Modern CSS Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-/* General Styles */
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #f8f9fa, #e2e8f0);
-    color: #333;
-    line-height: 1.6;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    padding: 20px;
-}
+        /* General Styles */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f8f9fa, #e2e8f0);
+            color: #333;
+            line-height: 1.6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
 
-/* Chat Container */
-.chat-container {
-    max-width: 800px;
-    width: 100%;
-    background: #ffffff;
-    border-radius: 16px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-}
+        /* Chat Container */
+        .chat-container {
+            max-width: 800px;
+            width: 100%;
+            height: 100vh; /* Full height of the device */
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
 
-/* Chat Header */
-h2 {
-    text-align: center;
-    padding: 20px;
-    background: linear-gradient(135deg, #16a085, #12876f);
-    color: white;
-    margin: 0;
-    font-size: 1.5em;
-    position: relative;
-}
+        /* Chat Header */
+        h2 {
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #16a085, #12876f);
+            color: white;
+            margin: 0;
+            font-size: 1.5em;
+            position: relative;
+        }
 
-h2 a {
-    font-size: 0.8em;
-    margin-left: 10px;
-    color: #ffffff;
-    text-decoration: none;
-    background-color: #1abc9c;
-    padding: 5px 10px;
-    border-radius: 5px;
-    transition: background-color 0.3s ease;
-}
+        h2 a {
+            font-size: 0.8em;
+            margin-left: 10px;
+            color: #ffffff;
+            text-decoration: none;
+            background-color: #1abc9c;
+            padding: 5px 10px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
 
-h2 a:hover {
-    background-color: #16a085;
-}
+        h2 a:hover {
+            background-color: #16a085;
+        }
 
-/* Messages Section */
-.messages {
-    flex: 1;
-    padding: 20px;
-    overflow-y: auto;
-    background: #f8f9fa;
-    border-bottom: 1px solid #e2e8f0;
-}
+        /* Messages Section */
+        .messages {
+            flex: 1; /* Take up remaining space */
+            padding: 20px;
+            overflow-y: auto; /* Enable vertical scrolling */
+            background: #f8f9fa;
+            border-bottom: 1px solid #e2e8f0;
+        }
 
-.message {
-    margin-bottom: 15px;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-}
+        .message {
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
 
-.message.sent {
-    align-items: flex-end;
-}
+        .message.sent {
+            align-items: flex-end;
+        }
 
-.message p {
-    max-width: 90%;
-    padding: 12px 16px;
-    border-radius: 12px;
-    background: #16a085;
-    color: white;
-    font-size: 0.95em;
-    word-wrap: break-word;
-    position: relative;
-    animation: fadeIn 0.3s ease;
-}
+        .message p {
+            max-width: 90%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            background: #16a085;
+            color: white;
+            font-size: 0.95em;
+            word-wrap: break-word;
+            position: relative;
+            animation: fadeIn 0.3s ease;
+        }
+        .message.received{
+            align-items: flex-start;
+        }
+        .message.received p {
+            background: #e2e8f0;
+            color: #333;
+        }
 
-.message.received p {
-    background: #e2e8f0;
-    color: #333;
-}
+        .message small {
+            font-size: 0.8em;
+            color: #555;
+            margin-top: 4px;
+        }
 
-.message small {
-    font-size: 0.8em;
-    color: #555;
-    margin-top: 4px;
-}
+        /* Chat Input Form */
+        .chat-input {
+            display: flex;
+            gap: 10px;
+            padding: 20px;
+            background: #ffffff;
+            border-top: 1px solid #e2e8f0;
+        }
 
-/* Chat Input Form */
-.chat-input {
-    display: flex;
-    gap: 10px;
-    padding: 20px;
-    background: #ffffff;
-    border-top: 1px solid #e2e8f0;
-}
+        .chat-input textarea {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1em;
+            resize: none;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
 
-.chat-input textarea {
-    flex: 1;
-    padding: 12px;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    font-size: 1em;
-    resize: none;
-    outline: none;
-    transition: border-color 0.3s ease;
-}
+        .chat-input textarea:focus {
+            border-color: #16a085;
+        }
 
-.chat-input textarea:focus {
-    border-color: #16a085;
-}
+        .chat-input input[type="file"] {
+            display: none;
+        }
 
-.chat-input input[type="file"] {
-    display: none;
-}
+        .chat-input label {
+            padding: 12px 16px;
+            background: #e2e8f0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            display: inline-block;
+        }
 
-.chat-input label {
-    padding: 12px 16px;
-    background: #e2e8f0;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background 0.3s ease;
-    display: inline-block;
-}
+        .chat-input label:hover {
+            background: #cbd5e0;
+        }
 
-.chat-input label:hover {
-    background: #cbd5e0;
-}
+        .chat-input button {
+            padding: 12px 20px;
+            background: #16a085;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background 0.3s ease;
+        }
 
-.chat-input button {
-    padding: 12px 20px;
-    background: #16a085;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 1em;
-    transition: background 0.3s ease;
-}
+        .chat-input button:hover {
+            background: #12876f;
+        }
 
-.chat-input button:hover {
-    background: #12876f;
-}
+        /* Google Meet Button */
+        .google-meet-btn {
+            display: block;
+            text-align: center;
+            padding: 12px 20px;
+            background: #34a853;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            margin: 20px;
+            font-size: 1em;
+            font-weight: bold;
+            transition: background 0.3s ease;
+        }
 
-/* Google Meet Button */
-.google-meet-btn {
-    display: block;
-    text-align: center;
-    padding: 12px 20px;
-    background: #34a853;
-    color: white;
-    text-decoration: none;
-    border-radius: 8px;
-    margin: 20px;
-    font-size: 1em;
-    font-weight: bold;
-    transition: background 0.3s ease;
-}
+        .google-meet-btn:hover {
+            background: #2c8a45;
+        }
 
-.google-meet-btn:hover {
-    background: #2c8a45;
-}
+        /* Back Link and Settings Button */
+        /* Back Link and Left Arrow */
+        .back-link {
+            text-align: center;
+            margin-top: 16px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
 
-/* Back Link */
-.back-link {
-    text-align: center;
-    margin-top: 16px;
-    margin-bottom: 8px;
-}
+        .back-link a {
+            color: #16a085;
+            background-color: #e2e8f0;
+            padding: 8px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: color 0.3s ease;
+            text-decoration: none;
+        }
 
-.back-link a {
-    color: #16a085;
-    background-color: #e2e8f0;
-    padding: 8px;
-    border-radius: 8px;
-    font-weight: 600;
-    transition: color 0.3s ease;
-    text-decoration: none;
-}
+        .back-link a:hover {
+            color: #12876f;
+        }
 
-.back-link a:hover {
-    color: #12876f;
-}
+        .back-arrow {
+            font-size: 1.5em; /* Larger arrow */
+            padding: 8px 12px; /* Adjust padding for better appearance */
+        }
 
-/* Add/Remove User Buttons */
-.add-remove-user-section {
-    text-align: center;
-    margin: 20px;
-}
+        .settings-btn {
+            background: none;
+            border: none;
+            font-size: 1.2em;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: transform 0.3s ease;
+        }
 
-.add-user-btn,
-.remove-user-btn {
-    padding: 12px 20px;
-    border: none;
-    border-radius: 8px;
-    font-size: 1em;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
+        .settings-btn:hover {
+            transform: rotate(90deg);
+        }
 
-.add-user-btn {
-    background-color: #1abc9c;
-    color: white;
-}
+        /* Modal */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+            justify-content: center;
+            align-items: center;
+        }
 
-.add-user-btn:hover {
-    background-color: #16a085;
-}
+        .modal-content {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
 
-.remove-user-btn {
-    background-color: #e74c3c;
-    color: white;
-}
+        .close-modal {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 1.5em;
+            cursor: pointer;
+            color: #555;
+        }
 
-.remove-user-btn:hover {
-    background-color: #c0392b;
-}
+        .close-modal:hover {
+            color: #000;
+        }
 
-/* Add/Remove Task Partner Buttons */
-.add-task-partner-section {
-    text-align: center;
-    margin: 20px;
-}
+        /* Add/Remove User and Task Partner Buttons */
+        .add-remove-user-section,
+        .add-task-partner-section {
+            margin: 20px 0;
+        }
 
-.add-task-partner-btn,
-.remove-task-partner-btn {
-    padding: 12px 20px;
-    border: none;
-    border-radius: 8px;
-    font-size: 1em;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
+        .add-user-btn,
+        .remove-user-btn,
+        .add-task-partner-btn,
+        .remove-task-partner-btn {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-bottom: 10px;
+        }
 
-.add-task-partner-btn {
-    background-color: #1abc9c;
-    color: white;
-}
+        .add-user-btn,
+        .add-task-partner-btn {
+            background-color: #1abc9c;
+            color: white;
+        }
 
-.add-task-partner-btn:hover {
-    background-color: #16a085;
-}
+        .add-user-btn:hover,
+        .add-task-partner-btn:hover {
+            background-color: #16a085;
+        }
 
-.remove-task-partner-btn {
-    background-color: #e74c3c;
-    color: white;
-}
+        .remove-user-btn,
+        .remove-task-partner-btn {
+            background-color: #e74c3c;
+            color: white;
+        }
 
-.remove-task-partner-btn:hover {
-    background-color: #c0392b;
-}
+        .remove-user-btn:hover,
+        .remove-task-partner-btn:hover {
+            background-color: #c0392b;
+        }
 
-/* Animations */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
+        
 
-/* Responsive Design */
-@media (max-width: 600px) {
-    .message p {
-        max-width: 100%;
-    }
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
-    .chat-input {
-        flex-direction: column;
-    }
+        /* Responsive Design */
+        @media (max-width: 600px) {
+            .message p {
+                max-width: 100%;
+            }
 
-    .chat-input textarea {
-        width: 100%;
-    }
+            .chat-input {
+                flex-direction: column;
+            }
 
-    .chat-input button {
-        width: 100%;
-    }
-}
+            .chat-input textarea {
+                width: 100%;
+            }
+
+            .chat-input button {
+                width: 100%;
+            }
+        }
     </style>
- 
-    <script>
-        // Your existing JavaScript
-    </script>
 </head>
 <body>
-    <div class="chat-container">
+    <div class="chat-container" {% if task %} data-task-id="{{ task.id }}" {% endif %} receiver="{{ receiver }}" receiver-id="{{receiver.id}}">
+        <!-- Back Link and Settings Button -->
         {% if task.id %}
             <div class="back-link">
                 <a href="{% url 'task_detail' task.id %}">View Task</a>
+                <button id="settings-btn" class="settings-btn">⚙️</button>
             </div>
         {% endif %}
 
-        <!-- Add/Remove User to/from Allowed Users Buttons -->
-        {% if task.user == request.user and receiver != request.user %}
-        <div class="add-remove-user-section">
-            {% if receiver in task.allowed_users.all %}
-                <!-- Remove User Button -->
-                <form method="post" action="{% url 'remove_allowed_user' task.id receiver.id %}">
-                    {% csrf_token %}
-                    <button type="submit" class="remove-user-btn">Remove {{ receiver.username }} from Allowed Users</button>
-                </form>
-            {% else %}
-                <!-- Add User Button -->
-                <form method="post" action="{% url 'add_allowed_user' task.id receiver.id %}">
-                    {% csrf_token %}
-                    <button type="submit" class="add-user-btn">Add {{ receiver.username }} to Allowed Users</button>
-                </form>
-            {% endif %}
-        </div>
-        {% endif %}
+        <!-- Modal for Settings -->
+        <div id="settings-modal" class="modal">
+            <div class="modal-content">
+                <span class="close-modal">&times;</span>
+                <h3>Settings</h3>
 
-        <!-- Add Task Partner Button -->
-        {% if task.user == request.user and receiver != request.user %}
-        <div class="add-task-partner-section">
-            {% if task.task_partner == receiver %}
-                <!-- Remove Task Partner Button -->
-                <form method="post" action="{% url 'remove_task_partner' task.id %}">
-                    {% csrf_token %}
-                    <button type="submit" class="remove-task-partner-btn">Remove {{ receiver.username }} as Task Partner</button>
-                </form>
-            {% else %}
-                <!-- Add Task Partner Button -->
-                <form method="post" action="{% url 'add_task_partner' task.id receiver.id %}">
-                    {% csrf_token %}
-                    <button type="submit" class="add-task-partner-btn">Add {{ receiver.username }} as Task Partner</button>
-                </form>
-            {% endif %}
-        </div>
-        {% endif %}
+                <!-- Add/Remove User to/from Allowed Users -->
+                {% if task.user == request.user and receiver != request.user %}
+                    <div class="add-remove-user-section">
+                        {% if receiver in task.allowed_users.all %}
+                            <form method="post" action="{% url 'remove_allowed_user' task.id receiver.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="remove-user-btn">Remove {{ receiver.username }} from Allowed Users</button>
+                            </form>
+                        {% else %}
+                            <form method="post" action="{% url 'add_allowed_user' task.id receiver.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="add-user-btn">Add {{ receiver.username }} to Allowed Users</button>
+                            </form>
+                        {% endif %}
+                    </div>
+                {% endif %}
 
-        <!-- Chat Header with Profile View Link -->
+                <!-- Add/Remove Task Partner -->
+                {% if task.user == request.user and receiver != request.user %}
+                    <div class="add-task-partner-section">
+                        {% if task.task_partner == receiver %}
+                            <form method="post" action="{% url 'remove_task_partner' task.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="remove-task-partner-btn">Remove {{ receiver.username }} as Task Partner</button>
+                            </form>
+                        {% else %}
+                            <form method="post" action="{% url 'add_task_partner' task.id receiver.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="add-task-partner-btn">Add {{ receiver.username }} as Task Partner</button>
+                            </form>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Chat Header -->
         <h2>
+            <a href="{% url 'home' %}" class="back-arrow">←</a>
             Chat with {{ receiver.username }}
-            <a href="{% url 'view_profile_id' receiver.id %}" style="font-size: 0.8em; margin-left: 10px; color: #ffffff; text-decoration: none; background-color: #1abc9c; padding: 5px 10px; border-radius: 5px;">
-                View Profile
-            </a>
+            <a href="{% url 'view_profile_id' receiver.id %}">View Profile</a>
         </h2>
 
-        <!-- Messages Section with Profile View Links -->
+        <!-- Messages Section -->
         <div class="messages">
             {% for message in messages %}
                 <div class="message {% if message.sender == request.user %}sent{% else %}received{% endif %}">
-                    {% if message.content %}
-                        <p>
-                            <strong>
-                                <a href="{% url 'view_profile_id' message.sender.id %}" style="color: inherit; text-decoration: none;">
-                                    {{ message.sender.username }}
-                                </a>
-                            </strong>: {{ message.content }}
-                        </p>
-                    {% endif %}
-                    {% if message.attachment %}
-                        <p>
-                            <strong>
-                                <a href="{% url 'view_profile_id' message.sender.id %}" style="color: inherit; text-decoration: none;">
-                                    {{ message.sender.username }}
-                                </a>
-                            </strong>: 
+                    <p>
+                        <strong>{{ message.sender.username }}</strong>: {{ message.content }}
+                        {% if message.attachment %}
                             <a href="{{ message.attachment.url }}" target="_blank" style="color: inherit; text-decoration: underline;">
                                 Download Attachment
                             </a>
-                        </p>
-                    {% endif %}
+                        {% endif %}
+                    </p>
                     <small>{{ message.timestamp }}</small>
                 </div>
             {% endfor %}
         </div>
 
         <!-- Chat Input Form -->
-        <form id="chat-form" method="post" enctype="multipart/form-data" class="chat-input">
+        <form id="chat-form" method="post" enctype="multipart/form-data">
             {% csrf_token %}
-            <textarea name="content" rows="2" placeholder="Type your message here..."></textarea>
-            <label for="file-upload" aria-label="Attach File">📎</label>
-            <input id="file-upload" type="file" name="attachment" accept="image/*,video/*,audio/*,.pdf,.doc,.docx" />
-            <button type="submit">Send</button>
+            <div class="chat-input">
+                <textarea name="message" id="message-input" placeholder="Type your message..."></textarea>
+                <label for="file-upload" aria-label="Attach File">📎</label>
+                <input id="file-upload" type="file" name="attachment" accept="image/*,video/*,audio/*,.pdf,.doc,.docx" />
+                <button type="submit">Send</button>
+            </div>
         </form>
 
         <!-- Google Meet Button -->
-        <a 
-            href="https://meet.google.com/new" 
-            target="_blank" 
-            class="google-meet-btn">
+        <a href="https://meet.google.com/new" target="_blank" class="google-meet-btn">
             Start Google Meet
         </a>
-    </div>  
+    </div>
+
+    <script>
+        let sendMessage=false;
+        document.addEventListener("DOMContentLoaded", function () {
+            // Scroll to the bottom of the messages container
+            const messagesContainer = document.querySelector(".messages");
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            // WebSocket setup
+            const chatContainer = document.querySelector(".chat-container");
+            const taskId = chatContainer.getAttribute("data-task-id");
+            const receiverId = chatContainer.getAttribute("receiver-id");
+
+            const socket = new WebSocket(`ws://localhost:8000/ws/chat/${taskId}/${receiverId}/`);
+
+            socket.onopen = function () {
+                console.log("WebSocket connection established");
+            };
+
+            socket.onmessage = function (event) {
+                const data = JSON.parse(event.data);
+                console.log("Received message:", data);
+                appendMessage(data, "received");
+
+                // Scroll to the bottom after receiving a new message
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            };
+
+            socket.onerror = function (error) {
+                console.error("WebSocket Error:", error);
+            };
+
+            socket.onclose = function (event) {
+                console.log("WebSocket closed:", event);
+            };
+
+            // Form submission handler
+            const chatForm = document.getElementById("chat-form");
+            const messageInput = document.getElementById("message-input");
+            const fileInput = document.getElementById("file-upload");
+
+            chatForm.addEventListener("submit", function (event) {
+                event.preventDefault();
+                sendMessage=true;
+
+                const formData = new FormData(chatForm);
+
+                fetch(chatForm.action, {
+                    method: "POST",
+                    body: formData,
+                    headers: {
+                        "X-Requested-With": "XMLHttpRequest"
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        
+
+                        // Clear input fields
+                        messageInput.value = "";
+                        fileInput.value = "";
+
+                        // Scroll to the bottom after sending a new message
+                        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                    } else {
+                        alert("Error sending message.");
+                    }
+                })
+                .catch(error => console.error("Error:", error));
+            });
+
+            // Append message to the chat
+            function appendMessage(message, type) {
+                console.log(message.sender)
+                console.log(message)
+
+                if(sendMessage==true){
+                    sentMessage=false
+                    const messageContainer = document.querySelector(".messages");
+                    const messageDiv = document.createElement("div");
+                    messageDiv.classList.add("message", "sent");
+                    let messageContent = `<p><strong>${message.sender}</strong>: ${message.message}</p>`;
+                    if (message.attachment) {
+                        messageContent += `<p><a href="${message.attachment}" target="_blank" style="color: inherit; text-decoration: underline;">Download Attachment</a></p>`;
+                    }
+                    messageContent += `<small>${message.timestamp}</small>`;
+                    messageDiv.innerHTML = messageContent;
+                    messageContainer.appendChild(messageDiv);
+                    messageContainer.scrollTop = messageContainer.scrollHeight;
+                   
+                }else{
+                    const messageContainer = document.querySelector(".messages");
+                    const messageDiv = document.createElement("div");
+                    messageDiv.classList.add("message",type);
+                    if (message.attachment) {
+            messageContent += `<p><a href="${message.attachment}" target="_blank" style="color: inherit; text-decoration: underline;">Download Attachment</a></p>`;
+        }
+                    messageDiv.innerHTML = `<p><strong>${message.sender } </strong>: ${message.message}</p><small>just now</small>`;
+                    messageContainer.appendChild(messageDiv);
+                    messageContainer.scrollTop = messageContainer.scrollHeight;
+                }
+            }
+        });
+            // Modal functionality
+            const modal = document.getElementById("settings-modal");
+            const settingsBtn = document.getElementById("settings-btn");
+            const closeModal = document.querySelector(".close-modal");
+
+            if (settingsBtn) {
+                settingsBtn.addEventListener("click", function () {
+                    modal.style.display = "flex";
+                });
+            }
+
+            if (closeModal) {
+                closeModal.addEventListener("click", function () {
+                    modal.style.display = "none";
+                });
+            }
+
+            window.addEventListener("click", function (event) {
+                if (event.target === modal) {
+                    modal.style.display = "none";
+                }
+            });
+    
+    </script>
 </body>
 </html>

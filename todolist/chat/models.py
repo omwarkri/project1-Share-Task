@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.db import models
+from task.models import Task
 
 class Message(models.Model):
     sender = models.ForeignKey(
@@ -12,11 +13,26 @@ class Message(models.Model):
         on_delete=models.CASCADE, 
         related_name='received_messages'
     )
-    content = models.TextField()
-    timestamp = models.DateTimeField(auto_now_add=True)
-    attachment = models.FileField(upload_to="chat_attachments/", blank=True, null=True)  # For file attachments
+    task = models.ForeignKey(  # Added task field
+        Task,  # Assuming Task is in the same app; otherwise, use 'app_name.Task'
+        on_delete=models.CASCADE, 
+        related_name='messages', 
+        null=True, 
+        blank=True
+    )
+    content = models.TextField()  # Message content
+    timestamp = models.DateTimeField(auto_now_add=True)  # Timestamp of message creation
+    attachment = models.FileField(
+        upload_to="chat_attachments/",  # Directory to store attachments
+        blank=True, 
+        null=True
+    )
 
+    def __str__(self):
+        return f"Message from {self.sender} to {self.receiver} at {self.timestamp}"
 
+    class Meta:
+        ordering = ['-timestamp']  # Order messages by timestamp (newest first)
 
 from django.db import models
 

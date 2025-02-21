@@ -118,7 +118,7 @@
             {% for chat in chats %}
             <div class="chat-item">
                 {% if chat.task %}
-                    <a href="{% url 'chat' task_id=chat.task.id %}?receiver_id={{ chat.sender.id }}">
+                    <a href="{% url 'chat' task_id=chat.task.id %}?receiver_id={{ chat.receiver_id }}">
                         <strong>
                             {% if chat.sender.id == request.user.id %}
                                 {{ chat.receiver.username }}

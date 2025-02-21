@@ -63,33 +63,46 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from .models import Message
 
+from django.contrib.auth.decorators import login_required
+from django.db.models import Q
+from chat.models import Message
+
 @login_required
 def all_chats(request):
     user = request.user
-    
-    # Fetch messages involving the current user
+
+    # Fetch messages where the user is either the sender or receiver
     conversations = Message.objects.filter(
-        Q(sender=user) | Q(receiver=user)  
+        Q(sender=user) | Q(receiver=user)
     ).order_by('-timestamp')
 
-    # Group by (contact, task_id) to separate conversations by task
+    # Dictionary to store grouped conversations
     grouped_chats = {}
+
     for message in conversations:
+        # Ensure the receiver is NOT the logged-in user
         contact = message.receiver if message.sender == user else message.sender
+        if contact.id == user.id:  # This should never happen, but just in case
+            continue
+
         task_id = message.task.id if message.task else None  # Handle messages with no task
-
         chat_key = (contact.id, task_id)  # Unique key: (User ID, Task ID)
-        
-        if chat_key not in grouped_chats:
-            grouped_chats[chat_key] = message  # Store latest message for this chat
 
+        # Store only the latest message for each unique (contact, task_id) chat
+        if chat_key not in grouped_chats:
+            # Add receiver_id dynamically
+            message.receiver_id = contact.id
+            grouped_chats[chat_key] = message  
+
+    # Get list of latest messages for each chat
     context = list(grouped_chats.values())
-    
-    # Debugging output
+
+    # Debugging output (optional)
     for msg in context:
-        print(f"Chat with User {msg.receiver.id if msg.sender == user else msg.sender.id}, Task ID: {msg.task.id if msg.task else 'No Task'}")
+        print(f"Chat with User {msg.receiver_id}, Task ID: {msg.task.id if msg.task else 'No Task'}")
 
     return context
+
 
 
 

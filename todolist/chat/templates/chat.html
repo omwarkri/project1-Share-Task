@@ -520,7 +520,7 @@
                     if (message.attachment) {
                         messageContent += `<p><a href="${message.attachment}" target="_blank" style="color: inherit; text-decoration: underline;">Download Attachment</a></p>`;
                     }
-                    messageContent += `<small>${message.timestamp}</small>`;
+                    messageContent += `<small>Just now.</small>`;
                     messageDiv.innerHTML = messageContent;
                     messageContainer.appendChild(messageDiv);
                     messageContainer.scrollTop = messageContainer.scrollHeight;

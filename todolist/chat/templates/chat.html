@@ -342,8 +342,8 @@
         }
     </style>
 </head>
-<body>
-    <div class="chat-container" {% if task %} data-task-id="{{ task.id }}" {% endif %} receiver="{{ receiver }}" receiver-id="{{receiver.id}}">
+<body class="main-body" user-name="{{request.user }}">
+    <div class="chat-container" {% if task %} data-task-id="{{ task.id }}" {% endif %} receiver="{{ receiver }}" receiver-id="{{receiver.id}}"  current-user="{{request.user}}"">
         <!-- Back Link and Settings Button -->
         {% if task.id %}
             <div class="back-link">
@@ -353,7 +353,7 @@
         {% endif %}
 
         <!-- Modal for Settings -->
-        <div id="settings-modal" class="modal">
+        <div id="settings-modal" class="modal" >
             <div class="modal-content">
                 <span class="close-modal">&times;</span>
                 <h3>Settings</h3>
@@ -444,6 +444,8 @@
 
             // WebSocket setup
             const chatContainer = document.querySelector(".chat-container");
+            let currentUser = document.querySelector(".chat-container");
+            currentUser  = chatContainer.getAttribute("current-user");
             const taskId = chatContainer.getAttribute("data-task-id");
             const receiverId = chatContainer.getAttribute("receiver-id");
 
@@ -509,9 +511,9 @@
             // Append message to the chat
             function appendMessage(message, type) {
                 console.log(message.sender)
-                console.log(message)
+                console.log(currentUser,"trial 3")
 
-                if(sendMessage==true){
+                if(currentUser==message.sender){
                     sentMessage=false
                     const messageContainer = document.querySelector(".messages");
                     const messageDiv = document.createElement("div");

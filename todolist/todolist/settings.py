@@ -25,12 +25,16 @@ SECRET_KEY = 'django-insecure-q@=i731s$q8+^qv617(+f9-=&tkg)fmr80262)d7c%9nc*=!wb
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['share-task.onrender.com','127.0.0.1']
+ALLOWED_HOSTS = ["share-task.onrender.com", "127.0.0.1", "localhost"]
+
+CSRF_TRUSTED_ORIGINS = ["https://share-task.onrender.com"]
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    "corsheaders"
     "daphne",
     'django.contrib.admin',
     'django.contrib.auth',
@@ -48,6 +52,7 @@ INSTALLED_APPS = [
     'notes_app',
     'channels',
     'ai_task_management',
+    
     
 
 ]
@@ -90,6 +95,7 @@ REST_FRAMEWORK = {
 
 
 MIDDLEWARE = [
+     "corsheaders.middleware.CorsMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -98,6 +104,10 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+CORS_ALLOWED_ORIGINS = [
+    "https://share-task.onrender.com",
+]
+CORS_ALLOW_CREDENTIALS = True
 
 ROOT_URLCONF = 'todolist.urls'
 

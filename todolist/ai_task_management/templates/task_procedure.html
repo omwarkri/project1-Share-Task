@@ -1,13 +1,19 @@
 <h3 class="Header">
   Task Procedure:
-
+  
 </h3>
-<p id="procedure-content">{{ procedure }}</p>
+{% if procedure %}
+<p id="procedure-content" class="{% if not procedure %}hidden{% endif %}">{{ procedure|default:"" }}</p>
+  {% else %}
+    <button id="generate-ai" onclick="generateAIProcedure()">Generate AI Procedure</button>
+  
+  {% endif %}
+
 
 <style>
   /* General Styles */
   .Header {
-    color: #2c3e50; /* Dark text for contrast */
+    color: #2c3e50;
     font-size: 24px;
     font-weight: 600;
     margin-bottom: 16px;
@@ -16,8 +22,8 @@
     justify-content: space-between;
   }
 
-  #toggle-procedure {
-    background: #1abc9c; /* Primary color */
+  #toggle-procedure, #generate-ai {
+    background: #1abc9c;
     color: white;
     border: none;
     border-radius: 8px;
@@ -27,17 +33,17 @@
     transition: background-color 0.3s ease, transform 0.2s ease;
   }
 
-  #toggle-procedure:hover {
-    background: #16a085; /* Darker shade for hover */
+  #toggle-procedure:hover, #generate-ai:hover {
+    background: #16a085;
     transform: translateY(-2px);
   }
 
-  #toggle-procedure:active {
+  #toggle-procedure:active, #generate-ai:active {
     transform: translateY(0);
   }
 
   #procedure-content {
-    background: #f8f9fa; /* Light background */
+    background: #f8f9fa;
     padding: 16px;
     border-radius: 8px;
     border: 1px solid #e0e0e0;
@@ -58,6 +64,13 @@
     border: none;
   }
 
+  /* Loading Effect */
+  .loading {
+    color: #3498db;
+    font-size: 16px;
+    font-style: italic;
+  }
+
   /* Responsive Design */
   @media (max-width: 600px) {
     .Header {
@@ -66,7 +79,7 @@
       align-items: flex-start;
     }
 
-    #toggle-procedure {
+    #toggle-procedure, #generate-ai {
       margin-top: 8px;
       width: 100%;
       text-align: center;
@@ -79,3 +92,41 @@
   }
 </style>
 
+<script>
+  function toggleProcedure() {
+    const content = document.getElementById("procedure-content");
+    content.classList.toggle("hidden");
+  }
+
+  function generateAIProcedure() {
+    const button = document.getElementById("generate-ai");
+    const content = document.getElementById("procedure-content");
+
+    // Disable button & show loading text
+    button.disabled = true;
+    button.innerText = "Generating...";
+    content.innerHTML = '<span class="loading">Generating procedure, please wait...</span>';
+    content.classList.remove("hidden");
+
+    fetch(`/generate-ai-procedure/{{ task.id }}/`)
+      .then(response => response.json())
+      .then(data => {
+        content.innerText = data.procedure || "No procedure generated.";
+        const procedureContent = document.getElementById('procedure-content');
+        if (procedureContent) {
+          formatBoldText(procedureContent);
+          addLineBreaksAfterPeriods(procedureContent);
+          formatProcedureContent(procedureContent);
+        }
+      })
+      .catch(error => {
+        console.error("Error:", error);
+        content.innerText = "Failed to generate procedure. Please try again.";
+      })
+      .finally(() => {
+        // Re-enable button after fetching
+        button.disabled = false;
+        button.innerText = "Generate AI Procedure";
+      });
+  }
+</script>

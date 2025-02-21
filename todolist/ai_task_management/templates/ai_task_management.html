@@ -408,7 +408,7 @@
     function formatBoldText(element) {
       element.innerHTML = element.innerHTML.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
     }
-
+   
     // Function to add line breaks after periods, excluding specific cases
     function addLineBreaksAfterPeriods(element) {
       element.innerHTML = element.innerHTML.replace(
@@ -442,11 +442,11 @@
     }
 
     // Apply to all chat messages
-    const messageContents = document.querySelectorAll('.message-content');
-    messageContents.forEach(message => {
-      formatBoldText(message);
-      addLineBreaksAfterPeriods(message);
-    });
+      const messageContents = document.querySelectorAll('.message-content');
+      messageContents.forEach(message => {
+        formatBoldText(message);
+        addLineBreaksAfterPeriods(message);
+      });
 
     // Toggle options dropdown
     function toggleOptions() {

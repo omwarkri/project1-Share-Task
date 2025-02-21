@@ -27,7 +27,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["share-task.onrender.com", "127.0.0.1", "localhost"]
 
-CSRF_TRUSTED_ORIGINS = ["https://share-task.onrender.com"]
+CSRF_TRUSTED_ORIGINS = ["https://share-task.onrender.com","http://127.0.0.1:8000"]
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 
@@ -108,6 +108,7 @@ MIDDLEWARE = [
 ]
 CORS_ALLOWED_ORIGINS = [
     "https://share-task.onrender.com",
+    'http://127.0.0.1:8000'
 ]
 CORS_ALLOW_CREDENTIALS = True
 

@@ -59,6 +59,8 @@ INSTALLED_APPS = [
 ASGI_APPLICATION = "todolist.asgi.application"
 
 
+
+
 CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels.layers.InMemoryChannelLayer',

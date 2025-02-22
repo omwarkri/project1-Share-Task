@@ -449,8 +449,9 @@
             const taskId = chatContainer.getAttribute("data-task-id");
             const receiverId = chatContainer.getAttribute("receiver-id");
 
-            // const socket = new WebSocket(`ws://localhost:8000/ws/chat/${taskId}/${receiverId}/`);
-            const socket = new WebSocket(`wss://share-task.onrender.com/ws/chat/${taskId}/${receiverId}/`);
+            const protocol = window.location.protocol === "https:" ? "wss" : "ws";
+            const socket = new WebSocket(`${protocol}://${window.location.host}/ws/chat/${taskId}/${receiverId}/`);
+
 
             socket.onopen = function () {
                 console.log("WebSocket connection established");

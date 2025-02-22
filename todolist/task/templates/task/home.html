@@ -12,15 +12,16 @@
             <!-- Floating Add Task Button -->
             <button class="floating-add-task-button wave" onclick="openAddTaskModal()">+</button>
             <div class="header-actions">
-                <input type="text" class="search-bar" placeholder="Search tasks..." oninput="searchTasks()" />
+                <input type="text" id="search-bar" placeholder="Search tasks..." oninput="searchTasks()" />
                 <button class="filter-button" onclick="openFilterModal()">Filters</button>
                 <button class="view-chats-button" onclick="openChatModal()">View Chats</button>
             </div>
         </div>
 
         <!-- Task List -->
-        <div class="task-grid ">
+        <div class="task-grid " id="task-list">
             {% for task_data in tasks_with_suggestions %}
+
                 <div class="task-card task-item" data-status="{{ task_data.task.status }}" data-priority="{{ task_data.task.priority }}">
                     <div class="task-header">
                         <strong class="task-title">{{ task_data.task.title }}</strong>
@@ -43,8 +44,7 @@
                     
                     <div class="task-footer">
                         <button class="task-action" onclick="openViewDependencyModal({{ task_data.task.id }})">Dependencies</button>
-                        <!-- <div id="viewTaskDependencies" class="modal" style="display: none;"></div> -->
-                        <!-- View Task Dependencies Modal -->
+            
                         
                         <button class="task-action" onclick="openModal({{ task_data.task.id }})">Complete</button>
                         <a href="{% url 'task_detail' task_data.task.id %}" class="task-action">Details</a>
@@ -891,9 +891,8 @@ function applySorting() {
         activeButton.classList.add('active');
     }
 }
-
-        function searchTasks() {
-    const query = document.getElementById('task-search').value;
+function searchTasks() {
+    const query = document.getElementById('search-bar').value;
     const taskList = document.getElementById('task-list');
 
     fetch(`/search-tasks/?q=${encodeURIComponent(query)}`, {
@@ -902,24 +901,67 @@ function applySorting() {
         .then(response => response.json())
         .then(data => {
             taskList.innerHTML = '';
+
             if (data.tasks.length === 0) {
-                taskList.innerHTML = '<li>No tasks found.</li>';
+                taskList.innerHTML = '<p>No tasks found.</p>';
             } else {
                 data.tasks.forEach(task => {
                     taskList.innerHTML += `
-                        <li class="task-item">
-                            <strong class="task-title">${task.title}</strong>
-                            <p><strong>Priority:</strong> ${task.priority}</p>
-                            <p><strong>Status:</strong> ${task.status}</p>
-                            <p><strong>Due Date:</strong> ${task.due_date}</p>
-                        </li>`;
+                        <div class="task-card task-item" data-status="${task.status}" data-priority="${task.priority}">
+                            <div class="task-header">
+                                <strong class="task-title">${task.title}</strong>
+                                <span class="task-priority ${task.priority}">${task.priority}</span>
+                            </div>
+                            <div class="task-body">
+                                <p><strong>Status:</strong> ${task.status}</p>
+                                <p><strong>Due Date:</strong> ${task.due_date}</p>
+
+                                <a href="/ai-task-management/${task.id}/" class="suggested-users-button">Manage task with AI</a>
+                                <a href="/${task.id}/suggested_users/" class="suggested-users-button">Find Task Partner</a>
+
+                                ${task.is_overdue ? '<span class="badge badge-danger">Overdue</span>' : ''}
+                                ${task.is_approaching_due_date ? '<span class="badge badge-warning">Approaching Due</span>' : ''}
+                            </div>
+
+                            <div class="task-footer"> 
+                                <button class="task-action view-dependencies" onclick="openViewDependencyModal(${task.id})" data-task-id="${task.id}">Dependencies</button>
+                                <button class="task-action complete-task" data-task-id="${task.id} onclick="openModal(${task.id} )">Complete</button>
+                                <a href="/task/${task.id}/" class="task-action">Details</a>
+                            </div>
+                        </div>  
+
+                        <div id="viewTaskDependencies-${task.id}" class="modal" style="display: none;">
+                            <div class="modal-content">
+                                <span class="close-modal" data-task-id="${task.id}">&times;</span>
+                                <h3>Task Dependencies</h3>
+
+                                <div class="task-dependencies">
+                                    <h4>Current Dependencies</h4>
+                                    <ul id="dependency-list-${task.id}" class="dependency-list">
+                                        <li class="no-dependencies">No dependencies set for this task.</li>
+                                    </ul>
+                                </div>
+
+                                <form method="POST" id="update-dependencies-form-${task.id}" class="dependency-form">
+                                    <input type="hidden" name="csrfmiddlewaretoken" value="${data.csrf_token}">
+                                    <h4>Update Dependencies</h4>
+                                    <select id="dependency-select-${task.id}" name="dependencies" multiple class="dependency-select">
+                                    </select>
+                                    <button type="submit" class="submit-button">Update Dependencies</button>
+                                </form>
+                            </div>
+                        </div>`;
                 });
+
+                // // ✅ Attach event listeners to dynamically added elements
+                // attachModalEventListeners();
             }
         })
         .catch(error => {
             console.error('Error fetching tasks:', error);
         });
 }
+
 
 function openViewDependencyModal(taskId) {
     // Fetch task details and dependencies
@@ -1004,6 +1046,23 @@ function closeViewDependencyModal() {
         document.getElementById(`shareTaskModal-${taskId}`).style.display = 'none';
     }
 
+    // function attachModalEventListeners() {
+    // Open Dependency Modal
+//     document.querySelectorAll('.view-dependencies').forEach(button => {
+//         button.addEventListener('click', function () {
+//             const taskId = this.getAttribute('data-task-id');
+//             document.getElementById(`viewTaskDependencies-${taskId}`).style.display = 'block';
+//         });
+//     });
+
+//     // Close Dependency Modal
+//     document.querySelectorAll('.close-modal').forEach(button => {
+//         button.addEventListener('click', function () {
+//             const taskId = this.getAttribute('data-task-id');
+//             document.getElementById(`viewTaskDependencies-${taskId}`).style.display = 'none';
+//         });
+//     });
+// }
 
 
 

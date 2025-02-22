@@ -135,11 +135,11 @@ def home(request):
     # Add suggested users to each task
     tasks_with_suggestions = []
     for task in tasks:
-        response = get_suggested_users(task, request.user)
+        # response = get_suggested_users(task, request.user)
         tasks_with_suggestions.append({
             'task': task,
-            'users_in_progress': response.get("users_in_progress"),
-            'users_completed': response.get("users_completed"),
+            'users_in_progress': [],
+            'users_completed':[],
         })
 
     # Get all chats for the user
@@ -171,6 +171,7 @@ from django.contrib.auth.decorators import login_required
 @require_GET
 def search_tasks(request):
     query = request.GET.get('q', '')
+    print(query)
     tasks = Task.objects.filter(user=request.user, title__icontains=query) if query else Task.objects.filter(user=request.user)
     
     task_data = [

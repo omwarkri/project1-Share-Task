@@ -277,13 +277,51 @@ header .bubbles .bubble:nth-child(3) {
   animation-delay: 2s;
 }
 
-/* Footer */
+/* Footer Section */
 footer {
-  background: #2c3e50;
+  background: rgba(44, 62, 80, 0.8); /* Semi-transparent background */
   color: white;
   padding: 30px;
   text-align: center;
   animation: fadeIn 2s ease-in-out;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(10px); /* Glassy effect */
+  border-top: 1px solid rgba(255, 255, 255, 0.1); /* Subtle border */
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1); /* Soft shadow */
+}
+
+/* Shine Effect */
+footer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  ); /* Shine gradient */
+  animation: shine 3s infinite ease-in-out; /* Shine animation */
+}
+
+@keyframes shine {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+footer p {
+  font-size: 0.9rem;
+  opacity: 0.8;
+  position: relative;
+  z-index: 1; /* Ensure text is above the shine effect */
 }
 
 footer p {

@@ -12,7 +12,7 @@
             <!-- Floating Add Task Button -->
             <button class="floating-add-task-button wave" onclick="openAddTaskModal()">+</button>
             <div class="header-actions">
-                <input type="text" id="search-bar" placeholder="Search tasks..." oninput="searchTasks()" />
+                <input type="text" id="search-bar" class="search-bar" placeholder="Search tasks..." oninput="searchTasks()" />
                 <button class="filter-button" onclick="openFilterModal()">Filters</button>
                 <button class="view-chats-button" onclick="openChatModal()">View Chats</button>
             </div>
@@ -925,7 +925,7 @@ function searchTasks() {
 
                             <div class="task-footer"> 
                                 <button class="task-action view-dependencies" onclick="openViewDependencyModal(${task.id})" data-task-id="${task.id}">Dependencies</button>
-                                <button class="task-action complete-task"  onclick="openModal(${task.id} )" data-task-id="${task.id}>Complete</button>
+                                <button class="task-action complete-task"  onclick="openModal(${task.id} )" >Complete</button>
                                 <a href="/task/${task.id}/" class="task-action">Details</a>
                             </div>
                         </div>  

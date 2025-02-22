@@ -22,7 +22,7 @@
                     </ul>
                     <!-- Pass task details in the chat URL -->
                     <a href="{% url 'chat' task.
-                    id  %}?receiver_id={{user.user_id }}&task_title={{ task.title}}" class="chat-button">lets Chat</a>
+                    id  %}?receiver_id={{user.user_id }}" class="chat-button">lets Chat</a>
                 </li>
             {% empty %}
                 <li class="no-users">No users currently working on similar tasks.</li>

@@ -925,7 +925,7 @@ function searchTasks() {
 
                             <div class="task-footer"> 
                                 <button class="task-action view-dependencies" onclick="openViewDependencyModal(${task.id})" data-task-id="${task.id}">Dependencies</button>
-                                <button class="task-action complete-task" data-task-id="${task.id} onclick="openModal(${task.id} )">Complete</button>
+                                <button class="task-action complete-task"  onclick="openModal(${task.id} )" data-task-id="${task.id}>Complete</button>
                                 <a href="/task/${task.id}/" class="task-action">Details</a>
                             </div>
                         </div>  
@@ -1009,6 +1009,7 @@ function openViewDependencyModal(taskId) {
 }
 
 function closeViewDependencyModal() {
+
     document.getElementById('viewTaskDependencies').style.display = 'none';
 }
 
@@ -1039,6 +1040,9 @@ function closeViewDependencyModal() {
     }
 
     function openModal(taskId) {
+        console.log(
+            "open model"
+        )
         document.getElementById(`shareTaskModal-${taskId}`).style.display = 'flex';
     }
 

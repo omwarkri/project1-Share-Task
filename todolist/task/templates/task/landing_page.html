@@ -5,241 +5,404 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Share Task - Collaborate, Organize, Succeed</title>
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
-    body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-      background-color: #f8f9fa;
-      color: #333;
-      line-height: 1.6;
-    }
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  background-color: #f8f9fa;
+  color: #333;
+  line-height: 1.6;
+}
 
-    a {
-      text-decoration: none;
-      color: inherit;
-    }
+a {
+  text-decoration: none;
+  color: inherit;
+}
 
-    header {
-      background: linear-gradient(135deg, #16a085, #1abc9c);
-      color: white;
-      padding: 60px 20px;
-      text-align: center;
-      animation: fadeIn 1.5s ease-in-out;
-    }
+/* Header Section */
+header {
+  background: linear-gradient(135deg, #16a085, #1abc9c);
+  color: white;
+  padding: 60px 20px;
+  text-align: center;
+  animation: fadeIn 1.5s ease-in-out;
+  position: relative;
+  overflow: hidden;
+}
 
-    header h1 {
-      font-size: 3rem;
-      margin-bottom: 15px;
-      font-weight: 700;
-      animation: slideInDown 1s ease-in-out;
-    }
+header h1 {
+  font-size: 3rem;
+  margin-bottom: 15px;
+  font-weight: 700;
+  animation: slideInDown 1s ease-in-out;
+}
 
-    header p {
-      font-size: 1.25rem;
-      margin-bottom: 30px;
-      opacity: 0.9;
-      animation: slideInUp 1s ease-in-out;
-    }
+header p {
+  font-size: 1.25rem;
+  margin-bottom: 30px;
+  opacity: 0.9;
+  animation: slideInUp 1s ease-in-out;
+}
 
-    .cta-button {
-      background: white;
-      color: #16a085;
-      padding: 14px 28px;
-      border-radius: 8px;
-      font-size: 1rem;
-      font-weight: 600;
-      transition: background 0.3s ease, transform 0.3s ease;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      animation: fadeIn 2s ease-in-out;
-    }
+/* Half Circles for Header */
+header::before,
+header::after {
+  content: '';
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  z-index: 1;
 
-    .cta-button:hover {
-      background: #f0f4f8;
-      transform: translateY(-2px);
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
-    }
+}
 
-    .features, .how-it-works {
-      padding: 60px 20px;
-      background: white;
-      text-align: center;
-      animation: fadeIn 2s ease-in-out;
-    }
+/* header::before {
+  top: 0px;
+  left: -200px;
+} */
 
-    .features h2, .how-it-works h2 {
-      font-size: 2.5rem;
-      margin-bottom: 30px;
-      color: #2c3e50;
-      font-weight: 700;
-      animation: slideInDown 1s ease-in-out;
-    }
+header::after {
+  top: 0px;
+  right: -100px;
+}
 
-    .feature-cards, .steps {
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 30px;
-      margin-top: 30px;
-    }
+/* Small Bubbles for Header */
+header .bubbles {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  pointer-events: none;
+}
 
-    .feature-card, .step-card {
-      background: #ffffff;
-      border-radius: 16px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      padding: 30px;
-      width: 300px;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-      animation: fadeInUp 1s ease-in-out;
-    }
+header .bubbles .bubble {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  animation: float 3s infinite ease-in-out;
+}
 
-    .feature-card:hover, .step-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-    }
+header .bubbles .bubble:nth-child(1) {
+  top: 20%;
+  left: 10%;
+  animation-delay: 0s;
+}
 
-    .feature-card img, .step-card img {
-      width: 80px;
-      height: 80px;
-      margin-bottom: 20px;
-      object-fit: contain;
-      background-color: #f0f4f8;
-      border-radius: 12px;
-      animation: bounce 2s infinite;
-    }
+header .bubbles .bubble:nth-child(2) {
+  top: 40%;
+  left: 50%;
+  animation-delay: 1s;
+}
 
-    .feature-card h3, .step-card h3 {
-      font-size: 1.5rem;
-      margin-bottom: 15px;
-      color: #2c3e50;
-      font-weight: 600;
-    }
+header .bubbles .bubble:nth-child(3) {
+  top: 60%;
+  left: 30%;
+  animation-delay: 2s;
+}
 
-    .feature-card p, .step-card p {
-      font-size: 1rem;
-      color: #555;
-      line-height: 1.6;
-    }
+/* CTA Button */
+.cta-button {
+  background: white;
+  color: #16a085;
+  padding: 14px 28px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: background 0.3s ease, transform 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  animation: fadeIn 2s ease-in-out;
+}
 
-    .cta-section {
-      background: linear-gradient(135deg, #16a085, #1abc9c);
-      color: white;
-      padding: 60px 20px;
-      text-align: center;
-      animation: fadeIn 2s ease-in-out;
-    }
+.cta-button:hover {
+  background: #f0f4f8;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
 
-    .cta-section h2 {
-      font-size: 2.5rem;
-      margin-bottom: 20px;
-      font-weight: 700;
-      animation: slideInDown 1s ease-in-out;
-    }
+/* Features Section */
+.features,
+.how-it-works {
+  padding: 60px 20px;
+  background: white;
+  text-align: center;
+  animation: fadeIn 2s ease-in-out;
+}
 
-    footer {
-      background: #2c3e50;
-      color: white;
-      padding: 30px;
-      text-align: center;
-      animation: fadeIn 2s ease-in-out;
-    }
+.features h2,
+.how-it-works h2 {
+  font-size: 2.5rem;
+  margin-bottom: 30px;
+  color: #2c3e50;
+  font-weight: 700;
+  animation: slideInDown 1s ease-in-out;
+}
 
-    footer p {
-      font-size: 0.9rem;
-      opacity: 0.8;
-    }
+.feature-cards,
+.steps {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 30px;
+  margin-top: 30px;
+}
 
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-      }
-      to {
-        opacity: 1;
-      }
-    }
+.feature-card,
+.step-card {
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 30px;
+  width: 300px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  animation: fadeInUp 1s ease-in-out;
+}
 
-    @keyframes slideInDown {
-      from {
-        transform: translateY(-50px);
-        opacity: 0;
-      }
-      to {
-        transform: translateY(0);
-        opacity: 1;
-      }
-    }
+.feature-card:hover,
+.step-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
 
-    @keyframes slideInUp {
-      from {
-        transform: translateY(50px);
-        opacity: 0;
-      }
-      to {
-        transform: translateY(0);
-        opacity: 1;
-      }
-    }
+.feature-card img,
+.step-card img {
+  width: 80px;
+  height: 80px;
+  margin-bottom: 20px;
+  object-fit: contain;
+  background-color: #f0f4f8;
+  border-radius: 12px;
+  animation: bounce 2s infinite;
+}
 
-    @keyframes fadeInUp {
-      from {
-        transform: translateY(20px);
-        opacity: 0;
-      }
-      to {
-        transform: translateY(0);
-        opacity: 1;
-      }
-    }
+.feature-card h3,
+.step-card h3 {
+  font-size: 1.5rem;
+  margin-bottom: 15px;
+  color: #2c3e50;
+  font-weight: 600;
+}
 
-    @keyframes bounce {
-      0%, 20%, 50%, 80%, 100% {
-        transform: translateY(0);
-      }
-      40% {
-        transform: translateY(-20px);
-      }
-      60% {
-        transform: translateY(-10px);
-      }
-    }
+.feature-card p,
+.step-card p {
+  font-size: 1rem;
+  color: #555;
+  line-height: 1.6;
+}
 
-    @media (max-width: 768px) {
-      header h1 {
-        font-size: 2.5rem;
-      }
+/* CTA Section */
+.cta-section {
+  background: linear-gradient(135deg, #16a085, #1abc9c);
+  color: white;
+  padding: 60px 20px;
+  text-align: center;
+  animation: fadeIn 2s ease-in-out;
+  position: relative;
+  overflow: hidden;
+}
 
-      header p {
-        font-size: 1.1rem;
-      }
+.cta-section h2 {
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+  font-weight: 700;
+  animation: slideInDown 1s ease-in-out;
+}
 
-      .features h2, .how-it-works h2, .cta-section h2 {
-        font-size: 2rem;
-      }
+/* Half Circles for CTA Section */
+.cta-section::before,
+.cta-section::after {
+  content: '';
+  position: absolute;
+  width: 400px;
+  height: 400px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  z-index: 1;
+  animation: float 6s infinite ease-in-out;
+}
 
-      .feature-cards, .steps {
-        flex-direction: column;
-        align-items: center;
-      }
+.cta-section::before {
+  bottom: -200px;
+  left: -200px;
+}
 
-      .feature-card, .step-card {
-        width: 100%;
-        max-width: 400px;
-      }
-    }
+.cta-section::after {
+  bottom: -200px;
+  right: -200px;
+}
+
+/* Small Bubbles for CTA Section */
+.cta-section .bubbles {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.cta-section .bubbles .bubble {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  animation: float 3s infinite ease-in-out;
+}
+
+.cta-section .bubbles .bubble:nth-child(1) {
+  top: 20%;
+  left: 70%;
+  animation-delay: 0s;
+}
+
+.cta-section .bubbles .bubble:nth-child(2) {
+  top: 50%;
+  left: 40%;
+  animation-delay: 1s;
+}
+
+.cta-section .bubbles .bubble:nth-child(3) {
+  top: 80%;
+  left: 80%;
+  animation-delay: 2s;
+}
+
+/* Footer */
+footer {
+  background: #2c3e50;
+  color: white;
+  padding: 30px;
+  text-align: center;
+  animation: fadeIn 2s ease-in-out;
+}
+
+footer p {
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInDown {
+  from {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-20px);
+  }
+  60% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  header h1 {
+    font-size: 2.5rem;
+  }
+
+  header p {
+    font-size: 1.1rem;
+  }
+
+  .features h2,
+  .how-it-works h2,
+  .cta-section h2 {
+    font-size: 2rem;
+  }
+
+  .feature-cards,
+  .steps {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .feature-card,
+  .step-card {
+    width: 100%;
+    max-width: 400px;
+  }
+}
   </style>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
   <header>
+    <div class="bubbles">
+      <div class="bubble"></div>
+      <div class="bubble"></div>
+      <div class="bubble"></div>
+      <div class="bubble"></div>
+      <div class="bubble"></div>
+      <div class="bubble"></div>
+    </div>
     <h1>Share Task</h1>
     <p>Collaborate, Organize, and Succeed with Ease</p>
     <a href="/user/register/" class="cta-button">Get Started for Free</a>
   </header>
 
   <section class="features">
+    
     <h2>Why Choose Share Task?</h2>
     <div class="feature-cards">
       <div class="feature-card">
@@ -297,6 +460,12 @@
   </section>
 
   <section class="cta-section">
+    <div class="bubbles">
+      <div class="bubble"></div>
+      <div class="bubble"></div>
+      <div class="bubble"></div>
+      <div class="bubble"></div>
+    </div>
     <h2>Start Managing Your Tasks Smarter Today!</h2>
     <a href="/user/register/" class="cta-button">Sign Up Now</a>
   </section>

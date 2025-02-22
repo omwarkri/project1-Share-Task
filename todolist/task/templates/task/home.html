@@ -917,7 +917,7 @@ function searchTasks() {
                                 <p><strong>Due Date:</strong> ${task.due_date}</p>
 
                                 <a href="/ai-task-management/${task.id}/" class="suggested-users-button">Manage task with AI</a>
-                                <a href="/${task.id}/suggested_users/" class="suggested-users-button">Find Task Partner</a>
+                                <a href="/task/${task.id}/suggested_users/" class="suggested-users-button">Find Task Partner</a>
 
                                 ${task.is_overdue ? '<span class="badge badge-danger">Overdue</span>' : ''}
                                 ${task.is_approaching_due_date ? '<span class="badge badge-warning">Approaching Due</span>' : ''}

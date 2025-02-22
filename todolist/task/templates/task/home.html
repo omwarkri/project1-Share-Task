@@ -87,6 +87,7 @@
 
 <!-- Modals (Add Task, Filter, Chat, etc.) -->
 <!-- Add Task Modal -->
+<!-- Add Task Modal -->
 <div id="addTaskModal" class="modal" style="display: none;">
     <div class="modal-content">
         <span class="close-modal" onclick="closeAddTaskModal()">&times;</span>
@@ -108,7 +109,6 @@
         </form>
     </div>
 </div>
-
 <!-- Chat Modal -->
 <div id="chatModal" class="modal" style="display: none;">
     <div class="modal-content">
@@ -964,6 +964,12 @@ function searchTasks() {
 
 
 function openViewDependencyModal(taskId) {
+    document.addEventListener('DOMContentLoaded', function () {
+    flatpickr('#id_due_date', {
+      dateFormat: 'Y-m-d',  // Format to match Django's expected format
+      enableTime: false,    // Disable time selection
+    });
+  });
     // Fetch task details and dependencies
     fetch(`/get-task-dependencies/${taskId}/`)
         .then(response => response.json())

@@ -6,7 +6,9 @@ class TaskForm(forms.ModelForm):
     class Meta:
         model = Task
         fields = ['title', 'description', 'due_date', 'priority', 'category', 'status', 'dependencies']
-
+        widgets = {
+            'due_date': forms.DateInput(attrs={'type': 'date'}),  # Use HTML5 date input
+        }
     dependencies = forms.ModelMultipleChoiceField(
         queryset=Task.objects.all(), 
         widget=forms.CheckboxSelectMultiple,

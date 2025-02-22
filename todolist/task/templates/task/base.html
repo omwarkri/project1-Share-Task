@@ -6,7 +6,10 @@
     <title>{{ app_name }}</title>
     {% load static %}
     <!-- <link rel="stylesheet" href="{% static 'css/style.css' %}"> -->
-    <script src="{% static 'js/script.js' %}" defer></script>
+    <!-- <script src="{% static 'js/script.js' %}" defer></script> -->
+    <!-- Add this to your base template or the template where the modal is rendered -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <style>
 /* General Styles */
 * {
@@ -277,7 +280,7 @@ footer {
 </head>
 <body>
     <header class="header-div">
-        <h1>Share Task</h1>
+        <a href="{% url 'home' %}" style="text-decoration: none; "><h1>Share Task</h1></a>
         <div>
           
             <span>Welcome, <a href="{% url 'profile' %}">{{ user.username }}</a>!</span>
@@ -287,7 +290,7 @@ footer {
     <!-- Sidebar -->
 <div class="sidebar" id="sidebar">
     <div>
-        <a href="{% 'home' % }" style="text-decoration: none; "><h2>Share Task</h2></a>
+        <a href="{% url 'home' %}" style="text-decoration: none; "><h2>Share Task</h2></a>
         <ul class="sidebar-menu">
             <li><a id="all-tasks-link" href="{% url 'home' %}">All Tasks</a></li>
             <li><a id="leaderboard-link" href="{% url 'leaderboard' %}">Leaderboard</a></li>

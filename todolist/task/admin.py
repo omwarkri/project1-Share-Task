@@ -11,7 +11,7 @@ from .models import (
 # Register Task model
 @admin.register(Task)
 class TaskAdmin(admin.ModelAdmin):
-    list_display = ('title', 'user', 'status', 'priority', 'due_date', 'created_at')
+    list_display = ('title', 'user', 'status', 'priority', 'due_date', 'created_at',"reminder_sent")
     list_filter = ('status', 'priority', 'created_at')
     search_fields = ('title', 'description')
     filter_horizontal = ('allowed_users',)  # For easier management of ManyToManyField

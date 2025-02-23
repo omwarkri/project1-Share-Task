@@ -84,6 +84,12 @@ from .forms import TaskForm,TaskDependenciesForm
     
 
 
+from django.utils import timezone
+from django.db.models import Q
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
+from .models import Task
+from .forms import TaskForm, TaskDependenciesForm
 
 @login_required
 def home(request):
@@ -93,9 +99,11 @@ def home(request):
     sort_by = request.GET.get('sort_by', 'created_at')  # Default: Sort by creation date
     order = request.GET.get('order', 'desc')  # Default: Descending order
     search_query = request.GET.get('q', None)  # Search query for tasks
+
     # Start with tasks for the logged-in user
     tasks = Task.objects.filter(user=request.user)
 
+    # Apply search query filter
     if search_query:
         tasks = tasks.filter(
             Q(title__icontains=search_query) |
@@ -134,20 +142,26 @@ def home(request):
 
     # Add suggested users to each task
     tasks_with_suggestions = []
+    now = timezone.now()
+
     for task in tasks:
-        # response = get_suggested_users(task, request.user)
+        # Check if the task is overdue or approaching due date
+        is_overdue = task.is_overdue()
+        is_approaching = task.is_approaching_due_date()
+
+        # Add notification flags
         tasks_with_suggestions.append({
             'task': task,
             'users_in_progress': [],
-            'users_completed':[],
+            'users_completed': [],
+            'is_overdue': is_overdue,
+            'is_approaching': is_approaching,
         })
 
     # Get all chats for the user
     chats = all_chats(request)
-    print(chats[0])
 
-    TaskDependencies = TaskDependenciesForm()
-
+    # Prepare context
     context = {
         'tasks_with_suggestions': tasks_with_suggestions,
         'app_name': 'Share Task',
@@ -158,9 +172,10 @@ def home(request):
         'sort_by': sort_by.lstrip('-'),  # Remove '-' for display purposes
         'order': order,
         'search_query': search_query,
-        'TaskDependenciesForm':TaskDependencies
+        'TaskDependenciesForm': TaskDependenciesForm(),
     }
-    return render(request, 'task/home.html', context)
+
+    return render(request, 'task/home.html', context)   
 
 
 from django.http import JsonResponse

@@ -2,17 +2,30 @@ from django import forms
 from .models import Task
 
 
+from django import forms
+from django.utils import timezone
+from .models import Task
+
 class TaskForm(forms.ModelForm):
     class Meta:
         model = Task
         fields = ['title', 'description', 'due_date', 'priority', 'category', 'status', 'dependencies']
         widgets = {
-            'due_date': forms.DateInput(attrs={'type': 'date'}),  # Use HTML5 date input
+            'due_date': forms.DateTimeInput(attrs={'type': 'datetime-local'}),  # Use HTML5 datetime input
         }
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)  # Get the current user from kwargs
+        super().__init__(*args, **kwargs)
+
+        # Filter dependencies to only include tasks for the current user
+        if user:
+            self.fields['dependencies'].queryset = Task.objects.filter(user=user)
+
     dependencies = forms.ModelMultipleChoiceField(
-        queryset=Task.objects.all(), 
+        queryset=Task.objects.none(),  # Start with an empty queryset
         widget=forms.CheckboxSelectMultiple,
-        required=False
+        required=False,
     )
 
 class TaskDependenciesForm(forms.ModelForm):

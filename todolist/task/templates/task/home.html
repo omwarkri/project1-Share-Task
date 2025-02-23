@@ -3,6 +3,29 @@
 {% block content %}
 <div class="dashboard-container">
 
+    <h2>Overdue Tasks</h2>
+    <ul>
+        {% for task_data in tasks_with_suggestions %}
+            {% if task_data.is_overdue %}
+            <li>
+                {{ task_data.task.title }} - Due: {{ task_data.task.due_date }}
+            </li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+
+    <!-- Tasks Due Soon -->
+    <h2>Tasks Due Soon</h2>
+    <ul>
+        {% for task_data in tasks_with_suggestions %}
+            {% if task_data.is_approaching and not task_data.is_overdue %}
+            <li>
+                {{ task_data.task.title }} - Due: {{ task_data.task.due_date }}
+            </li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+
 
     <!-- Main Content -->
     <div class="main-content">
@@ -259,6 +282,7 @@ div.task-mid-buttons{
 .main-content {
     flex: 1;
     padding: 20px;
+    padding-bottom: 60px;
     background-color: #fff;
     overflow: hidden;
     transition: margin-left 0.3s ease-in-out;

@@ -5,7 +5,7 @@ from datetime import timedelta
 from django.utils import timezone
 
 
-class Task(models.Model):
+class   Task(models.Model):
     STATUS_CHOICES = [
         ('pending', 'Pending'),
         ('in_progress', 'In Progress'),
@@ -39,6 +39,7 @@ class Task(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     dependencies = models.ManyToManyField('self', through='TaskDependency', symmetrical=False, related_name='dependent_tasks')
     procedure = models.TextField(blank=True, null=True) 
+    reminder_sent = models.BooleanField(default=False)  # New field
     def __str__(self):
         return self.title
 
@@ -48,7 +49,7 @@ class Task(models.Model):
         return False
 
     def is_approaching_due_date(self):
-        if self.due_date and self.due_date - timezone.now() <= timedelta(days=2):
+        if self.due_date and self.due_date - timezone.now() <= timezone.timedelta(days=2):
             return True
         return False
     

@@ -67,6 +67,10 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from chat.models import Message
 
+from django.db.models import Q
+from django.contrib.auth.decorators import login_required
+from .models import Message
+
 @login_required
 def all_chats(request):
     user = request.user
@@ -85,7 +89,11 @@ def all_chats(request):
         if contact.id == user.id:  # This should never happen, but just in case
             continue
 
-        task_id = message.task.id if message.task else None  # Handle messages with no task
+        # Skip messages without a task
+        if not message.task:  # Discard messages with no task
+            continue
+
+        task_id = message.task.id  # Task ID is guaranteed to exist here
         chat_key = (contact.id, task_id)  # Unique key: (User ID, Task ID)
 
         # Store only the latest message for each unique (contact, task_id) chat
@@ -99,7 +107,7 @@ def all_chats(request):
 
     # Debugging output (optional)
     for msg in context:
-        print(f"Chat with User {msg.receiver_id}, Task ID: {msg.task.id if msg.task else 'No Task'}")
+        print(f"Chat with User {msg.receiver_id}, Task ID: {msg.task.id}")
 
     return context
 

@@ -32,8 +32,8 @@
                         <p><strong>Due Date:</strong> {{ task_data.task.due_date|date:"F j, Y, g:i a" }}</p>
 
 
-                        <a href="{% url 'ai_task_management' task_data.task.id %}" class="suggested-users-button">Manage task with AI</a>
-                        <a href="{% url 'suggested_users' task_data.task.id %}" class="suggested-users-button">Find Task Partner</a>
+                        <a href="{% url 'ai_task_management' task_data.task.id %}" class="suggested-users-button"><img src="/media/symbols/manage ai.png" alt=""></a>
+                        <a href="{% url 'suggested_users' task_data.task.id %}" class="suggested-users-button"><img src="/media/symbols/friend.png" alt=""></a>
                      
                         {% if task_data.task.is_overdue %}
                             <span class="badge badge-danger">Overdue</span>
@@ -238,6 +238,11 @@ body {
    
     height: 100vh;
     background-color: #f5f5f5;
+}
+
+a.suggested-users-button img{
+    height: 30px;
+    width: 30px;
 }
 
 
@@ -456,18 +461,23 @@ body {
 }
 
 .suggested-users-button {
-    display: inline-block;
-    padding: 6px 12px;
-    background-color: #1abc9c; /* Accent color for button */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    padding: 6px;
+    background-color: transparent; /* Accent color for button */
+    border:1px solid rgba(93, 142, 135, 0.933);
     color: white;
     text-decoration: none;
     border-radius: 8px;
     font-size: 14px;
     margin-top: 10px;
+  
 }
 
 .suggested-users-button:hover {
-    background-color: #16a085; 
+    background-color: transparent; 
 }
 
 /* Modal Styles */

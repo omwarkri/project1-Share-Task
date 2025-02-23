@@ -13,21 +13,20 @@
     <style>
         /* General Styles */
   
-
         h1, h2 {
-            color: #2c3e50;
+            color: #1abc9c;
             margin-bottom: 10px;
             font-weight: 600;
         }
 
         h1 {
             font-size: 2.5em;
-            margin-bottom: 20px;
+         
         }
 
         h2 {
             font-size: 1.8em;
-            margin-top: 30px;
+         
         }
 
         p {
@@ -36,42 +35,262 @@
             margin: 5px 0;
         }
 
+        .profile-main {
+    height: 100vh; /* Full viewport height */
+    overflow-y: auto; /* Enable vertical scrolling */
+    padding-top: 50px; /* Optional: Add padding for better spacing */
+    background-color: #f8f9fa; /* Optional: Add a background color */
+}
+
         /* Card Styles */
         .card {
             background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            padding: 30px;
-            max-width: 1000px;
+            padding: 24px;
             width: 100%;
+            margin: 8px 0;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: auto;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
-        /* Calendar Styles */
+
         .calendar {
-            display: grid;
-            grid-template-columns: repeat(52, 15px);
-            gap: 3px;
-            margin-top: 20px;
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    display: grid;
+    grid-template-rows: repeat(10, 15px); /* Arrange days vertically */
+    grid-auto-flow: column; /* Flow days into columns */
+    gap: 3px;
+    margin-top: 20px;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.calendar-header {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9em;
+    color: #555;
+    margin-bottom: 10px;
+    font-weight: 500;
+}
+
+.calendar-header span {
+    margin: 0 5px;
+}
+
+.day {
+    width: 15px;
+    height: 15px;
+    background-color: #e0e0e0;
+    border-radius: 3px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.day:hover {
+    transform: scale(1.2);
+    opacity: 0.8;
+}
+
+        /* Profile Picture Styles */
+        .profile-picture-container {
+            margin: 20px 0;
         }
 
-        .calendar-header {
-            grid-column: 1 / -1; /* Span the entire width of the calendar */
+        .profile-picture {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #1abc9c;
+            transition: transform 0.3s ease;
+        }
+
+        .profile-picture:hover {
+            transform: scale(1.05);
+        }
+
+        /* Edit Button Styles */
+        .edit-button {
+            background-color: #1abc9c;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 500;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            margin-top: 20px;
+        }
+
+        .edit-button:hover {
+            background-color: #16a085;
+            transform: translateY(-2px);
+        }
+
+        .edit-button:active {
+            transform: translateY(0);
+        }
+
+        /* Modal Styles */
+        /* Modal Styles */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+    justify-content: center;
+    align-items: center;
+    z-index: 3000; /* Ensure it's on top of other elements */
+}
+
+.modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Animation for modal */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+        .modal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 0.9em;
-            color: #555;
-            margin-bottom: 10px;
-            font-weight: 500;
+            margin-bottom: 20px;
         }
 
-        .calendar-header span {
-            margin: 0 5px;
+        .modal-header h2 {
+            margin: 0;
+            font-size: 1.5em;
+            color: #1abc9c;
         }
+
+        .close-button {
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            cursor: pointer;
+            color: #555;
+        }
+
+        .close-button:hover {
+            color: #1abc9c;
+        }
+
+        /* Form Group Styles */
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #1abc9c;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            color: #555;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .form-input:focus {
+            border-color: #1abc9c;
+            box-shadow: 0 0 8px rgba(26, 188, 156, 0.3);
+            outline: none;
+        }
+
+        /* Submit Button Styles */
+        .submit-button {
+            background-color: #1abc9c;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .submit-button:hover {
+            background-color: #16a085;
+            transform: translateY(-2px);
+        }
+
+        .submit-button:active {
+            transform: translateY(0);
+        }
+
+        /* Badges Section */
+        .badges {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .badge {
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #1abc9c;
+            color: white;
+            font-size: 1.2em;
+            font-weight: bold;
+            transition: transform 0.3s ease;
+        }
+
+        .badge:hover {
+            transform: scale(1.1);
+        }
+
+        .badge img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        /* Calendar Styles */
+       
 
         .day {
             width: 15px;
@@ -87,21 +306,52 @@
         }
 
         /* Color Classes */
-        .green {
-            background-color: #16a085; /* Green */
+        .green { background-color: #1abc9c; }
+        .dark-green { background-color: #16a085; }
+        .yellow { background-color: #FFEB3B; }
+
+        /* Rating and Reviews Section */
+        .rating-reviews {
+            margin-top: 30px;
         }
 
-        .dark-green {
-            background-color: #12876f; /* Darker Green */
+        .rating-reviews h2 {
+            font-size: 1.8em;
+            margin-bottom: 20px;
         }
 
-        .yellow {
-            background-color: #FFEB3B; /* Yellow */
+        .review-card {
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 15px;
+            text-align: left;
         }
 
-        /* Button Styles */
-        button {
-            background-color: #16a085;
+        .review-card p {
+            margin: 5px 0;
+            color: #555;
+        }
+
+        .review-card .rating {
+            font-weight: bold;
+            color: #FFD700;
+        }
+
+        .review-card .comment {
+            font-style: italic;
+            margin-top: 10px;
+        }
+
+        .review-card .timestamp {
+            font-size: 0.9em;
+            color: #888;
+        }
+
+        /* Logout Button */
+        .logout-button {
+            background-color: #e74c3c;
             color: white;
             border: none;
             padding: 10px 20px;
@@ -113,13 +363,25 @@
             margin-top: 20px;
         }
 
-        button:hover {
-            background-color: #12876f;
+        .logout-button:hover {
+            background-color: #c0392b;
             transform: translateY(-2px);
         }
 
-        button:active {
+        .logout-button:active {
             transform: translateY(0);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         /* Responsive Design */
@@ -150,111 +412,7 @@
                 font-size: 1.5em;
             }
         }
-
-        .rating-reviews {
-            margin-top: 30px;
-        }
-
-        .rating-reviews h2 {
-            font-size: 1.8em;
-            margin-bottom: 20px;
-        }
-
-        .review-card {
-            background: #ffffff;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            margin-bottom: 15px;
-        }
-
-        .review-card p {
-            margin: 5px 0;
-            color: #555;
-        }
-
-        .review-card .rating {
-            font-weight: bold;
-            color: #FFD700; /* Gold color for ratings */
-        }
-
-        .review-card .comment {
-            font-style: italic;
-            margin-top: 10px;
-        }
-
-        .review-card .timestamp {
-            font-size: 0.9em;
-            color: #888;
-        }
-
-        .badge_icon {
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 5px;
-            font-size: 1.2em;
-            font-weight: bold;
-            color: #fff;
-            transition: transform 0.3s ease;
-        }
-
-        .badge:hover {
-            transform: scale(1.1);
-        }
-
-        .tasks-section {
-            margin-top: 30px;
-        }
-
-        .tasks-section h2 {
-            font-size: 1.8em;
-            margin-bottom: 20px;
-        }
-
-        .task-card {
-            background: #ffffff;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            margin-bottom: 15px;
-        }
-
-        .task-card h3 {
-            font-size: 1.2em;
-            margin-bottom: 10px;
-            color: #2c3e50;
-        }
-
-        .task-card p {
-            margin: 5px 0;
-            color: #555;
-        }
-
-        .task-card .status {
-            font-weight: bold;
-            color: #16a085; /* Green for completed tasks */
-        }
-
-        .task-card .task-partner {
-            font-style: italic;
-            color: #1abc9c; /* Blue for task partner */
-        }
-
-        /* Link Styles */
-        .task-action {
-            color: #16a085;
-            text-decoration: none;
-            font-weight: 500;
-            transition: color 0.3s ease;
-        }
-
-        .task-action:hover {
-            color: #12876f;
-        }
+ 
     </style>
 
 </head>

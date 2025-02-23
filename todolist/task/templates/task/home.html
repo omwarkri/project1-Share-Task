@@ -32,14 +32,17 @@
                         <p><strong>Due Date:</strong> {{ task_data.task.due_date|date:"F j, Y, g:i a" }}</p>
 
 
-                        <a href="{% url 'ai_task_management' task_data.task.id %}" class="suggested-users-button"><img src="/media/symbols/manage ai.png" alt=""></a>
-                        <a href="{% url 'suggested_users' task_data.task.id %}" class="suggested-users-button"><img src="/media/symbols/friend.png" alt=""></a>
-                     
-                        {% if task_data.task.is_overdue %}
+                        <div class="task-mid-buttons">
+                            <a href="{% url 'ai_task_management' task_data.task.id %}" class="suggested-users-button"><img src="/media/symbols/manage ai.png" alt=""></a>
+                            <a href="{% url 'suggested_users' task_data.task.id %}" class="suggested-users-button"><img src="/media/symbols/friend.png" alt=""></a>
+                            {% if task_data.task.is_overdue %}
                             <span class="badge badge-danger">Overdue</span>
                         {% elif task_data.task.is_approaching_due_date %}
                             <span class="badge badge-warning">Approaching Due</span>
                         {% endif %}
+                        </div>
+                     
+                      
                     </div>
                     
                     <div class="task-footer">
@@ -245,6 +248,11 @@ a.suggested-users-button img{
     width: 30px;
 }
 
+
+div.task-mid-buttons{
+    display: flex;
+    gap:8px;
+}
 
 /* Main Content */
 /* Main Content */
@@ -687,11 +695,15 @@ a.suggested-users-button img{
 }
 
 .badge-danger, .badge-warning {
+    margin: 8px;
     padding: 4px 8px;
     border-radius: 12px;
     font-size: 12px;
     font-weight: bold;
     margin-top: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .badge-danger {

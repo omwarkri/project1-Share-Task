@@ -9,6 +9,14 @@
     <title>User Profile</title>
     {% load custom_filters %}
     <style>
+        /* Reset default margins and padding */
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%; /* Ensure full height */
+            overflow: hidden; /* Prevent default body scrolling */
+        }
+
         /* General Styles */
         h1, h2 {
             color: #1abc9c;
@@ -32,10 +40,54 @@
 
         /* Profile Main Container */
         .profile-main {
-            height: 80vh; /* Fixed height */
+            height: 100vh; /* Full viewport height */
             overflow-y: auto; /* Enable vertical scrolling */
             background-color: #f8f9fa; /* Optional: Add a background color */
             padding: 20px; /* Optional: Add padding for better spacing */
+            box-sizing: border-box; /* Include padding in height calculation */
+        }
+
+        /* Custom Scrollbar Styles */
+        .profile-main::-webkit-scrollbar {
+            width: 10px; /* Width of the scrollbar */
+        }
+
+        .profile-main::-webkit-scrollbar-track {
+            background: #f1f1f1; /* Color of the track */
+            border-radius: 10px; /* Rounded corners for the track */
+        }
+
+        .profile-main::-webkit-scrollbar-thumb {
+            background: #1abc9c; /* Color of the scrollbar thumb */
+            border-radius: 10px; /* Rounded corners for the thumb */
+            border: 2px solid #f1f1f1; /* Border around the thumb */
+        }
+
+        .profile-main::-webkit-scrollbar-thumb:hover {
+            background: #16a085; /* Color of the thumb on hover */
+        }
+
+        .left-section::-webkit-scrollbar,
+        .right-section::-webkit-scrollbar {
+            width: 8px; /* Width of the scrollbar */
+        }
+
+        .left-section::-webkit-scrollbar-track,
+        .right-section::-webkit-scrollbar-track {
+            background: #f1f1f1; /* Color of the track */
+            border-radius: 10px; /* Rounded corners for the track */
+        }
+
+        .left-section::-webkit-scrollbar-thumb,
+        .right-section::-webkit-scrollbar-thumb {
+            background: #1abc9c; /* Color of the scrollbar thumb */
+            border-radius: 10px; /* Rounded corners for the thumb */
+            border: 2px solid #f1f1f1; /* Border around the thumb */
+        }
+
+        .left-section::-webkit-scrollbar-thumb:hover,
+        .right-section::-webkit-scrollbar-thumb:hover {
+            background: #16a085; /* Color of the thumb on hover */
         }
 
         /* Flex Container */
@@ -50,6 +102,10 @@
             flex: 1; /* Take up 1 part of the available space */
             max-width: 400px; /* Optional: Limit the width of the left section */
             overflow-y: auto; /* Enable scrolling if content overflows */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+       
         }
 
         /* Right Section */
@@ -61,10 +117,12 @@
         /* Card Styles */
         .card {
             background: white;
-            padding: 20px;
+            padding: 30px; /* Increased padding for better spacing */
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             margin-bottom: 20px; /* Space between cards */
+            width: 100%; /* Ensure card takes full width */
+            text-align: center; /* Center align text */
         }
 
         /* Profile Picture Styles */
@@ -85,30 +143,24 @@
             transform: scale(1.05);
         }
 
-        /* Edit Button Styles */
-        .edit-button {
-            background-color: #1abc9c;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1em;
-            font-weight: 500;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-            margin-top: 20px;
-        }
-
-        .edit-button:hover {
-            background-color: #16a085;
-            transform: translateY(-2px);
-        }
-
-        .edit-button:active {
-            transform: translateY(0);
+        /* User Score */
+        .user-score {
+            font-size: 1.2em;
+            color: #1abc9c;
+            margin: 15px 0;
         }
 
         /* Badges Section */
+        .badges-section {
+            margin: 20px 0;
+        }
+
+        .badges-section h3 {
+            font-size: 1.5em;
+            color: #1abc9c;
+            margin-bottom: 10px;
+        }
+
         .badges {
             display: flex;
             flex-wrap: wrap;
@@ -140,6 +192,52 @@
             height: 100%;
             border-radius: 50%;
             object-fit: cover;
+        }
+
+        /* Edit Button Styles */
+        .edit-button {
+            background-color: #1abc9c;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 500;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            margin-top: 20px;
+        }
+
+        .edit-button:hover {
+            background-color: #16a085;
+            transform: translateY(-2px);
+        }
+
+        .edit-button:active {
+            transform: translateY(0);
+        }
+
+        /* Logout Button */
+        .logout-button {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 500;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            margin-top: 20px;
+        }
+
+        .logout-button:hover {
+            background-color: #c0392b;
+            transform: translateY(-2px);
+        }
+
+        .logout-button:active {
+            transform: translateY(0);
         }
 
         /* Calendar Styles */
@@ -227,27 +325,122 @@
             color: #888;
         }
 
-        /* Logout Button */
-        .logout-button {
-            background-color: #e74c3c;
+        /* Modal Styles */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+            justify-content: center;
+            align-items: center;
+            z-index: 1000; /* Ensure it's on top of other elements */
+        }
+
+        .modal-content {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            position: relative;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        /* Modal Header */
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 1.5em;
+            color: #1abc9c;
+        }
+
+        /* Close Button */
+        .close-button {
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            cursor: pointer;
+            color: #555;
+            transition: color 0.3s ease;
+        }
+
+        .close-button:hover {
+            color: #1abc9c;
+        }
+
+        /* Form Group Styles */
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #1abc9c;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            color: #555;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .form-input:focus {
+            border-color: #1abc9c;
+            box-shadow: 0 0 8px rgba(26, 188, 156, 0.3);
+            outline: none;
+        }
+
+        /* Submit Button */
+        .submit-button {
+            background-color: #1abc9c;
             color: white;
             border: none;
-            padding: 10px 20px;
+            padding: 12px 24px;
             border-radius: 8px;
-            cursor: pointer;
             font-size: 1em;
-            font-weight: 500;
+            font-weight: 600;
+            cursor: pointer;
             transition: background-color 0.3s ease, transform 0.2s ease;
+            width: 100%;
             margin-top: 20px;
         }
 
-        .logout-button:hover {
-            background-color: #c0392b;
+        .submit-button:hover {
+            background-color: #16a085;
             transform: translateY(-2px);
         }
 
-        .logout-button:active {
+        .submit-button:active {
             transform: translateY(0);
+        }
+
+        /* Animation for Modal */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         /* Responsive Design */
@@ -258,6 +451,26 @@
 
             .left-section, .right-section {
                 max-width: 100%; /* Full width on smaller screens */
+            }
+
+            /* Adjust calendar for mobile */
+            .calendar {
+                grid-template-rows: repeat(10, 10px); /* Smaller rows for mobile */
+                gap: 2px; /* Reduce gap between days */
+                padding: 10px; /* Reduce padding */
+            }
+
+            .day {
+                width: 10px; /* Smaller day size */
+                height: 10px; /* Smaller day size */
+            }
+
+            .calendar-header {
+                font-size: 0.8em; /* Smaller font size for header */
+            }
+
+            .calendar-header span {
+                margin: 0 2px; /* Reduce margin between month names */
             }
         }
     </style>
@@ -280,19 +493,22 @@
                 <!-- Edit Button -->
                 <button class="edit-button" onclick="openProfileEditModal()">Edit Profile</button>
 
-                <p>Score: {{ user.score }}</p>
+                <p class="user-score">Score: {{ user.score }}</p>
 
                 <!-- Display Badges -->
-                <div class="badges">
-                    {% if user.user_badges %}
-                        {% for user_badge in user_badges %}
-                            <div class="badge" title="{{ user_badge.badge.name }}">
-                                <img class="badge_icon" src="http://127.0.0.1:8000/media/{{ user_badge.badge.icon }}" alt="{{ user_badge.badge.name }}">
-                            </div>
-                        {% endfor %}
-                    {% else %}
-                        <p>No badges earned yet.</p>
-                    {% endif %}
+                <div class="badges-section">
+                    <h3>Badges</h3>
+                    <div class="badges">
+                        {% if user.user_badges %}
+                            {% for user_badge in user_badges %}
+                                <div class="badge" title="{{ user_badge.badge.name }}">
+                                    <img class="badge_icon" src="http://127.0.0.1:8000/media/{{ user_badge.badge.icon }}" alt="{{ user_badge.badge.name }}">
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <p>No badges earned yet.</p>
+                        {% endif %}
+                    </div>
                 </div>
 
                 <!-- Logout Button -->
@@ -392,6 +608,14 @@
             console.log('Modal closed!'); // Debugging: Log to confirm the function is called
         }
     }
+
+    // Close modal when clicking outside the modal content
+    window.addEventListener('click', function (event) {
+        const modal = document.getElementById('editModal');
+        if (event.target === modal) {
+            closeProfileEditModal();
+        }
+    });
 </script>
 
 {% endblock %}

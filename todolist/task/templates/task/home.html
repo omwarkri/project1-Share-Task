@@ -260,33 +260,27 @@
 
 
 <style>
-
+/* General Styles */
 body {
     background-color: #f8f9fa; /* Light background */
     color: #333; /* Dark text for contrast */
- 
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
 }
 
-/* Button styling */
-/* Button styling */
-/* Center the button */
-
-
-    /* Dashboard Layout */
+/* Dashboard Layout */
 .dashboard-container {
-    overflow: hidden;
-    height: 80vh;
-    background-color: #f5f5f5;
+    display: flex;
+    flex-direction: column;
+    height: 100vh; /* Full viewport height */
+    overflow: hidden; /* Prevent outer scrolling */
+    background-color: #fff;
     position: relative;
 }
 
-.button-container {
-    display: flex;
-    justify-content: center; /* Center horizontally */
-    margin-bottom: 10px; /* Space below the button */
-}
-
-/* Button styling */
+/* Shutter Button */
 .shutter-button {
     background-color: #16a085; /* Green background */
     color: white; /* White text */
@@ -299,44 +293,42 @@ body {
     align-items: center; /* Center the icon and text vertically */
     gap: 8px; /* Space between icon and text */
     position: absolute;
-    top:-10;
-    left:50%;
-    transform: translateX(-50%); /* Adjust for exact centering */
+    top: -60px; /* Adjust position */
+    left: 50%;
+    transform: translateX(-50%); /* Center horizontally */
     transition: top 0.5s ease-out; /* Smooth transition for movement */
+    z-index: 2000; /* Ensure it's above other elements */
 }
 
 .shutter-button:hover {
     background-color: #00a483; /* Darker green on hover */
 }
 
-/* Shutter container styling */
+/* Shutter Container */
 .shutter-container {
     height: 0; /* Start with zero height */
     overflow: hidden; /* Hide overflow content */
     transition: height 0.5s ease-out; /* Smooth transition */
-    background-color: #2c3e50; /* Light background */
+    background-color: #2c3e50; /* Dark background */
     color: white;
     border: 1px solid #ddd; /* Border */
     border-radius: 5px; /* Rounded corners */
     padding: 0 15px; /* Padding */
     margin: 0 auto; /* Center the container */
-    width:  100%; /* Set a width for the container */
+    width: 100%; /* Full width */
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-
-
-/* Class to expand the shutter */
 .shutter-container.expanded {
     height: 200px; /* Set a specific height */
     padding: 15px; /* Add padding when expanded */
 }
 
-.shutter-container.expanded .container{
+.shutter-container.expanded .container {
     overflow-y: auto; /* Enable vertical scrolling */
-
+    width: 100%; /* Full width */
 }
 
 a.suggested-users-button img{
@@ -366,6 +358,7 @@ div.task-mid-buttons{
     display: flex;
     justify-content: space-between;
     padding: 8px;
+    padding-top: 16px;
     align-items: center;
     margin-bottom: 20px;
     background-color: #ffffff; /* White background */
@@ -507,7 +500,8 @@ div.task-mid-buttons{
     gap: 20px;
     padding: 20px;
     overflow-y: auto;
-    max-height: calc(100vh - 100px);
+    max-height: calc(100vh - 10px);
+
 }
 
 .task-card {

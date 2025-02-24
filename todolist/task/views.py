@@ -24,7 +24,8 @@ from django.db.models import Q
 from django.contrib.auth import get_user_model
 from user.models import CustomUser
 from django.db.models import Q
-from chat.views import all_chats
+
+
 User = get_user_model()
 
 from django.contrib.auth import get_user_model
@@ -90,7 +91,6 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from .models import Task
 from .forms import TaskForm, TaskDependenciesForm
-
 @login_required
 def home(request):
     # Get filter and sorting parameters from the request
@@ -132,18 +132,14 @@ def home(request):
         sort_by = 'created_at'  # Default to sorting by creation date if invalid
 
     # Determine the sorting order
-    if order == 'desc':
-        sort_by = f'-{sorting_fields[sort_by]}'  # Add '-' for descending order
-    else:
-        sort_by = sorting_fields[sort_by]  # Ascending order
+    sort_by = f"-{sorting_fields[sort_by]}" if order == 'desc' else sorting_fields[sort_by]
 
     # Apply sorting to the tasks
     tasks = tasks.order_by(sort_by)
 
     # Add suggested users to each task
     tasks_with_suggestions = []
-    now = timezone.now()
-
+    
     for task in tasks:
         # Check if the task is overdue or approaching due date
         is_overdue = task.is_overdue()
@@ -158,15 +154,11 @@ def home(request):
             'is_approaching': is_approaching,
         })
 
-    # Get all chats for the user
-    chats = all_chats(request)
-
     # Prepare context
     context = {
         'tasks_with_suggestions': tasks_with_suggestions,
         'app_name': 'Share Task',
         'form': TaskForm(),
-        'chats': chats,
         'status_filter': status_filter,
         'priority_filter': priority_filter,
         'sort_by': sort_by.lstrip('-'),  # Remove '-' for display purposes
@@ -175,7 +167,8 @@ def home(request):
         'TaskDependenciesForm': TaskDependenciesForm(),
     }
 
-    return render(request, 'task/home.html', context)   
+    return render(request, 'task/home.html', context)
+
 
 
 from django.http import JsonResponse

@@ -143,34 +143,17 @@
     </div>
 </div>
 <!-- Chat Modal -->
+<!-- Chat Modal -->
 <div id="chatModal" class="modal" style="display: none;">
     <div class="modal-content">
         <span class="close-modal" onclick="closeChatModal()">&times;</span>
         <h3>All Chats</h3>
         <div class="chat-list">
-            {% for chat in chats %}
-            <div class="chat-item">
-                {% if chat.task %}
-                    <a href="{% url 'chat' task_id=chat.task.id %}?receiver_id={{ chat.receiver_id }}">
-                        <strong>
-                            {% if chat.sender.id == request.user.id %}
-                                {{ chat.receiver.username }}
-                            {% else %}
-                                {{ chat.sender.username }}
-                            {% endif %}
-                            {{ chat.task.id }}
-                        </strong>: {{ chat.content }}
-                        <small class="chat-time">{{ chat.timestamp }}</small>
-                    </a>
-                {% endif %}
-            </div>
-{% empty %}
-    <p>No chats available.</p>
-{% endfor %}
-
+            <p>Loading chats...</p>
         </div>
     </div>
 </div>
+
 
 <!-- Share Task Modals -->
 {% for task_data in tasks_with_suggestions %}
@@ -302,6 +285,7 @@ body {
     position: absolute;
     top:0;
     left:50%;
+    margin-top: -100px;
     transform: translateX(-50%); /* Adjust for exact centering */
     transition: top 0.5s ease-out; /* Smooth transition for movement */
     z-index:2000;
@@ -369,7 +353,7 @@ div.task-mid-buttons{
     display: flex;
     justify-content: space-between;
     padding: 8px;
-    padding-top: 16px;
+    padding-top: 8px;
     align-items: center;
     margin-bottom: 20px;
     background-color: #ffffff; /* White background */
@@ -510,7 +494,7 @@ div.task-mid-buttons{
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 20px;
     padding: 20px;
-    padding-bottom: 120px;
+    padding-bottom: 300px;
     overflow-y: auto;
     max-height: calc(100vh - 10px);
 
@@ -1065,8 +1049,8 @@ function searchTasks() {
                                 <p><strong>Status:</strong> ${task.status}</p>
                                 <p><strong>Due Date:</strong> ${task.due_date}</p>
 
-                                <a href="/ai-task-management/${task.id}/" class="suggested-users-button">Manage task with AI</a>
-                                <a href="/task/${task.id}/suggested_users/" class="suggested-users-button">Find Task Partner</a>
+                                <a href="/ai-task-management/${task.id}/" class="suggested-users-button"><img src="/media/symbols/manage ai.png" alt=""></a>
+                                <a href="/task/${task.id}/suggested_users/" class="suggested-users-button"><img src="/media/symbols/friend.png" alt=""></a>
 
                                 ${task.is_overdue ? '<span class="badge badge-danger">Overdue</span>' : ''}
                                 ${task.is_approaching_due_date ? '<span class="badge badge-warning">Approaching Due</span>' : ''}
@@ -1187,12 +1171,47 @@ function closeViewDependencyModal() {
 
 
     function openChatModal() {
-        document.getElementById('chatModal').style.display = 'flex';
-    }
+    const chatModal = document.getElementById('chatModal');
+    chatModal.style.display = 'block'; // Show the modal
 
-    function closeChatModal() {
-        document.getElementById('chatModal').style.display = 'none';
-    }
+    // Fetch chats from the backend
+    fetch('/fetch-all-chats/')
+        .then(response => response.json())
+        .then(data => {
+            console.log(data)
+            const chatList = document.querySelector('.chat-list');
+            chatList.innerHTML = ''; // Clear previous chats
+
+            if (data.chats && data.chats.length > 0) {
+                data.chats.forEach(chat => {
+                    const chatItem = document.createElement('div');
+                    chatItem.classList.add('chat-item');
+
+                    if (chat.task_id) {
+                        chatItem.innerHTML = `
+                            <a href="/chat/${chat.task_id}/?receiver_id=${chat.user.id}">
+                                <strong>${chat.user.username} ${chat.task_id}</strong>: ${chat.last_message}
+                                <small class="chat-time">${chat.timestamp}</small>
+                            </a>
+                        `;
+                    }
+
+                    chatList.appendChild(chatItem);
+                });
+            } else {
+                chatList.innerHTML = '<p>No chats available.</p>';
+            }
+        })
+        .catch(error => {
+            console.error("Error fetching chats:", error);
+            document.querySelector('.chat-list').innerHTML = '<p>Error loading chats.</p>';
+        });
+}
+
+function closeChatModal() {
+    document.getElementById('chatModal').style.display = 'none';
+}
+
 
     function openModal(taskId) {
         console.log(

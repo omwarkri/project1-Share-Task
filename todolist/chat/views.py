@@ -71,51 +71,66 @@ from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from .models import Message
 
+from django.db.models import Q
+from django.http import JsonResponse
+
+
+
+
+
+from django.db.models import Q, Max
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+
+from django.db.models import Q, Max
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
 @login_required
-def all_chats(request):
+def fetch_all_chats(request):
+    print("Fetching unique receiver-task pairs...")
+
     user = request.user
 
-    # Fetch messages where the user is either the sender or receiver
-    conversations = Message.objects.filter(
-        Q(sender=user) | Q(receiver=user)
-    ).order_by('-timestamp')
+    # Get the latest message per (receiver, task) pair
+    latest_messages = (
+        Message.objects.filter(Q(sender=user) | Q(receiver=user), task__isnull=False)
+        .values("receiver", "task")  # Get only receiver-task pairs
+        .annotate(latest_timestamp=Max("timestamp"))  # Get the latest timestamp per pair
+    )
 
-    # Dictionary to store grouped conversations
-    grouped_chats = {}
+    # Fetch actual messages using the latest timestamp
+    unique_chats = Message.objects.filter(
+        Q(sender=user) | Q(receiver=user),
+        task__isnull=False,
+        timestamp__in=[entry["latest_timestamp"] for entry in latest_messages],
+    ).select_related("sender", "receiver", "task").order_by("-timestamp")
 
-    for message in conversations:
-        # Ensure the receiver is NOT the logged-in user
-        contact = message.receiver if message.sender == user else message.sender
-        if contact.id == user.id:  # This should never happen, but just in case
-            continue
+    # Format response
+    context = {}
+    
+    for msg in unique_chats:
+        # Ensure we always get the other user in the chat (not the logged-in user)
+        chat_user = msg.receiver if msg.sender == user else msg.sender
+        task_id = msg.task.id
+        chat_key = (chat_user.id, task_id)  # Ensure unique (user, task) pairs
 
-        # Skip messages without a task
-        if not message.task:  # Discard messages with no task
-            continue
+        if chat_key not in context:
+            context[chat_key] = {
+                "user": {
+                    "id": chat_user.id,
+                    "username": chat_user.username,
+                },
+                "task_id": task_id,
+                "last_message": msg.content,
+                "timestamp": msg.timestamp,
+                "attachment_url": msg.attachment.url if msg.attachment else None,
+            }
 
-        task_id = message.task.id  # Task ID is guaranteed to exist here
-        chat_key = (contact.id, task_id)  # Unique key: (User ID, Task ID)
-
-        # Store only the latest message for each unique (contact, task_id) chat
-        if chat_key not in grouped_chats:
-            # Add receiver_id dynamically
-            message.receiver_id = contact.id
-            grouped_chats[chat_key] = message  
-
-    # Get list of latest messages for each chat
-    context = list(grouped_chats.values())
-
-    # Debugging output (optional)
-    for msg in context:
-        print(f"Chat with User {msg.receiver_id}, Task ID: {msg.task.id}")
-
-    return context
-
-
-
-
-
-
+    return JsonResponse({'chats': list(context.values())})
 
 
 

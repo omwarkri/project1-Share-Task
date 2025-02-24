@@ -44,7 +44,7 @@ header {
     position: fixed; /* Fixed position to stay at the top */
     top: 0;
     z-index: 500;
-    padding: 15px 20px;
+    padding: 16px;
 }
 
 .header-div {
@@ -53,7 +53,7 @@ header {
     align-items: center;
     max-width: 1600px;
     margin: 0 auto;
-    margin-left: 100px;
+    margin-left: 24px;
 }
 
 header h1 {
@@ -61,6 +61,11 @@ header h1 {
     font-size: 1.8rem;
     color: #1abc9c;
     font-weight: 700;
+}
+
+header img.site-logo{
+    height: 60px;
+    width: 50px;
 }
 
 header .welcome-message {
@@ -208,14 +213,19 @@ header .welcome-message a:hover {
 
 /* Main Content */
 main {
-    width: calc(100% - 250px); /* Subtract sidebar width */
-    margin-left: 250px; /* Offset for sidebar */
-    padding: 20px;
+    width: 100%;
+    max-width: 1600px;
+    margin: 0 auto;
     background-color: white;
     border-radius: 12px;
-    min-height: calc(100vh - 100px); /* Ensures it fills available space */
-    overflow-y: auto; /* Enables vertical scrolling if content overflows */
-    margin-top: 70px; /* Offset for the fixed header */
+    min-height: calc(100vh - 100px);
+    overflow-y: auto;
+    display: flex
+;
+    margin-top: 90px;
+    padding-left: 250px;
+    position: relative;
+    flex-direction: column;
 }
 
 /* Sidebar Toggle Button */
@@ -244,6 +254,7 @@ main {
     header {
         width: 100%; /* Full width on smaller screens */
         margin-left: 0; /* Remove sidebar offset */
+        padding: 8px;
     }
 
     .sidebar {
@@ -258,7 +269,8 @@ main {
         width: 100%; /* Full width on smaller screens */
         margin-left: 0; /* Remove sidebar offset */
         padding: 16px 8px;
-        margin-top: 0; /* Remove header offset */
+        margin-top: 72px;
+       
     }
 
     .sidebar-toggle {
@@ -284,7 +296,7 @@ main {
     <header >
        <div class="header-div">
         <a href="{% url 'home' %}" style="text-decoration: none;">
-            <h1>Share Task</h1>
+            <img class="site-logo" src="/media/symbols/logo.png" alt="">
         </a>
         <div class="welcome-message">
             <span>Welcome, <a href="{% url 'profile' %}">{{ user.username }}</a>!</span>

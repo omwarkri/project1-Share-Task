@@ -299,7 +299,7 @@ body {
     align-items: center; /* Center the icon and text vertically */
     gap: 8px; /* Space between icon and text */
     position: absolute;
-    top:0;
+    top:-10;
     left:50%;
     transform: translateX(-50%); /* Adjust for exact centering */
     transition: top 0.5s ease-out; /* Smooth transition for movement */
@@ -940,10 +940,10 @@ div.task-mid-buttons{
 
             // Change the button text and arrow based on the container's state
             if (shutterContainer.classList.contains('expanded')) {
-                toggleButton.innerHTML = '▲ Hide Tasks Due Soon';
-                toggleButton.style.top = '0px'; /* Move the button up */
+                toggleButton.innerHTML = '▲';
+                toggleButton.style.top = '0'; /* Move the button up */
             } else {
-                toggleButton.innerHTML = '▼ Show Tasks Due Soon';
+                toggleButton.innerHTML = '▼';
                 toggleButton.style.top = '0'; /* Move the button back to the top */
             }
         });

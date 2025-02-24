@@ -268,7 +268,7 @@
 body {
     background-color: #f8f9fa; /* Light background */
     color: #333; /* Dark text for contrast */
-    
+    height:100%;
  
 }
 
@@ -328,11 +328,12 @@ body {
     margin: 0 auto; /* Center the container */
     width:  100%; /* Set a width for the container */
     display: flex;
-    
+    gap:24px; 
     align-items: center;
     justify-content: center;
     scrollbar-width: thin; /* "auto" or "thin" */
     scrollbar-color: #16a085 #f1f1f1; /* thumb and track color */
+    margin-top:-60px;
 }
 
 
@@ -346,7 +347,7 @@ body {
 .shutter-container.expanded .container {
     overflow-y: auto; /* Enable vertical scrolling */
     max-height: 100%; /* Prevent overflow beyond the parent container */
-    width:80%;
+    width:100%;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -520,7 +521,7 @@ div.task-mid-buttons{
     gap: 20px;
     padding: 20px;
     overflow-y: auto;
-    max-height: calc(100vh - 100px);
+        height:100%;
 }
 
 .task-card {

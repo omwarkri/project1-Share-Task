@@ -3,7 +3,6 @@
 {% block content %}
 
 <!DOCTYPE html>
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -19,12 +18,10 @@
 
         h1 {
             font-size: 2.5em;
-         
         }
 
         h2 {
             font-size: 1.8em;
-         
         }
 
         p {
@@ -33,69 +30,42 @@
             margin: 5px 0;
         }
 
+        /* Profile Main Container */
         .profile-main {
-    height: 100vh; /* Full viewport height */
-    overflow-y: auto; /* Enable vertical scrolling */
-    padding-top:40px;/* Optional: Add padding for better spacing */
-    background-color: #f8f9fa; /* Optional: Add a background color */
-}
+            height: 80vh; /* Fixed height */
+            overflow-y: auto; /* Enable vertical scrolling */
+            background-color: #f8f9fa; /* Optional: Add a background color */
+            padding: 20px; /* Optional: Add padding for better spacing */
+        }
+
+        /* Flex Container */
+        .flex-container {
+            display: flex;
+            gap: 20px; /* Space between left and right sections */
+            height: 100%; /* Take full height of the parent */
+        }
+
+        /* Left Section */
+        .left-section {
+            flex: 1; /* Take up 1 part of the available space */
+            max-width: 400px; /* Optional: Limit the width of the left section */
+            overflow-y: auto; /* Enable scrolling if content overflows */
+        }
+
+        /* Right Section */
+        .right-section {
+            flex: 2; /* Take up 2 parts of the available space */
+            overflow-y: auto; /* Enable scrolling if content overflows */
+        }
 
         /* Card Styles */
         .card {
             background: white;
-            padding: 44px;
-            width: 100%;
-            
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            overflow: auto;
+            padding: 20px;
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px; /* Space between cards */
         }
-
-
-        .calendar {
-    display: grid;
-    grid-template-rows: repeat(10, 15px); /* Arrange days vertically */
-    grid-auto-flow: column; /* Flow days into columns */
-    gap: 3px;
-    margin-top: 20px;
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-}
-
-.calendar-header {
-    grid-column: 1 / -1;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 0.9em;
-    color: #555;
-    margin-bottom: 10px;
-    font-weight: 500;
-}
-
-.calendar-header span {
-    margin: 0 5px;
-}
-
-.day {
-    width: 15px;
-    height: 15px;
-    background-color: #e0e0e0;
-    border-radius: 3px;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-}
-
-.day:hover {
-    transform: scale(1.2);
-    opacity: 0.8;
-}
 
         /* Profile Picture Styles */
         .profile-picture-container {
@@ -138,121 +108,6 @@
             transform: translateY(0);
         }
 
-        /* Modal Styles */
-        /* Modal Styles */
-.modal {
-    display: none; /* Hidden by default */
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
-    justify-content: center;
-    align-items: center;
-    z-index: 3000; /* Ensure it's on top of other elements */
-}
-
-.modal-content {
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    width: 90%;
-    max-width: 500px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    animation: fadeIn 0.3s ease-in-out;
-}
-
-/* Animation for modal */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .modal-header h2 {
-            margin: 0;
-            font-size: 1.5em;
-            color: #1abc9c;
-        }
-
-        .close-button {
-            background: none;
-            border: none;
-            font-size: 1.5em;
-            cursor: pointer;
-            color: #555;
-        }
-
-        .close-button:hover {
-            color: #1abc9c;
-        }
-
-        /* Form Group Styles */
-        .form-group {
-            margin-bottom: 20px;
-            text-align: left;
-        }
-
-        .form-group label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: #1abc9c;
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 1em;
-            color: #555;
-            transition: border-color 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .form-input:focus {
-            border-color: #1abc9c;
-            box-shadow: 0 0 8px rgba(26, 188, 156, 0.3);
-            outline: none;
-        }
-
-        /* Submit Button Styles */
-        .submit-button {
-            background-color: #1abc9c;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            font-size: 1em;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-            width: 100%;
-            margin-top: 20px;
-        }
-
-        .submit-button:hover {
-            background-color: #16a085;
-            transform: translateY(-2px);
-        }
-
-        .submit-button:active {
-            transform: translateY(0);
-        }
-
         /* Badges Section */
         .badges {
             display: flex;
@@ -288,7 +143,32 @@
         }
 
         /* Calendar Styles */
-       
+        .calendar {
+            display: grid;
+            grid-template-rows: repeat(10, 15px); /* Arrange days vertically */
+            grid-auto-flow: column; /* Flow days into columns */
+            gap: 3px;
+            margin-top: 20px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .calendar-header {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9em;
+            color: #555;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        .calendar-header span {
+            margin: 0 5px;
+        }
 
         .day {
             width: 15px;
@@ -370,176 +250,148 @@
             transform: translateY(0);
         }
 
-        /* Animations */
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
         /* Responsive Design */
         @media (max-width: 768px) {
-            .calendar {
-                grid-template-columns: repeat(26, 15px);
+            .flex-container {
+                flex-direction: column; /* Stack sections vertically on smaller screens */
             }
 
-            .calendar-header {
-                font-size: 0.8em;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .calendar {
-                grid-template-columns: repeat(13, 15px);
-            }
-
-            .calendar-header {
-                font-size: 0.7em;
-            }
-
-            h1 {
-                font-size: 2em;
-            }
-
-            h2 {
-                font-size: 1.5em;
+            .left-section, .right-section {
+                max-width: 100%; /* Full width on smaller screens */
             }
         }
     </style>
 </head>
+
 <div class="profile-main">
-    <div class="card">
-        <h1>Welcome, {{ user.username }}!</h1>
-        <div class="profile-picture-container">
-            {% if user.profile_picture %}
-                <img class="profile-picture" src="{{ user.profile_picture.url }}" alt="{{ user.username }}'s Profile Picture">
-            {% else %}
-                <img class="profile-picture" src="https://via.placeholder.com/150" alt="Default Profile Picture">
-            {% endif %}
-        </div>
-
-        <!-- Edit Button -->
-        <button class="edit-button" onclick="openProfileEditModal()">Edit Profile</button>
-
-        <p>Score: {{ user.score }}</p>
-
-        <!-- Display Badges -->
-        <div class="badges">
-            {% if user.user_badges %}
-                {% for user_badge in user_badges %}
-                    <div class="badge" title="{{ user_badge.badge.name }}">
-                        <img class="badge_icon" src="http://127.0.0.1:8000/media/{{ user_badge.badge.icon }}" alt="{{ user_badge.badge.name }}">
-                    </div>
-                {% endfor %}
-            {% else %}
-                <p>No badges earned yet.</p>
-            {% endif %}
-        </div>
-
-        <!-- Modal for Profile Update -->
-        <!-- Modal for Profile Update -->
-<div id="editModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h2>Edit Profile</h2>
-            <button class="close-button" onclick="closeProfileEditModal()">&times;</button>
-        </div>
-        <form method="POST" enctype="multipart/form-data">
-            {% csrf_token %}
-            <div class="form-group">
-                <label for="username">Username:</label>
-                <input type="text" id="username" name="username" value="{{ user.username }}" class="form-input">
-            </div>
-            <div class="form-group">
-                <label for="email">Email:</label>
-                <input type="email" id="email" name="email" value="{{ user.email }}" class="form-input">
-            </div>
-            <div class="form-group">
-                <label for="profile_picture">Profile Picture Update:</label>
-                <input type="file" id="profile_picture" name="profile_picture" class="form-input">
-            </div>
-            <button type="submit" class="submit-button">Update Profile</button>
-        </form>
-    </div>
-</div>
-
-
-        <h2>Your Activity Calendar</h2>
-        <div class="calendar-header">
-            <span>{{ previous_month|date:"F Y" }}</span>
-            <span>{{ current_month|date:"F Y" }}</span>
-        </div>
-        <div class="calendar">
-            
-            
-            {% for date in dates %}
-                <div class="day 
-                    {% if color_map|get_item:date == 'green' %}
-                        green
-                    {% elif color_map|get_item:date == 'dark_green' %}
-                        dark-green
-                    {% elif color_map|get_item:date == 'yellow' %}
-                        yellow
-                    {% endif %}" 
-                    title="{{ date }}">
+    <div class="flex-container">
+        <!-- Left Section: Profile Details -->
+        <div class="left-section">
+            <div class="card">
+                <h1>Welcome, {{ user.username }}!</h1>
+                <div class="profile-picture-container">
+                    {% if user.profile_picture %}
+                        <img class="profile-picture" src="{{ user.profile_picture.url }}" alt="{{ user.username }}'s Profile Picture">
+                    {% else %}
+                        <img class="profile-picture" src="https://via.placeholder.com/150" alt="Default Profile Picture">
+                    {% endif %}
                 </div>
-            {% endfor %}
+
+                <!-- Edit Button -->
+                <button class="edit-button" onclick="openProfileEditModal()">Edit Profile</button>
+
+                <p>Score: {{ user.score }}</p>
+
+                <!-- Display Badges -->
+                <div class="badges">
+                    {% if user.user_badges %}
+                        {% for user_badge in user_badges %}
+                            <div class="badge" title="{{ user_badge.badge.name }}">
+                                <img class="badge_icon" src="http://127.0.0.1:8000/media/{{ user_badge.badge.icon }}" alt="{{ user_badge.badge.name }}">
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p>No badges earned yet.</p>
+                    {% endif %}
+                </div>
+
+                <!-- Logout Button -->
+                <form method="post" action="{% url 'logout' %}" style="display: inline;">
+                    {% csrf_token %}
+                    <button class="logout-button" type="submit">Logout</button>
+                </form>
+            </div>
         </div>
 
-        <!-- Rating and Reviews Section -->
-        <div class="rating-reviews">
-            <h2>Your Ratings and Reviews</h2>
-            {% if feedbacks %}
-                {% for feedback in feedbacks %}
-                    <div class="review-card">
-                        <p class="rating">Rating: {{ feedback.rating }}/5</p>
-                        <p class="comment">Comment: {{ feedback.comment }}</p>
-                        <p class="timestamp">Date: {{ feedback.created_at|date:"F j, Y" }}</p>
-                    </div>
-                {% endfor %}
-            {% else %}
-                <p>No ratings or reviews yet.</p>
-            {% endif %}
+        <!-- Right Section: Activity and Reviews -->
+        <div class="right-section">
+            <div class="card">
+                <h2>Your Activity Calendar</h2>
+                <div class="calendar-header">
+                    <span>{{ previous_month|date:"F Y" }}</span>
+                    <span>{{ current_month|date:"F Y" }}</span>
+                </div>
+                <div class="calendar">
+                    {% for date in dates %}
+                        <div class="day 
+                            {% if color_map|get_item:date == 'green' %}
+                                green
+                            {% elif color_map|get_item:date == 'dark_green' %}
+                                dark-green
+                            {% elif color_map|get_item:date == 'yellow' %}
+                                yellow
+                            {% endif %}" 
+                            title="{{ date }}">
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Rating and Reviews Section -->
+                <div class="rating-reviews">
+                    <h2>Your Ratings and Reviews</h2>
+                    {% if feedbacks %}
+                        {% for feedback in feedbacks %}
+                            <div class="review-card">
+                                <p class="rating">Rating: {{ feedback.rating }}/5</p>
+                                <p class="comment">Comment: {{ feedback.comment }}</p>
+                                <p class="timestamp">Date: {{ feedback.created_at|date:"F j, Y" }}</p>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p>No ratings or reviews yet.</p>
+                    {% endif %}
+                </div>
+            </div>
         </div>
-
-
-        <!-- Logout Button -->
-        <form method="post" action="{% url 'logout' %}" style="display: inline;">
-            {% csrf_token %}
-            <button class="logout-button" type="submit">Logout</button>
-        </form>
     </div>
 
-    <script>    // Function to open the modal
-        function openProfileEditModal() {
-            const modal = document.getElementById('editModal');
-            if (modal) {
-                modal.style.display = 'flex'; // Ensure the modal is visible
-                console.log('Modal opened!'); // Debugging: Log to confirm the function is called
-            } else {
-                console.error('Modal not found!');
-            }
-        }
-
-        // Function to close the modal
-        function closeProfileEditModal() {
-            console.log("closiing model")
-            const modal = document.getElementById('editModal');
-            if (modal) {
-                console.log("get models")
-                modal.style.display = 'none'; // Hide the modal
-                console.log('Modal closed!'); // Debugging: Log to confirm the function is called
-            }
-        }
-
-        // Close modal when clicking outside the modal content
-    
-    </script>
+    <!-- Modal for Profile Update -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Edit Profile</h2>
+                <button class="close-button" onclick="closeProfileEditModal()">&times;</button>
+            </div>
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" name="username" value="{{ user.username }}" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" value="{{ user.email }}" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label for="profile_picture">Profile Picture Update:</label>
+                    <input type="file" id="profile_picture" name="profile_picture" class="form-input">
+                </div>
+                <button type="submit" class="submit-button">Update Profile</button>
+            </form>
+        </div>
+    </div>
 </div>
+
+<script>
+    // Function to open the modal
+    function openProfileEditModal() {
+        const modal = document.getElementById('editModal');
+        if (modal) {
+            modal.style.display = 'flex'; // Ensure the modal is visible
+            console.log('Modal opened!'); // Debugging: Log to confirm the function is called
+        } else {
+            console.error('Modal not found!');
+        }
+    }
+
+    // Function to close the modal
+    function closeProfileEditModal() {
+        const modal = document.getElementById('editModal');
+        if (modal) {
+            modal.style.display = 'none'; // Hide the modal
+            console.log('Modal closed!'); // Debugging: Log to confirm the function is called
+        }
+    }
+</script>
 
 {% endblock %}

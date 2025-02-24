@@ -323,7 +323,34 @@ body {
 
 .shutter-container.expanded .container{
     overflow-y: auto; /* Enable vertical scrolling */
+    height:100%;
+    width:80%;
+}
 
+.shutter-container.expanded .container {
+    overflow-y: auto; /* Enable vertical scrolling */
+    height: 100%; /* Take full height of the parent */
+    width: 80%; /* Set width to 80% of the parent */
+    padding-right: 10px; /* Add padding to prevent content from overlapping the scrollbar */
+}
+
+/* Custom Scrollbar Styles */
+.shutter-container.expanded .container::-webkit-scrollbar {
+    width: 8px; /* Reduce scrollbar width */
+}
+
+.shutter-container.expanded .container::-webkit-scrollbar-track {
+    background: #f1f1f1; /* Light gray track */
+    border-radius: 4px; /* Rounded corners */
+}
+
+.shutter-container.expanded .container::-webkit-scrollbar-thumb {
+    background: #888; /* Dark gray thumb */
+    border-radius: 4px; /* Rounded corners */
+}
+
+.shutter-container.expanded .container::-webkit-scrollbar-thumb:hover {
+    background: #555; /* Darker gray on hover */
 }
 
 a.suggested-users-button img{
@@ -346,6 +373,7 @@ div.task-mid-buttons{
     background-color: #fff;
     overflow: hidden;
     transition: margin-left 0.3s ease-in-out;
+    height: 100%;
 }
 
 /* Header */
@@ -494,11 +522,11 @@ div.task-mid-buttons{
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 20px;
     padding: 20px;
-    padding-bottom: 300px;
+    margin-bottom: 300px;  /* Use margin instead */
     overflow-y: auto;
-    max-height: calc(100vh - 10px);
-
+    max-height: 100%; /* Ensures it doesn't exceed parent's height */
 }
+
 
 .task-card {
     background-color: #ffffff; /* White background */
@@ -932,6 +960,7 @@ div.task-mid-buttons{
             if (shutterContainer.classList.contains('expanded')) {
                 toggleButton.innerHTML = '▲';
                 toggleButton.style.top = '0'; /* Move the button up */
+                shutterContent.scrollTo({ top: 0, behavior: 'smooth' }); // Smooth scroll to top
             } else {
                 toggleButton.innerHTML = '▼';
                 toggleButton.style.top = '0'; /* Move the button back to the top */

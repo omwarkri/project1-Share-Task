@@ -284,7 +284,7 @@ body {
     height: 90vh;
     background-color: #fff;
     position: relative;
-    padding-top:20px;
+    /* padding-top:20px; */
 }
 
 .button-container {
@@ -400,7 +400,7 @@ div.task-mid-buttons{
 .main-content {
     flex: 1;
     padding: 20px;
-    padding-top: 30px;
+
     padding-bottom: 60px;
     background-color: #fff;
     overflow: hidden;
@@ -990,10 +990,10 @@ div.task-mid-buttons{
 
             // Change the button text and arrow based on the container's state
             if (shutterContainer.classList.contains('expanded')) {
-                toggleButton.innerHTML = '▲ Hide Tasks Due Soon';
-                toggleButton.style.top = '-40px'; /* Move the button up */
+                toggleButton.innerHTML = '▲';
+                toggleButton.style.top = '0'; /* Move the button up */
             } else {
-                toggleButton.innerHTML = '▼ Show Tasks Due Soon';
+                toggleButton.innerHTML = '▼';
                 toggleButton.style.top = '0'; /* Move the button back to the top */
             }
         });

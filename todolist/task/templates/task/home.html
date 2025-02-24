@@ -284,7 +284,7 @@ body {
     height: 90vh;
     background-color: #fff;
     position: relative;
-    /* padding-top:20px; */
+    padding-top:24px;
 }
 
 .button-container {
@@ -1109,8 +1109,8 @@ function searchTasks() {
                                 <p><strong>Status:</strong> ${task.status}</p>
                                 <p><strong>Due Date:</strong> ${task.due_date}</p>
 
-                                <a href="/ai-task-management/${task.id}/" class="suggested-users-button">Manage task with AI</a>
-                                <a href="/task/${task.id}/suggested_users/" class="suggested-users-button">Find Task Partner</a>
+                                <a href="/ai-task-management/${task.id}/" class="suggested-users-button"><img src="/media/symbols/manage ai.png" alt=""></a>
+                                <a href="/task/${task.id}/suggested_users/" class="suggested-users-button"><img src="/media/symbols/friend.png" alt=""></a>
 
                                 ${task.is_overdue ? '<span class="badge badge-danger">Overdue</span>' : ''}
                                 ${task.is_approaching_due_date ? '<span class="badge badge-warning">Approaching Due</span>' : ''}

@@ -11,7 +11,8 @@
 <!-- Container for the "Tasks Due Soon" list -->
 <div id="shutter-container" class="shutter-container">
     <div class="container">
-        <h2>Overdue Tasks</h2>
+        <div>
+            <h2>Overdue Tasks</h2>
     <ul>
         {% for task_data in tasks_with_suggestions %}
             {% if task_data.is_overdue %}
@@ -20,17 +21,20 @@
             </li>
             {% endif %}
         {% endfor %}
-    </ul>  
-    <h2>Tasks Due Soon</h2>
-    <ul>
-        {% for task_data in tasks_with_suggestions %}
-            {% if task_data.is_approaching and not task_data.is_overdue %}
-            <li>
-                {{ task_data.task.title }} - Due: {{ task_data.task.due_date }}
-            </li>
-            {% endif %}
-        {% endfor %}
-    </ul>
+    </ul> 
+        </div> 
+        <div>
+            <h2>Tasks Due Soon</h2>
+            <ul>
+                {% for task_data in tasks_with_suggestions %}
+                    {% if task_data.is_approaching and not task_data.is_overdue %}
+                    <li>
+                        {{ task_data.task.title }} - Due: {{ task_data.task.due_date }}
+                    </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
     </div>
 </div>
 
@@ -264,6 +268,7 @@
 body {
     background-color: #f8f9fa; /* Light background */
     color: #333; /* Dark text for contrast */
+    
  
 }
 
@@ -301,6 +306,9 @@ body {
     position: absolute;
     top:0;
     left:50%;
+    transform: translateX(-50%); /* Adjust for exact centering */
+    transition: top 0.5s ease-out; /* Smooth transition for movement */
+    z-index:1000;
 }
 
 .shutter-button:hover {
@@ -320,21 +328,28 @@ body {
     margin: 0 auto; /* Center the container */
     width:  100%; /* Set a width for the container */
     display: flex;
+    
     align-items: center;
     justify-content: center;
+    scrollbar-width: thin; /* "auto" or "thin" */
+    scrollbar-color: #16a085 #f1f1f1; /* thumb and track color */
 }
-
 
 
 /* Class to expand the shutter */
 .shutter-container.expanded {
     height: 200px; /* Set a specific height */
     padding: 15px; /* Add padding when expanded */
+    overflow: hidden; /* Ensure content does not overflow */
 }
 
-.shutter-container.expanded .container{
+.shutter-container.expanded .container {
     overflow-y: auto; /* Enable vertical scrolling */
-
+    max-height: 100%; /* Prevent overflow beyond the parent container */
+    width:80%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 a.suggested-users-button img{
@@ -911,6 +926,10 @@ div.task-mid-buttons{
         grid-template-columns: 1fr; /* Single column layout on mobile */
     }
 
+    .shutter-container.expanded .container{
+        flex-direction: column;
+    }
+
     .floating-add-task-button {
         bottom: 24px;
         right: 24px;
@@ -929,20 +948,22 @@ div.task-mid-buttons{
 
     // Get the button and container elements
     const toggleButton = document.getElementById('toggle-shutter-button');
-    const shutterContainer = document.getElementById('shutter-container');
+        const shutterContainer = document.getElementById('shutter-container');
 
-    // Add a click event listener to the button
-    toggleButton.addEventListener('click', function () {
-        // Toggle the 'expanded' class on the container
-        shutterContainer.classList.toggle('expanded');
+        // Add a click event listener to the button
+        toggleButton.addEventListener('click', function () {
+            // Toggle the 'expanded' class on the container
+            shutterContainer.classList.toggle('expanded');
 
-        // Change the button text and arrow based on the container's state
-        if (shutterContainer.classList.contains('expanded')) {
-            toggleButton.innerHTML = '▲';
-        } else {
-            toggleButton.innerHTML = '▼';
-        }
-    });
+            // Change the button text and arrow based on the container's state
+            if (shutterContainer.classList.contains('expanded')) {
+                toggleButton.innerHTML = '▲ Hide Tasks Due Soon';
+                toggleButton.style.top = '-40px'; /* Move the button up */
+            } else {
+                toggleButton.innerHTML = '▼ Show Tasks Due Soon';
+                toggleButton.style.top = '0'; /* Move the button back to the top */
+            }
+        });
 
 
 

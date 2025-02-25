@@ -1,111 +1,85 @@
+
+
 {% extends 'task/base.html' %}
 
 {% block content %}
 <div class="dashboard-container">
+    <!-- Button to toggle the shutter -->
+    <button id="toggle-shutter-button" class="shutter-button">▼</button>
 
-
-
-<!-- Button to toggle the shutter -->
-<button id="toggle-shutter-button" class="shutter-button">▼ </button>
-
-<!-- Container for the "Tasks Due Soon" list -->
-<div id="shutter-container" class="shutter-container">
-    <div class="container">
-        <h2>Overdue Tasks</h2>
-    <ul>
-        {% for task_data in tasks_with_suggestions %}
-            {% if task_data.is_overdue %}
-            <li>
-                {{ task_data.task.title }} - Due: {{ task_data.task.due_date }}
-            </li>
-            {% endif %}
-        {% endfor %}
-    </ul>  
-    <h2>Tasks Due Soon</h2>
-    <ul>
-        {% for task_data in tasks_with_suggestions %}
-            {% if task_data.is_approaching and not task_data.is_overdue %}
-            <li>
-                {{ task_data.task.title }} - Due: {{ task_data.task.due_date }}
-            </li>
-            {% endif %}
-        {% endfor %}
-    </ul>
+    <!-- Container for the "Tasks Due Soon" list -->
+    <div id="shutter-container" class="shutter-container">
+        <div class="container">
+            <h2>⏰ Overdue Tasks</h2>
+            <ul>
+                {% for task_data in tasks_with_suggestions %}
+                    {% if task_data.is_overdue %}
+                    <li>
+                        📌 {{ task_data.task.title }} - Due: {{ task_data.task.due_date }}
+                    </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>  
+            <h2>🔔 Tasks Due Soon</h2>
+            <ul>
+                {% for task_data in tasks_with_suggestions %}
+                    {% if task_data.is_approaching and not task_data.is_overdue %}
+                    <li>
+                        📌 {{ task_data.task.title }} - Due: {{ task_data.task.due_date }}
+                    </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
     </div>
-</div>
 
     <!-- Main Content -->
     <div class="main-content">
         <!-- Header -->
         <div class="header">
-            <h1>All Tasks</h1>
+            <h1>📋 All Tasks</h1>
             <!-- Floating Add Task Button -->
-            <button class="floating-add-task-button wave" onclick="openAddTaskModal()">+</button>
+            <button class="floating-add-task-button wave" onclick="openAddTaskModal()">➕</button>
             <div class="header-actions">
-                <input type="text" id="search-bar" class="search-bar" placeholder="Search tasks..." oninput="searchTasks()" />
-                <button class="filter-button" onclick="openFilterModal()">Filters</button>
-                <button class="view-chats-button" onclick="openChatModal()">View Chats</button>
+                <input type="text" id="search-bar" class="search-bar" placeholder="🔍 Search tasks..." oninput="searchTasks()" />
+                <button class="filter-button" onclick="openFilterModal()">⚙️ Filters</button>
+                <button class="view-chats-button" onclick="openChatModal()">💬 Chats</button>
             </div>
         </div>
 
         <!-- Task List -->
-        <div class="task-grid " id="task-list">
+        <div class="task-grid" id="task-list">
             {% for task_data in tasks_with_suggestions %}
-
                 <div class="task-card task-item" data-status="{{ task_data.task.status }}" data-priority="{{ task_data.task.priority }}">
                     <div class="task-header">
-                        <strong class="task-title">{{ task_data.task.title }}</strong>
-                        <span class="task-priority {{ task_data.task.priority }}">{{ task_data.task.get_priority_display }}</span>
+                        <strong class="task-title">📌 {{ task_data.task.title }}</strong>
+                        <span class="task-priority {{ task_data.task.priority }}">
+                            {% if task_data.task.priority == 'high' %}🚨
+                            {% elif task_data.task.priority == 'medium' %}⚠️
+                            {% else %}✅
+                            {% endif %}
+                            {{ task_data.task.get_priority_display }}
+                        </span>
                     </div>
                     <div class="task-body">
-                        <p><strong>Status:</strong> {{ task_data.task.get_status_display }}</p>
-                        <p><strong>Due Date:</strong> {{ task_data.task.due_date|date:"F j, Y, g:i a" }}</p>
-
+                        <p><strong>📊 Status:</strong> {{ task_data.task.get_status_display }}</p>
+                        <p><strong>📅 Due Date:</strong> {{ task_data.task.due_date|date:"F j, Y, g:i a" }}</p>
 
                         <div class="task-mid-buttons">
-                            <a href="{% url 'ai_task_management' task_data.task.id %}" class="suggested-users-button"><img src="/media/symbols/manage ai.png" alt=""></a>
-                            <a href="{% url 'suggested_users' task_data.task.id %}" class="suggested-users-button"><img src="/media/symbols/friend.png" alt=""></a>
+                            <a href="{% url 'ai_task_management' task_data.task.id %}" class="suggested-users-button">🤖</a>
+                            <a href="{% url 'suggested_users' task_data.task.id %}" class="suggested-users-button">👥</a>
                             {% if task_data.task.is_overdue %}
-                            <span class="badge badge-danger">Overdue</span>
-                        {% elif task_data.task.is_approaching_due_date %}
-                            <span class="badge badge-warning">Approaching Due</span>
-                        {% endif %}
+                            <span class="badge badge-danger">⏳ Overdue</span>
+                            {% elif task_data.task.is_approaching_due_date %}
+                            <span class="badge badge-warning">⏰ Approaching Due</span>
+                            {% endif %}
                         </div>
-                     
-                      
                     </div>
                     
                     <div class="task-footer">
-                        <button class="task-action" onclick="openViewDependencyModal({{ task_data.task.id }})">Dependencies</button>
-            
-                        
-                        <button class="task-action" onclick="openModal({{ task_data.task.id }})">Complete</button>
-                        <a href="{% url 'task_detail' task_data.task.id %}" class="task-action">Details</a>
-                    </div>
-                </div>  
-                <div id="viewTaskDependencies"  style="display: none;">
-                    <div class="modal-content">
-                        <span class="close-modal" onclick="closeViewDependencyModal()">&times;</span>
-                        <h3>Task Dependencies</h3>
-                        
-                        <!-- Display Current Dependencies -->
-                        <div class="task-dependencies">
-                            <h4>Current Dependencies</h4>
-                            <ul id="dependency-list" class="dependency-list">
-                                <!-- Dependencies will be dynamically populated here -->
-                                <li class="no-dependencies">No dependencies set for this task.</li>
-                            </ul>
-                        </div>
-
-                        <!-- Form to Update Dependencies -->
-                        <form method="POST" id="update-dependencies-form" class="dependency-form">
-                            {% csrf_token %}
-                            <h4>Update Dependencies</h4>
-                            <select id="dependency-select" name="dependencies" multiple class="dependency-select">
-                                <!-- Options will be dynamically populated here -->
-                            </select>
-                            <button type="submit" class="submit-button">Update Dependencies</button>
-                        </form>
+                        <button class="task-action" onclick="openViewDependencyModal({{ task_data.task.id }})">🔗 Dependencies</button>
+                        <button class="task-action" onclick="openModal({{ task_data.task.id }})">✔️ Complete</button>
+                        <a href="{% url 'task_detail' task_data.task.id %}" class="task-action">📄 Details</a>
                     </div>
                 </div>  
             {% endfor %}
@@ -113,18 +87,12 @@
     </div>
 </div>
 
-
-<!-- View Task Dependencies Modal -->
-
-
-
-<!-- Modals (Add Task, Filter, Chat, etc.) -->
-<!-- Add Task Modal -->
+<!-- Modals -->
 <!-- Add Task Modal -->
 <div id="addTaskModal" class="modal" style="display: none;">
     <div class="modal-content">
         <span class="close-modal" onclick="closeAddTaskModal()">&times;</span>
-        <h3>Add a New Task</h3>
+        <h3>➕ Add a New Task</h3>
         <form method="post" action="{% url 'add_task' %}">
             {% csrf_token %}
             {% for field in form %}
@@ -138,54 +106,116 @@
                     {% endif %}
                 </div>
             {% endfor %}
-            <button type="submit" class="submit-button">Add Task</button>
+            <button type="submit" class="submit-button">➕ Add Task</button>
         </form>
     </div>
 </div>
-<!-- Chat Modal -->
+
 <!-- Chat Modal -->
 <div id="chatModal" class="modal" style="display: none;">
     <div class="modal-content">
         <span class="close-modal" onclick="closeChatModal()">&times;</span>
-        <h3>All Chats</h3>
+        <h3>💬 All Chats</h3>
         <div class="chat-list">
             <p>Loading chats...</p>
         </div>
     </div>
 </div>
 
+<!-- Filter Modal -->
+<div id="filterModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeFilterModal()">&times;</span>
+        <h3>⚙️ Filters</h3>
+        <div class="filter-group">
+            <h4>🔀 Sort By:</h4>
+            <div class="filter-options">
+                <select id="sort-by" class="modern-select" onchange="applySorting()">
+                    <option value="title">📝 Title</option>
+                    <option value="due_date">📅 Due Date</option>
+                    <option value="priority">🚦 Priority</option>
+                    <option value="status">📊 Status</option>
+                </select>
+                <select id="sort-order" class="modern-select" onchange="applySorting()">
+                    <option value="asc">⬆️ Ascending</option>
+                    <option value="desc">⬇️ Descending</option>
+                </select>
+            </div>
+        </div>
+        <div class="filter-group">
+            <h4>📊 Filter by Status:</h4>
+            <div class="filter-buttons">
+                <button onclick="filterTasks('all', 'all')" class="modern-button">🌐 All</button>
+                <button onclick="filterTasks('pending', 'all')" class="modern-button">⏳ Pending</button>
+                <button onclick="filterTasks('in_progress', 'all')" class="modern-button">🚧 In Progress</button>
+                <button onclick="filterTasks('completed', 'all')" class="modern-button">✅ Completed</button>
+                <button onclick="filterTasks('archived', 'all')" class="modern-button">🗄️ Archived</button>  
+            </div>
+        </div>
+        <div class="filter-group">
+            <h4>🚦 Filter by Priority:</h4>
+            <div class="filter-buttons">
+                <button onclick="filterTasks('all', 'all')" class="modern-button">🌐 All</button>
+                <button onclick="filterTasks('all', 'low')" class="modern-button">✅ Low</button>
+                <button onclick="filterTasks('all', 'medium')" class="modern-button">⚠️ Medium</button>
+                <button onclick="filterTasks('all', 'high')" class="modern-button">🚨 High</button>
+                <button onclick="filterTasks('all', 'critical')" class="modern-button">🔥 Critical</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- View Task Dependencies Modal -->
+<div id="viewTaskDependencies" style="display: none;">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeViewDependencyModal()">&times;</span>
+        <h3>🔗 Task Dependencies</h3>
+        <div class="task-dependencies">
+            <h4>📌 Current Dependencies</h4>
+            <ul id="dependency-list" class="dependency-list">
+                <li class="no-dependencies">No dependencies set for this task.</li>
+            </ul>
+        </div>
+        <form method="POST" id="update-dependencies-form" class="dependency-form">
+            {% csrf_token %}
+            <h4>🔄 Update Dependencies</h4>
+            <select id="dependency-select" name="dependencies" multiple class="dependency-select"></select>
+            <button type="submit" class="submit-button">🔄 Update Dependencies</button>
+        </form>
+    </div>
+</div>
 
 <!-- Share Task Modals -->
 {% for task_data in tasks_with_suggestions %}
 <div id="shareTaskModal-{{ task_data.task.id }}" class="modal" style="display: none;">
     <div class="modal-content">
         <span class="close-modal" onclick="closeModal({{ task_data.task.id }})">&times;</span>
-        <h3>Share Your Task Completion</h3>
+        <h3>📤 Share Your Task Completion</h3>
         <p>Would you like to share how you completed this task?</p>
         <form method="post" enctype="multipart/form-data" action="{% url 'complete_task' task_data.task.id %}">
             {% csrf_token %}
-            <label for="completion_details">How did you complete the task?</label>
+            <label for="completion_details">📝 How did you complete the task?</label>
             <textarea name="completion_details" id="completion_details" rows="4"></textarea>
-            <label for="uploaded_image">Upload Image (optional):</label>
+            <label for="uploaded_image">🖼️ Upload Image (optional):</label>
             <input type="file" name="uploaded_image" id="uploaded_image" accept="image/*">
-            <label for="uploaded_file">Upload Video/File (optional):</label>
+            <label for="uploaded_file">📁 Upload Video/File (optional):</label>
             <input type="file" name="uploaded_file" id="uploaded_file" accept="video/*,.pdf,.doc,.docx">
             {% if task_data.task.task_partner %}
             <div class="partner-feedback">
-                <h4>Rate and Comment on the Task Partner</h4>
-                <label for="partner_rating">Rating (1-5):</label>
+                <h4>⭐ Rate and Comment on the Task Partner</h4>
+                <label for="partner_rating">🌟 Rating (1-5):</label>
                 <input type="number" name="partner_rating" id="partner_rating" min="1" max="5" required>
-                <label for="partner_comment">Comment:</label>
+                <label for="partner_comment">💬 Comment:</label>
                 <textarea name="partner_comment" id="partner_comment" rows="3"></textarea>
             </div>
             {% endif %}
             <div class="skip-sharing">
                 <label>
                     <input type="checkbox" name="skip_sharing" id="skip_sharing">
-                    I do not want to share my completion details.
+                    🙈 I do not want to share my completion details.
                 </label>
             </div>
-            <button type="submit" class="submit-button">Submit</button>
+            <button type="submit" class="submit-button">📤 Submit</button>
         </form>
     </div>
 </div>
@@ -379,6 +409,7 @@ div.task-mid-buttons{
 /* Header */
 .header {
     display: flex
+    
 ;
     justify-content: space-between;
     padding: 8px;
@@ -941,20 +972,18 @@ div.task-mid-buttons{
     }
 }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
 
 <script>
 
 
-    //shutter animation
-    // Get the button and container elements
-
-    // Get the button and container elements
-    const toggleButton = document.getElementById('toggle-shutter-button');
+        const toggleButton = document.getElementById('toggle-shutter-button');
         const shutterContainer = document.getElementById('shutter-container');
 
         // Add a click event listener to the button
         toggleButton.addEventListener('click', function () {
             // Toggle the 'expanded' class on the container
+            console.log("opening")
             shutterContainer.classList.toggle('expanded');
 
             // Change the button text and arrow based on the container's state
@@ -967,6 +996,23 @@ div.task-mid-buttons{
                 toggleButton.style.top = '0'; /* Move the button back to the top */
             }
         });
+
+function celebrateCompletion() {
+    confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 }
+    });
+}
+
+document.querySelector('.complete-task').addEventListener('click', celebrateCompletion);
+
+
+    //shutter animation
+    // Get the button and container elements
+
+    // Get the button and container elements
+    
 
 
 

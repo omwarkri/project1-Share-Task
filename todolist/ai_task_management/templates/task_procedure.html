@@ -1,14 +1,12 @@
 <h3 class="Header">
   Task Procedure:
-  
-</h3>
-{% if procedure %}
-<p id="procedure-content" class="{% if not procedure %}hidden{% endif %}">{{ procedure|default:"" }}</p>
-  {% else %}
+  {% if not procedure %}
     <button id="generate-ai" onclick="generateAIProcedure()">Generate AI Procedure</button>
-  
   {% endif %}
+</h3>
 
+<!-- Always render the procedure-content element, even if hidden -->
+<p id="procedure-content" class="{% if not procedure %}hidden{% endif %}">{{ procedure|default:"" }}</p>
 
 <style>
   /* General Styles */
@@ -22,7 +20,7 @@
     justify-content: space-between;
   }
 
-  #toggle-procedure, #generate-ai {
+  #generate-ai {
     background: #1abc9c;
     color: white;
     border: none;
@@ -33,12 +31,12 @@
     transition: background-color 0.3s ease, transform 0.2s ease;
   }
 
-  #toggle-procedure:hover, #generate-ai:hover {
+  #generate-ai:hover {
     background: #16a085;
     transform: translateY(-2px);
   }
 
-  #toggle-procedure:active, #generate-ai:active {
+  #generate-ai:active {
     transform: translateY(0);
   }
 
@@ -79,7 +77,7 @@
       align-items: flex-start;
     }
 
-    #toggle-procedure, #generate-ai {
+    #generate-ai {
       margin-top: 8px;
       width: 100%;
       text-align: center;
@@ -93,14 +91,14 @@
 </style>
 
 <script>
-  function toggleProcedure() {
-    const content = document.getElementById("procedure-content");
-    content.classList.toggle("hidden");
-  }
-
   function generateAIProcedure() {
     const button = document.getElementById("generate-ai");
     const content = document.getElementById("procedure-content");
+
+    if (!content) {
+      console.error("Procedure content element not found.");
+      return;
+    }
 
     // Disable button & show loading text
     button.disabled = true;
@@ -111,12 +109,13 @@
     fetch(`/generate-ai-procedure/{{ task.id }}/`)
       .then(response => response.json())
       .then(data => {
-        content.innerText = data.procedure || "No procedure generated.";
-        const procedureContent = document.getElementById('procedure-content');
-        if (procedureContent) {
-          formatBoldText(procedureContent);
-          addLineBreaksAfterPeriods(procedureContent);
-          formatProcedureContent(procedureContent);
+        if (data.procedure) {
+          content.innerText = data.procedure;
+          formatBoldText(content);
+          addLineBreaksAfterPeriods(content);
+          formatProcedureContent(content);
+        } else {
+          content.innerText = "No procedure generated.";
         }
       })
       .catch(error => {
@@ -128,5 +127,20 @@
         button.disabled = false;
         button.innerText = "Generate AI Procedure";
       });
+  }
+
+  function formatBoldText(element) {
+    // Example: Wrap text between ** with <strong> tags
+    element.innerHTML = element.innerHTML.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  }
+
+  function addLineBreaksAfterPeriods(element) {
+    // Example: Add line breaks after periods
+    element.innerHTML = element.innerHTML.replace(/\. /g, '.<br>');
+  }
+
+  function formatProcedureContent(element) {
+    // Example: Format numbered lists
+    element.innerHTML = element.innerHTML.replace(/(\d+\.\s)/g, '<br>$1');
   }
 </script>

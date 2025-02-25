@@ -32,6 +32,7 @@ header {
   animation: fadeIn 1.5s ease-in-out;
   position: relative;
   overflow: hidden;
+
 }
 
 header h1 {
@@ -58,7 +59,7 @@ header::after {
   background: rgba(255, 255, 255, 0.1);
   border-radius: 50%;
   z-index: 1;
-
+  pointer-events: none; /* Prevent blocking clicks */
 }
 
 /* header::before {
@@ -69,6 +70,7 @@ header::after {
 header::after {
   top: 0px;
   right: -100px;
+  
 }
 
 /* Small Bubbles for Header */
@@ -120,7 +122,8 @@ header .bubbles .bubble:nth-child(3) {
   transition: background 0.3s ease, transform 0.3s ease;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   animation: fadeIn 2s ease-in-out;
-  z-index:1000
+  z-index:10;
+
 }
 
 .cta-button:hover {

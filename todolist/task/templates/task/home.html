@@ -1157,49 +1157,32 @@ function searchTasks() {
                 data.tasks.forEach(task => {
                     taskList.innerHTML += `
                         <div class="task-card task-item" data-status="${task.status}" data-priority="${task.priority}">
-                            <div class="task-header">
-                                <strong class="task-title">${task.title}</strong>
-                                <span class="task-priority ${task.priority}">${task.priority}</span>
-                            </div>
-                            <div class="task-body">
-                                <p><strong>Status:</strong> ${task.status}</p>
-                                <p><strong>Due Date:</strong> ${task.due_date}</p>
+    <div class="task-header">
+        <strong class="task-title">📌 ${task.title}</strong>
+        <span class="task-priority ${task.priority}">
+            ${task.priority === 'high' ? '🚨' : task.priority === 'medium' ? '⚠️' : '✅'}
+            ${task.priority}
+        </span>
+    </div>
+    <div class="task-body">
+        <p><strong>📊 Status:</strong> ${task.status}</p>
+        <p><strong>📅 Due Date:</strong> ${task.due_date}</p>
 
-                                <a href="/ai-task-management/${task.id}/" class="suggested-users-button"><img src="/media/symbols/manage ai.png" alt=""></a>
-                                <a href="/task/${task.id}/suggested_users/" class="suggested-users-button"><img src="/media/symbols/friend.png" alt=""></a>
-
-                                ${task.is_overdue ? '<span class="badge badge-danger">Overdue</span>' : ''}
-                                ${task.is_approaching_due_date ? '<span class="badge badge-warning">Approaching Due</span>' : ''}
-                            </div>
-
-                            <div class="task-footer"> 
-                                <button class="task-action view-dependencies" onclick="openViewDependencyModal(${task.id})" data-task-id="${task.id}">Dependencies</button>
-                                <button class="task-action complete-task"  onclick="openModal(${task.id} )" >Complete</button>
-                                <a href="/task/${task.id}/" class="task-action">Details</a>
-                            </div>
-                        </div>  
-
-                        <div id="viewTaskDependencies-${task.id}" class="modal" style="display: none;">
-                            <div class="modal-content">
-                                <span class="close-modal" data-task-id="${task.id}">&times;</span>
-                                <h3>Task Dependencies</h3>
-
-                                <div class="task-dependencies">
-                                    <h4>Current Dependencies</h4>
-                                    <ul id="dependency-list-${task.id}" class="dependency-list">
-                                        <li class="no-dependencies">No dependencies set for this task.</li>
-                                    </ul>
-                                </div>
-
-                                <form method="POST" id="update-dependencies-form-${task.id}" class="dependency-form">
-                                    <input type="hidden" name="csrfmiddlewaretoken" value="${data.csrf_token}">
-                                    <h4>Update Dependencies</h4>
-                                    <select id="dependency-select-${task.id}" name="dependencies" multiple class="dependency-select">
-                                    </select>
-                                    <button type="submit" class="submit-button">Update Dependencies</button>
-                                </form>
-                            </div>
-                        </div>`;
+        <div class="task-mid-buttons">
+            <a href="/ai-task-management/${task.id}/" class="suggested-users-button">🤖</a>
+            <a href="/task/${task.id}/suggested_users/" class="suggested-users-button">👥</a>
+            ${task.is_overdue ? '<span class="badge badge-danger">⏳ Overdue</span>' : ''}
+            ${task.is_approaching_due_date ? '<span class="badge badge-warning">⏰ Approaching Due</span>' : ''}
+        </div>
+    </div>
+    
+    <div class="task-footer">
+        <button class="task-action" onclick="openViewDependencyModal(${task.id})">🔗 Dependencies</button>
+        <button class="task-action" onclick="openModal(${task.id})">✔️ Complete</button>
+        <a href="/task/${task.id}/" class="task-action">📄 Details</a>
+    </div>
+</div>
+`;
                 });
 
                 // // ✅ Attach event listeners to dynamically added elements

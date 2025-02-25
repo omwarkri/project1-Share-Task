@@ -82,5 +82,5 @@ def send_task_reminders():
 def start_scheduler():
     """Start the scheduler when Django starts."""
     scheduler = BackgroundScheduler()
-    scheduler.add_job(send_task_reminders, "interval", minutes=1)  # Runs every 1 minute
+    scheduler.add_job(send_task_reminders, "interval", minutes=40)  # Runs every 1 minute
     scheduler.start()

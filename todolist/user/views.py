@@ -279,3 +279,107 @@ class ProtectedView(APIView):
 
     def get(self, request):
         return Response({"message": "This is a protected view!"})
+
+
+from django.shortcuts import render
+from django.http import JsonResponse
+from .models import UserTaskAnalytics
+
+def get_user_analytics(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'Unauthorized'}, status=401)
+
+    analytics, created = UserTaskAnalytics.objects.get_or_create(user=request.user)
+
+    data = {
+        'total_tasks': analytics.total_tasks,
+        'completed_tasks': analytics.completed_tasks,
+        'overdue_tasks': analytics.overdue_tasks,
+        'average_completion_time': analytics.average_completion_time,
+        'most_common_category': analytics.most_common_category,
+        'last_updated': analytics.last_updated.strftime("%Y-%m-%d %H:%M:%S"),
+    }
+    
+    return JsonResponse(data)
+
+
+
+
+import csv
+import io
+from datetime import timedelta
+from django.utils import timezone
+from django.http import HttpResponse
+from django.contrib.auth.decorators import login_required
+from task.models import Task
+
+@login_required
+def download_task_report(request, report_type):
+    """Generate and download daily, weekly, or monthly task reports in CSV format."""
+    user = request.user
+    now = timezone.now()
+
+    # Filter tasks based on report type
+    if report_type == "daily":
+        start_date = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    elif report_type == "weekly":
+        start_date = now - timedelta(days=now.weekday())  # Start of the week (Monday)
+    elif report_type == "monthly":
+        start_date = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    else:
+        return HttpResponse("Invalid report type", status=400)
+
+    tasks = Task.objects.filter(user=user, created_at__gte=start_date)
+
+    # Create CSV response
+    response = HttpResponse(content_type="text/csv")
+    response["Content-Disposition"] = f'attachment; filename="{report_type}_task_report.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(["Task Name", "Status", "Due Date", "Created At", "Updated At"])
+
+    for task in tasks:
+        writer.writerow([task.title, task.status, task.due_date, task.created_at, task.updated_at])
+
+    return response
+
+
+
+
+
+from reportlab.pdfgen import canvas
+
+@login_required
+def download_task_report_pdf(request, report_type):
+    user = request.user
+    now = timezone.now()
+
+    # Set time range
+    if report_type == "daily":
+        start_date = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    elif report_type == "weekly":
+        start_date = now - timedelta(days=now.weekday())  # Start of the week
+    elif report_type == "monthly":
+        start_date = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    else:
+        return HttpResponse("Invalid report type", status=400)
+
+    tasks = Task.objects.filter(user=user, created_at__gte=start_date)
+
+    # Create PDF response
+    response = HttpResponse(content_type="application/pdf")
+    response["Content-Disposition"] = f'attachment; filename="{report_type}_task_report.pdf"'
+
+    p = canvas.Canvas(response)
+    p.drawString(60, 800, f"{report_type.capitalize()} Task Report")
+
+    y = 780
+    for task in tasks:
+        p.drawString(40, y, f"Task: {task.title}, Status: {task.status}, Due: {task.due_date}")
+        y -= 20
+
+    p.showPage()
+    p.save()
+    return response
+
+

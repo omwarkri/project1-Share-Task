@@ -222,6 +222,6 @@ def start_scheduler():
     scheduler.add_job(send_task_reminders, IntervalTrigger(minutes=20))
 
     # Run `send_daily_task_schedule` every day at 9 AM
-    scheduler.add_job(send_daily_task_schedule, IntervalTrigger(minutes=1))
+    scheduler.add_job(send_daily_task_schedule, CronTrigger(hour=9,minute=0))
 
     scheduler.start()

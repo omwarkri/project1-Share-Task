@@ -114,6 +114,193 @@
             overflow-y: auto; /* Enable scrolling if content overflows */
         }
 
+        /* Right Section Styles */
+.right-section {
+    flex: 2; /* Take up 2 parts of the available space */
+    overflow-y: auto; /* Enable scrolling if content overflows */
+    padding: 20px; /* Add padding for better spacing */
+    background-color: #ffffff; /* White background for contrast */
+    border-radius: 12px; /* Rounded corners */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    margin-left: 20px; /* Space between left and right sections */
+}
+
+/* Card Styles in Right Section */
+.right-section .card {
+    background: #ffffff; /* White background */
+    padding: 25px; /* Increased padding for better spacing */
+    border-radius: 12px; /* Rounded corners */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    margin-bottom: 20px; /* Space between cards */
+    width: 100%; /* Ensure card takes full width */
+    text-align: left; /* Align text to the left */
+}
+
+/* Analytics Button */
+.right-section .analytics-button {
+    background-color: #3498db; /* Blue color */
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 1em;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    margin-bottom: 20px; /* Space below the button */
+    width: 100%; /* Full width */
+}
+
+.right-section .analytics-button:hover {
+    background-color: #2980b9; /* Darker blue on hover */
+    transform: translateY(-2px); /* Slight lift effect */
+}
+
+/* Calendar Styles */
+.right-section .calendar {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(15px, 1fr)); /* Responsive grid */
+    gap: 5px; /* Space between days */
+    margin-top: 20px;
+    background-color: #f8f9fa; /* Light background */
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.right-section .calendar-header {
+    grid-column: 1 / -1; /* Span across all columns */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9em;
+    color: #555;
+    margin-bottom: 10px;
+    font-weight: 500;
+}
+
+.right-section .calendar-header span {
+    margin: 0 5px;
+}
+
+.right-section .day {
+    width: 15px;
+    height: 15px;
+    background-color: #e0e0e0; /* Default color */
+    border-radius: 3px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.right-section .day:hover {
+    transform: scale(1.2); /* Slight zoom on hover */
+    opacity: 0.8; /* Slight transparency */
+}
+
+/* Color Classes for Calendar */
+.right-section .green { background-color: #1abc9c; } /* Light green */
+.right-section .dark-green { background-color: #16a085; } /* Dark green */
+.right-section .yellow { background-color: #FFEB3B; } /* Yellow */
+
+/* Rating and Reviews Section */
+.right-section .rating-reviews {
+    margin-top: 30px;
+}
+
+.right-section .rating-reviews h2 {
+    font-size: 1.8em;
+    margin-bottom: 20px;
+    color: #1abc9c; /* Accent color */
+}
+
+.right-section .review-card {
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+.right-section .review-card p {
+    margin: 5px 0;
+    color: #555;
+}
+
+.right-section .review-card .rating {
+    font-weight: bold;
+    color: #FFD700; /* Gold color for ratings */
+}
+
+.right-section .review-card .comment {
+    font-style: italic;
+    margin-top: 10px;
+}
+
+.right-section .review-card .timestamp {
+    font-size: 0.9em;
+    color: #888;
+}
+
+/* Report Form Styles */
+.right-section #reportForm {
+    margin-bottom: 20px;
+}
+
+.right-section #reportForm label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #1abc9c; /* Accent color */
+}
+
+.right-section #reportForm .form-select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 1em;
+    color: #555;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.right-section #reportForm .form-select:focus {
+    border-color: #1abc9c;
+    box-shadow: 0 0 8px rgba(26, 188, 156, 0.3);
+    outline: none;
+}
+
+.right-section #reportForm .btn {
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 1em;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    margin-right: 10px; /* Space between buttons */
+}
+
+.right-section #reportForm .btn-primary {
+    background-color: #1abc9c; /* Accent color */
+    color: white;
+    border: none;
+}
+
+.right-section #reportForm .btn-primary:hover {
+    background-color: #16a085; /* Darker accent color */
+    transform: translateY(-2px);
+}
+
+.right-section #reportForm .btn-danger {
+    background-color: #e74c3c; /* Red color */
+    color: white;
+    border: none;
+}
+
+.right-section #reportForm .btn-danger:hover {
+    background-color: #c0392b; /* Darker red */
+    transform: translateY(-2px);
+}
+
         /* Card Styles */
         .card {
             background: white;
@@ -216,6 +403,110 @@
         .edit-button:active {
             transform: translateY(0);
         }
+
+        /* Analytics Button */
+.analytics-button {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: 500;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    margin-top: 20px;
+}
+
+.analytics-button:hover {
+    background-color: #2980b9;
+    transform: translateY(-2px);
+}
+
+
+/* Toggle Buttons */
+.toggle-buttons {
+    display: flex;
+    gap: 10px; /* Space between buttons */
+    margin-bottom: 20px; /* Space below buttons */
+}
+
+.toggle-button {
+    background-color: #f8f9fa; /* Light background */
+    color: #555; /* Dark text */
+    border: 1px solid #ddd; /* Light border */
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 1em;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.toggle-button.active {
+    background-color: #1abc9c; /* Accent color */
+    color: white; /* White text */
+    border: none;
+}
+
+.toggle-button:hover {
+    background-color: #16a085; /* Darker accent color */
+    color: white; /* White text */
+    transform: translateY(-2px); /* Slight lift effect */
+}
+
+/* Analytics Section */
+#analyticsSection {
+    display: none; /* Hidden by default */
+}
+
+#analyticsSection h2 {
+    color: #1abc9c; /* Accent color */
+    margin-bottom: 20px;
+}
+
+#analyticsSection p {
+    font-size: 1.1em;
+    color: #555;
+    margin: 10px 0;
+}
+
+#analyticsSection strong {
+    color: #1abc9c; /* Accent color */
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 400px;
+    position: relative;
+}
+
+.close {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    font-size: 24px;
+    cursor: pointer;
+}
+
 
         /* Logout Button */
         .logout-button {
@@ -521,7 +812,28 @@
 
         <!-- Right Section: Activity and Reviews -->
         <div class="right-section">
-            <div class="card">
+            <!-- Toggle Buttons -->
+            <div class="toggle-buttons">
+                <button id="activityButton" class="toggle-button active" onclick="showActivity()">Activity</button>
+                <button id="analyticsButton" class="toggle-button" onclick="showAnalytics()">Analytics</button>
+            </div>
+        
+            <!-- Activity Section -->
+            <div id="activitySection" class="card">
+                <!-- Report Form -->
+                <form id="reportForm">
+                    <label for="reportType">Select Report Type:</label>
+                    <select id="reportType" class="form-select">
+                        <option value="daily">Daily Report</option>
+                        <option value="weekly">Weekly Report</option>
+                        <option value="monthly">Monthly Report</option>
+                    </select>
+                    <br>
+                    <button type="button" id="downloadCsv" class="btn btn-primary">Download CSV</button>
+                    <button type="button" id="downloadPdf" class="btn btn-danger">Download PDF</button>
+                </form>
+        
+                <!-- Activity Calendar -->
                 <h2>Your Activity Calendar</h2>
                 <div class="calendar-header">
                     <span>{{ previous_month|date:"F Y" }}</span>
@@ -541,26 +853,33 @@
                         </div>
                     {% endfor %}
                 </div>
-
-                <!-- Rating and Reviews Section -->
-                <div class="rating-reviews">
-                    <h2>Your Ratings and Reviews</h2>
-                    {% if feedbacks %}
-                        {% for feedback in feedbacks %}
-                            <div class="review-card">
-                                <p class="rating">Rating: {{ feedback.rating }}/5</p>
-                                <p class="comment">Comment: {{ feedback.comment }}</p>
-                                <p class="timestamp">Date: {{ feedback.created_at|date:"F j, Y" }}</p>
-                            </div>
-                        {% endfor %}
-                    {% else %}
-                        <p>No ratings or reviews yet.</p>
-                    {% endif %}
-                </div>
+        
+                <!-- Rating and Reviews -->
+                <h2>Your Ratings and Reviews</h2>
+                {% if feedbacks %}
+                    {% for feedback in feedbacks %}
+                        <div class="review-card">
+                            <p class="rating">Rating: {{ feedback.rating }}/5</p>
+                            <p class="comment">Comment: {{ feedback.comment }}</p>
+                            <p class="timestamp">Date: {{ feedback.created_at|date:"F j, Y" }}</p>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p>No ratings or reviews yet.</p>
+                {% endif %}
+            </div>
+        
+            <!-- Analytics Section -->
+            <div id="analyticsSection" class="card" style="display: none;">
+                <h2>User Analytics</h2>
+                <p><strong>Total Tasks:</strong> <span id="totalTasks">-</span></p>
+                <p><strong>Completed Tasks:</strong> <span id="completedTasks">-</span></p>
+                <p><strong>Overdue Tasks:</strong> <span id="overdueTasks">-</span></p>
+                <p><strong>Avg. Completion Time:</strong> <span id="averageTime">-</span> hours</p>
+                <p><strong>Most Common Category:</strong> <span id="commonCategory">-</span></p>
+                <p><strong>Last Updated:</strong> <span id="lastUpdated">-</span></p>
             </div>
         </div>
-    </div>
-
     <!-- Modal for Profile Update -->
     <div id="editModal" class="modal">
         <div class="modal-content">
@@ -589,6 +908,32 @@
 </div>
 
 <script>
+    function fetchUserAnalytics() {
+    fetch('/user/api/user-analytics/')
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            alert("Error: " + data.error);
+            return;
+        }
+
+        // Populate modal with analytics data
+        document.getElementById("totalTasks").innerText = data.total_tasks;
+        document.getElementById("completedTasks").innerText = data.completed_tasks;
+        document.getElementById("overdueTasks").innerText = data.overdue_tasks;
+        document.getElementById("averageTime").innerText = data.average_completion_time;
+        document.getElementById("commonCategory").innerText = data.most_common_category || "N/A";
+        document.getElementById("lastUpdated").innerText = data.last_updated;
+
+        // Show modal
+        document.getElementById("analyticsModal").style.display = "flex";
+    })
+    .catch(error => console.error("Error fetching analytics:", error));
+}
+
+function closeAnalyticsModal() {
+    document.getElementById("analyticsModal").style.display = "none";
+}
     // Function to open the modal
     function openProfileEditModal() {
         const modal = document.getElementById('editModal');
@@ -608,6 +953,64 @@
             console.log('Modal closed!'); // Debugging: Log to confirm the function is called
         }
     }
+
+    document.getElementById("downloadCsv").addEventListener("click", function() {
+    var reportType = document.getElementById("reportType").value;
+    window.location.href = "/user/download-report/" + reportType + "/";
+});
+
+document.getElementById("downloadPdf").addEventListener("click", function() {
+    var reportType = document.getElementById("reportType").value;
+    window.location.href = "/user/download-report/pdf/" + reportType + "/";
+});
+
+
+// Function to show the Activity section
+function showActivity() {
+    document.getElementById('activitySection').style.display = 'block';
+    document.getElementById('analyticsSection').style.display = 'none';
+
+    // Update button states
+    document.getElementById('activityButton').classList.add('active');
+    document.getElementById('analyticsButton').classList.remove('active');
+}
+
+// Function to show the Analytics section
+function showAnalytics() {
+    document.getElementById('activitySection').style.display = 'none';
+    document.getElementById('analyticsSection').style.display = 'block';
+
+    // Update button states
+    document.getElementById('analyticsButton').classList.add('active');
+    document.getElementById('activityButton').classList.remove('active');
+
+    // Fetch analytics data
+    fetchUserAnalytics();
+}
+
+// Function to fetch analytics data
+function fetchUserAnalytics() {
+    fetch('/user/api/user-analytics/')
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert("Error: " + data.error);
+                return;
+            }
+
+            // Populate analytics data
+            document.getElementById("totalTasks").innerText = data.total_tasks;
+            document.getElementById("completedTasks").innerText = data.completed_tasks;
+            document.getElementById("overdueTasks").innerText = data.overdue_tasks;
+            document.getElementById("averageTime").innerText = data.average_completion_time;
+            document.getElementById("commonCategory").innerText = data.most_common_category || "N/A";
+            document.getElementById("lastUpdated").innerText = data.last_updated;
+        })
+        .catch(error => console.error("Error fetching analytics:", error));
+}
+
+// Initialize with Activity section visible
+showActivity();
 
     // Close modal when clicking outside the modal content
     window.addEventListener('click', function (event) {

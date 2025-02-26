@@ -56,3 +56,19 @@ class UserBadge(models.Model):
     def __str__(self):
         return f"{self.user.username} - {self.badge.name}"
 
+
+
+from django.db import models
+from django.utils import timezone
+
+class UserTaskAnalytics(models.Model):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name="task_analytics")
+    total_tasks = models.PositiveIntegerField(default=0)
+    completed_tasks = models.PositiveIntegerField(default=0)
+    overdue_tasks = models.PositiveIntegerField(default=0)
+    average_completion_time = models.FloatField(default=0.0)  # In hours
+    most_common_category = models.CharField(max_length=100, blank=True, null=True)
+    last_updated = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Analytics for {self.user.username}"

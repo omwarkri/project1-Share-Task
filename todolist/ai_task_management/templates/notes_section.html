@@ -1,21 +1,28 @@
-<style>
-/* General Styles */
-/* General Styles */
-.notesapp {
-    position: relative;
-    max-width: 100%;
-    height: 80vh;
-    margin: 10px;
-    padding: 10px;
-    background: #ecf9f6; /* Light background to match theme */
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-    overflow: hidden;
-    border: 2px solid #1abc9c; /* Theme border */
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notes App</title>
+    <style>
+        /* General Styles */
+        .notesapp {
+            position: relative;
+            max-width: 100%;
+            height: 80vh;
+            margin: 10px;
+            padding: 10px;
+            background: #ecf9f6; /* Light background to match theme */
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+            border: 2px solid #1abc9c; /* Theme border */
+        }
 
-#notessection {
+        #notessection {
+    position: relative; /* Ensure the loading spinner is positioned correctly */
     padding: 10px;
+    height: 100%; /* Ensure the container takes full height */
 }
 
 #noteList {
@@ -26,394 +33,475 @@
     overflow-y: auto;
 }
 
-#noteList li {
-    background: #ecf9f6;
-    padding: 10px;
-    margin-bottom: 8px;
-    border-radius: 8px;
-    border: 1px solid #1abc9c; /* Themed border */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
+        #noteList li {
+            background: #ffffff;
+            padding: 10px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            border: 1px solid #1abc9c; /* Themed border */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
 
-#noteList li strong {
-    color: #16a085; /* Darker shade for contrast */
-    font-weight: bold;
-    font-size: 14px;
-}
+        #noteList li strong {
+            color: #16a085; /* Darker shade for contrast */
+            font-weight: bold;
+            font-size: 14px;
+        }
 
-#noteList li small {
-    color: #48c9b0; /* Matching lighter shade */
-    font-size: 10px;
-    display: block;
-    margin-top: 3px;
-}
+        #noteList li small {
+            color: #48c9b0; /* Matching lighter shade */
+            font-size: 10px;
+            display: block;
+            margin-top: 3px;
+        }
 
-#noteList li .view-more {
-    color: #1abc9c;
-    cursor: pointer;
-    font-size: 10px;
-    margin-top: 3px;
-    display: inline-block;
-}
+        #noteList li .view-more {
+            color: #1abc9c;
+            cursor: pointer;
+            font-size: 10px;
+            margin-top: 3px;
+            display: inline-block;
+        }
 
-#noteList li .view-more:hover {
-    color: #16a085;
-}
+        #noteList li .view-more:hover {
+            color: #16a085;
+        }
 
-/* Note Form */
-#noteFormWrapper {
-    width: 100%;
-    height: 100%;
-    background: #ecf9f6;
-    display: none;
-    padding: 10px;
-    z-index: 1000;
-}
+        /* Note Form */
+        #noteFormWrapper {
+            width: 100%;
+            height: 100%;
+            background: #ecf9f6;
+            display: none;
+            padding: 10px;
+            z-index: 1000;
+        }
 
-#noteForm {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-}
+        #noteForm {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
 
-#noteText {
-    flex-grow: 1;
-    width: 100%;
-    padding: 8px;
-    border: 2px solid #1abc9c;
-    border-radius: 8px;
-    font-size: 14px;
-    outline: none;
-    resize: none;
-    background: #f9fdfd;
-}
+        #noteText {
+            flex-grow: 1;
+            width: 100%;
+            padding: 8px;
+            border: 2px solid #1abc9c;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            resize: none;
+            background: #f9fdfd;
+        }
 
-#noteHeader {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 8px;
-}
+        #noteHeader {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
 
-#backButton {
-    background: none;
-    border: none;
-    font-size: 20px;
-    cursor: pointer;
-    color: #16a085;
-}
+        #backButton {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #16a085;
+        }
 
-#submitNote {
-    padding: 8px 16px;
-    background: #1abc9c;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 14px;
-    cursor: pointer;
-    margin-top: 8px;
-    transition: background 0.3s ease;
-}
+        #submitNote {
+            padding: 8px 16px;
+            background: #1abc9c;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: background 0.3s ease;
+        }
 
-#submitNote:hover {
-    background: #16a085;
-}
+        #submitNote:hover {
+            background: #16a085;
+        }
 
-/* Floating Add Note Button */
-#addNoteButton {
-    position: absolute;
-    bottom: 10px;
-    right: 10px;
-    cursor: pointer;
-    font-size: 20px;
-    background: #1abc9c;
-    color: white;
-    border-radius: 50%;
-    border: none;
-    width: 40px;
-    height: 40px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-    transition: background 0.3s ease;
-    z-index: 100;
-}
+        /* Floating Add Note Button */
+        #addNoteButton {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            cursor: pointer;
+            font-size: 20px;
+            background: #1abc9c;
+            color: white;
+            border-radius: 50%;
+            border: none;
+            width: 40px;
+            height: 40px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            transition: background 0.3s ease;
+            z-index: 100;
+        }
 
-#addNoteButton:hover {
-    background: #16a085;
-}
 
-/* Loading Spinner */
-#loadingSpinner {
-    display: none;
+        #addNoteButton:hover {
+            background: #16a085;
+        }
+
+        /* Loading Spinner */
+        #loadingSpinner {
+    display: none; /* Hidden by default */
     position: absolute;
     top: 50%;
     left: 50%;
+    height: 100%;
+    width: 100%;
     transform: translate(-50%, -50%);
     font-size: 20px;
     color: #1abc9c;
     background-color: #ecf9f6;
-}
-
-/* Mobile Styles */
-@media (max-width: 600px) {
-    .notesapp {
-        overflow-y: scroll;
-        height: 100%;
-    }
-
-    #noteList {
-        max-height: 100%;
-    }
-
-    #noteList li {
-        padding: 8px;
-        margin-bottom: 6px;
-    }
-
-    #noteList li .note-content {
-        -webkit-line-clamp: 2;
-    }
-
-    #noteList li strong {
-        font-size: 12px;
-    }
-
-    #noteList li small {
-        font-size: 9px;
-    }
-
-    #noteList li .view-more {
-        font-size: 9px;
-    }
-
-    #noteText {
-        font-size: 12px;
-    }
-
-    #submitNote {
-        font-size: 12px;
-    }
-
-    #addNoteButton {
-        bottom: 5px;
-        right: 5px;
-        font-size: 18px;
-        width: 36px;
-        height: 36px;
-    }
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 
-</style>
-
-<!-- Notes Section -->
-<div class="notesapp">
-    <div id="notessection">
-        <h3>Notes:</h3>
-        <ul id="noteList"></ul>
-    </div>
-
-    <button id="addNoteButton">+</button>
-
-    <div id="noteFormWrapper">
-        <div id="noteHeader">
-            <button id="backButton" >&#8592;</button>
-        </div>
-        <div id="noteForm">
-            <textarea id="noteText" placeholder="Enter your note..."></textarea>
-            <button id="submitNote" onclick="submitNote()">Save Note</button>
-        </div>
-    </div>
-
-    <div id="loadingSpinner">Loading...</div>
-</div>
-
-<script>
-// Show loading spinner
-function showLoading() {
-    document.getElementById('loadingSpinner').style.display = 'block';
-}
-
-// Hide loading spinner
-function hideLoading() {
-    document.getElementById('loadingSpinner').style.display = 'none';
-}
-
-// Load notes from the server
-function loadNotes() {
-    showLoading();
-    fetch("{% url 'get_task_notes' task.id %}", {
-        method: 'GET',
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest',
-        },
-    })
-    .then(response => response.json())
-    .then(data => {
-        hideLoading();
-        const noteList = document.getElementById('noteList');
-        noteList.innerHTML = ''; // Clear previous notes
-
-        if (data.status === 'success') {
-            data.notes.forEach(note => {
-                const noteItem = document.createElement('li');
-                noteItem.innerHTML = `
-                    <strong>${note.username}</strong>
-                    <div class="note-content">${note.note_text}</div>
-                    <small>Added on ${note.created_at}</small>
-                    <div class="view-more" data-note-id="${note.id}">View More</div>
-                `;
-                noteList.appendChild(noteItem);
-            });
-
-            // Add event listeners to view more buttons
-            document.querySelectorAll('.view-more').forEach(button => {
-                button.addEventListener('click', (e) => {
-                    const noteId = e.target.getAttribute('data-note-id');
-                    showNoteForm(noteId);
-                });
-            });
-        } else {
-            noteList.innerHTML = '<li>No notes available for this task.</li>';
+    #loadingSpinner div{           
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-    })
-    .catch(error => {
-        hideLoading();
-        console.error('Error:', error);
-    });
-}
 
-// Show the note form
-function showNoteForm(noteId = null) {
-    currentNoteId = noteId;
 
-    const noteTextArea = document.getElementById('noteText');
 
-    if (noteId) {
-        // Load existing note text
-        const noteContent = document.querySelector(`[data-note-id="${noteId}"]`).previousElementSibling.previousElementSibling;
-        noteTextArea.value = noteContent.textContent;
-    } else {
-        noteTextArea.value = '';
-    }
+        /* Mobile Styles */
+        @media (max-width: 600px) {
+            .notesapp {
+                overflow-y: scroll;
+                height: 100%;
+            }
 
-    document.getElementById('notessection').style.display = 'none';
-    document.getElementById('addNoteButton').style.display = 'none';
-    document.getElementById('noteFormWrapper').style.display = 'block';
-}
+            #noteList {
+                max-height: 100%;
+            }
 
-// Hide the note form
+            #noteList li {
+                padding: 8px;
+                margin-bottom: 6px;
+            }
+
+            #noteList li .note-content {
+                -webkit-line-clamp: 2;
+            }
+
+            #noteList li strong {
+                font-size: 12px;
+            }
+
+            #noteList li small {
+                font-size: 9px;
+            }
+
+            #noteList li .view-more {
+                font-size: 9px;
+            }
+
+            #noteText {
+                font-size: 12px;
+            }
+
+            #submitNote {
+                font-size: 12px;
+            }
+
+            #addNoteButton {
+                bottom: 5px;
+                right: 5px;
+                font-size: 18px;
+                width: 36px;
+                height: 36px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Notes Section -->
+    <div class="notesapp">
+        <div id="notessection">
+            <h3>Notes:</h3>
+            <ul id="noteList"></ul>
+            <div id="loadingSpinner">
+                <div >
+                    Loading...
+                </div>
+            </div> <!-- Loading spinner -->
+        </div>
+
+        <button id="addNoteButton">+</button>
+
+        <div id="noteFormWrapper">
+            <div id="noteHeader">
+                <button id="backButton">&#8592;</button>
+            </div>
+            <div id="noteForm">
+                <textarea id="noteText" placeholder="Enter your note..."></textarea>
+                <button id="submitNote">Save Note</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        let currentNoteId = null; // Track the current note being edited
+
+        // Show loading spinner
+        function showLoading() {
+            document.getElementById('loadingSpinner').style.display = 'block';
+        }
+
+        // Hide loading spinner
+        function hideLoading() {
+            document.getElementById('loadingSpinner').style.display = 'none';
+        }
+
+        // Load notes from the server
+        function loadNotes() {
+            showLoading();
+            fetch("{% url 'get_task_notes' task.id %}", {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                hideLoading();
+                const noteList = document.getElementById('noteList');
+                noteList.innerHTML = ''; // Clear previous notes
+
+                if (data.status === 'success') {
+                    data.notes.forEach(note => {
+                        const noteItem = document.createElement('li');
+                        noteItem.innerHTML = `
+                            <strong>${note.username}</strong>
+                            <div class="note-content">${note.note_text}</div>
+                            <small>Added on ${note.created_at}</small>
+                            <div class="view-more" data-note-id="${note.id}">View More</div>
+                        `;
+                        noteList.appendChild(noteItem);
+                    });
+
+                    // Add event listeners to view more buttons
+                    document.querySelectorAll('.view-more').forEach(button => {
+                        button.addEventListener('click', (e) => {
+                            const noteId = e.target.getAttribute('data-note-id');
+                            showNoteForm(noteId);
+                        });
+                    });
+                } else {
+                    noteList.innerHTML = '<li>No notes available for this task.</li>';
+                }
+            })
+            .catch(error => {
+                hideLoading();
+                console.error('Error:', error);
+            });
+        }
+
+        // Show the note form
+        function showNoteForm(noteId = null) {
+            currentNoteId = noteId;
+
+            const noteTextArea = document.getElementById('noteText');
+
+            if (noteId) {
+                // Load existing note text
+                const noteContent = document.querySelector(`[data-note-id="${noteId}"]`).previousElementSibling.previousElementSibling;
+                noteTextArea.value = noteContent.textContent;
+            } else {
+                noteTextArea.value = '';
+            }
+
+            document.getElementById('notessection').style.display = 'none';
+            document.getElementById('addNoteButton').style.display = 'none';
+            document.getElementById('noteFormWrapper').style.display = 'block';
+        }
+
+  // Hide the note form
 function hideNoteForm() {
     const noteText = document.getElementById('noteText').value.trim();
-    if (noteText && currentNoteId) {
+
+    if (currentNoteId) {
+        console.log("Updating note..."); // Debugging
+        // If a note is being edited, update the note
         updateNote();
+    } else if (noteText) {
+        console.log("Adding new note..."); // Debugging
+        // If there is text in the textarea, submit the new note
+        submitNoteFromBackButton(noteText);
     } else {
-        submitNote();
+        console.log("Hiding form without saving..."); // Debugging
+        // If no note is being edited and no text is entered, just hide the form
         document.getElementById('noteFormWrapper').style.display = 'none';
         document.getElementById('notessection').style.display = 'block';
         document.getElementById('addNoteButton').style.display = 'block';
+        loadNotes(); // Reload notes after hiding the form
     }
 }
 
-// Submit a new note
-function submitNote() {
-    const noteText = document.getElementById('noteText').value.trim();
-    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
-    if (!noteText) {
-        alert('Please enter a note.');
-        return;
-    }
+        // Submit a new note
+        function submitNote() {
+            const noteText = document.getElementById('noteText').value.trim();
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            console.log("submitnote executing")
+            if (!noteText ) {
+                alert('Please enter a note.');
+                return;
+            }
 
-    showLoading();
+            showLoading();
 
-    fetch("{% url 'add_task_note' task.id %}", {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': csrfToken,
-            'X-Requested-With': 'XMLHttpRequest',
-        },
-        body: JSON.stringify({ note_text: noteText }),
-    })
-    .then(response => response.json())
-    .then(data => {
-        hideLoading();
-        if (data.status === 'success') {
-            document.getElementById('noteText').value = ''; // Clear the textarea
-            document.getElementById('noteFormWrapper').style.display = 'none';
-            document.getElementById('notessection').style.display = 'block';
-            document.getElementById('addNoteButton').style.display = 'block';
-            loadNotes(); // Reload notes after saving
-        } else {
-            alert('Error: ' + data.message);
+            fetch("{% url 'add_task_note' task.id %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+                body: JSON.stringify({ note_text: noteText }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                hideLoading();
+                if (data.status === 'success') {
+                    document.getElementById('noteText').value = ''; // Clear the textarea
+                    hideNoteForm(); // Hide the form and reload notes
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            })
+            .catch(error => {
+                hideLoading();
+                console.error('Error:', error);
+                alert('An error occurred while adding the note.');
+            });
         }
-    })
-    .catch(error => {
-        hideLoading();
-        console.error('Error:', error);
-        alert('An error occurred while adding the note.');
-    });
-}
 
-// Update an existing note
-function updateNote() {
-    const noteText = document.getElementById('noteText').value.trim();
-    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        function submitNoteFromBackButton(noteText) {
+         
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            console.log("submitNoteFromBackButton executing",noteText)
+            if (!noteText ) {
+                alert('Please enter a note.');
+                return;
+            }
 
-    if (!noteText) {
-        alert('Please enter a note.');
-        return;
-    }
+            showLoading();
 
-    if (!currentNoteId) {
-        console.error('Note ID is undefined');
-        return;
-    }
-
-    showLoading();
-
-    const url = `{% url 'update_task_note' 0 %}`.replace("0", currentNoteId);
-
-    fetch(url, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': csrfToken,
-            'X-Requested-With': 'XMLHttpRequest',
-        },
-        body: JSON.stringify({ note_text: noteText }),
-    })
-    .then(response => response.json())
-    .then(data => {
-        hideLoading();
-        if (data.status === 'success') {
-            document.getElementById('noteText').value = '';
-            document.getElementById('noteFormWrapper').style.display = 'none';
-            document.getElementById('noteList').style.display = 'block';
-            document.getElementById('addNoteButton').style.display = 'block';
-            loadNotes(); // Reload notes after updating
-        } else {
-            alert('Error: ' + data.message);
+            fetch("{% url 'add_task_note' task.id %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+                body: JSON.stringify({ note_text: noteText }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                hideLoading();
+                if (data.status === 'success') {
+                    document.getElementById('noteText').value = ''; // Clear the textarea
+                    hideNoteForm(); // Hide the form and reload notes
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            })
+            .catch(error => {
+                hideLoading();
+                console.error('Error:', error);
+                alert('An error occurred while adding the note.');
+            });
         }
-    })
-    .catch(error => {
-        hideLoading();
-        console.error('Error:', error);
-        alert('An error occurred while updating the note.');
-    });
-}
+        // Update an existing note
+        function updateNote() {
+            const noteText = document.getElementById('noteText').value.trim();
+            console.log(noteText)
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
-document.getElementById('addNoteButton').addEventListener('click', () => showNoteForm());
-document.getElementById('backButton').addEventListener('click', hideNoteForm);
-document.getElementById('submitNote').addEventListener('click', () => {
-    if (currentNoteId) {
-        updateNote();
-    } else {
-        submitNote();
-    }
-});
+            if (!noteText) {
+                alert('Please enter a note.');
+                return;
+            }
 
-// Load notes when the page loads
-document.addEventListener('DOMContentLoaded', loadNotes);
-</script>
+            if (!currentNoteId) {
+                console.error('Note ID is undefined');
+                return;
+            }
 
+            showLoading();
+
+            const url = `{% url 'update_task_note' 0 %}`.replace("0", currentNoteId);
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+                body: JSON.stringify({ note_text: noteText }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                hideLoading();
+                if (data.status === 'success') {
+                    document.getElementById('noteText').value = ''; // Clear the textarea
+                    hideNoteForm(); // Hide the form and reload notes
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            })
+            .catch(error => {
+                hideLoading();
+                console.error('Error:', error);
+                alert('An error occurred while updating the note.');
+            });
+        }
+
+        // Event Listeners
+        document.getElementById('addNoteButton').addEventListener('click', () => {
+            showNoteForm(); // Show the form for adding a new note
+        });
+
+        document.getElementById('backButton').addEventListener('click', () => {
+            console.log("hidenotform")
+            hideNoteForm(); // Hide the form without saving
+        });
+
+        document.getElementById('submitNote').addEventListener('click', () => {
+            console.log("someone click on submit note")
+            const noteText = document.getElementById('noteText').value.trim();
+            if (!noteText) {
+                alert('Please enter a note.');
+                return;
+            }
+
+            if (currentNoteId) {
+                updateNote(); // Update existing note
+            } else {
+                submitNote(); // Submit new note
+            }
+        });
+
+        // Load notes when the page loads
+        document.addEventListener('DOMContentLoaded', loadNotes);
+    </script>
+</body>
+</html>

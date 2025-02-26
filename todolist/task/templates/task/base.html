@@ -44,15 +44,18 @@ header {
     position: fixed; /* Fixed position to stay at the top */
     top: 0;
     z-index: 500;
-    padding: 16px;
+    height: 48px;
+    padding-left: 30px;
+    padding-right: 30px;
 }
 
 .header-div {
+    height: 100%;
     display: flex;
     justify-content: space-between;
     align-items: center;
     max-width: 1600px;
-    margin: 0 auto;
+    
     margin-left: 24px;
 }
 
@@ -63,9 +66,16 @@ header h1 {
     font-weight: 700;
 }
 
-header img.site-logo{
-    height: 60px;
-    width: 50px;
+.sidebar-header{
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+        justify-content: center;
+}
+
+img.site-logo{
+    height: 50px;
+    width: 40px;
 }
 
 header .welcome-message {
@@ -222,7 +232,7 @@ main {
     overflow-y: auto;
     display: flex
 ;
-    margin-top: 90px;
+    margin-top: 40px;
     padding-left: 250px;
     position: relative;
     flex-direction: column;
@@ -247,6 +257,94 @@ main {
 
 .sidebar-toggle:hover {
     background: #16a085;
+}
+
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+
+    overflow-y: auto; /* Enable scrolling for the modal */
+    padding: 20px; /* Add padding to prevent content from touching the edges */
+    z-index: 3000;
+}
+
+.modal-content {
+    background-color: #fff;
+    padding: 25px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    position: relative;
+    animation: modalFadeIn 0.3s ease;
+    max-height: 90vh; /* Limit modal height to 90% of the viewport height */
+    overflow-y: auto; /* Enable scrolling for the modal content */
+   
+}
+
+/* Chat Modal Styles */
+.chat-list {
+    max-height: 300px;
+    overflow-y: auto;
+    margin-top: 10px;
+}
+
+.chat-item {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.chat-item a {
+    text-decoration: none;
+    color: #2c3e50;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.chat-time {
+    font-size: 12px;
+    color: #777;
+}
+
+.filter-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.close-modal {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 24px;
+    cursor: pointer;
+    color: #666;
+    transition: color 0.3s ease;
+}
+
+.close-modal:hover {
+    color: #333;
 }
 
 /* Responsive Fixes */
@@ -296,21 +394,22 @@ main {
 <body class="base-main-body">
     <header >
        <div class="header-div">
-        <a href="{% url 'home' %}" style="text-decoration: none;">
-            <img class="site-logo" src="/media/symbols/logo.png" alt="">
-        </a>
+        
         <div class="welcome-message">
             <span>Welcome, <a href="{% url 'profile' %}">{{ user.username }}</a>!</span>
         </div>
+        <button class="view-chats-button" onclick="openChatModal()">💬 Chats</button>
        </div>
     </header>
     <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
     <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
         <div>
-            <a href="{% url 'home' %}" style="text-decoration: none;">
+            <a class="sidebar-header" href="{% url 'home' %}" style="text-decoration: none;">
+                <img class="site-logo" src="/media/symbols/logo.png" alt="">
                 <h2>Share Task</h2>
             </a>
+ 
             <ul class="sidebar-menu">
                 <li>
                     <a id="all-tasks-link" href="{% url 'home' %}">
@@ -354,6 +453,17 @@ main {
         &copy; {{ year }} {{ app_name }}. All rights reserved.
     </footer>
 </body>
+
+<!-- Chat Modal -->
+<div id="chatModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeChatModal()">&times;</span>
+        <h3>💬 All Chats</h3>
+        <div class="chat-list">
+            <p>Loading chats...</p>
+        </div>
+    </div>
+</div>
 <script>
     function toggleSidebar() {
         const sidebar = document.getElementById("sidebar");
@@ -374,6 +484,44 @@ main {
             leaderboardLink.classList.add('active');
         }
     }
+
+    function openChatModal() {
+    const chatModal = document.getElementById('chatModal');
+    chatModal.style.display = 'block'; // Show the modal
+
+    // Fetch chats from the backend
+    fetch('/fetch-all-chats/')
+        .then(response => response.json())
+        .then(data => {
+            console.log(data)
+            const chatList = document.querySelector('.chat-list');
+            chatList.innerHTML = ''; // Clear previous chats
+
+            if (data.chats && data.chats.length > 0) {
+                data.chats.forEach(chat => {
+                    const chatItem = document.createElement('div');
+                    chatItem.classList.add('chat-item');
+
+                    if (chat.task_id) {
+                        chatItem.innerHTML = `
+                            <a href="/chat/${chat.task_id}/?receiver_id=${chat.user.id}">
+                                <strong>${chat.user.username} ${chat.task_id}</strong>: ${chat.last_message}
+                                <small class="chat-time">${chat.timestamp}</small>
+                            </a>
+                        `;
+                    }
+
+                    chatList.appendChild(chatItem);
+                });
+            } else {
+                chatList.innerHTML = '<p>No chats available.</p>';
+            }
+        })
+        .catch(error => {
+            console.error("Error fetching chats:", error);
+            document.querySelector('.chat-list').innerHTML = '<p>Error loading chats.</p>';
+        });
+}
 
     document.addEventListener('DOMContentLoaded', setActiveLink);
 </script>

@@ -93,7 +93,7 @@
         /* Flex Container */
         .flex-container {
             display: flex;
-            gap: 20px; /* Space between left and right sections */
+            gap: 8px; /* Space between left and right sections */
             height: 100%; /* Take full height of the parent */
         }
 
@@ -127,13 +127,22 @@
 
 /* Card Styles in Right Section */
 .right-section .card {
-    background: #ffffff; /* White background */
-    padding: 25px; /* Increased padding for better spacing */
-    border-radius: 12px; /* Rounded corners */
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-    margin-bottom: 20px; /* Space between cards */
-    width: 100%; /* Ensure card takes full width */
-    text-align: left; /* Align text to the left */
+    background: #ffffff;
+    padding: 0px;
+    /* border-radius: 12px; */
+    /* box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); */
+    /* margin-bottom: 20px; */
+    width: 100%;
+    text-align: left;
+}
+.card {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); 
+    margin-bottom: 20px;
+    width: 100%;
+    text-align: center;
 }
 
 /* Analytics Button */
@@ -163,7 +172,7 @@
     gap: 5px; /* Space between days */
     margin-top: 20px;
     background-color: #f8f9fa; /* Light background */
-    padding: 20px;
+  
     border-radius: 10px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
 }
@@ -302,15 +311,7 @@
 }
 
         /* Card Styles */
-        .card {
-            background: white;
-            padding: 30px; /* Increased padding for better spacing */
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px; /* Space between cards */
-            width: 100%; /* Ensure card takes full width */
-            text-align: center; /* Center align text */
-        }
+     
 
         /* Profile Picture Styles */
         .profile-picture-container {
@@ -536,10 +537,10 @@
             display: grid;
             grid-template-rows: repeat(10, 15px); /* Arrange days vertically */
             grid-auto-flow: column; /* Flow days into columns */
-            gap: 3px;
+            gap: 10px;
             margin-top: 20px;
             background-color: #fff;
-            padding: 20px;
+            
             border-radius: 10px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
         }
@@ -560,8 +561,8 @@
         }
 
         .day {
-            width: 15px;
-            height: 15px;
+            width: 12px;
+            height: 12px;
             background-color: #e0e0e0;
             border-radius: 3px;
             transition: background-color 0.3s ease, transform 0.2s ease;
@@ -746,14 +747,16 @@
 
             /* Adjust calendar for mobile */
             .calendar {
-                grid-template-rows: repeat(10, 10px); /* Smaller rows for mobile */
+                grid-template-rows: repeat(15, 16px); /* Smaller rows for mobile */
                 gap: 2px; /* Reduce gap between days */
-                padding: 10px; /* Reduce padding */
+                padding: 4px; /* Reduce padding */
             }
 
             .day {
-                width: 10px; /* Smaller day size */
-                height: 10px; /* Smaller day size */
+
+                width: 4px; /* Smaller day size */
+                height: 4px; /* Smaller day size */
+                margin-bottom: 4px;
             }
 
             .calendar-header {

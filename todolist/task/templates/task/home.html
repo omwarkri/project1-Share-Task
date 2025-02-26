@@ -47,7 +47,7 @@
             <div class="header-actions">
                 <input type="text" id="search-bar" class="search-bar" placeholder="🔍 Search tasks..." oninput="searchTasks()" />
                 <button class="filter-button" onclick="openFilterModal()">⚙️ Filters</button>
-                <button class="view-chats-button" onclick="openChatModal()">💬 Chats</button>
+
             </div>
         </div>
 
@@ -115,16 +115,7 @@
     </div>
 </div>
 
-<!-- Chat Modal -->
-<div id="chatModal" class="modal" style="display: none;">
-    <div class="modal-content">
-        <span class="close-modal" onclick="closeChatModal()">&times;</span>
-        <h3>💬 All Chats</h3>
-        <div class="chat-list">
-            <p>Loading chats...</p>
-        </div>
-    </div>
-</div>
+
 
 <!-- Filter Modal -->
 <div id="filterModal" class="modal">
@@ -296,6 +287,7 @@ body {
         flex-direction: column;
         height: 100vh; /* Full viewport height */
         overflow: hidden; /* Prevent double scrollbars */
+        padding-top: 60px;
     }
 .button-container {
     display: flex;
@@ -316,7 +308,7 @@ body {
     align-items: center; /* Center the icon and text vertically */
     gap: 8px; /* Space between icon and text */
     position: absolute;
-    top:0;
+    top:10;
     left:50%;
     margin-top: -10px;
     transform: translateX(-50%); /* Adjust for exact centering */
@@ -401,9 +393,10 @@ div.task-mid-buttons{
 /* Main Content */
  .main-content {
         flex: 1; /* Take remaining space */
-        padding: 20px;
+        padding: 16px;
         height: calc(100vh - 60px); /* Adjust height to account for header */
         overflow-y: auto;
+        
     }
 
     /* Task Grid */
@@ -424,9 +417,7 @@ div.task-mid-buttons{
 ;
     justify-content: space-between;
     padding: 8px;
-    padding-top: 8px;
     align-items: center;
-    margin-bottom: 20px;
     background-color: #ffffff;
 }
 
@@ -1104,11 +1095,11 @@ div.task-mid-buttons{
             // Change the button text and arrow based on the container's state
             if (shutterContainer.classList.contains('expanded')) {
                 toggleButton.innerHTML = '▲';
-                toggleButton.style.top = '0'; /* Move the button up */
+                toggleButton.style.top = '10'; /* Move the button up */
                 shutterContent.scrollTo({ top: 0, behavior: 'smooth' }); // Smooth scroll to top
             } else {
                 toggleButton.innerHTML = '▼';
-                toggleButton.style.top = '0'; /* Move the button back to the top */
+                toggleButton.style.top = '10'; /* Move the button back to the top */
             }
         });
 
@@ -1344,43 +1335,7 @@ function closeViewDependencyModal() {
     }
 
 
-    function openChatModal() {
-    const chatModal = document.getElementById('chatModal');
-    chatModal.style.display = 'block'; // Show the modal
-
-    // Fetch chats from the backend
-    fetch('/fetch-all-chats/')
-        .then(response => response.json())
-        .then(data => {
-            console.log(data)
-            const chatList = document.querySelector('.chat-list');
-            chatList.innerHTML = ''; // Clear previous chats
-
-            if (data.chats && data.chats.length > 0) {
-                data.chats.forEach(chat => {
-                    const chatItem = document.createElement('div');
-                    chatItem.classList.add('chat-item');
-
-                    if (chat.task_id) {
-                        chatItem.innerHTML = `
-                            <a href="/chat/${chat.task_id}/?receiver_id=${chat.user.id}">
-                                <strong>${chat.user.username} ${chat.task_id}</strong>: ${chat.last_message}
-                                <small class="chat-time">${chat.timestamp}</small>
-                            </a>
-                        `;
-                    }
-
-                    chatList.appendChild(chatItem);
-                });
-            } else {
-                chatList.innerHTML = '<p>No chats available.</p>';
-            }
-        })
-        .catch(error => {
-            console.error("Error fetching chats:", error);
-            document.querySelector('.chat-list').innerHTML = '<p>Error loading chats.</p>';
-        });
-}
+   
 
 function closeChatModal() {
     document.getElementById('chatModal').style.display = 'none';

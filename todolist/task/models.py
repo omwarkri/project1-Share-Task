@@ -44,14 +44,16 @@ class   Task(models.Model):
         return self.title
 
     def is_overdue(self):
-        if self.due_date and self.due_date < timezone.now():
-            return True
-        return False
+        """Check if the task is overdue, but exclude completed tasks."""
+        if self.status == 'completed':  # Ignore completed tasks
+            return False
+        return bool(self.due_date and self.due_date < timezone.now())
 
     def is_approaching_due_date(self):
-        if self.due_date and self.due_date - timezone.now() <= timezone.timedelta(days=2):
-            return True
-        return False
+        """Check if the task is approaching its due date (within 2 days), but exclude completed tasks."""
+        if self.status == 'completed':  # Ignore completed tasks
+            return False
+        return bool(self.due_date and 0 <= (self.due_date - timezone.now()).days <= 2)
     
 
     def can_be_completed(self):

@@ -135,7 +135,7 @@
     background: white;
     padding: 30px;
     border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); 
+
     margin-bottom: 20px;
     width: 100%;
     text-align: center;
@@ -227,7 +227,7 @@
 .right-section .review-card {
     background: #ffffff;
     border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    
     padding: 20px;
     margin-bottom: 15px;
     text-align: left;
@@ -744,13 +744,21 @@
                 flex-direction: column; /* Stack sections vertically on smaller screens */
             }
 
+            .profile-main{
+                padding: 16px;
+                padding-top: 64px;
+            }
             .left-section, .right-section {
                 max-width: 100%; /* Full width on smaller screens */
+                overflow: visible;
+                padding: 0;
+                margin: 0;
+                box-shadow: none;
             }
 
             /* Adjust calendar for mobile */
             .calendar {
-                grid-template-rows: repeat(15, 16px); /* Smaller rows for mobile */
+                grid-template-rows: repeat(26, 16px); /* Smaller rows for mobile */
                 gap: 2px; /* Reduce gap between days */
                 padding: 4px; /* Reduce padding */
             }

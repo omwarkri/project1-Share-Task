@@ -10,12 +10,7 @@
     {% load custom_filters %}
     <style>
         /* Reset default margins and padding */
-        html, body {
-            margin: 0;
-            padding: 0;
-            height: 100%; /* Ensure full height */
-            overflow: hidden; /* Prevent default body scrolling */
-        }
+        
 
         /* General Styles */
         h1, h2 {
@@ -45,6 +40,7 @@
             background-color: #f8f9fa; /* Optional: Add a background color */
             padding: 20px; /* Optional: Add padding for better spacing */
             box-sizing: border-box; /* Include padding in height calculation */
+            
         }
 
         /* Custom Scrollbar Styles */
@@ -99,14 +95,14 @@
 
         /* Left Section */
         .left-section {
-            flex: 1; /* Take up 1 part of the available space */
-            max-width: 400px; /* Optional: Limit the width of the left section */
-            overflow-y: auto; /* Enable scrolling if content overflows */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-       
-        }
+    flex: 1;
+    max-width: 400px;
+    overflow-y: auto;
+    display: flex
+;
+    align-items: start;
+    justify-content: center;
+}
 
         /* Right Section */
         .right-section {
@@ -143,6 +139,13 @@
     margin-bottom: 20px;
     width: 100%;
     text-align: center;
+}
+
+
+.bio{
+    display: flex;
+    gap:8px;
+    align-items: center;
 }
 
 /* Analytics Button */
@@ -319,8 +322,8 @@
         }
 
         .profile-picture {
-            width: 150px;
-            height: 150px;
+            width: 70px;
+            height: 70px;
             border-radius: 50%;
             object-fit: cover;
             border: 4px solid #1abc9c;
@@ -384,17 +387,17 @@
 
         /* Edit Button Styles */
         .edit-button {
-            background-color: #1abc9c;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1em;
-            font-weight: 500;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-            margin-top: 20px;
-        }
+    background-color: #1abc9c;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: 500;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    /* margin-top: 20px; */
+}
 
         .edit-button:hover {
             background-color: #16a085;
@@ -775,14 +778,17 @@
         <!-- Left Section: Profile Details -->
         <div class="left-section">
             <div class="card">
-                <h1>Welcome, {{ user.username }}!</h1>
-                <div class="profile-picture-container">
-                    {% if user.profile_picture %}
-                        <img class="profile-picture" src="{{ user.profile_picture.url }}" alt="{{ user.username }}'s Profile Picture">
-                    {% else %}
-                        <img class="profile-picture" src="https://via.placeholder.com/150" alt="Default Profile Picture">
-                    {% endif %}
+                <div class="bio">
+                    <div class="profile-picture-container">
+                        {% if user.profile_picture %}
+                            <img class="profile-picture" src="{{ user.profile_picture.url }}" alt="{{ user.username }}'s Profile Picture">
+                        {% else %}
+                            <img class="profile-picture" src="https://via.placeholder.com/150" alt="Default Profile Picture">
+                        {% endif %}
+                    </div>
+                    <h1>{{ user.username }}!</h1>
                 </div>
+               
 
                 <!-- Edit Button -->
                 <button class="edit-button" onclick="openProfileEditModal()">Edit Profile</button>

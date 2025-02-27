@@ -8,408 +8,320 @@
     <!-- Add FontAwesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-    /* General Styles */
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
+        /* General Styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-html {
-    width: 100%;
-    height: 100%;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f8f9fa;
-    color: #333;
-    line-height: 1.6;
-}
+        html {
+            width: 100%;
+            height: 100%;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+        }
 
-body.base-main-body {
-    overflow: hidden;
-    width: 100%;
-    height: 100%;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f8f9fa;
-    color: #333;
-    line-height: 1.6;
-}
+        body.base-main-body {
+            overflow: hidden;
+            width: 100%;
+            height: 100%;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+        }
 
-/* Header Styles */
-header {
-    background-color: #ffffff;
-    color: #333;
-    width: calc(100% - 250px); /* Subtract sidebar width */
-    margin-left: 250px; /* Offset for sidebar */
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    position: fixed; /* Fixed position to stay at the top */
-    top: 0;
-    z-index: 500;
-    height: 48px;
-    padding-left: 30px;
-    padding-right: 30px;
-}
+        /* Header Styles */
+        header {
+            background-color: #ffffff;
+            color: #333;
+            width: 100%;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            top: 0;
+            z-index: 500;
+            height: 48px;
+            padding: 0 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
 
-.header-div {
-    height: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    max-width: 1600px;
-    
-    margin-left: 24px;
-}
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
 
-header h1 {
-    margin: 0;
-    font-size: 1.8rem;
-    color: #1abc9c;
-    font-weight: 700;
-}
+        .header-div {
+            width: 100%;
+            max-width: 1600px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
-.sidebar-header{
-        display: flex;
-        align-items: center;
-        flex-direction: column;
-        justify-content: center;
-}
+        .view-chats-button {
+            padding: 8px 12px;
+            background-color: #f8f9fa;
+            color: #555;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
 
-img.site-logo{
-    height: 50px;
-    width: 40px;
-}
+        .view-chats-button:hover {
+            background-color: #e9ecef;
+        }
 
-header .welcome-message {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
+        /* Sidebar Styles */
+        .sidebar {
+            width: 250px;
+            padding: 20px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            overflow-y: auto;
+            transition: transform 0.3s ease-in-out;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            background-color: #ffffff;
+            transform: translateX(-100%); /* Hidden by default on mobile */
+        }
 
-header .welcome-message span {
-    font-size: 1rem;
-    color: #555;
-}
+        .sidebar.show {
+            transform: translateX(0); /* Show sidebar when toggled */
+        }
 
-header .welcome-message a {
-    color: #1abc9c;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 1rem;
-    transition: color 0.3s ease;
-}
+        .sidebar-toggle-div {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 20px;
+        }
 
-header .welcome-message a:hover {
-    color: #16a085;
-}
+        .sidebar-toggle {
+            background: #1abc9c;
+            color: white;
+            border: none;
+            padding: 8px;
+            font-size: 18px;
+            cursor: pointer;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
 
-/* Sidebar Styles */
-.sidebar {
-    width: 250px;
-    padding: 20px;
-    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: 100vh;
-    overflow-y: auto;
-    transition: transform 0.3s ease-in-out;
-    z-index: 1000;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    background-color: #ffffff; /* White background */
-}
+        .sidebar-toggle:hover {
+            background: #16a085;
+        }
 
-.sidebar h2 {
-    color: #1abc9c; /* Accent color for headings */
-    font-size: 24px;
-    margin-bottom: 20px;
-    font-weight: 700;
-    text-align: center;
-}
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            flex-direction: column;
+            justify-content: center;
+        }
 
-.sidebar-menu {
-    list-style: none;
-    padding: 0;
-}
+        img.site-logo {
+            height: 50px;
+            width: 40px;
+        }
 
-.sidebar-menu li {
-    margin: 15px 0;
-}
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+        }
 
-.sidebar-menu a {
-    color: #555; /* Darker text for buttons */
-    background-color: transparent;
-    border: none;
-    text-decoration: none;
-    font-size: 16px;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px;
-    border-radius: 8px;
-}
+        .sidebar-menu li {
+            margin: 15px 0;
+        }
 
-.sidebar-menu a:hover {
-    background-color: #f0f0f0; /* Light background on hover */
-    color: #1abc9c;
-}
+        .sidebar-menu a {
+            color: #555;
+            background-color: transparent;
+            border: none;
+            text-decoration: none;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            border-radius: 8px;
+        }
 
-.sidebar-menu a.active {
-    background-color: #1abc9c; /* Accent color for active link */
-    color: white;
-}
+        .sidebar-menu a:hover {
+            background-color: #f0f0f0;
+            color: #1abc9c;
+        }
 
-.sidebar-menu a i {
-    font-size: 18px;
-}
+        .sidebar-menu a.active {
+            background-color: #1abc9c;
+            color: white;
+        }
 
-.sidebar-footer {
-    margin-top: 30px;
-}
+        .sidebar-footer {
+            margin-top: 30px;
+        }
 
-.sidebar-footer .accountbutton {
-    width: 100%;
-    padding: 10px;
-    background-color: transparent;
-    color: #555; /* Darker text for logout/login button */
-    border: 1px solid #ddd; /* Light border */
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-}
+        .accountbutton {
+            width: 100%;
+            padding: 10px;
+            background-color: transparent;
+            color: #555;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
 
-.sidebar-footer .accountbutton:hover {
-    background-color: #1abc9c; /* Accent color on hover */
-    color: white;
-    border-color: #1abc9c;
-}
+        .accountbutton:hover {
+            background-color: #1abc9c;
+            color: white;
+            border-color: #1abc9c;
+        }
 
-.sidebar-footer .accountbutton i {
-    font-size: 18px;
-}
+        .add-task {
+            width: 100%;
+            padding: 12px;
+            background-color: #1abc9c;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
 
-/* Add Task Button */
-.add-task {
-    width: 100%;
-    padding: 12px;
-    background-color: #1abc9c; /* Accent color */
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 16px;
-    font-weight: 600;
-    transition: background-color 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    margin-top: 20px;
-}
+        .add-task:hover {
+            background-color: #16a085;
+        }
 
-.add-task:hover {
-    background-color: #16a085; /* Darker accent color on hover */
-}
+        /* Main Content */
+        main {
+            width: 100%;
+            max-width: 1600px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 12px;
+            min-height: calc(100vh - 100px);
+            overflow-y: auto;
+            margin-top: 64px; /* Space for the fixed header */
+            padding: 20px;
+            position: relative;
+        }
 
-.add-task i {
-    font-size: 18px;
-}
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 3000;
+        }
 
-/* Main Content */
-main {
-    width: 100%;
-    max-width: 1600px;
-    margin: 0 auto;
-    background-color: white;
-    border-radius: 12px;
-    min-height: calc(100vh - 100px);
-    overflow-y: auto;
-    display: flex
-;
-    margin-top: 40px;
-    padding-left: 250px;
-    position: relative;
-    flex-direction: column;
-}
+        .modal-content {
+            background-color: #fff;
+            padding: 25px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            position: relative;
+            animation: modalFadeIn 0.3s ease;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
 
-/* Sidebar Toggle Button */
-.sidebar-toggle {
-    display: none; /* Hidden by default */
-    position: fixed;
-    top: 20px;
-    right: 24px;
-    background: #1abc9c;
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    font-size: 18px;
-    cursor: pointer;
-    border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    z-index: 1100;
-}
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
-.sidebar-toggle:hover {
-    background: #16a085;
-}
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+            transition: color 0.3s ease;
+        }
 
+        .close-modal:hover {
+            color: #333;
+        }
 
-/* Modal Styles */
-.modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    justify-content: center;
-    align-items: center;
+        /* Responsive Fixes */
+        @media (max-width: 768px) {
+            header {
+                padding: 0 16px;
+            }
 
-    overflow-y: auto; /* Enable scrolling for the modal */
-    padding: 20px; /* Add padding to prevent content from touching the edges */
-    z-index: 3000;
-}
+            main {
+                padding-left: 0;
+                margin-top: 64px;
+            }
 
-.modal-content {
-    background-color: #fff;
-    padding: 25px;
-    border-radius: 12px;
-    width: 90%;
-    max-width: 500px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-    position: relative;
-    animation: modalFadeIn 0.3s ease;
-    max-height: 90vh; /* Limit modal height to 90% of the viewport height */
-    overflow-y: auto; /* Enable scrolling for the modal content */
-   
-}
-
-/* Chat Modal Styles */
-.chat-list {
-    max-height: 300px;
-    overflow-y: auto;
-    margin-top: 10px;
-}
-
-.chat-item {
-    padding: 10px;
-    border-bottom: 1px solid #ddd;
-}
-
-.chat-item a {
-    text-decoration: none;
-    color: #2c3e50;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.chat-time {
-    font-size: 12px;
-    color: #777;
-}
-
-.filter-buttons {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-}
-
-@keyframes modalFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.close-modal {
-    position: absolute;
-    top: 15px;
-    right: 20px;
-    font-size: 24px;
-    cursor: pointer;
-    color: #666;
-    transition: color 0.3s ease;
-}
-
-.close-modal:hover {
-    color: #333;
-}
-
-/* Responsive Fixes */
-@media (max-width: 768px) {
-    header {
-        width: 100%; /* Full width on smaller screens */
-        margin-left: 0; /* Remove sidebar offset */
-        padding: 8px;
-        padding-right: 35%;
-    }
-
-    .sidebar {
-        transform: translateX(-100%); /* Hide sidebar by default */
-    }
-
-    .sidebar.show {
-        transform: translateX(0); /* Show sidebar when toggled */
-    }
-
-    main {
-        width: 100%; /* Full width on smaller screens */
-        margin-left: 0; /* Remove sidebar offset */
-        padding: 16px 8px;
-        margin-top: 72px;
-       
-    }
-
-    .sidebar-toggle {
-        display: block; /* Show toggle button on mobile */
-    }
-
-    header h1 {
-        margin-top: -8px;
-    }
-
-    header a, header button {
-        margin-left: 0;
-        margin-bottom: 8px;
-    }
-
-    footer {
-        padding: 16px;
-    }
-}   
+            .sidebar-toggle {
+                display: block;
+            }
+        }
     </style>
 </head>
 <body class="base-main-body">
-    <header >
-       <div class="header-div">
-        
-        <div class="welcome-message">
-            <span>Welcome, <a href="{% url 'profile' %}">{{ user.username }}</a>!</span>
+    <header>
+        <div class="header-div">
+            <div class="header-left">
+                <button class="sidebar-toggle" onclick="toggleSidebar()" aria-label="Toggle Sidebar">☰</button>
+                <div class="welcome-message">
+                    <span>Welcome, <a href="{% url 'profile' %}">{{ user.username }}</a>!</span>
+                </div>
+            </div>
+            <button class="view-chats-button" onclick="openChatModal()">💬 Chats</button>
         </div>
-        <button class="view-chats-button" onclick="openChatModal()">💬 Chats</button>
-       </div>
     </header>
-    <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+
     <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
+        <div class="sidebar-toggle-div">
+            <button class="sidebar-toggle" onclick="toggleSidebar()" aria-label="Close Sidebar">X</button>
+        </div>
         <div>
             <a class="sidebar-header" href="{% url 'home' %}" style="text-decoration: none;">
-                <img class="site-logo" src="/media/symbols/logo.png" alt="">
+                <img class="site-logo" src="/media/symbols/logo.png" alt="Site Logo">
                 <h2>Share Task</h2>
             </a>
- 
             <ul class="sidebar-menu">
                 <li>
                     <a id="all-tasks-link" href="{% url 'home' %}">
@@ -452,77 +364,80 @@ main {
     <footer>
         &copy; {{ year }} {{ app_name }}. All rights reserved.
     </footer>
-</body>
 
-<!-- Chat Modal -->
-<div id="chatModal" class="modal" style="display: none;">
-    <div class="modal-content">
-        <span class="close-modal" onclick="closeChatModal()">&times;</span>
-        <h3>💬 All Chats</h3>
-        <div class="chat-list">
-            <p>Loading chats...</p>
+    <!-- Chat Modal -->
+    <div id="chatModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeChatModal()">&times;</span>
+            <h3>💬 All Chats</h3>
+            <div class="chat-list">
+                <p>Loading chats...</p>
+            </div>
         </div>
     </div>
-</div>
-<script>
-    function toggleSidebar() {
-        const sidebar = document.getElementById("sidebar");
-        sidebar.classList.toggle("show");
-    }
 
-    function setActiveLink() {
-        const currentPath = window.location.pathname;
-        const allTasksLink = document.getElementById('all-tasks-link');
-        const leaderboardLink = document.getElementById('leaderboard-link');
-
-        allTasksLink.classList.remove('active');
-        leaderboardLink.classList.remove('active');
-
-        if (currentPath === "{% url 'home' %}") {
-            allTasksLink.classList.add('active');
-        } else if (currentPath === "{% url 'leaderboard' %}") {
-            leaderboardLink.classList.add('active');
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById("sidebar");
+            sidebar.classList.toggle("show");
         }
-    }
 
-    function openChatModal() {
-    const chatModal = document.getElementById('chatModal');
-    chatModal.style.display = 'block'; // Show the modal
+        function openChatModal() {
+            const chatModal = document.getElementById('chatModal');
+            chatModal.style.display = 'block';
 
-    // Fetch chats from the backend
-    fetch('/fetch-all-chats/')
-        .then(response => response.json())
-        .then(data => {
-            console.log(data)
-            const chatList = document.querySelector('.chat-list');
-            chatList.innerHTML = ''; // Clear previous chats
+            // Fetch chats from the backend
+            fetch('/fetch-all-chats/')
+                .then(response => response.json())
+                .then(data => {
+                    const chatList = document.querySelector('.chat-list');
+                    chatList.innerHTML = '';
 
-            if (data.chats && data.chats.length > 0) {
-                data.chats.forEach(chat => {
-                    const chatItem = document.createElement('div');
-                    chatItem.classList.add('chat-item');
+                    if (data.chats && data.chats.length > 0) {
+                        data.chats.forEach(chat => {
+                            const chatItem = document.createElement('div');
+                            chatItem.classList.add('chat-item');
 
-                    if (chat.task_id) {
-                        chatItem.innerHTML = `
-                            <a href="/chat/${chat.task_id}/?receiver_id=${chat.user.id}">
-                                <strong>${chat.user.username} ${chat.task_id}</strong>: ${chat.last_message}
-                                <small class="chat-time">${chat.timestamp}</small>
-                            </a>
-                        `;
+                            if (chat.task_id) {
+                                chatItem.innerHTML = `
+                                    <a href="/chat/${chat.task_id}/?receiver_id=${chat.user.id}">
+                                        <strong>${chat.user.username} ${chat.task_id}</strong>: ${chat.last_message}
+                                        <small class="chat-time">${chat.timestamp}</small>
+                                    </a>
+                                `;
+                            }
+
+                            chatList.appendChild(chatItem);
+                        });
+                    } else {
+                        chatList.innerHTML = '<p>No chats available.</p>';
                     }
-
-                    chatList.appendChild(chatItem);
+                })
+                .catch(error => {
+                    console.error("Error fetching chats:", error);
+                    document.querySelector('.chat-list').innerHTML = '<p>Error loading chats.</p>';
                 });
-            } else {
-                chatList.innerHTML = '<p>No chats available.</p>';
-            }
-        })
-        .catch(error => {
-            console.error("Error fetching chats:", error);
-            document.querySelector('.chat-list').innerHTML = '<p>Error loading chats.</p>';
-        });
-}
+        }
 
-    document.addEventListener('DOMContentLoaded', setActiveLink);
-</script>
+        function closeChatModal() {
+            const chatModal = document.getElementById('chatModal');
+            chatModal.style.display = 'none';
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const currentPath = window.location.pathname;
+            const allTasksLink = document.getElementById('all-tasks-link');
+            const leaderboardLink = document.getElementById('leaderboard-link');
+
+            allTasksLink.classList.remove('active');
+            leaderboardLink.classList.remove('active');
+
+            if (currentPath === "{% url 'home' %}") {
+                allTasksLink.classList.add('active');
+            } else if (currentPath === "{% url 'leaderboard' %}") {
+                leaderboardLink.classList.add('active');
+            }
+        });
+    </script>
+</body>
 </html>

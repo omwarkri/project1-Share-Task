@@ -15,7 +15,7 @@
         /* General Styles */
         h1, h2 {
             color: #1abc9c;
-            margin-bottom: 10px;
+          
             font-weight: 600;
         }
 
@@ -37,9 +37,9 @@
         .profile-main {
             height: 100vh; /* Full viewport height */
             overflow-y: auto; /* Enable vertical scrolling */
-            background-color: #f8f9fa; /* Optional: Add a background color */
-            padding: 20px; /* Optional: Add padding for better spacing */
+            background-color: #fff; /* Optional: Add a background color */
             box-sizing: border-box; /* Include padding in height calculation */
+            
             
         }
 
@@ -135,7 +135,6 @@
     background: white;
     padding: 30px;
     border-radius: 12px;
-
     margin-bottom: 20px;
     width: 100%;
     text-align: center;
@@ -338,7 +337,14 @@
         .user-score {
             font-size: 1.2em;
             color: #1abc9c;
-            margin: 15px 0;
+            margin-top: -8px;
+
+        }
+
+        .name-badge{
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         /* Badges Section */
@@ -674,6 +680,12 @@
         }
 
         /* Form Group Styles */
+        #reportForm{
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            width: 40%;
+        }
         .form-group {
             margin-bottom: 20px;
             text-align: left;
@@ -746,7 +758,10 @@
 
             .profile-main{
                 padding: 16px;
-                padding-top: 64px;
+                padding-top: 8px;
+            }
+            .logout-button{
+                margin: 0;
             }
             .left-section, .right-section {
                 max-width: 100%; /* Full width on smaller screens */
@@ -755,20 +770,26 @@
                 margin: 0;
                 box-shadow: none;
             }
+            .card{
+                padding: 8px;
+            }
 
             /* Adjust calendar for mobile */
             .calendar {
-                grid-template-rows: repeat(26, 16px); /* Smaller rows for mobile */
-                gap: 2px; /* Reduce gap between days */
+                grid-template-rows: repeat(24, 10px); /* Smaller rows for mobile */
+                gap: 1px; /* Reduce gap between days */
                 padding: 4px; /* Reduce padding */
             }
+            .right-section .day {
+    width: 19px;
+    height: 13px;
+    margin-bottom: 10px; 
 
-            .day {
+    border-radius: 3px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
 
-                width: 4px; /* Smaller day size */
-                height: 4px; /* Smaller day size */
-                margin-bottom: 4px;
-            }
+        
 
             .calendar-header {
                 font-size: 0.8em; /* Smaller font size for header */
@@ -794,30 +815,24 @@
                             <img class="profile-picture" src="https://via.placeholder.com/150" alt="Default Profile Picture">
                         {% endif %}
                     </div>
-                    <h1>{{ user.username }}!</h1>
+
+                   <div>
+                    <div class="name-badge">
+                        <h1>{{ user.username }}!</h1>
+        .
+        <div class="badge" title="{{ user_badges.last.badge.name }}">
+            <img class="badge_icon" src="http://127.0.0.1:8000/media/{{ user_badges.last.badge.icon }}" alt="{{ user_badges.last.badge.name }}">
+        </div>
+                    </div>
+                    <p class="user-score">Score: {{ user.score }}</p>
+                   </div>
                 </div>
                
 
                 <!-- Edit Button -->
                 <button class="edit-button" onclick="openProfileEditModal()">Edit Profile</button>
 
-                <p class="user-score">Score: {{ user.score }}</p>
-
-                <!-- Display Badges -->
-                <div class="badges-section">
-                    <h3>Badges</h3>
-                    <div class="badges">
-                        {% if user.user_badges %}
-                            {% for user_badge in user_badges %}
-                                <div class="badge" title="{{ user_badge.badge.name }}">
-                                    <img class="badge_icon" src="http://127.0.0.1:8000/media/{{ user_badge.badge.icon }}" alt="{{ user_badge.badge.name }}">
-                                </div>
-                            {% endfor %}
-                        {% else %}
-                            <p>No badges earned yet.</p>
-                        {% endif %}
-                    </div>
-                </div>
+            
 
                 <!-- Logout Button -->
                 <form method="post" action="{% url 'logout' %}" style="display: inline;">

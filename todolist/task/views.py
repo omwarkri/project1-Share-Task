@@ -102,7 +102,7 @@ def home(request):
 
     # Start with tasks for the logged-in user
     tasks = Task.objects.filter(user=request.user)
-
+  
     # Apply search query filter
     if search_query:
         tasks = tasks.filter(
@@ -228,6 +228,9 @@ def add_task(request):
         if form.is_valid():
             task = form.save(commit=False)
             task.user = request.user
+            is_private = request.POST.get('private') == 'on'  # 'on' is the value when the checkbox is checked
+            task.shareable = not is_private  # If private is True, shareable is False, and vice versa
+
             task.save()
 
             # Log the task creation

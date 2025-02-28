@@ -46,7 +46,21 @@
             </div>
             <div class="header-actions">
                 <input type="text" id="search-bar" class="search-bar" placeholder="🔍 Search tasks..." oninput="searchTasks()" />
+                <button id="clear-filter-button" class="clear-filter-button" onclick="displayAllTasks()">🗑️</button>
+                <input type="text" id="date-filter" class="search-bar" placeholder="📅 Filter by date..." onclick="filterTasks()" />
+                <div class="private-task-toggle">
+                    🔒
+                    <label class="switch">
+                        
+                        <input type="checkbox" id="private-task-switch" >
+                        <span class="slider">
+                            
+                        </span>
+                    </label>
+                </div>
+                
                 <button class="filter-button" onclick="openFilterModal()">⚙️ Filters</button>
+                
 
             </div>
         </div>
@@ -54,9 +68,9 @@
         <!-- Task List -->
         <div class="task-grid" id="task-list">
             {% for task_data in tasks_with_suggestions %}
-                <div class="task-card task-item" data-status="{{ task_data.task.status }}" data-priority="{{ task_data.task.priority }}">
+                <div class="task-card task-item" data-status="{{ task_data.task.status }}" data-priority="{{ task_data.task.priority }}" data-private="{{ task_data.task.shareable|yesno:'true,false' }}" data-due-datetime="{{ task_data.task.due_date|date:'Y-m-d H:i' }}">
                     <div class="task-header">
-                        <strong class="task-title">📌 {{ task_data.task.title }}</strong>
+                        <strong class="task-title">📌 {{ task_data.task.title }} </strong>
                         <span class="task-priority {{ task_data.task.priority }}">
                             {% if task_data.task.priority == 'high' %}🚨
                             {% elif task_data.task.priority == 'medium' %}⚠️
@@ -68,6 +82,7 @@
                     <div class="task-body">
                         <p><strong>📊 Status:</strong> {{ task_data.task.get_status_display }}</p>
                         <p><strong>📅 Due Date:</strong> {{ task_data.task.due_date|date:"F j, Y, g:i a" }}</p>
+                        {{task_data.task.shareable}}
 
                         <div class="task-mid-buttons">
                             <a href="{% url 'ai_task_management' task_data.task.id %}" class="suggested-users-button">🤖</a>
@@ -93,6 +108,7 @@
 
 <!-- Modals -->
 <!-- Add Task Modal -->
+<!-- Add Task Modal -->
 <div id="addTaskModal" class="modal" style="display: none;">
     <div class="modal-content">
         <span class="close-modal" onclick="closeAddTaskModal()">&times;</span>
@@ -110,11 +126,27 @@
                     {% endif %}
                 </div>
             {% endfor %}
+            <!-- Calendar Input for Due Date -->
+          <!-- <div>
+                <label for="due-date">📅 Due Date:</label>
+                <input type="text" id="due-date" name="due_date" placeholder="Select due date" />
+            </div>    -->
+            <div class="private-task-toggle">
+                <label for="private-task-switch">Mark as Private:</label>
+                <input type="checkbox" id="is-private-task" name="private">
+            </div>
             <button type="submit" class="submit-button">➕ Add Task</button>
         </form>
     </div>
 </div>
 
+<script>
+    // Initialize Flatpickr for the due date field in the Add Task modal
+    flatpickr("#due-date", {
+        dateFormat: "Y-m-d", // Format to match your task due dates
+        defaultDate: "today", // Set default date to today
+    });
+</script>
 
 
 <!-- Filter Modal -->
@@ -430,6 +462,75 @@ div.task-mid-buttons{
     display: flex;
     gap: 10px;
 }
+
+
+.private-task-toggle {
+    display: flex;
+    align-items: center;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 24px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    background-color: #ccc;
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 24px;
+    transition: 0.3s;
+}
+
+.slider::before {
+    content: "";
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    left: 2px;
+    bottom: 2px;
+    background-color: white;
+    border-radius: 50%;
+    transition: 0.3s;
+}
+
+.lock-icon {
+    position: absolute;
+    font-size: 14px;
+    color: white;
+    right: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.switch input:checked + .slider {
+    background-color: #4caf50;
+}
+
+.switch input:checked + .slider::before {
+    transform: translateX(26px);
+}
+
+.switch input:checked + .slider .lock-icon {
+    content: "🔒"; /* Locked Icon */
+}
+
+.switch input:not(:checked) + .slider .lock-icon {
+    content: "🔓"; /* Unlocked Icon */
+}
+
 
 .search-bar {
     padding: 8px 12px;
@@ -917,12 +1018,6 @@ div.task-mid-buttons{
 
 }
 
-footer{
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
 /* Wave Animation */
 @keyframes wave {
     0% {
@@ -1087,6 +1182,69 @@ footer{
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
 
 <script>
+     function displayAllTasks() {
+    const taskItems = document.querySelectorAll('.task-item');
+
+    taskItems.forEach(task => {
+        console.log(task)
+        task.style.display = 'block'; // Show all tasks
+    });
+}
+
+    // Function to filter tasks by date
+// Function to filter tasks by both date and private status
+function filterTasks() {
+    const selectedDate = document.getElementById('date-filter').value; // Get selected date
+    const showPrivateTasks = document.getElementById('private-task-switch').checked; // Get private task toggle state
+
+    const taskItems = document.querySelectorAll('.task-item');
+
+    taskItems.forEach(task => {
+        const taskDueDateTime = task.getAttribute('data-due-datetime'); // Full datetime string
+        const isPrivate = task.getAttribute('data-private') === 'false'; // Check if task is private
+
+        // Extract the date portion from the datetime string
+        const taskDueDate = taskDueDateTime ? taskDueDateTime.split(' ')[0] : null;
+
+        // Check if the task matches the selected date (if any)
+        const matchesDate = !selectedDate || taskDueDate === selectedDate;
+
+        // Check if the task matches the private filter
+        const matchesPrivateFilter = showPrivateTasks ? isPrivate : true;
+
+        // Display the task if it matches both filters
+        if (matchesDate && matchesPrivateFilter) {
+            task.style.display = 'block'; // Show the task
+        } else {
+            task.style.display = 'none'; // Hide the task
+        }
+    });
+}
+
+
+
+
+// Add event listeners to both filters
+document.getElementById('date-filter').addEventListener('input', filterTasks);
+document.getElementById('private-task-switch').addEventListener('change', filterTasks);
+
+// Initialize Flatpickr for date filtering (without time)
+flatpickr("#date-filter", {
+    enableTime: false, // Disable time selection
+    dateFormat: "Y-m-d", // Format to match only the date portion
+    onChange: function(selectedDates, dateStr) {
+        // document.getElementById("due-date").value = dateStr;
+        let dueDateField = document.querySelector("[name='due_date']");
+        console.log(dueDateField)
+        if (dueDateField) {
+            console.log(dateStr)
+            dueDateField.value = dateStr + " 12:00"; 
+        }
+
+        filterTasks(); // Filter tasks by the selected date
+    }
+});
+
 
 
         const toggleButton = document.getElementById('toggle-shutter-button');
@@ -1183,22 +1341,7 @@ function applySorting() {
         taskItems.forEach(task => taskList.appendChild(task));
     }
     // Function to filter tasks by status and priority
-    function filterTasks(status, priority) {
-    // Filter tasks based on status and priority
-    const taskItems = document.querySelectorAll('.task-item');
-    taskItems.forEach(task => {
-        const taskStatus = task.getAttribute('data-status');
-        const taskPriority = task.getAttribute('data-priority');
 
-        const statusMatch = status === 'all' || taskStatus === status;
-        const priorityMatch = priority === 'all' || taskPriority === priority;
-
-        if (statusMatch && priorityMatch) {
-            task.style.display = 'block'; // Show the task
-        } else {
-            task.style.display = 'none'; // Hide the task
-        }
-    });
 
     // Update the active class on sidebar buttons
     const sidebarButtons = document.querySelectorAll('.sidebar-menu button');
@@ -1211,7 +1354,7 @@ function applySorting() {
     if (activeButton) {
         activeButton.classList.add('active');
     }
-}
+
 function searchTasks() {
     const query = document.getElementById('search-bar').value;
     const taskList = document.getElementById('task-list');
@@ -1376,6 +1519,7 @@ function closeChatModal() {
 //         });
 //     });
 // }
+
 
 
 

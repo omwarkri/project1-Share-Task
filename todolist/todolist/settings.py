@@ -157,11 +157,11 @@ WSGI_APPLICATION = 'todolist.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'share_task',
-        'USER': 'share_task_user',
-        'PASSWORD': 'hZrrRKws2LV2pDSvgOMgfnfZRCFrdAQQ',
-        'HOST': 'dpg-cud6k0in91rc73epr120-a.oregon-postgres.render.com',  # or your server IP
-        'PORT': '5432',       # default PostgreSQL port
+        'NAME': 'defaultdb',
+        'USER': 'avnadmin',
+        'PASSWORD': 'AVNS_vEqaMldyHtujX4KVGbg',
+        'HOST': 'pg-b2f283-shantanuchavhan002-568b.l.aivencloud.com',  # or your server IP
+        'PORT': '11560',       # default PostgreSQL port
     }
 }
 

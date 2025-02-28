@@ -271,7 +271,7 @@ function hideLoading() {
 
 // Load notes from the server
 function loadNotes() {
-    showLoading();
+    showLoading(); // Show loading indicator
     fetch("{% url 'get_task_notes' task.id %}", {
         method: 'GET',
         headers: {
@@ -280,18 +280,28 @@ function loadNotes() {
     })
     .then(response => response.json())
     .then(data => {
-        hideLoading();
+        hideLoading(); // Hide loading indicator
         const noteList = document.getElementById('noteList');
         noteList.innerHTML = ''; // Clear previous notes
 
         if (data.status === 'success') {
             data.notes.forEach(note => {
                 const noteItem = document.createElement('li');
+
+                // Split the note text into lines
+                const lines = note.note_text.split('\n');
+
+                // Check if the note has more than 4 lines
+                const hasMoreLines = lines.length > 4;
+
+                // Take only the first 4 lines
+                const truncatedText = lines.slice(0, 4).join('\n');
+
                 noteItem.innerHTML = `
                     <strong>${note.username}</strong>
-                    <div class="note-content">${note.note_text}</div>
+                    <div class="note-content">${truncatedText}</div>
                     <small>Added on ${note.created_at}</small>
-                    <div class="view-more" data-note-id="${note.id}">View More</div>
+                    ${hasMoreLines ? `<div class="view-more" data-note-id="${note.id}">View More</div>` : ''}
                 `;
                 noteList.appendChild(noteItem);
             });
@@ -304,12 +314,16 @@ function loadNotes() {
                 });
             });
         } else {
+            // Display a message if no notes are available
             noteList.innerHTML = '<li>No notes available for this task.</li>';
         }
     })
     .catch(error => {
-        hideLoading();
+        hideLoading(); // Hide loading indicator in case of error
         console.error('Error:', error);
+        // Optionally, display an error message to the user
+        const noteList = document.getElementById('noteList');
+        noteList.innerHTML = '<li>Failed to load notes. Please try again later.</li>';
     });
 }
 

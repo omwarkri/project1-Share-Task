@@ -47,12 +47,12 @@
             <div class="header-actions">
                 <input type="text" id="search-bar" class="search-bar" placeholder="🔍 Search tasks..." oninput="searchTasks()" />
                 <button id="clear-filter-button" class="clear-filter-button" onclick="displayAllTasks()">🗑️</button>
-                <input type="text" id="date-filter" class="search-bar" placeholder="📅 Filter by date..." onclick="filterTasks()" />
-                <div class="private-task-toggle">
+                <input type="text" id="date-filter" class="search-bar" placeholder="📅 Filter by date..." />
+                <div class="private-task-toggle" onclick="filterTasks()">
                     🔒
                     <label class="switch">
                         
-                        <input type="checkbox" id="private-task-switch" >
+                        <input type="checkbox" id="is-private-task" >
                         <span class="slider">
                             
                         </span>
@@ -1192,28 +1192,42 @@ div.task-mid-buttons{
 }
 
     // Function to filter tasks by date
-// Function to filter tasks by both date and private status
-function filterTasks() {
-    const selectedDate = document.getElementById('date-filter').value; // Get selected date
-    const showPrivateTasks = document.getElementById('private-task-switch').checked; // Get private task toggle state
+
+
+function filterTasks(statusFilter = 'all', priorityFilter = 'all') {
+    const dateFilterInput = document.getElementById("date-filter");
+    const selectedDate = dateFilterInput ? dateFilterInput.value.trim() : '';
+    const privateSwitch = document.getElementById('is-private-task'); // Get private task toggle state
+    
+    if (!privateSwitch) {
+        console.error("Private task switch element not found!");
+        return;
+    }
+
+    const showPrivate = privateSwitch.checked; // Get toggle state
+    if (privateSwitch.checked==true){
+        privateSwitch.checked=false
+
+    }else{
+        privateSwitch.checked=true
+    }
+    console.log("Task privacy:", showPrivate);
 
     const taskItems = document.querySelectorAll('.task-item');
 
     taskItems.forEach(task => {
+        const taskStatus = task.getAttribute('data-status'); // Get task status
+        const taskPriority = task.getAttribute('data-priority'); // Get task priority
         const taskDueDateTime = task.getAttribute('data-due-datetime'); // Full datetime string
         const isPrivate = task.getAttribute('data-private') === 'false'; // Check if task is private
 
-        // Extract the date portion from the datetime string
-        const taskDueDate = taskDueDateTime ? taskDueDateTime.split(' ')[0] : null;
+        // Match filters
+        const matchesStatus = (statusFilter === 'all' || taskStatus === statusFilter);
+        const matchesPriority = (priorityFilter === 'all' || taskPriority === priorityFilter);
+        const matchesDate = (selectedDate === '' || taskDueDateTime.startsWith(selectedDate));
+        const matchesPrivacy = (showPrivate || isPrivate); // Show if private allowed OR task is not private
 
-        // Check if the task matches the selected date (if any)
-        const matchesDate = !selectedDate || taskDueDate === selectedDate;
-
-        // Check if the task matches the private filter
-        const matchesPrivateFilter = showPrivateTasks ? isPrivate : true;
-
-        // Display the task if it matches both filters
-        if (matchesDate && matchesPrivateFilter) {
+        if (matchesStatus && matchesPriority && matchesDate && matchesPrivacy) {
             task.style.display = 'block'; // Show the task
         } else {
             task.style.display = 'none'; // Hide the task
@@ -1224,9 +1238,13 @@ function filterTasks() {
 
 
 
+
+
+
+
 // Add event listeners to both filters
-document.getElementById('date-filter').addEventListener('input', filterTasks);
-document.getElementById('private-task-switch').addEventListener('change', filterTasks);
+
+
 
 // Initialize Flatpickr for date filtering (without time)
 flatpickr("#date-filter", {
@@ -1240,6 +1258,7 @@ flatpickr("#date-filter", {
             console.log(dateStr)
             dueDateField.value = dateStr + " 12:00"; 
         }
+
 
         filterTasks(); // Filter tasks by the selected date
     }
@@ -1531,4 +1550,4 @@ function closeChatModal() {
     filterTasks('all', 'all');
 </script>
 
-{% endblock %}
+{% endblock %}	

@@ -178,6 +178,11 @@
         }
 
 
+        .note-content{
+            height: 100px;
+            overflow: hidden;
+        }
+
 
         /* Mobile Styles */
         @media (max-width: 600px) {
@@ -271,7 +276,7 @@ function hideLoading() {
 
 // Load notes from the server
 function loadNotes() {
-    showLoading(); // Show loading indicator
+    showLoading();
     fetch("{% url 'get_task_notes' task.id %}", {
         method: 'GET',
         headers: {
@@ -280,28 +285,18 @@ function loadNotes() {
     })
     .then(response => response.json())
     .then(data => {
-        hideLoading(); // Hide loading indicator
+        hideLoading();
         const noteList = document.getElementById('noteList');
         noteList.innerHTML = ''; // Clear previous notes
 
         if (data.status === 'success') {
             data.notes.forEach(note => {
                 const noteItem = document.createElement('li');
-
-                // Split the note text into lines
-                const lines = note.note_text.split('\n');
-
-                // Check if the note has more than 4 lines
-                const hasMoreLines = lines.length > 4;
-
-                // Take only the first 4 lines
-                const truncatedText = lines.slice(0, 4).join('\n');
-
                 noteItem.innerHTML = `
                     <strong>${note.username}</strong>
-                    <div class="note-content">${truncatedText}</div>
+                    <div class="note-content">${note.note_text}</div>
                     <small>Added on ${note.created_at}</small>
-                    ${hasMoreLines ? `<div class="view-more" data-note-id="${note.id}">View More</div>` : ''}
+                    <div class="view-more" data-note-id="${note.id}">View More</div>
                 `;
                 noteList.appendChild(noteItem);
             });
@@ -314,19 +309,14 @@ function loadNotes() {
                 });
             });
         } else {
-            // Display a message if no notes are available
             noteList.innerHTML = '<li>No notes available for this task.</li>';
         }
     })
     .catch(error => {
-        hideLoading(); // Hide loading indicator in case of error
+        hideLoading();
         console.error('Error:', error);
-        // Optionally, display an error message to the user
-        const noteList = document.getElementById('noteList');
-        noteList.innerHTML = '<li>Failed to load notes. Please try again later.</li>';
     });
 }
-
 // Show the note form
 function showNoteForm(noteId = null) {
     currentNoteId = noteId;
@@ -489,4 +479,4 @@ document.getElementById('submitNote').addEventListener('click', () => {
 document.addEventListener('DOMContentLoaded', loadNotes);
     </script>
 </body>
-</html>
+</html> 

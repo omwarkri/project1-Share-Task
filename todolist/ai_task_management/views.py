@@ -30,8 +30,6 @@ def generate_ai_response(task_id, user_message):
     # Extract AI response text
     ai_response = response.text
     
-    # Save AI response in the database
-    ChatAIMessage.objects.create(task_id=task_id, sender="AI", message=ai_response)
 
     return ai_response
 

@@ -16,5 +16,11 @@ urlpatterns = [
     path("api/tasks/<int:task_id>/subtasks/", get_subtasks),
     path("api/tasks/<int:task_id>/subtasks/add/", add_subtask),
     path("api/subtasks/<int:subtask_id>/toggle/", toggle_subtask),
+
+
+    path('teams/', teams_list, name='teams_list'),  # Show all teams
+    path('teams/<int:team_id>/', view_team_tasks, name='view_team_tasks'),  # Show tasks for a team
+    path('teams/create/', create_team, name='create_team'),
+    
   
 ]

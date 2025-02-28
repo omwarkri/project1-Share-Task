@@ -5,6 +5,21 @@ from datetime import timedelta
 from django.utils import timezone
 
 
+
+from django.contrib.auth.models import User
+from django.db import models
+from user.models import CustomUser
+
+class Team(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+    description = models.TextField(blank=True, null=True)
+    created_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="teams")
+    members = models.ManyToManyField(CustomUser, related_name="team_members", blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.name
+
 class   Task(models.Model):
     STATUS_CHOICES = [
         ('pending', 'Pending'),
@@ -40,6 +55,7 @@ class   Task(models.Model):
     dependencies = models.ManyToManyField('self', through='TaskDependency', symmetrical=False, related_name='dependent_tasks')
     procedure = models.TextField(blank=True, null=True) 
     reminder_sent = models.BooleanField(default=False)  # New field
+    team = models.ForeignKey(Team, on_delete=models.CASCADE, null=True, blank=True, related_name="team_tasks")  # Team tasks
     def __str__(self):
         return self.title
 
@@ -66,6 +82,10 @@ class   Task(models.Model):
 
     class Meta:
         ordering = ['-created_at']
+
+
+
+
 
 
 
@@ -200,3 +220,8 @@ class TaskDependency(models.Model):
 
     class Meta:
         unique_together = ('task', 'dependent_on')  # Prevents duplicate dependencies
+
+
+
+
+

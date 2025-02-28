@@ -782,3 +782,122 @@ def generate_ai_procedure(request, task_id):
 
 
 
+
+
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from .models import Team
+from .forms import TeamForm
+
+@login_required
+def create_team(request):
+    if request.method == "POST":
+        form = TeamForm(request.POST)
+        if form.is_valid():
+            team = form.save(commit=False)
+            team.created_by = request.user
+            team.save()
+            team.members.add(request.user)  # Auto-add creator as a member
+            return redirect("team_list")
+    else:
+        form = TeamForm()
+    return render(request, "tasks/create_team.html", {"form": form})
+
+
+
+
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from .models import Team
+from .forms import TeamForm
+
+@login_required
+def teams_list(request):
+    teams = Team.objects.all()  # Fetch all teams
+
+    if request.method == "POST":
+        form = TeamForm(request.POST)
+        if form.is_valid():
+            team = form.save(commit=False)
+            team.created_by = request.user
+            team.save()
+            team.members.add(request.user)  # Add creator as a team member
+            return redirect('teams_list')  # Refresh page after submission
+    else:
+        form = TeamForm()
+
+    return render(request, 'teams/teams_list.html', {'teams': teams, 'form': form})
+
+
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from .models import Team, Task
+from .forms import AddMemberForm, TaskForm  # Import the TaskForm
+
+@login_required
+def view_team_tasks(request, team_id):
+    team = get_object_or_404(Team, id=team_id)
+    tasks = Task.objects.filter(team=team)  # Fetch tasks for the team
+    add_member_form = AddMemberForm()
+    task_form = TaskForm()  # Task creation form
+
+    if request.method == "POST":
+        if "add_member" in request.POST:
+            add_member_form = AddMemberForm(request.POST)
+            if add_member_form.is_valid():
+                user = add_member_form.cleaned_data['user']
+                if user not in team.members.all():
+                    team.members.add(user)
+                    messages.success(request, f"{user.username} added to the team!")
+                else:
+                    messages.warning(request, f"{user.username} is already in the team!")
+                return redirect('view_team_tasks', team_id=team.id)
+
+        elif "add_task" in request.POST:
+            task_form = TaskForm(request.POST)
+            if task_form.is_valid():
+                task = task_form.save(commit=False)
+                task.team = team  # Assign the task to the current team
+                task.created_by = request.user  # Assign task creator
+                task.save()
+                messages.success(request, "Task added successfully!")
+                return redirect('view_team_tasks', team_id=team.id)
+
+    return render(request, 'teams/team_tasks.html', {
+        'team': team,
+        'tasks': tasks,
+        'add_member_form': add_member_form,
+        'task_form': task_form
+    })
+
+
+
+
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from .forms import TeamForm
+from .models import Team
+
+@login_required
+def create_team(request):
+    if request.method == "POST":
+        form = TeamForm(request.POST)
+        if form.is_valid():
+            team = form.save(commit=False)
+            team.created_by = request.user
+            team.save()
+            team.members.add(request.user)  # Add creator as a team member
+            return redirect('teams_list')  # Redirect to teams list
+    else:
+        form = TeamForm()
+    
+    return render(request, 'teams/create_team.html', {'form': form})
+
+
+
+
+
+
+
+

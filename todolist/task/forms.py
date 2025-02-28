@@ -81,3 +81,20 @@ class TaskNotesForm(forms.ModelForm):
         widgets = {
             'note_text': forms.Textarea(attrs={'rows': 4, 'placeholder': 'Add a note...'}),
         }
+
+
+
+
+from django import forms
+from .models import Team
+from user.models import CustomUser
+
+class TeamForm(forms.ModelForm):
+    class Meta:
+        model = Team
+        fields = ['name', 'description']
+
+
+
+class AddMemberForm(forms.Form):
+    user = forms.ModelChoiceField(queryset=CustomUser.objects.all(), label="Select User")

@@ -64,6 +64,11 @@
             justify-content: space-between;
             align-items: center;
         }
+        .header-site-logo{
+            height: 35px;
+            width:30px;
+
+        }
 
         .view-chats-button {
             padding: 8px 12px;
@@ -287,6 +292,8 @@
             color: #333;
         }
 
+       
+
         /* Responsive Fixes */
         @media (max-width: 768px) {
             header {
@@ -312,6 +319,8 @@
         <div class="header-div">
             <div class="header-left">
                 <button class="sidebar-toggle" onclick="toggleSidebar()" aria-label="Toggle Sidebar">☰</button>
+                <a class="sidebar-header" href="{% url 'home' %}" style="text-decoration: none;"><img class="header-site-logo" src="/media/symbols/logo.png" alt="Site Logo"></a>
+                
                 <div class="welcome-message">
                     <span>Welcome, <a href="{% url 'profile' %}">{{ user.username }}</a>!</span>
                 </div>

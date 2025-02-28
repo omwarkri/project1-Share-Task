@@ -259,93 +259,104 @@
     <script>
         let currentNoteId = null; // Track the current note being edited
 
-        // Show loading spinner
-        function showLoading() {
-            document.getElementById('loadingSpinner').style.display = 'block';
-        }
+// Show loading spinner
+function showLoading() {
+    document.getElementById('loadingSpinner').style.display = 'block';
+}
 
-        // Hide loading spinner
-        function hideLoading() {
-            document.getElementById('loadingSpinner').style.display = 'none';
-        }
+// Hide loading spinner
+function hideLoading() {
+    document.getElementById('loadingSpinner').style.display = 'none';
+}
 
-        // Load notes from the server
-        function loadNotes() {
-            showLoading();
-            fetch("{% url 'get_task_notes' task.id %}", {
-                method: 'GET',
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                },
-            })
-            .then(response => response.json())
-            .then(data => {
-                hideLoading();
-                const noteList = document.getElementById('noteList');
-                noteList.innerHTML = ''; // Clear previous notes
+// Load notes from the server
+function loadNotes() {
+    showLoading();
+    fetch("{% url 'get_task_notes' task.id %}", {
+        method: 'GET',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        hideLoading();
+        const noteList = document.getElementById('noteList');
+        noteList.innerHTML = ''; // Clear previous notes
 
-                if (data.status === 'success') {
-                    data.notes.forEach(note => {
-                        const noteItem = document.createElement('li');
-                        noteItem.innerHTML = `
-                            <strong>${note.username}</strong>
-                            <div class="note-content">${note.note_text}</div>
-                            <small>Added on ${note.created_at}</small>
-                            <div class="view-more" data-note-id="${note.id}">View More</div>
-                        `;
-                        noteList.appendChild(noteItem);
-                    });
-
-                    // Add event listeners to view more buttons
-                    document.querySelectorAll('.view-more').forEach(button => {
-                        button.addEventListener('click', (e) => {
-                            const noteId = e.target.getAttribute('data-note-id');
-                            showNoteForm(noteId);
-                        });
-                    });
-                } else {
-                    noteList.innerHTML = '<li>No notes available for this task.</li>';
-                }
-            })
-            .catch(error => {
-                hideLoading();
-                console.error('Error:', error);
+        if (data.status === 'success') {
+            data.notes.forEach(note => {
+                const noteItem = document.createElement('li');
+                noteItem.innerHTML = `
+                    <strong>${note.username}</strong>
+                    <div class="note-content">${note.note_text}</div>
+                    <small>Added on ${note.created_at}</small>
+                    <div class="view-more" data-note-id="${note.id}">View More</div>
+                `;
+                noteList.appendChild(noteItem);
             });
+
+            // Add event listeners to view more buttons
+            document.querySelectorAll('.view-more').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const noteId = e.target.getAttribute('data-note-id');
+                    showNoteForm(noteId);
+                });
+            });
+        } else {
+            noteList.innerHTML = '<li>No notes available for this task.</li>';
         }
+    })
+    .catch(error => {
+        hideLoading();
+        console.error('Error:', error);
+    });
+}
 
-        // Show the note form
-        function showNoteForm(noteId = null) {
-            currentNoteId = noteId;
+// Show the note form
+function showNoteForm(noteId = null) {
+    currentNoteId = noteId;
 
-            const noteTextArea = document.getElementById('noteText');
+    const noteTextArea = document.getElementById('noteText');
 
-            if (noteId) {
-                // Load existing note text
-                const noteContent = document.querySelector(`[data-note-id="${noteId}"]`).previousElementSibling.previousElementSibling;
-                noteTextArea.value = noteContent.textContent;
-            } else {
-                noteTextArea.value = '';
-            }
+    if (noteId) {
+        // Load existing note text
+        const noteContent = document.querySelector(`[data-note-id="${noteId}"]`).previousElementSibling.previousElementSibling;
+        noteTextArea.value = noteContent.textContent;
+    } else {
+        noteTextArea.value = '';
+    }
 
-            document.getElementById('notessection').style.display = 'none';
-            document.getElementById('addNoteButton').style.display = 'none';
-            document.getElementById('noteFormWrapper').style.display = 'block';
-        }
+    document.getElementById('notessection').style.display = 'none';
+    document.getElementById('addNoteButton').style.display = 'none';
+    document.getElementById('noteFormWrapper').style.display = 'block';
+}
 
-  // Hide the note form
+// Hide the note form and save the note if necessary
 function hideNoteForm() {
     const noteText = document.getElementById('noteText').value.trim();
 
-    if (currentNoteId) {
-        console.log("Updating note..."); // Debugging
-        // If a note is being edited, update the note
-        updateNote();
-    } else if (noteText) {
-        console.log("Adding new note..."); // Debugging
-        // If there is text in the textarea, submit the new note
-        submitNoteFromBackButton(noteText);
+    if (noteText) {
+        if (currentNoteId) {
+            // If a note is being edited, update the note
+            updateNote(() => {
+                // After updating, hide the form
+                document.getElementById('noteFormWrapper').style.display = 'none';
+                document.getElementById('notessection').style.display = 'block';
+                document.getElementById('addNoteButton').style.display = 'block';
+                loadNotes(); // Reload notes after hiding the form
+            });
+        } else {
+            // If there is text in the textarea, submit the new note
+            submitNote(() => {
+                // After submitting, hide the form
+                document.getElementById('noteFormWrapper').style.display = 'none';
+                document.getElementById('notessection').style.display = 'block';
+                document.getElementById('addNoteButton').style.display = 'block';
+                loadNotes(); // Reload notes after hiding the form
+            });
+        }
     } else {
-        console.log("Hiding form without saving..."); // Debugging
         // If no note is being edited and no text is entered, just hide the form
         document.getElementById('noteFormWrapper').style.display = 'none';
         document.getElementById('notessection').style.display = 'block';
@@ -354,154 +365,114 @@ function hideNoteForm() {
     }
 }
 
+// Submit a new note
+function submitNote(callback) {
+    const noteText = document.getElementById('noteText').value.trim();
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
-        // Submit a new note
-        function submitNote() {
-            const noteText = document.getElementById('noteText').value.trim();
-            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-            console.log("submitnote executing")
-            if (!noteText ) {
-                alert('Please enter a note.');
-                return;
-            }
+    if (!noteText) {
+        alert('Please enter a note.');
+        return;
+    }
 
-            showLoading();
+    showLoading();
 
-            fetch("{% url 'add_task_note' task.id %}", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': csrfToken,
-                    'X-Requested-With': 'XMLHttpRequest',
-                },
-                body: JSON.stringify({ note_text: noteText }),
-            })
-            .then(response => response.json())
-            .then(data => {
-                hideLoading();
-                if (data.status === 'success') {
-                    document.getElementById('noteText').value = ''; // Clear the textarea
-                    hideNoteForm(); // Hide the form and reload notes
-                } else {
-                    alert('Error: ' + data.message);
-                }
-            })
-            .catch(error => {
-                hideLoading();
-                console.error('Error:', error);
-                alert('An error occurred while adding the note.');
-            });
+    fetch("{% url 'add_task_note' task.id %}", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken,
+            'X-Requested-With': 'XMLHttpRequest',
+        },
+        body: JSON.stringify({ note_text: noteText }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        hideLoading();
+        if (data.status === 'success') {
+            document.getElementById('noteText').value = ''; // Clear the textarea
+            if (callback) callback();
+        } else {
+            alert('Error: ' + data.message);
         }
+    })
+    .catch(error => {
+        hideLoading();
+        console.error('Error:', error);
+        alert('An error occurred while adding the note.');
+    });
+}
 
-        function submitNoteFromBackButton(noteText) {
-         
-            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-            console.log("submitNoteFromBackButton executing",noteText)
-            if (!noteText ) {
-                alert('Please enter a note.');
-                return;
-            }
+// Update an existing note
+function updateNote(callback) {
+    const noteText = document.getElementById('noteText').value.trim();
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
-            showLoading();
+    if (!noteText) {
+        alert('Please enter a note.');
+        return;
+    }
 
-            fetch("{% url 'add_task_note' task.id %}", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': csrfToken,
-                    'X-Requested-With': 'XMLHttpRequest',
-                },
-                body: JSON.stringify({ note_text: noteText }),
-            })
-            .then(response => response.json())
-            .then(data => {
-                hideLoading();
-                if (data.status === 'success') {
-                    document.getElementById('noteText').value = ''; // Clear the textarea
-                    hideNoteForm(); // Hide the form and reload notes
-                } else {
-                    alert('Error: ' + data.message);
-                }
-            })
-            .catch(error => {
-                hideLoading();
-                console.error('Error:', error);
-                alert('An error occurred while adding the note.');
-            });
+    if (!currentNoteId) {
+        console.error('Note ID is undefined');
+        return;
+    }
+
+    showLoading();
+
+    const url = `{% url 'update_task_note' 0 %}`.replace("0", currentNoteId);
+
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken,
+            'X-Requested-With': 'XMLHttpRequest',
+        },
+        body: JSON.stringify({ note_text: noteText }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        hideLoading();
+        if (data.status === 'success') {
+            document.getElementById('noteText').value = ''; // Clear the textarea
+            if (callback) callback();
+        } else {
+            alert('Error: ' + data.message);
         }
-        // Update an existing note
-        function updateNote() {
-            const noteText = document.getElementById('noteText').value.trim();
-            console.log(noteText)
-            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    })
+    .catch(error => {
+        hideLoading();
+        console.error('Error:', error);
+        alert('An error occurred while updating the note.');
+    });
+}
 
-            if (!noteText) {
-                alert('Please enter a note.');
-                return;
-            }
+// Event Listeners
+document.getElementById('addNoteButton').addEventListener('click', () => {
+    showNoteForm(); // Show the form for adding a new note
+});
 
-            if (!currentNoteId) {
-                console.error('Note ID is undefined');
-                return;
-            }
+document.getElementById('backButton').addEventListener('click', () => {
+    hideNoteForm(); // Hide the form and save the note if necessary
+});
 
-            showLoading();
+document.getElementById('submitNote').addEventListener('click', () => {
+    const noteText = document.getElementById('noteText').value.trim();
+    if (!noteText) {
+        alert('Please enter a note.');
+        return;
+    }
 
-            const url = `{% url 'update_task_note' 0 %}`.replace("0", currentNoteId);
+    if (currentNoteId) {
+        updateNote(); // Update existing note
+    } else {
+        submitNote(); // Submit new note
+    }
+});
 
-            fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': csrfToken,
-                    'X-Requested-With': 'XMLHttpRequest',
-                },
-                body: JSON.stringify({ note_text: noteText }),
-            })
-            .then(response => response.json())
-            .then(data => {
-                hideLoading();
-                if (data.status === 'success') {
-                    document.getElementById('noteText').value = ''; // Clear the textarea
-                    hideNoteForm(); // Hide the form and reload notes
-                } else {
-                    alert('Error: ' + data.message);
-                }
-            })
-            .catch(error => {
-                hideLoading();
-                console.error('Error:', error);
-                alert('An error occurred while updating the note.');
-            });
-        }
-
-        // Event Listeners
-        document.getElementById('addNoteButton').addEventListener('click', () => {
-            showNoteForm(); // Show the form for adding a new note
-        });
-
-        document.getElementById('backButton').addEventListener('click', () => {
-            console.log("hidenotform")
-            hideNoteForm(); // Hide the form without saving
-        });
-
-        document.getElementById('submitNote').addEventListener('click', () => {
-            console.log("someone click on submit note")
-            const noteText = document.getElementById('noteText').value.trim();
-            if (!noteText) {
-                alert('Please enter a note.');
-                return;
-            }
-
-            if (currentNoteId) {
-                updateNote(); // Update existing note
-            } else {
-                submitNote(); // Submit new note
-            }
-        });
-
-        // Load notes when the page loads
-        document.addEventListener('DOMContentLoaded', loadNotes);
+// Load notes when the page loads
+document.addEventListener('DOMContentLoaded', loadNotes);
     </script>
 </body>
 </html>

@@ -90,10 +90,21 @@
                         <p><strong>📊 Status:</strong> {{ task_data.task.get_status_display }}</p>
                         <p><strong>📅 Due Date:</strong> {{ task_data.task.due_date|date:"F j, Y, g:i a" }}</p>
                         {% if task_data.task.team %}
-    <p><strong>👤 Team:</strong>
-        <a href="{% url 'view_team_tasks' task_data.task.team.id %}">{{ task_data.task.team.name }}</a>
-    </p>
-{% endif %}
+            <p><strong>👤 Team:</strong>
+                <a href="{% url 'view_team_tasks' task_data.task.team.id %}">{{ task_data.task.team.name }}</a>
+            </p>
+        {% endif %}
+			
+                        <div class="task-mid-buttons">
+                            <a href="{% url 'ai_task_management' task_data.task.id %}" class="suggested-users-button">🤖</a>
+                            <a href="{% url 'suggested_users' task_data.task.id %}" class="suggested-users-button">👥</a>
+                            {% if task_data.task.is_overdue %}
+                            <span class="badge badge-danger">⏳ Overdue</span>
+                            {% elif task_data.task.is_approaching_due_date %}
+                            <span class="badge badge-warning">⏰ Approaching Due</span>
+                            {% endif %}
+                        </div>
+                       
                     </div>
                     <div class="task-footer">
                         <button class="task-action" onclick="openViewDependencyModal({{ task_data.task.id }})">🔗 Dependencies</button>

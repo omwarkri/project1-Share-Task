@@ -20,6 +20,7 @@ urlpatterns = [
 
     path('teams/', teams_list, name='teams_list'),  # Show all teams
     path('teams/<int:team_id>/', view_team_tasks, name='view_team_tasks'),  # Show tasks for a team
+
     path('teams/create/', create_team, name='create_team'),
     
   

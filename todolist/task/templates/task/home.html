@@ -38,6 +38,7 @@
         <!-- Header -->
         <div class="header">
             <h1>📋 All Tasks</h1>
+            
             <!-- Floating Add Task Button -->
             <div class="mobile-bottom-bar">
                 <button class="floating-add-task-button wave" onclick="openAddTaskModal()">
@@ -45,8 +46,10 @@
                 </button>
             </div>
             <div class="header-actions">
+                 <button id="clear-filter-button" class="clear-filter-button" onclick="displayAllTasks()">🗑️</button>
+                <button class="filter-button" onclick="showAssignedTasks()">👤 Show My Assigned Tasks</button>
                 <input type="text" id="search-bar" class="search-bar" placeholder="🔍 Search tasks..." oninput="searchTasks()" />
-                <button id="clear-filter-button" class="clear-filter-button" onclick="displayAllTasks()">🗑️</button>
+               
                 <input type="text" id="date-filter" class="search-bar" placeholder="📅 Filter by date..." />
                 <div class="private-task-toggle" onclick="filterTasks()">
                     🔒
@@ -65,12 +68,16 @@
             </div>
         </div>
 
+
         <!-- Task List -->
-        <div class="task-grid" id="task-list">
+        <div class="task-grid">
             {% for task_data in tasks_with_suggestions %}
-                <div class="task-card task-item" data-status="{{ task_data.task.status }}" data-priority="{{ task_data.task.priority }}" data-private="{{ task_data.task.shareable|yesno:'true,false' }}" data-due-datetime="{{ task_data.task.due_date|date:'Y-m-d H:i' }}">
+                <div class="task-card task-item" 
+                     data-status="{{ task_data.task.status }}" 
+                     data-priority="{{ task_data.task.priority }}" 
+                     data-assigned-to="{% if task_data.task.assigned_to %}{{ task_data.task.assigned_to.id }}{% endif %}">
                     <div class="task-header">
-                        <strong class="task-title">📌 {{ task_data.task.title }} </strong>
+                        <strong class="task-title">📌 {{ task_data.task.title }}</strong>
                         <span class="task-priority {{ task_data.task.priority }}">
                             {% if task_data.task.priority == 'high' %}🚨
                             {% elif task_data.task.priority == 'medium' %}⚠️
@@ -82,29 +89,24 @@
                     <div class="task-body">
                         <p><strong>📊 Status:</strong> {{ task_data.task.get_status_display }}</p>
                         <p><strong>📅 Due Date:</strong> {{ task_data.task.due_date|date:"F j, Y, g:i a" }}</p>
-                        {{task_data.task.shareable}}
-
-                        <div class="task-mid-buttons">
-                            <a href="{% url 'ai_task_management' task_data.task.id %}" class="suggested-users-button">🤖</a>
-                            <a href="{% url 'suggested_users' task_data.task.id %}" class="suggested-users-button">👥</a>
-                            {% if task_data.task.is_overdue %}
-                            <span class="badge badge-danger">⏳ Overdue</span>
-                            {% elif task_data.task.is_approaching_due_date %}
-                            <span class="badge badge-warning">⏰ Approaching Due</span>
-                            {% endif %}
-                        </div>
+                        {% if task_data.task.team %}
+    <p><strong>👤 Team:</strong>
+        <a href="{% url 'view_team_tasks' task_data.task.team.id %}">{{ task_data.task.team.name }}</a>
+    </p>
+{% endif %}
                     </div>
-                    
                     <div class="task-footer">
                         <button class="task-action" onclick="openViewDependencyModal({{ task_data.task.id }})">🔗 Dependencies</button>
                         <button class="task-action" onclick="openModal({{ task_data.task.id }})">✔️ Complete</button>
                         <a href="{% url 'task_detail' task_data.task.id %}" class="task-action">📄 Details</a>
                     </div>
-                </div>  
+                </div>
+            {% empty %}
+                <p>No tasks found.</p>
             {% endfor %}
         </div>
-    </div>
-</div>
+                    
+           
 
 <!-- Modals -->
 <!-- Add Task Modal -->
@@ -1182,6 +1184,19 @@ div.task-mid-buttons{
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
 
 <script>
+    function showAssignedTasks() {
+    const taskItems = document.querySelectorAll('.task-item');
+    const currentUserId = {{ request.user.id }}; // Pass the current user's ID from Django
+
+    taskItems.forEach(task => {
+        const assignedTo = task.getAttribute('data-assigned-to');
+        if (assignedTo && assignedTo === currentUserId.toString()) {
+            task.style.display = 'block'; // Show tasks assigned to the current user
+        } else {
+            task.style.display = 'none'; // Hide other tasks
+        }
+    });
+}
      function displayAllTasks() {
     const taskItems = document.querySelectorAll('.task-item');
 

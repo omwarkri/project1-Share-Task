@@ -20,7 +20,10 @@ class Team(models.Model):
     def __str__(self):
         return self.name
 
-class   Task(models.Model):
+from django.db import models
+from django.utils import timezone
+
+class Task(models.Model):
     STATUS_CHOICES = [
         ('pending', 'Pending'),
         ('in_progress', 'In Progress'),
@@ -47,41 +50,54 @@ class   Task(models.Model):
     category = models.CharField(max_length=100, blank=True, null=True)
     priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default='medium')
     status = models.CharField(max_length=15, choices=STATUS_CHOICES, default='pending')
+    
     allowed_users = models.ManyToManyField(CustomUser, related_name='allowed_tasks', blank=True)
     task_partner = models.ForeignKey(CustomUser, related_name='partnered_tasks', on_delete=models.SET_NULL, null=True, blank=True)
     shareable = models.BooleanField(default=True)
+    
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
+
     dependencies = models.ManyToManyField('self', through='TaskDependency', symmetrical=False, related_name='dependent_tasks')
-    procedure = models.TextField(blank=True, null=True) 
-    reminder_sent = models.BooleanField(default=False)  # New field
-    team = models.ForeignKey(Team, on_delete=models.CASCADE, null=True, blank=True, related_name="team_tasks")  # Team tasks
+    procedure = models.TextField(blank=True, null=True)  
+    reminder_sent = models.BooleanField(default=False)
+
+    team = models.ForeignKey(Team, on_delete=models.CASCADE, null=True, blank=True, related_name="team_tasks")  
+
+    # ✅ Corrected `assigned_to` field  
+    assigned_to = models.ForeignKey(
+        CustomUser,
+        related_name='assigned_tasks',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
+
     def __str__(self):
         return self.title
 
     def is_overdue(self):
         """Check if the task is overdue, but exclude completed tasks."""
-        if self.status == 'completed':  # Ignore completed tasks
+        if self.status == 'completed':  
             return False
         return bool(self.due_date and self.due_date < timezone.now())
 
     def is_approaching_due_date(self):
         """Check if the task is approaching its due date (within 2 days), but exclude completed tasks."""
-        if self.status == 'completed':  # Ignore completed tasks
+        if self.status == 'completed':  
             return False
         return bool(self.due_date and 0 <= (self.due_date - timezone.now()).days <= 2)
     
-
     def can_be_completed(self):
+        """Check if all dependencies are completed before marking this task as completed."""
         if self.dependencies.exists():
             for dependency in self.dependencies.all():
                 if dependency.status != 'completed':
                     return False  # Block completion if any dependency is not completed
         return True
 
-
     class Meta:
-        ordering = ['-created_at']
+        ordering = ['-created_at']  # ✅ Corrected ordering
 
 
 

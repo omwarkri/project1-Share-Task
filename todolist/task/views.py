@@ -100,8 +100,10 @@ def home(request):
     order = request.GET.get('order', 'desc')  # Default: Descending order
     search_query = request.GET.get('q', None)  # Search query for tasks
 
-    # Start with tasks for the logged-in user
-    tasks = Task.objects.filter(user=request.user)
+   
+    tasks = Task.objects.filter(
+        Q(user=request.user) | Q(assigned_to=request.user)
+    ).distinct()
   
     # Apply search query filter
     if search_query:
@@ -139,8 +141,10 @@ def home(request):
 
     # Add suggested users to each task
     tasks_with_suggestions = []
+  
     
     for task in tasks:
+        print(task.assigned_to)
         # Check if the task is overdue or approaching due date
         is_overdue = task.is_overdue()
         is_approaching = task.is_approaching_due_date()
@@ -148,6 +152,7 @@ def home(request):
         # Add notification flags
         tasks_with_suggestions.append({
             'task': task,
+            
             'users_in_progress': [],
             'users_completed': [],
             'is_overdue': is_overdue,
@@ -165,6 +170,7 @@ def home(request):
         'order': order,
         'search_query': search_query,
         'TaskDependenciesForm': TaskDependenciesForm(),
+        
     }
 
     return render(request, 'task/home.html', context)
@@ -833,14 +839,14 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import Team, Task
-from .forms import AddMemberForm, TaskForm  # Import the TaskForm
+from .forms import AddMemberForm, TeamTaskForm # Import the TaskForm
 
 @login_required
 def view_team_tasks(request, team_id):
     team = get_object_or_404(Team, id=team_id)
     tasks = Task.objects.filter(team=team)  # Fetch tasks for the team
     add_member_form = AddMemberForm()
-    task_form = TaskForm()  # Task creation form
+    task_form = TeamTaskForm()  # Task creation form
 
     if request.method == "POST":
         if "add_member" in request.POST:
@@ -855,7 +861,7 @@ def view_team_tasks(request, team_id):
                 return redirect('view_team_tasks', team_id=team.id)
 
         elif "add_task" in request.POST:
-            task_form = TaskForm(request.POST)
+            task_form = TeamTaskForm(request.POST)
             if task_form.is_valid():
                 task = task_form.save(commit=False)
                 task.team = team  # Assign the task to the current team

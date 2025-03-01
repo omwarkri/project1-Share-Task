@@ -1,170 +1,62 @@
-
-<style>
-/* Add this to your existing CSS */
-
-
-.container {
-    max-height: 80vh; /* Limit container height */
-    overflow-y: auto; /* Make content scrollable */
-    padding: 20px;
-    background-color: #fff;
-    border-radius: 5px;
-   
-}
-
-h2, h3 {
-    color: #333;
-}
-
-form {
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px;
-}
-
-form p {
-    margin: 10px 0;
-}
-
-form label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-}
-
-form input[type="text"],
-form input[type="date"],
-form select,
-form textarea {
-    width: 100%;
-    padding: 8px;
-    margin-bottom: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-}
-
-form button {
-    background-color: #28a745;
-    color: white;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-form button:hover {
-    background-color: #218838;
-}
-
-ul {
-    list-style-type: none;
-    padding: 0;
-}
-
-ul li {
-    background-color: #fff;
-    padding: 10px;
-    margin-bottom: 5px;
-    border-radius: 4px;
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-}
-
-a {
-    color: #007bff;
-    text-decoration: none;
-}
-
-a:hover {
-    text-decoration: underline;
-}
-
-/* Modal Styles */
-.modal {
-    display: none; /* Hidden by default */
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
-
-.modal-content {
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 5px;
-    width: 400px;
-    max-width: 90%;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-.modal-header h3 {
-    margin: 0;
-}
-
-.modal-header .close {
-    cursor: pointer;
-    font-size: 24px;
-    color: #333;
-}
-
-.modal-header .close:hover {
-    color: #000;
-}
-</style>
 {% extends "task/base.html" %}
 {% block content %}
-
 <div class="container">
-    <h2>Team: {{ team.name }}</h2>
-    <p>{{ team.description }}</p>
+    <!-- Include the sidebar -->
+    {% include "teams/sidebar.html" %}
 
-    <!-- Add Member Form -->
-    <h3>Add Member</h3>
-    <form method="post">
-        {% csrf_token %}
-        {{ add_member_form.as_p }}
-        <button type="submit" name="add_member">Add Member</button>
-    </form>
+    <div class="main-content">
+        <h2>Team: {{ team.name }}</h2>
+        <p>{{ team.description }}</p>
 
-    <!-- Display team members -->
-    <h3>Team Members</h3>
-    <ul>
-        {% for member in team.members.all %}
-            <li>{{ member.username }}</li>
-        {% endfor %}
-    </ul>
-
-    <!-- Button to open Add Task Modal -->
-    <button id="openTaskModal">Add Task</button>
-
-    <!-- Display Tasks -->
-    <h3>Tasks</h3>
-    <ul>
-        {% for task in tasks %}
-            <li>
-                <strong>{{ task.title }}</strong> - {{ task.status }} <br>
-                <small>Assigned to: {{ task.assigned_to.username|default:"Unassigned" }}</small><br>
-                <small>Due: {{ task.due_date|default:"No due date" }}</small>
-            </li>
+    
+      
+            <div class="task-grid">
+            {% for task in tasks %}
+            <div class="task-card task-item" 
+                 data-status="{{ task.status }}" 
+                 data-priority="{{ task.priority }}" 
+                 data-assigned-to="{% if task.assigned_to %}{{ task.assigned_to.id }}{% endif %}">
+                <div class="task-header">
+                    <strong class="task-title">📌 {{ task.title }}</strong>
+                    <span class="task-priority {{ task.priority }}">
+                        {% if task.priority == 'high' %}🚨
+                        {% elif task.priority == 'medium' %}⚠️
+                        {% else %}✅
+                        {% endif %}
+                        {{ task.get_priority_display }}
+                    </span>
+                </div>
+                <div class="task-body">
+                    <p><strong>📊 Status:</strong> {{ task.get_status_display }}</p>
+                    <p><strong>📅 Due Date:</strong> {{ task.due_date|date:"F j, Y, g:i a" }}</p>
+                    <p><strong>👤 Assigned To:</strong>
+                        {{task.assigned_to}}
+                    </p>
+        
+                    <div class="task-mid-buttons">
+                        <a href="{% url 'ai_task_management' task.id %}" class="suggested-users-button">🤖</a>
+                        <a href="{% url 'suggested_users' task.id %}" class="suggested-users-button">👥</a>
+                        {% if task.is_overdue %}
+                            <span class="badge badge-danger">⏳ Overdue</span>
+                        {% elif task.is_approaching_due_date %}
+                            <span class="badge badge-warning">⏰ Approaching Due</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="task-footer">
+                    <button class="task-action" onclick="openViewDependencyModal({{ task.id }})">🔗 Dependencies</button>
+                    <button class="task-action" onclick="openModal({{ task.id }})">✔️ Complete</button>
+                    <a href="{% url 'task_detail' task.id %}" class="task-action">📄 Details</a>
+                </div>
+            </div>
         {% empty %}
-            <li>No tasks yet.</li>
+            <p>No tasks found.</p>
         {% endfor %}
-    </ul>
+       
+        </div>
 
-    <a href="{% url 'teams_list' %}">Back to Teams</a>
+        <a href="{% url 'teams_list' %}">Back to Teams</a>
+    </div>
 </div>
 
 <!-- Add Task Modal -->
@@ -206,4 +98,157 @@ a:hover {
     });
 </script>
 
+<style>
+    .container {
+        display: flex;
+    }
+
+    .main-content {
+        margin-left: 100px; /* Adjust based on sidebar width */
+        padding: 20px;
+        flex-grow: 1;
+    }
+       /* Task Grid */
+       .task-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 20px;
+        padding: 20px;
+        margin-bottom: 20px; /* Reduce margin for better scrolling */
+    }
+
+.task-card {
+    background-color: #ffffff; /* White background */
+    border: 1px solid #ddd; /* Light border */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.task-card:hover {
+    transform: translateY(-5px);
+}
+
+.task-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.task-title {
+    font-size: 18px;
+    color: #2c3e50; /* Dark text for task title */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 70%;
+}
+
+.task-priority {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+    white-space: nowrap;
+    background-color: #f8f9fa; /* Light background for priority */
+    color: #555; /* Darker text */
+}
+
+.task-body {
+    margin-bottom: 10px;
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+.task-body p {
+    margin: 5px 0;
+    font-size: 14px;
+    color: #555; /* Darker text for task details */
+}
+
+.suggested-users-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    padding: 6px;
+    background-color: transparent; /* Accent color for button */
+    border:1px solid rgba(93, 142, 135, 0.933);
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 14px;
+    margin-top: 10px;
+  
+}
+
+.suggested-users-button:hover {
+    background-color: transparent; 
+}
+a.suggested-users-button img{
+    height: 30px;
+    width: 30px;
+}
+
+
+div.task-mid-buttons{
+    display: flex;
+    gap:8px;
+}
+
+.task-action {
+    padding: 6px 12px;
+    background-color: #f8f9fa; /* Light background for buttons */
+    color: #555; /* Darker text */
+    border: 1px solid #ddd; /* Light border */
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+    flex-grow: 1;
+    text-align: center;
+}
+
+.task-action:hover {
+    background-color: #1abc9c; /* Accent color on hover */
+    color: white;
+}
+
+.badge-danger, .badge-warning {
+
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.badge-danger {
+    background-color: #e74c3c;
+    color: #fff;
+}
+
+.badge-warning {
+    background-color: #f39c12;
+    color: #fff;
+}
+
+.task-footer {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+
+
+}
+
+</style>
 {% endblock %}

@@ -817,10 +817,15 @@ from django.contrib.auth.decorators import login_required
 from .models import Team
 from .forms import TeamForm
 
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+from .models import Team
+from .forms import TeamForm
+from django.db.models import Q
 @login_required
 def teams_list(request):
-    teams = Team.objects.all()  # Fetch all teams
-
+    # Handle team creation form submission
     if request.method == "POST":
         form = TeamForm(request.POST)
         if form.is_valid():
@@ -829,10 +834,27 @@ def teams_list(request):
             team.save()
             team.members.add(request.user)  # Add creator as a team member
             return redirect('teams_list')  # Refresh page after submission
-    else:
-        form = TeamForm()
 
-    return render(request, 'teams/teams_list.html', {'teams': teams, 'form': form})
+    # Fetch all teams
+    teams = Team.objects.filter(
+        Q(members=request.user) | Q(created_by=request.user)
+    ).distinct()
+    form = TeamForm()  # Initialize the form
+
+    teams_data = [
+        {
+            'id': team.id,
+            'name': team.name,
+            'description': team.description,
+            'created_by': team.created_by.username,
+            'members': [member.username for member in team.members.all()],
+        }
+        for team in teams
+    ]
+    return JsonResponse({'teams': teams_data})
+
+    # Render the HTML template for normal requests
+
 
 
 from django.shortcuts import render, redirect, get_object_or_404
@@ -879,26 +901,6 @@ def view_team_tasks(request, team_id):
 
 
 
-
-from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
-from .forms import TeamForm
-from .models import Team
-
-@login_required
-def create_team(request):
-    if request.method == "POST":
-        form = TeamForm(request.POST)
-        if form.is_valid():
-            team = form.save(commit=False)
-            team.created_by = request.user
-            team.save()
-            team.members.add(request.user)  # Add creator as a team member
-            return redirect('teams_list')  # Redirect to teams list
-    else:
-        form = TeamForm()
-    
-    return render(request, 'teams/create_team.html', {'form': form})
 
 
 

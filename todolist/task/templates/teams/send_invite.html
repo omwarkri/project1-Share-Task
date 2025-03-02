@@ -1,0 +1,15 @@
+{% extends "task/base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Invite a Member to Your Team</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="email" class="form-label">Member Email</label>
+            <input type="email" name="email" class="form-control" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Send Invitation</button>
+    </form>
+</div>
+{% endblock %}

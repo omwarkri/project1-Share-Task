@@ -22,6 +22,31 @@ class Team(models.Model):
 
     def __str__(self):
         return self.name
+from django.db import models
+from django.contrib.auth import get_user_model
+from django.utils.crypto import get_random_string
+
+User = get_user_model()
+
+from django.db import models
+from django.contrib.auth import get_user_model
+from django.utils.crypto import get_random_string
+
+User = get_user_model()
+
+class TeamInvitation(models.Model):
+    team = models.ForeignKey("Team", on_delete=models.CASCADE, related_name="invitations")
+    email = models.EmailField(unique=True)  # Email of the invited person
+    invited_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="sent_invitations")
+    token = models.CharField(max_length=50, unique=True, default=get_random_string)
+    invited_user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="received_invites")
+    is_accepted = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Invitation to {self.email} for {self.team.name}"
+
+
 
 class TeamScoreboard(models.Model):
     team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name="scoreboard")

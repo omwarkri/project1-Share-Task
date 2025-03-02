@@ -24,6 +24,8 @@ urlpatterns = [
 
     path('teams/create/', create_team, name='create_team'),
     path('teams/<int:team_id>/leaderboard/', team_leaderboard, name='team_leaderboard'),
+        path("teams/<int:team_id>/invite/", send_team_invite, name="send_team_invite"),
+    path("accept-invite/<str:token>/", accept_invite, name="accept_invite"),
     
   
 ]

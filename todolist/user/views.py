@@ -14,10 +14,13 @@ class ProtectedView(APIView):
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from user.models import CustomUser
+from task.models import TeamInvitation
 
 
-
-def login_view(request):
+def login_view(request,token=None):
+    invitation = None
+    if token:
+        invitation = get_object_or_404(TeamInvitation, token=token, is_accepted=False)
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
@@ -26,22 +29,59 @@ def login_view(request):
         if user is not None:
             login(request, user)
             print("redirecting")
+            if invitation:
+                invitation.invited_user = user
+                invitation.is_accepted = True
+                invitation.save()
+                    # Add user to the team
+                team = invitation.team
+                team.members.add(request.user)
+                return redirect('view_team_tasks',team_id=team.id)
             return redirect('home')  # Replace 'home' with your desired page
         else:
             return render(request, 'user/login.html', {'error': 'Invalid credentials'})
     return render(request, 'user/login.html')
 
-def register_view(request):
+
+from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpResponse
+from .models import CustomUser
+
+
+def register_view(request, token=None):
+    # invitation = None
+
+    # # If a token is provided, check if it corresponds to a valid invitation
+    # if token:
+    #     invitation = get_object_or_404(TeamInvitation, token=token, is_accepted=False)
+
     if request.method == 'POST':
-        username = request.POST['username']
-        email = request.POST['email']
-        password = request.POST['password']
-        if not CustomUser.objects.filter(username=username).exists():
-            user = CustomUser.objects.create_user(username=username, email=email, password=password)
-            return redirect('login')
-        else:
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+
+        # If registering via invitation, use the invited email
+        # if invitation:
+        #     email = invitation.email  
+
+        # Check if the username already exists
+        if CustomUser.objects.filter(username=username).exists():
             return render(request, 'user/register.html', {'error': 'Username already exists'})
-    return render(request, 'user/register.html')
+
+        # Create a new user
+        user = CustomUser.objects.create_user(username=username, email=email, password=password)
+
+        # If registering via an invitation, link the user and mark the invitation as accepted
+        if token:
+            redirect("login_with_token", token=token) 
+
+
+        return redirect('login')
+
+    return render(request, 'user/register.html', {'token': token, 'email': invitation.email if invitation else ''})
+
+
+
 from datetime import date, timedelta
 from django.utils import timezone
 from django.db.models import Count

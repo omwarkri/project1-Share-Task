@@ -6,7 +6,9 @@ from .views import UserRegistrationView, CustomTokenObtainPairView, ProtectedVie
 urlpatterns = [
    
     path('login/', views.login_view, name='login'),
+    path('login/<str:token>/', views.login_view, name='login_with_token'),
     path('register/', views.register_view, name='register'),
+    path('register/<str:token>/', views.register_view, name='register_with_token'),
     path('profile/', views.profile_view, name='profile'),
     path('profile/<int:user_id>/', views.profile_view_id, name='view_profile_id'),
     path('api/user-analytics/', get_user_analytics, name='user-analytics'),

@@ -49,3 +49,14 @@ class ActivityLogAdmin(admin.ModelAdmin):
     list_display = ('task', 'user', 'action', 'timestamp')
     list_filter = ('action', 'timestamp')
     search_fields = ('task__title', 'user__username', 'details')
+
+
+from django.contrib import admin
+from .models import TeamScoreboard
+
+@admin.register(TeamScoreboard)
+class TeamScoreboardAdmin(admin.ModelAdmin):
+    list_display = ('member', 'team', 'score')  # Display these fields in the admin list
+    list_filter = ('team',)  # Add filtering by team
+    search_fields = ('member__username', 'team__name')  # Enable search by member name or team name
+    ordering = ('-score',)  # Order by highest score first

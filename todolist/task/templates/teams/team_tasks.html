@@ -8,51 +8,87 @@
         <h2>Team: {{ team.name }}</h2>
         <p>{{ team.description }}</p>
 
-    
-      
-            <div class="task-grid">
+        <!-- Filter Section -->
+        <div class="filter-section">
+            <h3>Filter Tasks</h3>
+            <div class="filter-options">
+                <!-- Status Filter -->
+                <select id="status-filter" class="filter-select">
+                    <option value="all">All Statuses</option>
+                    <option value="pending">Pending</option>
+                    <option value="in_progress">In Progress</option>
+                    <option value="completed">Completed</option>
+                    <option value="archived">Archived</option>
+                </select>
+
+                <!-- Priority Filter -->
+                <select id="priority-filter" class="filter-select">
+                    <option value="all">All Priorities</option>
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                    <option value="critical">Critical</option>
+                </select>
+
+                <!-- Due Date Filter -->
+                <input type="date" id="due-date-filter" class="filter-select" />
+
+                <!-- Assigned User Filter -->
+                <select id="assigned-user-filter" class="filter-select">
+                    <option value="all">All Users</option>
+                    {% for member in team.members.all %}
+                        <option value="{{ member.id }}">{{ member.username }}</option>
+                    {% endfor %}
+                </select>
+
+                <!-- Clear Filters Button -->
+                <button id="clear-filters" class="filter-button">Clear Filters</button>
+            </div>
+        </div>
+
+        <!-- Task Grid -->
+        <div class="task-grid">
             {% for task in tasks %}
-            <div class="task-card task-item" 
-                 data-status="{{ task.status }}" 
-                 data-priority="{{ task.priority }}" 
-                 data-assigned-to="{% if task.assigned_to %}{{ task.assigned_to.id }}{% endif %}">
-                <div class="task-header">
-                    <strong class="task-title">📌 {{ task.title }}</strong>
-                    <span class="task-priority {{ task.priority }}">
-                        {% if task.priority == 'high' %}🚨
-                        {% elif task.priority == 'medium' %}⚠️
-                        {% else %}✅
-                        {% endif %}
-                        {{ task.get_priority_display }}
-                    </span>
-                </div>
-                <div class="task-body">
-                    <p><strong>📊 Status:</strong> {{ task.get_status_display }}</p>
-                    <p><strong>📅 Due Date:</strong> {{ task.due_date|date:"F j, Y, g:i a" }}</p>
-                    <p><strong>👤 Assigned To:</strong>
-                        {{task.assigned_to}}
-                    </p>
-        
-                    <div class="task-mid-buttons">
-                        <a href="{% url 'ai_task_management' task.id %}" class="suggested-users-button">🤖</a>
-                        <a href="{% url 'suggested_users' task.id %}" class="suggested-users-button">👥</a>
-                        {% if task.is_overdue %}
-                            <span class="badge badge-danger">⏳ Overdue</span>
-                        {% elif task.is_approaching_due_date %}
-                            <span class="badge badge-warning">⏰ Approaching Due</span>
-                        {% endif %}
+                <div class="task-card task-item" 
+                     data-status="{{ task.status }}" 
+                     data-priority="{{ task.priority }}" 
+                     data-due-date="{{ task.due_date|date:'Y-m-d' }}" 
+                     data-assigned-to="{% if task.assigned_to %}{{ task.assigned_to.id }}{% else %}all{% endif %}">
+                    <div class="task-header">
+                        <strong class="task-title">📌 {{ task.title }}</strong>
+                        <span class="task-priority {{ task.priority }}">
+                            {% if task.priority == 'high' %}🚨
+                            {% elif task.priority == 'medium' %}⚠️
+                            {% else %}✅
+                            {% endif %}
+                            {{ task.get_priority_display }}
+                        </span>
+                    </div>
+                    <div class="task-body">
+                        <p><strong>📊 Status:</strong> {{ task.get_status_display }}</p>
+                        <p><strong>📅 Due Date:</strong> {{ task.due_date|date:"F j, Y, g:i a" }}</p>
+                        <p><strong>👤 Assigned To:</strong>
+                            {{ task.assigned_to }}
+                        </p>
+                        <div class="task-mid-buttons">
+                            <a href="{% url 'ai_task_management' task.id %}" class="suggested-users-button">🤖</a>
+                            <a href="{% url 'suggested_users' task.id %}" class="suggested-users-button">👥</a>
+                            {% if task.is_overdue %}
+                                <span class="badge badge-danger">⏳ Overdue</span>
+                            {% elif task.is_approaching_due_date %}
+                                <span class="badge badge-warning">⏰ Approaching Due</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="task-footer">
+                        <button class="task-action" onclick="openViewDependencyModal({{ task.id }})">🔗 Dependencies</button>
+                        <button class="task-action" onclick="openModal({{ task.id }})">✔️ Complete</button>
+                        <a href="{% url 'task_detail' task.id %}" class="task-action">📄 Details</a>
                     </div>
                 </div>
-                <div class="task-footer">
-                    <button class="task-action" onclick="openViewDependencyModal({{ task.id }})">🔗 Dependencies</button>
-                    <button class="task-action" onclick="openModal({{ task.id }})">✔️ Complete</button>
-                    <a href="{% url 'task_detail' task.id %}" class="task-action">📄 Details</a>
-                </div>
-            </div>
-        {% empty %}
-            <p>No tasks found.</p>
-        {% endfor %}
-       
+            {% empty %}
+                <p>No tasks found.</p>
+            {% endfor %}
         </div>
 
         <a href="{% url 'teams_list' %}">Back to Teams</a>
@@ -73,29 +109,193 @@
         </form>
     </div>
 </div>
+<!-- View Task Dependencies Modal -->
+<div id="viewTaskDependencies" style="display: none;">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeViewDependencyModal()">&times;</span>
+        <h3>🔗 Task Dependencies</h3>
+        <div class="task-dependencies">
+            <h4>📌 Current Dependencies</h4>
+            <ul id="dependency-list" class="dependency-list">
+                <li class="no-dependencies">No dependencies set for this task.</li>
+            </ul>
+        </div>
+        <form method="POST" id="update-dependencies-form" class="dependency-form">
+            {% csrf_token %}
+            <h4>🔄 Update Dependencies</h4>
+            <select id="dependency-select" name="dependencies" multiple class="dependency-select"></select>
+            <button type="submit" class="submit-button">🔄 Update Dependencies</button>
+        </form>
+    </div>
+</div>
 
+<!-- Share Task Modals -->
+{% for task in tasks  %}
+<div id="shareTaskModal-{{ task.id }}" class="modal" style="display: none;">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeModal({{task.id }})">&times;</span>
+        <h3>📤 Share Your Task Completion</h3>
+        <p>Would you like to share how you completed this task?</p>
+        <form method="post" enctype="multipart/form-data" action="{% url 'complete_task' task.id %}">
+            {% csrf_token %}
+            <label for="completion_details">📝 How did you complete the task?</label>
+            <textarea name="completion_details" id="completion_details" rows="4"></textarea>
+            <label for="uploaded_image">🖼️ Upload Image (optional):</label>
+            <input type="file" name="uploaded_image" id="uploaded_image" accept="image/*">
+            <label for="uploaded_file">📁 Upload Video/File (optional):</label>
+            <input type="file" name="uploaded_file" id="uploaded_file" accept="video/*,.pdf,.doc,.docx">
+            {% if task_data.task.task_partner %}
+            <div class="partner-feedback">
+                <h4>⭐ Rate and Comment on the Task Partner</h4>
+                <label for="partner_rating">🌟 Rating (1-5):</label>
+                <input type="number" name="partner_rating" id="partner_rating" min="1" max="5" required>
+                <label for="partner_comment">💬 Comment:</label>
+                <textarea name="partner_comment" id="partner_comment" rows="3"></textarea>
+            </div>
+            {% endif %}
+            <div class="skip-sharing">
+                <label>
+                    <input type="checkbox" name="skip_sharing" id="skip_sharing">
+                    🙈 I do not want to share my completion details.
+                </label>
+            </div>
+            <button type="submit" class="submit-button">📤 Submit</button>
+        </form>
+    </div>
+</div>
+{% endfor %}
 <script>
-    // JavaScript to handle modal open/close
+    // JavaScript for filtering tasks
+    function filterTasks() {
+        const statusFilter = document.getElementById('status-filter').value;
+        const priorityFilter = document.getElementById('priority-filter').value;
+        const dueDateFilter = document.getElementById('due-date-filter').value;
+        const assignedUserFilter = document.getElementById('assigned-user-filter').value;
+
+        const taskItems = document.querySelectorAll('.task-item');
+
+        taskItems.forEach(task => {
+            const taskStatus = task.getAttribute('data-status');
+            const taskPriority = task.getAttribute('data-priority');
+            const taskDueDate = task.getAttribute('data-due-date');
+            const taskAssignedTo = task.getAttribute('data-assigned-to');
+
+            const matchesStatus = (statusFilter === 'all' || taskStatus === statusFilter);
+            const matchesPriority = (priorityFilter === 'all' || taskPriority === priorityFilter);
+            const matchesDueDate = (dueDateFilter === '' || taskDueDate === dueDateFilter);
+            const matchesAssignedUser = (assignedUserFilter === 'all' || taskAssignedTo === assignedUserFilter);
+
+            if (matchesStatus && matchesPriority && matchesDueDate && matchesAssignedUser) {
+                task.style.display = 'block';
+            } else {
+                task.style.display = 'none';
+            }
+        });
+    }
+
+    // Attach event listeners to filters
+    document.getElementById('status-filter').addEventListener('change', filterTasks);
+    document.getElementById('priority-filter').addEventListener('change', filterTasks);
+    document.getElementById('due-date-filter').addEventListener('change', filterTasks);
+    document.getElementById('assigned-user-filter').addEventListener('change', filterTasks);
+
+    // Clear filters
+    document.getElementById('clear-filters').addEventListener('click', () => {
+        document.getElementById('status-filter').value = 'all';
+        document.getElementById('priority-filter').value = 'all';
+        document.getElementById('due-date-filter').value = '';
+        document.getElementById('assigned-user-filter').value = 'all';
+        filterTasks();
+    });
+
+    // Modal functionality
     const modal = document.getElementById("taskModal");
     const openModalBtn = document.getElementById("openTaskModal");
     const closeModalBtn = document.querySelector(".modal-header .close");
 
-    // Open modal when button is clicked
-    openModalBtn.addEventListener("click", () => {
+    openModalBtn?.addEventListener("click", () => {
         modal.style.display = "flex";
     });
 
-    // Close modal when close button is clicked
-    closeModalBtn.addEventListener("click", () => {
+    closeModalBtn?.addEventListener("click", () => {
         modal.style.display = "none";
     });
 
-    // Close modal when clicking outside the modal
     window.addEventListener("click", (event) => {
         if (event.target === modal) {
             modal.style.display = "none";
         }
     });
+    
+function openViewDependencyModal(taskId) {
+    document.addEventListener('DOMContentLoaded', function () {
+    flatpickr('#id_due_date', {
+      dateFormat: 'Y-m-d',  // Format to match Django's expected format
+      enableTime: false,    // Disable time selection
+    });
+  });
+    // Fetch task details and dependencies
+    fetch(`/get-task-dependencies/${taskId}/`)
+        .then(response => response.json())
+        .then(data => {
+            const dependencyList = document.getElementById('dependency-list');
+            const dependencySelect = document.getElementById('dependency-select');
+
+            // Clear existing content
+            dependencyList.innerHTML = '';
+            dependencySelect.innerHTML = '';
+
+            // Populate current dependencies
+            if (data.dependencies.length > 0) {
+                data.dependencies.forEach(dep => {
+                    const li = document.createElement('li');
+                    li.textContent = dep.title;
+                    dependencyList.appendChild(li);
+                });
+            } else {
+                const li = document.createElement('li');
+                li.textContent = 'No dependencies set for this task.';
+                li.classList.add('no-dependencies');
+                dependencyList.appendChild(li);
+            }
+
+            // Populate available tasks for updating dependencies
+            data.all_tasks.forEach(task => {
+                const option = document.createElement('option');
+                option.value = task.id;
+                option.textContent = task.title;
+                dependencySelect.appendChild(option);
+            });
+
+            // Set the form action URL
+            document.getElementById('update-dependencies-form').action = `/update-task-dependencies/${taskId}/`;
+
+            // Display the modal
+            document.getElementById('viewTaskDependencies').style.display = 'flex';
+        })
+        .catch(error => {
+            console.error('Error fetching task dependencies:', error);
+        });
+}
+
+
+
+function closeViewDependencyModal() {
+
+    document.getElementById('viewTaskDependencies').style.display = 'none';
+}
+
+function openModal(taskId) {
+        console.log(
+            "open model"
+        )
+        document.getElementById(`shareTaskModal-${taskId}`).style.display = 'flex';
+    }
+
+    function closeModal(taskId) {
+        document.getElementById(`shareTaskModal-${taskId}`).style.display = 'none';
+    }
+
 </script>
 
 <style>
@@ -108,147 +308,113 @@
         padding: 20px;
         flex-grow: 1;
     }
-       /* Task Grid */
-       .task-grid {
+
+    .filter-section {
+        margin-bottom: 20px;
+    }
+
+    .filter-options {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .filter-select {
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 14px;
+    }
+
+    .filter-button {
+        padding: 8px 16px;
+        background-color: #1abc9c;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+    .filter-button:hover {
+        background-color: #16a085;
+    }
+
+    .task-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
         gap: 20px;
         padding: 20px;
-        margin-bottom: 20px; /* Reduce margin for better scrolling */
     }
 
-.task-card {
-    background-color: #ffffff; /* White background */
-    border: 1px solid #ddd; /* Light border */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-    border-radius: 8px;
-    padding: 15px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-}
+    .task-card {
+        background-color: #ffffff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 15px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+    }
 
-.task-card:hover {
-    transform: translateY(-5px);
-}
+    .task-card:hover {
+        transform: translateY(-5px);
+    }
 
-.task-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-}
+    .task-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
 
-.task-title {
-    font-size: 18px;
-    color: #2c3e50; /* Dark text for task title */
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 70%;
-}
+    .task-title {
+        font-size: 18px;
+        color: #2c3e50;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 70%;
+    }
 
-.task-priority {
-    padding: 4px 8px;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: bold;
-    white-space: nowrap;
-    background-color: #f8f9fa; /* Light background for priority */
-    color: #555; /* Darker text */
-}
+    .task-priority {
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: bold;
+        background-color: #f8f9fa;
+        color: #555;
+    }
 
-.task-body {
-    margin-bottom: 10px;
-    flex-grow: 1;
-    overflow-y: auto;
-}
+    .task-body {
+        margin-bottom: 10px;
+    }
 
-.task-body p {
-    margin: 5px 0;
-    font-size: 14px;
-    color: #555; /* Darker text for task details */
-}
+    .task-body p {
+        margin: 5px 0;
+        font-size: 14px;
+        color: #555;
+    }
 
-.suggested-users-button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    padding: 6px;
-    background-color: transparent; /* Accent color for button */
-    border:1px solid rgba(93, 142, 135, 0.933);
-    color: white;
-    text-decoration: none;
-    border-radius: 8px;
-    font-size: 14px;
-    margin-top: 10px;
-  
-}
+    .task-footer {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+    }
 
-.suggested-users-button:hover {
-    background-color: transparent; 
-}
-a.suggested-users-button img{
-    height: 30px;
-    width: 30px;
-}
+    .task-action {
+        padding: 6px 12px;
+        background-color: #f8f9fa;
+        color: #555;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background-color 0.3s ease;
+    }
 
-
-div.task-mid-buttons{
-    display: flex;
-    gap:8px;
-}
-
-.task-action {
-    padding: 6px 12px;
-    background-color: #f8f9fa; /* Light background for buttons */
-    color: #555; /* Darker text */
-    border: 1px solid #ddd; /* Light border */
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background-color 0.3s ease;
-    flex-grow: 1;
-    text-align: center;
-}
-
-.task-action:hover {
-    background-color: #1abc9c; /* Accent color on hover */
-    color: white;
-}
-
-.badge-danger, .badge-warning {
-
-    padding: 4px 8px;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: bold;
-    margin-top: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.badge-danger {
-    background-color: #e74c3c;
-    color: #fff;
-}
-
-.badge-warning {
-    background-color: #f39c12;
-    color: #fff;
-}
-
-.task-footer {
-    display: flex;
-    gap: 10px;
-    margin-top: 10px;
-
-
-}
-
+    .task-action:hover {
+        background-color: #1abc9c;
+        color: white;
+    }
 </style>
 {% endblock %}

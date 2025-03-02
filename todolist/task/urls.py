@@ -3,6 +3,7 @@ from django.contrib import admin
 from django.urls import path,include
 from .views import search_tasks,update_task_dependencies,get_task_dependencies,add_task_note,generate_ai_procedure
 from .views import *
+from .views import team_leaderboard
 urlpatterns = [
 
      
@@ -22,6 +23,7 @@ urlpatterns = [
     path('teams/<int:team_id>/', view_team_tasks, name='view_team_tasks'),  # Show tasks for a team
 
     path('teams/create/', create_team, name='create_team'),
+    path('teams/<int:team_id>/leaderboard/', team_leaderboard, name='team_leaderboard'),
     
   
 ]

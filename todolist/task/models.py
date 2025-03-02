@@ -10,18 +10,40 @@ from django.contrib.auth.models import User
 from django.db import models
 from user.models import CustomUser
 
+from django.db import models
+from django.utils import timezone
+
 class Team(models.Model):
     name = models.CharField(max_length=255, unique=True)
     description = models.TextField(blank=True, null=True)
-    created_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="teams")
-    members = models.ManyToManyField(CustomUser, related_name="team_members", blank=True)
+    created_by = models.ForeignKey("user.CustomUser", on_delete=models.CASCADE, related_name="teams")
+    members = models.ManyToManyField("user.CustomUser", related_name="team_members", blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.name
 
-from django.db import models
-from django.utils import timezone
+class TeamScoreboard(models.Model):
+    team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name="scoreboard")
+    member = models.ForeignKey("user.CustomUser", on_delete=models.CASCADE, related_name="scores")
+    score = models.IntegerField(default=0)  # Tracks the member's score
+
+    def update_score(self, points):
+        """Updates the score of the member in the scoreboard."""
+        self.score += points
+        self.save()
+
+    @classmethod
+    def update_or_create_score(cls, member, team, points):
+    
+        """Updates score or creates a new scoreboard entry."""
+        scoreboard, created = cls.objects.get_or_create(team=team, member=member)
+        scoreboard.update_score(points)
+
+    def __str__(self):
+        return f"{self.member.username} - {self.score} points"
+
+
 
 class Task(models.Model):
     STATUS_CHOICES = [
@@ -50,21 +72,20 @@ class Task(models.Model):
     category = models.CharField(max_length=100, blank=True, null=True)
     priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default='medium')
     status = models.CharField(max_length=15, choices=STATUS_CHOICES, default='pending')
-    
+
     allowed_users = models.ManyToManyField(CustomUser, related_name='allowed_tasks', blank=True)
     task_partner = models.ForeignKey(CustomUser, related_name='partnered_tasks', on_delete=models.SET_NULL, null=True, blank=True)
     shareable = models.BooleanField(default=True)
-    
+
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
 
     dependencies = models.ManyToManyField('self', through='TaskDependency', symmetrical=False, related_name='dependent_tasks')
-    procedure = models.TextField(blank=True, null=True)  
+    procedure = models.TextField(blank=True, null=True)
     reminder_sent = models.BooleanField(default=False)
 
-    team = models.ForeignKey(Team, on_delete=models.CASCADE, null=True, blank=True, related_name="team_tasks")  
-
-    # ✅ Corrected `assigned_to` field  
+    team = models.ForeignKey(Team, on_delete=models.CASCADE, null=True, blank=True, related_name="team_tasks")
+    
     assigned_to = models.ForeignKey(
         CustomUser,
         related_name='assigned_tasks',
@@ -78,16 +99,16 @@ class Task(models.Model):
 
     def is_overdue(self):
         """Check if the task is overdue, but exclude completed tasks."""
-        if self.status == 'completed':  
+        if self.status == 'completed':
             return False
         return bool(self.due_date and self.due_date < timezone.now())
 
     def is_approaching_due_date(self):
         """Check if the task is approaching its due date (within 2 days), but exclude completed tasks."""
-        if self.status == 'completed':  
+        if self.status == 'completed':
             return False
         return bool(self.due_date and 0 <= (self.due_date - timezone.now()).days <= 2)
-    
+
     def can_be_completed(self):
         """Check if all dependencies are completed before marking this task as completed."""
         if self.dependencies.exists():
@@ -96,10 +117,31 @@ class Task(models.Model):
                     return False  # Block completion if any dependency is not completed
         return True
 
+    def save(self, *args, **kwargs):
+        previous_status = None
+        if self.pk:
+            previous_status = Task.objects.get(pk=self.pk).status  # Get previous status before saving
+
+        super().save(*args, **kwargs)  # Save the task
+
+        # If task status changed to completed, update scores
+        if previous_status != 'completed' and self.status == 'completed':
+
+            if self.assigned_to and self.team:
+                TeamScoreboard.update_or_create_score(self.assigned_to, self.team, points=10)  # Update team score
+
+
     class Meta:
-        ordering = ['-created_at']  # ✅ Corrected ordering
+        ordering = ['-created_at']
 
 
+
+def update_team_member_score(member, team, points=10):
+    """Increase the score of a team member when a task is completed."""
+    if member and team:
+        scoreboard, created = TeamScoreboard.objects.get_or_create(member=member, team=team)
+        scoreboard.score += points
+        scoreboard.save()
 
 
 

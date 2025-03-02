@@ -900,9 +900,21 @@ def view_team_tasks(request, team_id):
     })
 
 
+from django.shortcuts import render, get_object_or_404
+from .models import Team, TeamScoreboard
+
+def team_leaderboard(request, team_id):
+    print(team_id)
+    team = get_object_or_404(Team, id=team_id)
+    leaderboard = TeamScoreboard.objects.filter(team=team).order_by('-score')
+    print(leaderboard)
 
 
-
+    context = {
+        'team': team,
+        'leaderboard': leaderboard,
+    }
+    return render(request, 'teams/team_leaderboard.html', context)
 
 
 

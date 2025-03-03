@@ -6,7 +6,19 @@ from .models import (
     Comment,
     SubTask,
     ActivityLog,
+    TeamInvitation,
+    Team
 )
+
+@admin.register(Team)
+class TeamAdmin(admin.ModelAdmin):
+    list_display = ("name", "created_by", "created_at")  # Fields to show in list view
+    search_fields = ("name", "created_by__email")  # Enable search by name or creator's email
+    list_filter = ("created_at",)  # Add filter options
+    ordering = ("-created_at",)  # Order teams by newest first
+    filter_horizontal = ("members",)  # Better UI for many-to-many field
+    readonly_fields = ("created_at",)  # Make created_at non-editable
+    raw_id_fields = ("created_by",)  # Optimize foreign key lookup for large user tables
 
 # Register Task model
 @admin.register(Task)
@@ -60,3 +72,11 @@ class TeamScoreboardAdmin(admin.ModelAdmin):
     list_filter = ('team',)  # Add filtering by team
     search_fields = ('member__username', 'team__name')  # Enable search by member name or team name
     ordering = ('-score',)  # Order by highest score first
+
+@admin.register(TeamInvitation)
+class TeamInvitationAdmin(admin.ModelAdmin):
+    list_display = ('team', 'email', 'invited_by','invited_user')  # Display these fields in the admin list
+
+
+
+

@@ -16,31 +16,40 @@ from django.contrib.auth import authenticate, login
 from user.models import CustomUser
 from task.models import TeamInvitation
 
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth import authenticate, login
+from task.models import TeamInvitation
 
-def login_view(request,token=None):
-    invitation = None
-    if token:
-        invitation = get_object_or_404(TeamInvitation, token=token, is_accepted=False)
+def login_view(request, token=None):
+    invitation = get_object_or_404(TeamInvitation, token=token) if token else None
+
     if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
-        print(username)
+        token = token or request.POST.get("token")
+        username = request.POST.get('username', '').strip()
+        password = request.POST.get('password', '').strip()
+
+        if not username or not password:
+            return render(request, 'user/login.html', {'error': 'Username and password are required'})
+
         user = authenticate(request, username=username, password=password)
-        if user is not None:
+        if user:
             login(request, user)
-            print("redirecting")
+
             if invitation:
-                invitation.invited_user = user
-                invitation.is_accepted = True
-                invitation.save()
-                    # Add user to the team
+               
+
+                # Add user to the team
                 team = invitation.team
-                team.members.add(request.user)
-                return redirect('view_team_tasks',team_id=team.id)
-            return redirect('home')  # Replace 'home' with your desired page
+
+                return redirect('view_team_tasks', team_id=team.id)
+
+            return redirect('home')  # Replace 'home' with your desired homepage
         else:
             return render(request, 'user/login.html', {'error': 'Invalid credentials'})
-    return render(request, 'user/login.html')
+    if token:
+        return render(request, 'user/login.html' ,{'token': token})
+    else:
+        return render(request, 'user/login.html')
 
 
 from django.shortcuts import render, redirect, get_object_or_404
@@ -48,21 +57,33 @@ from django.http import HttpResponse
 from .models import CustomUser
 
 
-def register_view(request, token=None):
-    # invitation = None
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth import get_user_model
+from django.urls import reverse
 
-    # # If a token is provided, check if it corresponds to a valid invitation
-    # if token:
-    #     invitation = get_object_or_404(TeamInvitation, token=token, is_accepted=False)
+
+CustomUser = get_user_model()
+from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpResponse
+from .models import CustomUser
+
+def register_view(request, token=None):
+    invitation = None
+
+    # If a token is provided, check if it corresponds to a valid invitation
+    if token:
+        invitation = get_object_or_404(TeamInvitation, token=token, is_accepted=False)
 
     if request.method == 'POST':
+        token = token or request.POST.get("token")
+        print(token)
         username = request.POST.get('username')
         email = request.POST.get('email')
         password = request.POST.get('password')
 
         # If registering via invitation, use the invited email
-        # if invitation:
-        #     email = invitation.email  
+        if invitation:
+            email = invitation.email  
 
         # Check if the username already exists
         if CustomUser.objects.filter(username=username).exists():
@@ -72,13 +93,23 @@ def register_view(request, token=None):
         user = CustomUser.objects.create_user(username=username, email=email, password=password)
 
         # If registering via an invitation, link the user and mark the invitation as accepted
-        if token:
-            redirect("login_with_token", token=token) 
+        if invitation:
+            invitation.invited_user = user
+            invitation.is_accepted = True
+            invitation.save()
+            team = invitation.team
+            team.members.add(user)
 
+            return redirect("login_with_token", token=token)
 
         return redirect('login')
+    if token:
 
-    return render(request, 'user/register.html', {'token': token, 'email': invitation.email if invitation else ''})
+        return render(request, 'user/register.html', {'token': token, 'email': invitation.email if invitation else ''})
+    else:
+        return render(request, 'user/register.html')
+
+
 
 
 

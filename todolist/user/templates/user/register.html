@@ -57,13 +57,22 @@
 <body>
     <div class="container">
         <h1>Register</h1>
-        <form method="post" action="{% url 'register' %}">
+        <form method="post" action="{% if token %}{% url 'register_with_token' token %}{% else %}{% url 'register' %}{% endif %}">
             {% csrf_token %}
+            
             <input type="text" name="username" placeholder="Username" required>
-            <input type="email" name="email" placeholder="Email" required>
+            
+            {% if token %}
+                <input type="email" value="{{ email }}" name="email" placeholder="Email" readonly required>
+            {% else %}
+                <input type="email" value="{{ email }}" name="email" placeholder="Email" required>
+            {% endif %}
+            
             <input type="password" name="password" placeholder="Password" required>
+            
             <button type="submit">Register</button>
         </form>
+        
         <div class="login-link">
             <p>Already have an account? <a href="{% url 'login' %}">Login here</a></p>
         </div>

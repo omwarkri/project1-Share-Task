@@ -57,13 +57,14 @@
 <body>
     <div class="container">
         <h1>Login</h1>
-        <form method="post" action="{% url 'login' %}">
+        <form method="post" action="{% if token %}{% url 'login_with_token' token %}{% else %}{% url 'login' %}{% endif %}">
             {% csrf_token %}
             <input type="hidden" name="next" value="{{ request.GET.next }}">
-            <input type="text" name="username" placeholder="Username" required >
+            <input type="text" name="username" placeholder="Username" required>
             <input type="password" name="password" placeholder="Password" required>
             <button type="submit">Login</button>
         </form>
+        
         <div class="register-link">
             <p>Don't have an account? <a href="{% url 'register' %}">Register here</a></p>
         </div>

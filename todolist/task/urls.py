@@ -21,11 +21,11 @@ urlpatterns = [
 
     path('teams/', teams_list, name='teams_list'),  # Show all teams
     path('teams/<int:team_id>/', view_team_tasks, name='view_team_tasks'),  # Show tasks for a team
-
+    path("accept-invite/<str:token>/", accept_invite, name="accept_invite"),
     path('teams/create/', create_team, name='create_team'),
     path('teams/<int:team_id>/leaderboard/', team_leaderboard, name='team_leaderboard'),
-        path("teams/<int:team_id>/invite/", send_team_invite, name="send_team_invite"),
-    path("accept-invite/<str:token>/", accept_invite, name="accept_invite"),
+    path("teams/<int:team_id>/invite/", send_team_invite, name="send_team_invite"),
+    
     
   
 ]

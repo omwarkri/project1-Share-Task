@@ -2,22 +2,22 @@
 {% block content %}
 
 <style>
+    /* Container and Main Content Styles */
     .container {
-    display: flex;
-    height: 100vh; /* Ensure the container takes the full viewport height */
-    overflow: hidden; /* Prevent the entire page from scrolling */
-}
+        display: flex;
+        height: 100vh; /* Full viewport height */
+        overflow: hidden; /* Prevent the entire page from scrolling */
+    }
 
-.main-content {
-    margin-left: 100px; /* Adjust based on sidebar width */
-    padding: 20px;
-    flex-grow: 1;
-    overflow-y: auto; /* Enable vertical scrolling */
-    height: 100vh; /* Ensure it takes the full height */
-}
+    .main-content {
+        margin-left: 100px; /* Adjust based on sidebar width */
+        padding: 20px;
+        flex-grow: 1;
+        overflow-y: auto; /* Enable vertical scrolling */
+        height: 100vh; /* Full viewport height */
+    }
 
-/* Rest of your existing CSS */
-
+    /* Filter Section Styles */
     .filter-section {
         margin-bottom: 20px;
     }
@@ -49,11 +49,12 @@
         background-color: #16a085;
     }
 
+    /* Task Grid Styles */
     .task-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
         gap: 20px;
-        padding:20px 30px;
+        padding: 20px 30px;
     }
 
     .task-card {
@@ -126,7 +127,73 @@
         background-color: #1abc9c;
         color: white;
     }
+
+    /* Modal Styles */
+    .modal {
+        display: none; /* Hidden by default */
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+        justify-content: center;
+        align-items: center;
+        z-index: 1000; /* Ensure it's on top */
+    }
+
+    .modal-content {
+        background-color: white;
+        padding: 20px;
+        border-radius: 8px;
+        width: 90%;
+        max-width: 500px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .close-modal {
+        float: right;
+        font-size: 24px;
+        cursor: pointer;
+    }
+
+    .close-modal:hover {
+        color: #ff0000;
+    }
+
+    /* Form Styles */
+    form {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    form label {
+        font-weight: bold;
+    }
+
+    form input, form textarea {
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 14px;
+    }
+
+    form button {
+        padding: 10px;
+        background-color: #1abc9c;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+
+    form button:hover {
+        background-color: #16a085;
+    }
 </style>
+
 <div class="container">
     <!-- Include the sidebar -->
     {% include "teams/sidebar.html" %}
@@ -134,7 +201,7 @@
     <div class="main-content">
         <h2>Team: {{ team.name }}</h2>
         <p>{{ team.description }}</p>
-        <a href="{% url 'send_team_invite' team.id %}" class="btn btn-success">Invite Member</a>
+        <a id="invite-member-button" href="#" class="btn btn-success">Invite Member</a>
 
         <!-- Filter Section -->
         <div class="filter-section">
@@ -223,75 +290,22 @@
     </div>
 </div>
 
-<!-- Add Task Modal -->
-<div id="taskModal" class="modal">
+<!-- Invite Member Modal -->
+<div id="inviteMemberModal" class="modal" style="display: none;">
     <div class="modal-content">
-        <div class="modal-header">
-            <h3>Add Task</h3>
-            <span class="close">&times;</span>
-        </div>
-        <form method="post">
+        <span class="close-modal" onclick="closeInviteMemberModal()">&times;</span>
+        <h3>Invite Member</h3>
+        <form method="post" action="{% url 'send_team_invite' team.id %}">
             {% csrf_token %}
-            {{ task_form.as_p }}
-            <button type="submit" name="add_task">Create Task</button>
-        </form>
-    </div>
-</div>
-<!-- View Task Dependencies Modal -->
-<div id="viewTaskDependencies" style="display: none;">
-    <div class="modal-content">
-        <span class="close-modal" onclick="closeViewDependencyModal()">&times;</span>
-        <h3>🔗 Task Dependencies</h3>
-        <div class="task-dependencies">
-            <h4>📌 Current Dependencies</h4>
-            <ul id="dependency-list" class="dependency-list">
-                <li class="no-dependencies">No dependencies set for this task.</li>
-            </ul>
-        </div>
-        <form method="POST" id="update-dependencies-form" class="dependency-form">
-            {% csrf_token %}
-            <h4>🔄 Update Dependencies</h4>
-            <select id="dependency-select" name="dependencies" multiple class="dependency-select"></select>
-            <button type="submit" class="submit-button">🔄 Update Dependencies</button>
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+            <label for="message">Message (optional):</label>
+            <textarea id="message" name="message" rows="4"></textarea>
+            <button type="submit" class="submit-button">Send Invite</button>
         </form>
     </div>
 </div>
 
-<!-- Share Task Modals -->
-{% for task in tasks  %}
-<div id="shareTaskModal-{{ task.id }}" class="modal" style="display: none;">
-    <div class="modal-content">
-        <span class="close-modal" onclick="closeModal({{task.id }})">&times;</span>
-        <h3>📤 Share Your Task Completion</h3>
-        <p>Would you like to share how you completed this task?</p>
-        <form method="post" enctype="multipart/form-data" action="{% url 'complete_task' task.id %}">
-            {% csrf_token %}
-            <label for="completion_details">📝 How did you complete the task?</label>
-            <textarea name="completion_details" id="completion_details" rows="4"></textarea>
-            <label for="uploaded_image">🖼️ Upload Image (optional):</label>
-            <input type="file" name="uploaded_image" id="uploaded_image" accept="image/*">
-            <label for="uploaded_file">📁 Upload Video/File (optional):</label>
-            <input type="file" name="uploaded_file" id="uploaded_file" accept="video/*,.pdf,.doc,.docx">
-            {% if task_data.task.task_partner %}
-            <div class="partner-feedback">
-                <h4>⭐ Rate and Comment on the Task Partner</h4>
-                <label for="partner_rating">🌟 Rating (1-5):</label>
-                <input type="number" name="partner_rating" id="partner_rating" min="1" max="5" required>
-                <label for="partner_comment">💬 Comment:</label>
-                <textarea name="partner_comment" id="partner_comment" rows="3"></textarea>
-            </div>
-            {% endif %}
-            <div class="skip-sharing">
-                <label>
-                    <input type="checkbox" name="skip_sharing" id="skip_sharing">
-                    🙈 I do not want to share my completion details.
-                </label>
-            </div>
-            <button type="submit" class="submit-button">📤 Submit</button>
-        </form>
-    </div>
-</div>
-{% endfor %}
 <script>
     // JavaScript for filtering tasks
     function filterTasks() {
@@ -336,94 +350,26 @@
         filterTasks();
     });
 
-    // Modal functionality
-    const modal = document.getElementById("taskModal");
-    const openModalBtn = document.getElementById("openTaskModal");
-    const closeModalBtn = document.querySelector(".modal-header .close");
+    // Open Invite Member Modal
+    function openInviteMemberModal() {
+        document.getElementById('inviteMemberModal').style.display = 'flex';
+    }
 
-    openModalBtn?.addEventListener("click", () => {
-        modal.style.display = "flex";
-    });
+    // Close Invite Member Modal
+    function closeInviteMemberModal() {
+        document.getElementById('inviteMemberModal').style.display = 'none';
+    }
 
-    closeModalBtn?.addEventListener("click", () => {
-        modal.style.display = "none";
-    });
+    // Attach event listener to the Invite Member button
+    document.getElementById('invite-member-button').addEventListener('click', openInviteMemberModal);
 
-    window.addEventListener("click", (event) => {
+    // Close modal when clicking outside of it
+    window.addEventListener('click', (event) => {
+        const modal = document.getElementById('inviteMemberModal');
         if (event.target === modal) {
-            modal.style.display = "none";
+            modal.style.display = 'none';
         }
     });
-    
-function openViewDependencyModal(taskId) {
-    document.addEventListener('DOMContentLoaded', function () {
-    flatpickr('#id_due_date', {
-      dateFormat: 'Y-m-d',  // Format to match Django's expected format
-      enableTime: false,    // Disable time selection
-    });
-  });
-    // Fetch task details and dependencies
-    fetch(`/get-task-dependencies/${taskId}/`)
-        .then(response => response.json())
-        .then(data => {
-            const dependencyList = document.getElementById('dependency-list');
-            const dependencySelect = document.getElementById('dependency-select');
-
-            // Clear existing content
-            dependencyList.innerHTML = '';
-            dependencySelect.innerHTML = '';
-
-            // Populate current dependencies
-            if (data.dependencies.length > 0) {
-                data.dependencies.forEach(dep => {
-                    const li = document.createElement('li');
-                    li.textContent = dep.title;
-                    dependencyList.appendChild(li);
-                });
-            } else {
-                const li = document.createElement('li');
-                li.textContent = 'No dependencies set for this task.';
-                li.classList.add('no-dependencies');
-                dependencyList.appendChild(li);
-            }
-
-            // Populate available tasks for updating dependencies
-            data.all_tasks.forEach(task => {
-                const option = document.createElement('option');
-                option.value = task.id;
-                option.textContent = task.title;
-                dependencySelect.appendChild(option);
-            });
-
-            // Set the form action URL
-            document.getElementById('update-dependencies-form').action = `/update-task-dependencies/${taskId}/`;
-
-            // Display the modal
-            document.getElementById('viewTaskDependencies').style.display = 'flex';
-        })
-        .catch(error => {
-            console.error('Error fetching task dependencies:', error);
-        });
-}
-
-
-
-function closeViewDependencyModal() {
-
-    document.getElementById('viewTaskDependencies').style.display = 'none';
-}
-
-function openModal(taskId) {
-        console.log(
-            "open model"
-        )
-        document.getElementById(`shareTaskModal-${taskId}`).style.display = 'flex';
-    }
-
-    function closeModal(taskId) {
-        document.getElementById(`shareTaskModal-${taskId}`).style.display = 'none';
-    }
-
 </script>
 
 {% endblock %}

@@ -166,6 +166,8 @@ DATABASES = {
 }
 
 
+BASE_URL='https://share-task.onrender.com'
+
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.postgresql',

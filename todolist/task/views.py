@@ -927,12 +927,19 @@ from django.contrib.auth import get_user_model
 from .models import Team, TeamInvitation
 
 User = get_user_model()
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
 
 @login_required
 def send_team_invite(request, team_id):
     if request.method == "POST":
+
         email = request.POST.get("email")
+        message = request.POST.get("message", "")  # Get the optional message
         team = get_object_or_404(Team, id=team_id)
+
+        print(email)
 
         # Check if the user already exists
         invited_user = User.objects.filter(email=email).first()
@@ -952,12 +959,26 @@ def send_team_invite(request, team_id):
 
         # Send email with accept link
         invite_link = request.build_absolute_uri(f"/accept-invite/{invitation.token}/")
-        send_mail(
-            subject="Team Invitation",
-            message=f"You've been invited to join {team.name}!\nSign up or log in to accept: {invite_link}",
+
+        # Render HTML email template
+        html_content = render_to_string("teams/email_invitation.html", {
+            "team_name": team.name,
+            "invite_link": invite_link,
+            "message": message,  # Include the optional message
+            "invited_by": request.user.username,
+        })
+        text_content = strip_tags(html_content)  # Fallback for plain text email clients
+
+        # Send the email
+        email = EmailMultiAlternatives(
+            subject=f"Invitation to Join {team.name}",
+            body=text_content,
             from_email="no-reply@example.com",
-            recipient_list=[email],
+            to=[email],
         )
+
+        email.attach_alternative(html_content, "text/html")
+        email.send()
 
         messages.success(request, "Invitation sent successfully!")
         return redirect("team_leaderboard", team_id=team_id)
@@ -969,9 +990,13 @@ from django.contrib.auth import login
 
 def accept_invite(request, token):
     invitation = get_object_or_404(TeamInvitation, token=token, is_accepted=False)
+    
 
     # If user is not logged in, redirect them to sign up
-    if not request.user.is_authenticated:
+    if not request.user.is_authenticated :
+        messages.info(request, "You need to create an account before accepting the invite.")
+        return redirect("register_with_token", token=token)  # Redirect to sign-up with token
+    if invitation.email!=request.user.email:
         messages.info(request, "You need to create an account before accepting the invite.")
         return redirect("register_with_token", token=token)  # Redirect to sign-up with token
 

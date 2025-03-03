@@ -14,6 +14,14 @@ import re
 # Configure Gemini API
 generativeai.configure(api_key="AIzaSyDx3rr0MzUPaumvdII3WIffmtsZqAz7JIs")
 model = generativeai.GenerativeModel('gemini-1.5-flash')
+from django.utils import timezone
+from django.db.models import Q
+
+def update_daily_tasks():
+    """Reset daily tasks' status to 'pending' if they are completed or overdue."""
+    now = timezone.now()
+    Task.objects.filter(is_daily=True).update(status='pending', reminder_sent=False)
+
 
 # Reusable Email Template Function
 def generate_html_email(title, content, button_text=None, button_link=None, home_page_link=None):
@@ -279,14 +287,21 @@ from apscheduler.triggers.cron import CronTrigger
 from apscheduler.triggers.interval import IntervalTrigger
 
 # Scheduler Setup
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.triggers.cron import CronTrigger
+from apscheduler.triggers.interval import IntervalTrigger
+
 def start_scheduler():
     """Start the scheduler when Django starts."""
     scheduler = BackgroundScheduler()
 
-    # Run `send_task_reminders` every minute
+    # Run `send_task_reminders` every 20 minutes
     scheduler.add_job(send_task_reminders, IntervalTrigger(minutes=20))
 
     # Run `send_daily_task_schedule` every day at 9 AM
     scheduler.add_job(send_daily_task_schedule, CronTrigger(hour=9, minute=0))
+
+    # Run `update_daily_tasks` every day at midnight
+    scheduler.add_job(update_daily_tasks, CronTrigger(hour=0, minute=0))
 
     scheduler.start()

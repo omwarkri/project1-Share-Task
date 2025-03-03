@@ -930,7 +930,7 @@
                  <button id="clear-filter-button" class="clear-filter-button" onclick="displayAllTasks()">🗑️</button>
                 <button class="filter-button" onclick="showAssignedTasks()">👤 Show My Assigned Tasks</button>
                 <input type="text" id="search-bar" class="search-bar" placeholder="🔍 Search tasks..." oninput="searchTasks()" />
-               
+                <button class="filter-button" onclick="filterDailyTasks()">📅 Daily Tasks</button>
                 <input type="text" id="date-filter" class="search-bar" placeholder="📅 Filter by date..." />
                 <div class="private-task-toggle" onclick="filterTasks()">
                     🔒
@@ -956,7 +956,8 @@
                 <div class="task-card task-item" 
                      data-status="{{ task_data.task.status }}" 
                      data-priority="{{ task_data.task.priority }}" 
-                     data-assigned-to="{% if task_data.task.assigned_to %}{{ task_data.task.assigned_to.id }}{% endif %}">
+                     data-assigned-to="{% if task_data.task.assigned_to %}{{ task_data.task.assigned_to.id }}{% endif %}"
+                     data-is-daily="{{ task_data.task.is_daily }}"> <!-- Add this line -->
                     <div class="task-header">
                         <strong class="task-title">📌 {{ task_data.task.title }}</strong>
                         <span class="task-priority {{ task_data.task.priority }}">
@@ -965,6 +966,7 @@
                             {% else %}✅
                             {% endif %}
                             {{ task_data.task.get_priority_display }}
+                            
                         </span>
                     </div>
                     <div class="task-body">
@@ -983,6 +985,7 @@
                             <span class="badge badge-danger">⏳ Overdue</span>
                             {% elif task_data.task.is_approaching_due_date %}
                             <span class="badge badge-warning">⏰ Approaching Due</span>
+
                             {% endif %}
                         </div>
                        
@@ -1400,6 +1403,21 @@ function applySorting() {
     if (activeButton) {
         activeButton.classList.add('active');
     }
+
+    function filterDailyTasks() {
+    const taskItems = document.querySelectorAll('.task-item');
+    
+
+    taskItems.forEach(task => {
+        const isDaily = task.getAttribute('data-is-daily') === 'True'; // Check if task is daily
+        console.log(task.getAttribute('data-is-daily'),isDaily)
+        if (isDaily) {
+            task.style.display = 'block'; // Show daily tasks
+        } else {
+            task.style.display = 'none'; // Hide non-daily tasks
+        }
+    });
+}
 
 function searchTasks() {
     const query = document.getElementById('search-bar').value;

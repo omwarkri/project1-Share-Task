@@ -118,6 +118,7 @@ class Task(models.Model):
         null=True,
         blank=True
     )
+    is_daily = models.BooleanField(default=False)  # New field to mark daily tasks
 
     def __str__(self):
         return self.title

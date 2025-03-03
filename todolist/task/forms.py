@@ -9,7 +9,7 @@ from .models import Task
 class TaskForm(forms.ModelForm):
     class Meta:
         model = Task
-        fields = ['title', 'description', 'due_date', 'priority', 'category', 'status', 'dependencies']
+        fields = ['title', 'description', 'due_date', 'priority', 'category', 'status', 'dependencies','is_daily']
         widgets = {
             'due_date': forms.DateTimeInput(attrs={'type': 'datetime-local'}),  # Use HTML5 datetime input
         }
@@ -104,7 +104,7 @@ class AddMemberForm(forms.Form):
 class TaskForm(forms.ModelForm):
     class Meta:
         model = Task
-        fields = ['title', 'description', 'due_date', 'priority', 'category', 'status', 'dependencies']
+        fields = ['title', 'description', 'due_date', 'priority', 'category', 'status', 'dependencies','is_daily']
         widgets = {
             'due_date': forms.DateTimeInput(attrs={'type': 'datetime-local'}),  # Use HTML5 datetime input
         }

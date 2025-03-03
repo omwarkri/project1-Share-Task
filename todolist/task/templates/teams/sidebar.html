@@ -10,7 +10,7 @@
     left: 0;
     top: 0;
     overflow-y: auto; /* Scrollable if content overflows */
-    z-index: 1000; /* Ensure it's above other content */
+    z-index: 500; /* Ensure it's above other content */
     padding-top:60px ;
 }
 
@@ -137,7 +137,7 @@
     border: none;
     padding: 6px;
     border-radius: 5px;
-    z-index: 1001;
+    z-index: 501;
     cursor: pointer;
 }
 
@@ -168,7 +168,7 @@
     border: none;
     padding: 6px;
     border-radius: 5px;
-    z-index: 1001;
+    z-index: 501;
     cursor: pointer;
 
     }
@@ -296,8 +296,10 @@
         document.getElementById('teamMembersModal').style.display = 'none';
     }
 
+
     function openMemberAnalysisModal(memberId) {
-        const teamId = document.querySelector('.team-sidebar').getAttribute('data-team-id');
+        console.log("member analysis model")
+        
         fetch(`/team/${teamId}/member-analysis/${memberId}/`)
             .then(response => response.json())
             .then(data => {
@@ -322,6 +324,17 @@
     function closeMemberAnalysisModal() {
         document.getElementById('memberAnalysisModal').style.display = 'none';
     }
+
+    document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.member-link').forEach(link => {
+        link.addEventListener('click', function(event) {
+            event.preventDefault(); // Prevent default anchor behavior
+            const memberId = this.getAttribute('data-member-id');
+            openMemberAnalysisModal(memberId);
+        });
+    });
+});
+
 
     // Attach click event to member links
     document.addEventListener('DOMContentLoaded', () => {

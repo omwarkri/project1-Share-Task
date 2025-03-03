@@ -306,6 +306,62 @@
     </div>
 </div>
 
+<!-- View Task Dependencies Modal -->
+<div id="viewTaskDependencies" style="display: none;">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeViewDependencyModal()">&times;</span>
+        <h3>🔗 Task Dependencies</h3>
+        <div class="task-dependencies">
+            <h4>📌 Current Dependencies</h4>
+            <ul id="dependency-list" class="dependency-list">
+                <li class="no-dependencies">No dependencies set for this task.</li>
+            </ul>
+        </div>
+        <form method="POST" id="update-dependencies-form" class="dependency-form">
+            {% csrf_token %}
+            <h4>🔄 Update Dependencies</h4>
+            <select id="dependency-select" name="dependencies" multiple class="dependency-select"></select>
+            <button type="submit" class="submit-button">🔄 Update Dependencies</button>
+        </form>
+    </div>
+</div>
+
+<!-- Share Task Modals -->
+{% for task in tasks  %}
+<div id="shareTaskModal-{{ task.id }}" class="modal" style="display: none;">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeModal({{task.id }})">&times;</span>
+        <h3>📤 Share Your Task Completion</h3>
+        <p>Would you like to share how you completed this task?</p>
+        <form method="post" enctype="multipart/form-data" action="{% url 'complete_task' task.id %}">
+            {% csrf_token %}
+            <label for="completion_details">📝 How did you complete the task?</label>
+            <textarea name="completion_details" id="completion_details" rows="4"></textarea>
+            <label for="uploaded_image">🖼️ Upload Image (optional):</label>
+            <input type="file" name="uploaded_image" id="uploaded_image" accept="image/*">
+            <label for="uploaded_file">📁 Upload Video/File (optional):</label>
+            <input type="file" name="uploaded_file" id="uploaded_file" accept="video/*,.pdf,.doc,.docx">
+            {% if task_data.task.task_partner %}
+            <div class="partner-feedback">
+                <h4>⭐ Rate and Comment on the Task Partner</h4>
+                <label for="partner_rating">🌟 Rating (1-5):</label>
+                <input type="number" name="partner_rating" id="partner_rating" min="1" max="5" required>
+                <label for="partner_comment">💬 Comment:</label>
+                <textarea name="partner_comment" id="partner_comment" rows="3"></textarea>
+            </div>
+            {% endif %}
+            <div class="skip-sharing">
+                <label>
+                    <input type="checkbox" name="skip_sharing" id="skip_sharing">
+                    🙈 I do not want to share my completion details.
+                </label>
+            </div>
+            <button type="submit" class="submit-button">📤 Submit</button>
+        </form>
+    </div>
+</div>
+{% endfor %}
+
 <script>
     // JavaScript for filtering tasks
     function filterTasks() {
@@ -370,6 +426,67 @@
             modal.style.display = 'none';
         }
     });
+
+        // Open View Dependency Modal
+        function openViewDependencyModal(taskId) {
+        fetch(`/get-task-dependencies/${taskId}/`)
+            .then(response => response.json())
+            .then(data => {
+                const dependencyList = document.getElementById('dependency-list');
+                const dependencySelect = document.getElementById('dependency-select');
+
+                // Clear existing content
+                dependencyList.innerHTML = '';
+                dependencySelect.innerHTML = '';
+
+                // Populate current dependencies
+                if (data.dependencies.length > 0) {
+                    data.dependencies.forEach(dep => {
+                        const li = document.createElement('li');
+                        li.textContent = dep.title;
+                        dependencyList.appendChild(li);
+                    });
+                } else {
+                    const li = document.createElement('li');
+                    li.textContent = 'No dependencies set for this task.';
+                    li.classList.add('no-dependencies');
+                    dependencyList.appendChild(li);
+                }
+
+                // Populate available tasks for updating dependencies
+                data.all_tasks.forEach(task => {
+                    const option = document.createElement('option');
+                    option.value = task.id;
+                    option.textContent = task.title;
+                    dependencySelect.appendChild(option);
+                });
+
+                // Set the form action URL
+                document.getElementById('update-dependencies-form').action = `/update-task-dependencies/${taskId}/`;
+
+                // Display the modal
+                document.getElementById('viewTaskDependencies').style.display = 'flex';
+            })
+            .catch(error => {
+                console.error('Error fetching task dependencies:', error);
+            });
+    }
+
+    // Close View Dependency Modal
+    function closeViewDependencyModal() {
+        document.getElementById('viewTaskDependencies').style.display = 'none';
+    }
+
+    function openModal(taskId) {
+        console.log(
+            "open model"
+        )
+        document.getElementById(`shareTaskModal-${taskId}`).style.display = 'flex';
+    }
+
+    function closeModal(taskId) {
+        document.getElementById(`shareTaskModal-${taskId}`).style.display = 'none';
+    }
 </script>
 
 {% endblock %}

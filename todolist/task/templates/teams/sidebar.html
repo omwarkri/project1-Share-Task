@@ -1,5 +1,5 @@
 <!-- templates/task/sidebar.html -->
-<div class="team-sidebar">
+<div class="team-sidebar" data-team-id="{{team.id }}">
     <div class="team-sidebar-header">
         <h2>📋</h2> <!-- Main symbol for the app -->
     </div>
@@ -50,9 +50,23 @@
         <div class="team-members-list">
             <ul>
                 {% for member in team.members.all %}
-                    <li>{{ member.username }}</li>
+                    <li>
+                        <a href="#" class="member-link" data-member-id="{{ member.id }}">{{ member.username }}</a>
+                    </li>
                 {% endfor %}
             </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Member Analysis Modal -->
+<div id="memberAnalysisModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeMemberAnalysisModal()">&times;</span>
+        <h3 id="memberAnalysisTitle">👤 Member Analysis</h3>
+        <div id="memberAnalysisContent">
+            <!-- Analysis data will be loaded here dynamically -->
+            <p>Loading analysis...</p>
         </div>
     </div>
 </div>
@@ -183,6 +197,9 @@
 </style>
 
 <script>
+    const teamSidebar = document.querySelector('.team-sidebar');
+    const teamId = teamSidebar.getAttribute('data-team-id');
+    console.log(teamId);
     function openAddTaskModal() {
         const taskModal = document.getElementById('taskModal');
         taskModal.style.display = 'flex';
@@ -214,6 +231,70 @@
 
         if (event.target === teamMembersModal) {
             teamMembersModal.style.display = 'none';
+        }
+    });
+
+    function openTeamMembersModal() {
+        document.getElementById('teamMembersModal').style.display = 'flex';
+    }
+
+    // Close Team Members Modal
+    function closeTeamMembersModal() {
+        document.getElementById('teamMembersModal').style.display = 'none';
+    }
+
+    // Open Member Analysis Modal
+    function openMemberAnalysisModal(memberId) {
+        // Fetch member analysis data
+        fetch(`/team/${teamId}/member-analysis/${memberId}/`)
+            .then(response => response.json())
+            .then(data => {
+                // Update modal content with fetched data
+                document.getElementById('memberAnalysisTitle').innerText = `👤 ${data.member.username}'s Analysis`;
+                document.getElementById('memberAnalysisContent').innerHTML = `
+                    <p><strong>Total Tasks:</strong> ${data.total_tasks}</p>
+                    <p><strong>Completed Tasks:</strong> ${data.completed_tasks}</p>
+                    <p><strong>Pending Tasks:</strong> ${data.pending_tasks}</p>
+                    <p><strong>In Progress Tasks:</strong> ${data.in_progress_tasks}</p>
+                    <p><strong>Overdue Tasks:</strong> ${data.overdue_tasks}</p>
+                    <p><strong>Score:</strong> ${data.score}</p>
+                    <p><strong>Average Completion Time:</strong> ${data.average_completion_time || 'N/A'}</p>
+                `;
+                // Display the modal
+                document.getElementById('memberAnalysisModal').style.display = 'flex';
+            })
+            .catch(error => {
+                console.error('Error fetching member analysis:', error);
+                document.getElementById('memberAnalysisContent').innerHTML = '<p>Error loading analysis. Please try again.</p>';
+            });
+    }
+
+    // Close Member Analysis Modal
+    function closeMemberAnalysisModal() {
+        document.getElementById('memberAnalysisModal').style.display = 'none';
+    }
+
+    // Attach click event to member links
+    document.addEventListener('DOMContentLoaded', () => {
+        const memberLinks = document.querySelectorAll('.member-link');
+        memberLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const memberId = link.getAttribute('data-member-id');
+                openMemberAnalysisModal(memberId);
+            });
+        });
+    });
+
+    // Close modals when clicking outside
+    window.addEventListener('click', (event) => {
+        const teamMembersModal = document.getElementById('teamMembersModal');
+        const memberAnalysisModal = document.getElementById('memberAnalysisModal');
+        if (event.target === teamMembersModal) {
+            closeTeamMembersModal();
+        }
+        if (event.target === memberAnalysisModal) {
+            closeMemberAnalysisModal();
         }
     });
 </script>

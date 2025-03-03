@@ -1019,5 +1019,62 @@ def accept_invite(request, token):
 
 
 
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+from django.utils import timezone
+from .models import Team, Task, TeamScoreboard
+from django.db.models import (
+    F,  # For referencing model fields in queries
+    Avg,  # For calculating averages
+    ExpressionWrapper,  # For creating expressions in queries
+    fields,  # For defining field types (e.g., DurationField)
+)
+from django.db.models.functions import Extract  # Optional, for advanced date/time extraction
+from django.utils import timezone  # For working with timezone-aware datetimes
 
+def member_analysis(request, team_id,member_id):
+    """Fetch task analysis data for a specific team member."""
+    print(member_id)
+    member = get_object_or_404(CustomUser, id=member_id)
+    print(member)
+    print(team_id)
+    team = get_object_or_404(Team, id=team_id) # Pass team_id in the request
+
+    # Get tasks assigned to the member in this team
+    tasks = Task.objects.filter(team=team, assigned_to=member)
+
+    # Calculate task statistics
+    total_tasks = tasks.count()
+    completed_tasks = tasks.filter(status='completed')
+    pending_tasks = tasks.filter(status='pending').count()
+    in_progress_tasks = tasks.filter(status='in_progress').count()
+    overdue_tasks = tasks.filter(status__in=['pending', 'in_progress'], due_date__lt=timezone.now()).count()
+
+    # Calculate average completion time for completed tasks
+    if completed_tasks.exists():
+        average_completion_time = completed_tasks.annotate(
+            completion_time=ExpressionWrapper(
+                F('updated_at') - F('created_at'),
+                output_field=fields.DurationField()
+            )
+        ).aggregate(avg_completion_time=Avg('completion_time'))['avg_completion_time']
+        average_completion_time = str(average_completion_time)  # Convert to string for JSON
+    else:
+        average_completion_time = None
+
+    # Get the member's score from the scoreboard
+    scoreboard_entry = TeamScoreboard.objects.filter(team=team, member=member).first()
+    score = scoreboard_entry.score if scoreboard_entry else 0
+
+    # Return analysis data as JSON
+    return JsonResponse({
+        'member': {'username': member.username},
+        'total_tasks': total_tasks,
+        'completed_tasks': completed_tasks.count(),
+        'pending_tasks': pending_tasks,
+        'in_progress_tasks': in_progress_tasks,
+        'overdue_tasks': overdue_tasks,
+        'score': score,
+        'average_completion_time': average_completion_time,
+    })
 

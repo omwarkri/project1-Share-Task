@@ -25,6 +25,7 @@ urlpatterns = [
     path('teams/create/', create_team, name='create_team'),
     path('teams/<int:team_id>/leaderboard/', team_leaderboard, name='team_leaderboard'),
     path("teams/<int:team_id>/invite/", send_team_invite, name="send_team_invite"),
+    path('team/<int:team_id>/member-analysis/<int:member_id>/', member_analysis, name='member_analysis'),
     
     
   

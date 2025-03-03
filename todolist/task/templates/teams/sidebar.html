@@ -141,6 +141,7 @@
     cursor: pointer;
 }
 
+
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
     .mobile-sidebar-toggle {
@@ -156,8 +157,8 @@
         left: 0; /* Make it visible when active */
     }
 
-    .close-sidebar {
-        display: block; /* Hidden by default */
+    #closeSidebar {
+        display: none; /* Hidden by default */
     position: fixed;
     top: 50%;
     left: 0px;
@@ -167,14 +168,22 @@
     border: none;
     padding: 6px;
     border-radius: 5px;
-    z-index: 5001;
+    z-index: 1001;
     cursor: pointer;
 
+    }
+    #closeSidebar {
+        display: none; /* Hide initially */
+    }
+
+    .team-sidebar.active + #closeSidebar {
+        display: block; /* Show close button when sidebar is open */
     }
 }
 </style>
 <!-- Mobile Toggle Button -->
 <button id="mobileSidebarToggle" class="mobile-sidebar-toggle">></button>
+<button id="closeSidebar" class="mobile-sidebar-toggle">x</button>
 
 <!-- Sidebar -->
 <div class="team-sidebar" data-team-id="{{ team.id }}">
@@ -322,24 +331,30 @@
 
     // Open sidebar
     mobileToggle.addEventListener('click', (event) => {
-        event.stopPropagation(); // Prevent immediate closing
+        event.stopPropagation();
         sidebar.classList.add('active');
-        mobileToggle.style.display="none"
+        closeSidebarButton.style.display = 'block';
     });
 
-    // Close sidebar on clicking close button
-    closeSidebarButton.addEventListener('click', () => {
+    // Close sidebar
+    closeSidebarButton.addEventListener('click', (event) => {
+        event.stopPropagation();
         sidebar.classList.remove('active');
-        mobileToggle.style.display="block"
+        closeSidebarButton.style.display = 'none';
     });
 
-    // Close sidebar only when clicking outside (not inside)
-    document.addEventListener('click', (event) => {
-        if (!sidebar.contains(event.target) && !mobileToggle.contains(event.target)) {
-            sidebar.classList.remove('active');
-        }
+    // Prevent closing when clicking inside the sidebar
+    sidebar.addEventListener('click', (event) => {
+        event.stopPropagation();
+    });
+
+    // Close when clicking outside
+    document.addEventListener('click', () => {
+        sidebar.classList.remove('active');
+        closeSidebarButton.style.display = 'none';
     });
 });
+
 
 
 

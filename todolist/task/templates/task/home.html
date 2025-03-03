@@ -928,9 +928,10 @@
             </div>
             <div class="header-actions">
                  <button id="clear-filter-button" class="clear-filter-button" onclick="displayAllTasks()">🗑️</button>
+                 <button class="filter-button" onclick="filterDailyTasks()">📅 Daily Tasks</button>
                 <button class="filter-button" onclick="showAssignedTasks()">👤 Show My Assigned Tasks</button>
                 <input type="text" id="search-bar" class="search-bar" placeholder="🔍 Search tasks..." oninput="searchTasks()" />
-                <button class="filter-button" onclick="filterDailyTasks()">📅 Daily Tasks</button>
+                
                 <input type="text" id="date-filter" class="search-bar" placeholder="📅 Filter by date..." />
                 <div class="private-task-toggle" onclick="filterTasks()">
                     🔒

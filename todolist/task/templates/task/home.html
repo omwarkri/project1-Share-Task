@@ -3,6 +3,887 @@
 {% extends 'task/base.html' %}
 
 {% block content %}
+
+<style>
+
+    body {
+        background-color: #f8f9fa; /* Light background */
+        color: #333; /* Dark text for contrast */
+    
+     
+    }
+    
+    /* Button styling */
+    /* Button styling */
+    /* Center the button */
+    
+    
+        /* Dashboard Layout */
+    .dashboard-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh; /* Full viewport height */
+            overflow: hidden; /* Prevent double scrollbars */
+    
+        }
+    .button-container {
+        display: flex;
+        justify-content: center; /* Center horizontally */
+        margin-bottom: 10px; /* Space below the button */
+    }
+    
+    /* Button styling */
+    .shutter-button {
+        background-color: #16a085; /* Green background */
+        color: white; /* White text */
+        padding: 8px 16px; /* Padding */
+        border: none; /* Remove border */
+        cursor: pointer; /* Pointer cursor on hover */
+        font-size: 16px; /* Font size */
+        border-radius: 5px; /* Rounded corners */
+        display: flex;
+        align-items: center; /* Center the icon and text vertically */
+        gap: 8px; /* Space between icon and text */
+        position: absolute;
+        top:10;
+        left:50%;
+        margin-top: -10px;
+        transform: translateX(-50%); /* Adjust for exact centering */
+        transition: top 0.5s ease-out; /* Smooth transition for movement */
+        z-index:900;
+    
+    }
+    
+    .shutter-button:hover {
+        background-color: #00a483; /* Darker green on hover */
+    }
+    
+    /* Shutter container styling */
+    .shutter-container {
+        height: 0; /* Start with zero height */
+        overflow: hidden; /* Hide overflow content */
+        transition: height 0.5s ease-out; /* Smooth transition */
+        background-color: #2c3e50; /* Light background */
+        color: white;
+        border: 1px solid #ddd; /* Border */
+        border-radius: 5px; /* Rounded corners */
+        padding: 0 15px; /* Padding */
+        margin: 0 auto; /* Center the container */
+        width:  100%; /* Set a width for the container */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    
+    
+    /* Class to expand the shutter */
+    .shutter-container.expanded {
+        height: 200px; /* Set a specific height */
+        padding: 15px; /* Add padding when expanded */
+    }
+    
+    .shutter-container.expanded .container{
+        overflow-y: auto; /* Enable vertical scrolling */
+        height:100%;
+        width:80%;
+    }
+    
+    .shutter-container.expanded .container {
+        overflow-y: auto; /* Enable vertical scrolling */
+        height: 100%; /* Take full height of the parent */
+        width: 80%; /* Set width to 80% of the parent */
+        padding-right: 10px; /* Add padding to prevent content from overlapping the scrollbar */
+    }
+    
+    /* Custom Scrollbar Styles */
+    .shutter-container.expanded .container::-webkit-scrollbar {
+        width: 8px; /* Reduce scrollbar width */
+    }
+    
+    .shutter-container.expanded .container::-webkit-scrollbar-track {
+        background: #f1f1f1; /* Light gray track */
+        border-radius: 4px; /* Rounded corners */
+    }
+    
+    .shutter-container.expanded .container::-webkit-scrollbar-thumb {
+        background: #888; /* Dark gray thumb */
+        border-radius: 4px; /* Rounded corners */
+    }
+    
+    .shutter-container.expanded .container::-webkit-scrollbar-thumb:hover {
+        background: #555; /* Darker gray on hover */
+    }
+    
+    a.suggested-users-button img{
+        height: 30px;
+        width: 30px;
+    }
+    
+    
+    div.task-mid-buttons{
+        display: flex;
+        gap:8px;
+    }
+    
+    /* Main Content */
+    /* Main Content */
+     .main-content {
+            flex: 1; /* Take remaining space */
+            padding: 16px;
+            height: calc(100vh - 60px); /* Adjust height to account for header */
+            overflow-y: auto;
+            
+        }
+    
+        /* Task Grid */
+        .task-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            padding: 20px;
+            margin-bottom: 20px; /* Reduce margin for better scrolling */
+        
+        }
+    
+    
+    /* Header */
+    .header {
+        display: flex
+        
+    ;
+        justify-content: space-between;
+        padding: 8px;
+        align-items: center;
+        background-color: #ffffff;
+    }
+    
+    .header h1 {
+        font-size: 24px;
+        color: #1abc9c; /* Accent color for header */
+    }
+    
+    .header-actions {
+        display: flex;
+        gap: 10px;
+    }
+    
+    
+    .private-task-toggle {
+        display: flex;
+        align-items: center;
+    }
+    
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 50px;
+        height: 24px;
+    }
+    
+    .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+    
+    .slider {
+        background-color: #ccc;
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        border-radius: 24px;
+        transition: 0.3s;
+    }
+    
+    .slider::before {
+        content: "";
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        left: 2px;
+        bottom: 2px;
+        background-color: white;
+        border-radius: 50%;
+        transition: 0.3s;
+    }
+    
+    .lock-icon {
+        position: absolute;
+        font-size: 14px;
+        color: white;
+        right: 6px;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+    
+    .switch input:checked + .slider {
+        background-color: #4caf50;
+    }
+    
+    .switch input:checked + .slider::before {
+        transform: translateX(26px);
+    }
+    
+    .switch input:checked + .slider .lock-icon {
+        content: "🔒"; /* Locked Icon */
+    }
+    
+    .switch input:not(:checked) + .slider .lock-icon {
+        content: "🔓"; /* Unlocked Icon */
+    }
+    
+    
+    .search-bar {
+        padding: 8px 12px;
+        border: 1px solid #ddd; /* Light border */
+        background-color: #f8f9fa; /* Light background */
+        border-radius: 5px;
+        width: 200px;
+    }
+    
+    .filter-button {
+        padding: 8px 12px;
+        background-color: #f8f9fa; /* Light background */
+        color: #555; /* Darker text */
+        border: 1px solid #ddd; /* Light border */
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+    
+    .filter-button:hover, .view-chats-button:hover {
+        background-color: #1abc9c; /* Accent color on hover */
+        color: white;
+    }
+    
+    /* Filter Section Styles */
+    .filter-group {
+        margin-bottom: 20px;
+    }
+    
+    .filter-group h4 {
+        font-size: 14px;
+        color: #555;
+        margin-bottom: 10px;
+        font-weight: 500;
+    }
+    
+    .filter-options {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 15px;
+    }
+    
+    .modern-select {
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 14px;
+        color: #333;
+        background-color: #f9f9f9;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .modern-select:hover {
+        border-color: #007BFF;
+        background-color: #fff;
+    }
+    
+    .filter-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    .modern-button {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 8px;
+        background-color: #f1f1f1;
+        color: #333;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .modern-button:hover {
+        background-color: #007BFF;
+        color: #fff;
+        transform: translateY(-2px);
+    }
+    
+    .modern-button.active {
+        background-color: #007BFF;
+        color: #fff;
+    }
+    
+    /* Apply Filters Button */
+    .apply-filters-button {
+        width: 100%;
+        padding: 10px;
+        background-color: #007BFF;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .apply-filters-button:hover {
+        background-color: #0056b3;
+    }
+    
+    /* Open Filter Modal Button */
+    .open-filter-modal-button {
+        padding: 10px 20px;
+        background-color: #007BFF;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .open-filter-modal-button:hover {
+        background-color: #0056b3;  
+    }
+    
+    
+    
+        /* Task Grid */
+        .task-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            padding: 20px;
+            margin-bottom: 20px; /* Reduce margin for better scrolling */
+        }
+    
+    .task-card {
+        background-color: #ffffff; /* White background */
+        border: 1px solid #ddd; /* Light border */
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+        border-radius: 8px;
+        padding: 15px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .task-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .task-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+    
+    .task-title {
+        font-size: 18px;
+        color: #2c3e50; /* Dark text for task title */
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 70%;
+    }
+    
+    .task-priority {
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: bold;
+        white-space: nowrap;
+        background-color: #f8f9fa; /* Light background for priority */
+        color: #555; /* Darker text */
+    }
+    
+    .task-body {
+        margin-bottom: 10px;
+        flex-grow: 1;
+        overflow-y: auto;
+    }
+    
+    .task-body p {
+        margin: 5px 0;
+        font-size: 14px;
+        color: #555; /* Darker text for task details */
+    }
+    
+    .suggested-users-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        padding: 6px;
+        background-color: transparent; /* Accent color for button */
+        border:1px solid rgba(93, 142, 135, 0.933);
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-size: 14px;
+        margin-top: 10px;
+      
+    }
+    
+    .suggested-users-button:hover {
+        background-color: transparent; 
+    }
+    
+    /* Modal Styles */
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        justify-content: center;
+        align-items: center;
+    
+        overflow-y: auto; /* Enable scrolling for the modal */
+        padding: 20px; /* Add padding to prevent content from touching the edges */
+        z-index: 3000;
+    }
+    
+    .modal-content {
+        background-color: #fff;
+        padding: 25px;
+        border-radius: 12px;
+        width: 90%;
+        max-width: 500px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        position: relative;
+        animation: modalFadeIn 0.3s ease;
+        max-height: 90vh; /* Limit modal height to 90% of the viewport height */
+        overflow-y: auto; /* Enable scrolling for the modal content */
+       
+    }
+    
+    /* Chat Modal Styles */
+    .chat-list {
+        max-height: 300px;
+        overflow-y: auto;
+        margin-top: 10px;
+    }
+    
+    .chat-item {
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+    }
+    
+    .chat-item a {
+        text-decoration: none;
+        color: #2c3e50;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .chat-time {
+        font-size: 12px;
+        color: #777;
+    }
+    
+    .filter-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    @keyframes modalFadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .close-modal {
+        position: absolute;
+        top: 15px;
+        right: 20px;
+        font-size: 24px;
+        cursor: pointer;
+        color: #666;
+        transition: color 0.3s ease;
+    }
+    
+    .close-modal:hover {
+        color: #333;
+    }
+    
+    .modal-content h3 {
+        margin-top: 0;
+        font-size: 22px;
+        color: #2c3e50;
+        margin-bottom: 20px;
+    }
+    
+    .modal-content p {
+        margin-bottom: 15px;
+        font-size: 16px;
+        color: #555;
+    }
+    
+    .modal-content label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        font-size: 14px;
+        color: #333;
+    }
+    
+    .modal-content input[type="text"],
+    .modal-content input[type="file"],
+    .modal-content textarea,
+    .modal-content select {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 14px;
+        color: #333;
+        background-color: #f9f9f9;
+        transition: border-color 0.3s ease;
+    }
+    
+    .modal-content input[type="text"]:focus,
+    .modal-content input[type="file"]:focus,
+    .modal-content textarea:focus,
+    .modal-content select:focus {
+        border-color: #3498db;
+        outline: none;
+    }
+    
+    .modal-content textarea {
+        resize: vertical;
+        min-height: 100px;
+    }
+    
+    .modal-content .submit-button {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #3498db;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+    
+    .modal-content .submit-button:hover {
+        background-color: #2980b9;
+    }
+    
+    .modal-content .skip-sharing {
+        margin-bottom: 15px;
+    }
+    
+    .modal-content .skip-sharing label {
+        font-size: 14px;
+        color: #555;
+    }
+    
+    .modal-content .skip-sharing input[type="checkbox"] {
+        margin-right: 8px;
+    }
+    
+    .apply-filters-button {
+        width: 100%;
+        padding: 10px;
+        background-color: #007BFF;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .apply-filters-button:hover {
+        background-color: #0056b3;
+    }
+    
+    .task-footer {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+    
+    }
+    
+    .task-action {
+        padding: 6px 12px;
+        background-color: #f8f9fa; /* Light background for buttons */
+        color: #555; /* Darker text */
+        border: 1px solid #ddd; /* Light border */
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background-color 0.3s ease;
+        flex-grow: 1;
+        text-align: center;
+    }
+    
+    .task-action:hover {
+        background-color: #1abc9c; /* Accent color on hover */
+        color: white;
+    }
+    
+    .badge-danger, .badge-warning {
+    
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: bold;
+        margin-top: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .badge-danger {
+        background-color: #e74c3c;
+        color: #fff;
+    }
+    
+    .badge-warning {
+        background-color: #f39c12;
+        color: #fff;
+    }
+    
+    
+    
+    /* View Task Dependencies Modal Styles */
+    #viewTaskDependencies {
+        display: none; /* Hidden by default */
+        position: fixed; /* Position relative to the viewport */
+        top: 0;
+        left: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        background-color: rgba(0, 0, 0, 0.5);
+        justify-content: center; /* Center horizontally */
+        align-items: center; /* Center vertically */
+        z-index: 1000; /* Ensure it's on top of other elements */
+    }
+    
+    #viewTaskDependencies .modal-content {
+        background-color: #ffffff;
+        color: rgb(0, 0, 0);
+        padding: 20px;
+        border-radius: 8px;
+        width: 90%;
+        max-width: 500px; /* Adjust the maximum width as needed */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add a shadow for better visibility */
+    }
+    
+    /* Floating Add Task Button */
+    /* Floating Add Task Button */
+    .floating-add-task-button {
+        position: fixed;
+        bottom: 0;
+        right: 20px;
+        width: 60px;
+        height: 60px;
+        background-color: #1abc9c; /* Accent color */
+        color: white;
+        border: none;
+        border-radius: 50%;
+        font-size: 24px;
+        cursor: pointer;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 900; /* Ensure it's above other content */
+        transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+    
+    .floating-add-task-button:hover {
+        background-color: #16a085; /* Darker accent color on hover */
+    
+    }
+    
+    /* Wave Animation */
+    @keyframes wave {
+        0% {
+            box-shadow: 0 0 0 0 rgba(26, 188, 156, 0.4);
+        }
+        100% {
+            box-shadow: 0 0 0 20px rgba(26, 188, 156, 0);
+        }
+    }
+    
+    .floating-add-task-button.wave {
+        animation: wave 1.5s infinite; /* Continuous wave animation */
+    }
+    
+    
+    /* Mobile Responsiveness */
+    @media (max-width: 768px) {
+    
+        .main-content {
+                overflow-y: auto; /* Enable scrolling on mobile */
+                height: calc(100vh - 100px); /* Adjust height for mobile header */
+                padding-bottom: 80px; /* Add padding for floating button */
+            }
+    
+            .task-grid {
+                grid-template-columns: 1fr; /* Single column layout on mobile */
+                margin-bottom: 10px; /* Reduce margin for better scrolling */
+            }
+    
+    
+            .mobile-bottom-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 8px; /* Height of the bottom bar */
+            background-color: #1abc9c; /* Background color of the bar */
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1); /* Shadow at the top */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 999; /* Ensure it's below the FAB */
+        }
+    
+    
+    
+    
+            .floating-add-task-button {
+                position: fixed;
+            bottom: 0; /* Attach to the bottom of the screen */
+            left: 50%;
+            transform: translateX(-50%); /* Center the button horizontally */
+            width: 72px; /* Wider button for mobile */
+            height: 50px; /* Half-circle shape */
+            border-radius: 25px 25px 0 0; /* Rounded top, flat bottom */
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2); /* Shadow at the top */
+       
+        }
+    
+        
+        /* U-Shape Effect */
+        .mobile-bottom-bar::before,
+        .mobile-bottom-bar::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            width: 50%;
+            height: 10px; /* Height of the U-shape */
+            background-color: #1abc9c; /* Same as the bar */
+            z-index: -1; /* Place behind the FAB */
+        }
+    
+        .mobile-bottom-bar::before {
+            left: 0;
+            border-top-right-radius: 30px; /* Curve to create the U-shape */
+        }
+    
+        .mobile-bottom-bar::after {
+            right: 0;
+            border-top-left-radius: 30px; /* Curve to create the U-shape */
+        }
+    
+    
+        .floating-add-task-button .plus-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%); /* Center the plus icon */
+        }
+    
+        /* Wave effect for mobile */
+        /* .floating-add-task-button::before,
+        .floating-add-task-button::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            width: 10px; 
+            height: 20px; 
+            background-color:#1abc9c;
+            border: 2px solid #1abc9c;
+            z-index: -1; 
+        } */
+    
+        .floating-add-task-button::before {
+            left: -10px; /* Position to the left of the button */
+            border-top-right-radius: 20px; /* Curve to create the U-shape */
+            border-bottom: none;
+        }
+    /* 
+        .floating-add-task-button::after {
+            right: -10px; 
+            border-top-left-radius: 0px; 
+            border-bottom: none;
+        } */
+    
+        @keyframes mobileWave {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1.5);
+                opacity: 0;
+            }
+        }
+    
+        .sidebar-toggle {
+            display: block; /* Show toggle button on mobile */
+        }
+    
+    
+        .header {
+            flex-direction: column; /* Stack header content vertically */
+            align-items: flex-start;
+            margin-bottom: 0;
+           
+           
+        }
+    
+        .header-actions {
+            flex: end;
+            align-items: center;
+            justify-content: space-between;
+      
+           
+        }
+    
+        .search-bar {
+            width: 100%; /* Full width on mobile */
+            height: 60%;
+        }
+    
+        .task-grid {
+            grid-template-columns: 1fr; /* Single column layout on mobile */
+            overflow-y: hidden;
+            margin-bottom: 10px;
+            
+        }
+    
+    }
+    </style>
 <div class="dashboard-container">
     <!-- Button to toggle the shutter -->
     <button id="toggle-shutter-button" class="shutter-button">▼</button>
@@ -312,886 +1193,6 @@
 </div>
 
 
-<style>
-
-body {
-    background-color: #f8f9fa; /* Light background */
-    color: #333; /* Dark text for contrast */
-
- 
-}
-
-/* Button styling */
-/* Button styling */
-/* Center the button */
-
-
-    /* Dashboard Layout */
-.dashboard-container {
-        display: flex;
-        flex-direction: column;
-        height: 100vh; /* Full viewport height */
-        overflow: hidden; /* Prevent double scrollbars */
-
-    }
-.button-container {
-    display: flex;
-    justify-content: center; /* Center horizontally */
-    margin-bottom: 10px; /* Space below the button */
-}
-
-/* Button styling */
-.shutter-button {
-    background-color: #16a085; /* Green background */
-    color: white; /* White text */
-    padding: 8px 16px; /* Padding */
-    border: none; /* Remove border */
-    cursor: pointer; /* Pointer cursor on hover */
-    font-size: 16px; /* Font size */
-    border-radius: 5px; /* Rounded corners */
-    display: flex;
-    align-items: center; /* Center the icon and text vertically */
-    gap: 8px; /* Space between icon and text */
-    position: absolute;
-    top:10;
-    left:50%;
-    margin-top: -10px;
-    transform: translateX(-50%); /* Adjust for exact centering */
-    transition: top 0.5s ease-out; /* Smooth transition for movement */
-    z-index:900;
-
-}
-
-.shutter-button:hover {
-    background-color: #00a483; /* Darker green on hover */
-}
-
-/* Shutter container styling */
-.shutter-container {
-    height: 0; /* Start with zero height */
-    overflow: hidden; /* Hide overflow content */
-    transition: height 0.5s ease-out; /* Smooth transition */
-    background-color: #2c3e50; /* Light background */
-    color: white;
-    border: 1px solid #ddd; /* Border */
-    border-radius: 5px; /* Rounded corners */
-    padding: 0 15px; /* Padding */
-    margin: 0 auto; /* Center the container */
-    width:  100%; /* Set a width for the container */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-
-
-/* Class to expand the shutter */
-.shutter-container.expanded {
-    height: 200px; /* Set a specific height */
-    padding: 15px; /* Add padding when expanded */
-}
-
-.shutter-container.expanded .container{
-    overflow-y: auto; /* Enable vertical scrolling */
-    height:100%;
-    width:80%;
-}
-
-.shutter-container.expanded .container {
-    overflow-y: auto; /* Enable vertical scrolling */
-    height: 100%; /* Take full height of the parent */
-    width: 80%; /* Set width to 80% of the parent */
-    padding-right: 10px; /* Add padding to prevent content from overlapping the scrollbar */
-}
-
-/* Custom Scrollbar Styles */
-.shutter-container.expanded .container::-webkit-scrollbar {
-    width: 8px; /* Reduce scrollbar width */
-}
-
-.shutter-container.expanded .container::-webkit-scrollbar-track {
-    background: #f1f1f1; /* Light gray track */
-    border-radius: 4px; /* Rounded corners */
-}
-
-.shutter-container.expanded .container::-webkit-scrollbar-thumb {
-    background: #888; /* Dark gray thumb */
-    border-radius: 4px; /* Rounded corners */
-}
-
-.shutter-container.expanded .container::-webkit-scrollbar-thumb:hover {
-    background: #555; /* Darker gray on hover */
-}
-
-a.suggested-users-button img{
-    height: 30px;
-    width: 30px;
-}
-
-
-div.task-mid-buttons{
-    display: flex;
-    gap:8px;
-}
-
-/* Main Content */
-/* Main Content */
- .main-content {
-        flex: 1; /* Take remaining space */
-        padding: 16px;
-        height: calc(100vh - 60px); /* Adjust height to account for header */
-        overflow-y: auto;
-        
-    }
-
-    /* Task Grid */
-    .task-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-        gap: 20px;
-        padding: 20px;
-        margin-bottom: 20px; /* Reduce margin for better scrolling */
-    
-    }
-
-
-/* Header */
-.header {
-    display: flex
-    
-;
-    justify-content: space-between;
-    padding: 8px;
-    align-items: center;
-    background-color: #ffffff;
-}
-
-.header h1 {
-    font-size: 24px;
-    color: #1abc9c; /* Accent color for header */
-}
-
-.header-actions {
-    display: flex;
-    gap: 10px;
-}
-
-
-.private-task-toggle {
-    display: flex;
-    align-items: center;
-}
-
-.switch {
-    position: relative;
-    display: inline-block;
-    width: 50px;
-    height: 24px;
-}
-
-.switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-.slider {
-    background-color: #ccc;
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    border-radius: 24px;
-    transition: 0.3s;
-}
-
-.slider::before {
-    content: "";
-    position: absolute;
-    width: 20px;
-    height: 20px;
-    left: 2px;
-    bottom: 2px;
-    background-color: white;
-    border-radius: 50%;
-    transition: 0.3s;
-}
-
-.lock-icon {
-    position: absolute;
-    font-size: 14px;
-    color: white;
-    right: 6px;
-    top: 50%;
-    transform: translateY(-50%);
-}
-
-.switch input:checked + .slider {
-    background-color: #4caf50;
-}
-
-.switch input:checked + .slider::before {
-    transform: translateX(26px);
-}
-
-.switch input:checked + .slider .lock-icon {
-    content: "🔒"; /* Locked Icon */
-}
-
-.switch input:not(:checked) + .slider .lock-icon {
-    content: "🔓"; /* Unlocked Icon */
-}
-
-
-.search-bar {
-    padding: 8px 12px;
-    border: 1px solid #ddd; /* Light border */
-    background-color: #f8f9fa; /* Light background */
-    border-radius: 5px;
-    width: 200px;
-}
-
-.filter-button {
-    padding: 8px 12px;
-    background-color: #f8f9fa; /* Light background */
-    color: #555; /* Darker text */
-    border: 1px solid #ddd; /* Light border */
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.filter-button:hover, .view-chats-button:hover {
-    background-color: #1abc9c; /* Accent color on hover */
-    color: white;
-}
-
-/* Filter Section Styles */
-.filter-group {
-    margin-bottom: 20px;
-}
-
-.filter-group h4 {
-    font-size: 14px;
-    color: #555;
-    margin-bottom: 10px;
-    font-weight: 500;
-}
-
-.filter-options {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 15px;
-}
-
-.modern-select {
-    padding: 8px 12px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-size: 14px;
-    color: #333;
-    background-color: #f9f9f9;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.modern-select:hover {
-    border-color: #007BFF;
-    background-color: #fff;
-}
-
-.filter-buttons {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-}
-
-.modern-button {
-    padding: 8px 16px;
-    border: none;
-    border-radius: 8px;
-    background-color: #f1f1f1;
-    color: #333;
-    font-size: 14px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.modern-button:hover {
-    background-color: #007BFF;
-    color: #fff;
-    transform: translateY(-2px);
-}
-
-.modern-button.active {
-    background-color: #007BFF;
-    color: #fff;
-}
-
-/* Apply Filters Button */
-.apply-filters-button {
-    width: 100%;
-    padding: 10px;
-    background-color: #007BFF;
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.apply-filters-button:hover {
-    background-color: #0056b3;
-}
-
-/* Open Filter Modal Button */
-.open-filter-modal-button {
-    padding: 10px 20px;
-    background-color: #007BFF;
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.open-filter-modal-button:hover {
-    background-color: #0056b3;  
-}
-
-
-
-    /* Task Grid */
-    .task-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-        gap: 20px;
-        padding: 20px;
-        margin-bottom: 20px; /* Reduce margin for better scrolling */
-    }
-
-.task-card {
-    background-color: #ffffff; /* White background */
-    border: 1px solid #ddd; /* Light border */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-    border-radius: 8px;
-    padding: 15px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-}
-
-.task-card:hover {
-    transform: translateY(-5px);
-}
-
-.task-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-}
-
-.task-title {
-    font-size: 18px;
-    color: #2c3e50; /* Dark text for task title */
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 70%;
-}
-
-.task-priority {
-    padding: 4px 8px;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: bold;
-    white-space: nowrap;
-    background-color: #f8f9fa; /* Light background for priority */
-    color: #555; /* Darker text */
-}
-
-.task-body {
-    margin-bottom: 10px;
-    flex-grow: 1;
-    overflow-y: auto;
-}
-
-.task-body p {
-    margin: 5px 0;
-    font-size: 14px;
-    color: #555; /* Darker text for task details */
-}
-
-.suggested-users-button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    padding: 6px;
-    background-color: transparent; /* Accent color for button */
-    border:1px solid rgba(93, 142, 135, 0.933);
-    color: white;
-    text-decoration: none;
-    border-radius: 8px;
-    font-size: 14px;
-    margin-top: 10px;
-  
-}
-
-.suggested-users-button:hover {
-    background-color: transparent; 
-}
-
-/* Modal Styles */
-.modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    justify-content: center;
-    align-items: center;
-
-    overflow-y: auto; /* Enable scrolling for the modal */
-    padding: 20px; /* Add padding to prevent content from touching the edges */
-    z-index: 3000;
-}
-
-.modal-content {
-    background-color: #fff;
-    padding: 25px;
-    border-radius: 12px;
-    width: 90%;
-    max-width: 500px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-    position: relative;
-    animation: modalFadeIn 0.3s ease;
-    max-height: 90vh; /* Limit modal height to 90% of the viewport height */
-    overflow-y: auto; /* Enable scrolling for the modal content */
-   
-}
-
-/* Chat Modal Styles */
-.chat-list {
-    max-height: 300px;
-    overflow-y: auto;
-    margin-top: 10px;
-}
-
-.chat-item {
-    padding: 10px;
-    border-bottom: 1px solid #ddd;
-}
-
-.chat-item a {
-    text-decoration: none;
-    color: #2c3e50;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.chat-time {
-    font-size: 12px;
-    color: #777;
-}
-
-.filter-buttons {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-}
-
-@keyframes modalFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.close-modal {
-    position: absolute;
-    top: 15px;
-    right: 20px;
-    font-size: 24px;
-    cursor: pointer;
-    color: #666;
-    transition: color 0.3s ease;
-}
-
-.close-modal:hover {
-    color: #333;
-}
-
-.modal-content h3 {
-    margin-top: 0;
-    font-size: 22px;
-    color: #2c3e50;
-    margin-bottom: 20px;
-}
-
-.modal-content p {
-    margin-bottom: 15px;
-    font-size: 16px;
-    color: #555;
-}
-
-.modal-content label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 500;
-    font-size: 14px;
-    color: #333;
-}
-
-.modal-content input[type="text"],
-.modal-content input[type="file"],
-.modal-content textarea,
-.modal-content select {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 15px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-size: 14px;
-    color: #333;
-    background-color: #f9f9f9;
-    transition: border-color 0.3s ease;
-}
-
-.modal-content input[type="text"]:focus,
-.modal-content input[type="file"]:focus,
-.modal-content textarea:focus,
-.modal-content select:focus {
-    border-color: #3498db;
-    outline: none;
-}
-
-.modal-content textarea {
-    resize: vertical;
-    min-height: 100px;
-}
-
-.modal-content .submit-button {
-    display: inline-block;
-    padding: 10px 20px;
-    background-color: #3498db;
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.modal-content .submit-button:hover {
-    background-color: #2980b9;
-}
-
-.modal-content .skip-sharing {
-    margin-bottom: 15px;
-}
-
-.modal-content .skip-sharing label {
-    font-size: 14px;
-    color: #555;
-}
-
-.modal-content .skip-sharing input[type="checkbox"] {
-    margin-right: 8px;
-}
-
-.apply-filters-button {
-    width: 100%;
-    padding: 10px;
-    background-color: #007BFF;
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.apply-filters-button:hover {
-    background-color: #0056b3;
-}
-
-.task-footer {
-    display: flex;
-    gap: 10px;
-    margin-top: 10px;
-
-}
-
-.task-action {
-    padding: 6px 12px;
-    background-color: #f8f9fa; /* Light background for buttons */
-    color: #555; /* Darker text */
-    border: 1px solid #ddd; /* Light border */
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background-color 0.3s ease;
-    flex-grow: 1;
-    text-align: center;
-}
-
-.task-action:hover {
-    background-color: #1abc9c; /* Accent color on hover */
-    color: white;
-}
-
-.badge-danger, .badge-warning {
-
-    padding: 4px 8px;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: bold;
-    margin-top: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.badge-danger {
-    background-color: #e74c3c;
-    color: #fff;
-}
-
-.badge-warning {
-    background-color: #f39c12;
-    color: #fff;
-}
-
-
-
-/* View Task Dependencies Modal Styles */
-#viewTaskDependencies {
-    display: none; /* Hidden by default */
-    position: fixed; /* Position relative to the viewport */
-    top: 0;
-    left: 0;
-    width: 100%; /* Full width */
-    height: 100%; /* Full height */
-    background-color: rgba(0, 0, 0, 0.5);
-    justify-content: center; /* Center horizontally */
-    align-items: center; /* Center vertically */
-    z-index: 1000; /* Ensure it's on top of other elements */
-}
-
-#viewTaskDependencies .modal-content {
-    background-color: #ffffff;
-    color: rgb(0, 0, 0);
-    padding: 20px;
-    border-radius: 8px;
-    width: 90%;
-    max-width: 500px; /* Adjust the maximum width as needed */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add a shadow for better visibility */
-}
-
-/* Floating Add Task Button */
-/* Floating Add Task Button */
-.floating-add-task-button {
-    position: fixed;
-    bottom: 0;
-    right: 20px;
-    width: 60px;
-    height: 60px;
-    background-color: #1abc9c; /* Accent color */
-    color: white;
-    border: none;
-    border-radius: 50%;
-    font-size: 24px;
-    cursor: pointer;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 900; /* Ensure it's above other content */
-    transition: background-color 0.3s ease, transform 0.3s ease;
-}
-
-.floating-add-task-button:hover {
-    background-color: #16a085; /* Darker accent color on hover */
-
-}
-
-/* Wave Animation */
-@keyframes wave {
-    0% {
-        box-shadow: 0 0 0 0 rgba(26, 188, 156, 0.4);
-    }
-    100% {
-        box-shadow: 0 0 0 20px rgba(26, 188, 156, 0);
-    }
-}
-
-.floating-add-task-button.wave {
-    animation: wave 1.5s infinite; /* Continuous wave animation */
-}
-
-
-/* Mobile Responsiveness */
-@media (max-width: 768px) {
-
-    .main-content {
-            overflow-y: auto; /* Enable scrolling on mobile */
-            height: calc(100vh - 100px); /* Adjust height for mobile header */
-            padding-bottom: 80px; /* Add padding for floating button */
-        }
-
-        .task-grid {
-            grid-template-columns: 1fr; /* Single column layout on mobile */
-            margin-bottom: 10px; /* Reduce margin for better scrolling */
-        }
-
-
-        .mobile-bottom-bar {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        height: 8px; /* Height of the bottom bar */
-        background-color: #1abc9c; /* Background color of the bar */
-        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1); /* Shadow at the top */
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 999; /* Ensure it's below the FAB */
-    }
-
-
-
-
-        .floating-add-task-button {
-            position: fixed;
-        bottom: 0; /* Attach to the bottom of the screen */
-        left: 50%;
-        transform: translateX(-50%); /* Center the button horizontally */
-        width: 72px; /* Wider button for mobile */
-        height: 50px; /* Half-circle shape */
-        border-radius: 25px 25px 0 0; /* Rounded top, flat bottom */
-        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2); /* Shadow at the top */
-   
-    }
-
-    
-    /* U-Shape Effect */
-    .mobile-bottom-bar::before,
-    .mobile-bottom-bar::after {
-        content: '';
-        position: absolute;
-        bottom: 0;
-        width: 50%;
-        height: 10px; /* Height of the U-shape */
-        background-color: #1abc9c; /* Same as the bar */
-        z-index: -1; /* Place behind the FAB */
-    }
-
-    .mobile-bottom-bar::before {
-        left: 0;
-        border-top-right-radius: 30px; /* Curve to create the U-shape */
-    }
-
-    .mobile-bottom-bar::after {
-        right: 0;
-        border-top-left-radius: 30px; /* Curve to create the U-shape */
-    }
-
-
-    .floating-add-task-button .plus-icon {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%); /* Center the plus icon */
-    }
-
-    /* Wave effect for mobile */
-    /* .floating-add-task-button::before,
-    .floating-add-task-button::after {
-        content: '';
-        position: absolute;
-        bottom: 0;
-        width: 10px; 
-        height: 20px; 
-        background-color:#1abc9c;
-        border: 2px solid #1abc9c;
-        z-index: -1; 
-    } */
-
-    .floating-add-task-button::before {
-        left: -10px; /* Position to the left of the button */
-        border-top-right-radius: 20px; /* Curve to create the U-shape */
-        border-bottom: none;
-    }
-/* 
-    .floating-add-task-button::after {
-        right: -10px; 
-        border-top-left-radius: 0px; 
-        border-bottom: none;
-    } */
-
-    @keyframes mobileWave {
-        0% {
-            transform: scale(1);
-            opacity: 1;
-        }
-        100% {
-            transform: scale(1.5);
-            opacity: 0;
-        }
-    }
-
-    .sidebar-toggle {
-        display: block; /* Show toggle button on mobile */
-    }
-
-
-    .header {
-        flex-direction: column; /* Stack header content vertically */
-        align-items: flex-start;
-        margin-bottom: 0;
-       
-       
-    }
-
-    .header-actions {
-        flex: end;
-        align-items: center;
-        justify-content: space-between;
-  
-       
-    }
-
-    .search-bar {
-        width: 100%; /* Full width on mobile */
-        height: 60%;
-    }
-
-    .task-grid {
-        grid-template-columns: 1fr; /* Single column layout on mobile */
-        overflow-y: hidden;
-        margin-bottom: 10px;
-        
-    }
-
-}
-</style>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
 
 <script>

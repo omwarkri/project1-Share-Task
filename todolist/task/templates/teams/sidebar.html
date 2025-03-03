@@ -1,28 +1,198 @@
-<!-- templates/task/sidebar.html -->
-<div class="team-sidebar" data-team-id="{{team.id }}">
+<style>
+    /* Sidebar Styles */
+.team-sidebar {
+    width: 60px; /* Narrow sidebar for icons */
+    background-color: #e4fff9; /* Light background */
+    padding: 10px;
+    border-right: 1px solid #ccffeea1;
+    height: 100vh; /* Full height */
+    position: fixed; /* Fixed position */
+    left: 0;
+    top: 0;
+    overflow-y: auto; /* Scrollable if content overflows */
+    z-index: 1000; /* Ensure it's above other content */
+}
+
+.team-sidebar-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.team-sidebar-header h2 {
+    color: #333; /* Dark text for the header */
+    font-size: 24px;
+}
+
+.team-sidebar-links {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.team-sidebar-links li {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.team-sidebar-links li a {
+    color: #333; /* Dark text for links */
+    text-decoration: none;
+    font-size: 24px;
+    display: block;
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.team-sidebar-links li a:hover {
+    transform: scale(1.2); /* Slightly enlarge on hover */
+    color: #16a085; /* Teal color for hover */
+}
+
+.team-sidebar-links li a[title]:hover::after {
+    content: attr(title);
+    position: absolute;
+    background-color: #333;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 14px;
+    margin-left: 10px;
+    white-space: nowrap;
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.modal-header h3 {
+    margin: 0;
+}
+
+.close, .close-modal {
+    cursor: pointer;
+    font-size: 24px;
+    color: #666;
+}
+
+.close:hover, .close-modal:hover {
+    color: #333;
+}
+
+.team-members-list {
+    margin-top: 20px;
+}
+
+.team-members-list ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.team-members-list li {
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+}
+
+.team-members-list li:hover {
+    background-color: #f0f0f0;
+}
+
+/* Mobile Toggle Button */
+.mobile-sidebar-toggle {
+    display: none; /* Hidden by default */
+    position: fixed;
+    top: 50%;
+    left: 0px;
+    font-size: 24px;
+    background: #16a085;
+    color: #fff;
+    border: none;
+    padding: 6px;
+    border-radius: 5px;
+    z-index: 1001;
+    cursor: pointer;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .mobile-sidebar-toggle {
+        display: block; /* Show toggle button on mobile */
+    }
+
+    .team-sidebar {
+        left: -60px; /* Slightly off-screen */
+        transition: left 0.3s ease;
+    }
+
+    .team-sidebar.active {
+        left: 0; /* Make it visible when active */
+    }
+
+    .close-sidebar {
+        display: block; /* Hidden by default */
+    position: fixed;
+    top: 50%;
+    left: 0px;
+    font-size: 24px;
+    background: #16a085;
+    color: #fff;
+    border: none;
+    padding: 6px;
+    border-radius: 5px;
+    z-index: 5001;
+    cursor: pointer;
+
+    }
+}
+</style>
+<!-- Mobile Toggle Button -->
+<button id="mobileSidebarToggle" class="mobile-sidebar-toggle">></button>
+
+<!-- Sidebar -->
+<div class="team-sidebar" data-team-id="{{ team.id }}">
     <div class="team-sidebar-header">
-        <h2>📋</h2> <!-- Main symbol for the app -->
+        <h2>📋</h2>
+        <button id="closeSidebar" class="close-sidebar">&times;</button> <!-- Close button for mobile -->
     </div>
     <ul class="team-sidebar-links">
         <li>
-            <a href="{% url 'view_team_tasks' team.id %}" title="All Teams">
-                🏠 <!-- Home symbol for all teams -->
-            </a>
+            <a href="{% url 'view_team_tasks' team.id %}" title="All Teams">🏠</a>
         </li>
         <li>
-            <a href="#" onclick="openAddTaskModal()" title="Create Task">
-                ➕ <!-- Add symbol for creating a task -->
-            </a>
+            <a href="#" onclick="openAddTaskModal()" title="Create Task">➕</a>
         </li>
         <li>
-            <a href="{% url 'team_leaderboard' team.id %}" title="Leaderboard">
-                🏆<!-- Leaderboard symbol -->
-            </a>
+            <a href="{% url 'team_leaderboard' team.id %}" title="Leaderboard">🏆</a>
         </li>
         <li>
-            <a href="#" onclick="openTeamMembersModal()" title="Team Members">
-                👥 <!-- Team symbol -->
-            </a>
+            <a href="#" onclick="openTeamMembersModal()" title="Team Members">👥</a>
         </li>
     </ul>
 </div>
@@ -71,185 +241,59 @@
     </div>
 </div>
 
-<style>
-    .team-sidebar {
-        width: 80px; /* Narrow sidebar for icons */
-        background-color: #e4fff9; /* Light background */
-        padding: 10px;
-        border-right: 1px solid #ccffeea1;
-        height: 100vh; /* Full height */
-        position: fixed; /* Fixed position */
-        left: 0;
-        top: 0;
-        overflow-y: auto; /* Scrollable if content overflows */
-    }
 
-    .team-sidebar-header {
-        text-align: center;
-        margin-bottom: 20px;
-    }
-
-    .team-sidebar-header h2 {
-        color: #333; /* Dark text for the header */
-        font-size: 24px;
-    }
-
-    .team-sidebar-links {
-        list-style-type: none;
-        padding: 0;
-        margin: 0;
-    }
-
-    .team-sidebar-links li {
-        margin-bottom: 20px;
-        text-align: center;
-    }
-
-    .team-sidebar-links li a {
-        color: #333; /* Dark text for links */
-        text-decoration: none;
-        font-size: 24px;
-        display: block;
-        transition: transform 0.2s ease, color 0.2s ease;
-    }
-
-    .team-sidebar-links li a:hover {
-        transform: scale(1.2); /* Slightly enlarge on hover */
-        color: #16a085; /* Teal color for hover */
-    }
-
-    .team-sidebar-links li a[title]:hover::after {
-        content: attr(title);
-        position: absolute;
-        background-color: #333;
-        color: #fff;
-        padding: 5px 10px;
-        border-radius: 5px;
-        font-size: 14px;
-        margin-left: 10px;
-        white-space: nowrap;
-    }
-
-    /* Modal Styles */
-    .modal {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        justify-content: center;
-        align-items: center;
-        z-index: 1000;
-    }
-
-    .modal-content {
-        background-color: #fff;
-        padding: 20px;
-        border-radius: 8px;
-        width: 90%;
-        max-width: 400px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    }
-
-    .modal-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 20px;
-    }
-
-    .modal-header h3 {
-        margin: 0;
-    }
-
-    .close, .close-modal {
-        cursor: pointer;
-        font-size: 24px;
-        color: #666;
-    }
-
-    .close:hover, .close-modal:hover {
-        color: #333;
-    }
-
-    .team-members-list {
-        margin-top: 20px;
-    }
-
-    .team-members-list ul {
-        list-style-type: none;
-        padding: 0;
-    }
-
-    .team-members-list li {
-        padding: 10px;
-        margin-bottom: 10px;
-        background-color: #f9f9f9;
-        border-radius: 8px;
-        transition: background-color 0.3s ease;
-    }
-
-    .team-members-list li:hover {
-        background-color: #f0f0f0;
-    }
-</style>
 
 <script>
     const teamSidebar = document.querySelector('.team-sidebar');
     const teamId = teamSidebar.getAttribute('data-team-id');
-    console.log(teamId);
+    // Toggle Sidebar on Mobile
+    document.addEventListener('DOMContentLoaded', () => {
+        
+        const mobileToggle = document.getElementById('mobileSidebarToggle');
+        const sidebar = document.querySelector('.team-sidebar');
+        const closeSidebarButton = document.getElementById('closeSidebar');
+
+        // Open sidebar
+        mobileToggle.addEventListener('click', () => {
+            console.log("hii")
+            sidebar.classList.add('active');
+        });
+
+        // Close sidebar
+        closeSidebarButton.addEventListener('click', () => {
+            sidebar.classList.remove('active');
+        });
+
+        // Close sidebar when clicking outside
+        window.addEventListener('click', (event) => {
+            if (!sidebar.contains(event.target)) {
+                sidebar.classList.remove('active');
+            }
+        });
+    });
+
+    // Modal Functions
     function openAddTaskModal() {
-        const taskModal = document.getElementById('taskModal');
-        taskModal.style.display = 'flex';
+        document.getElementById('taskModal').style.display = 'flex';
     }
 
     function closeAddTaskModal() {
-        const taskModal = document.getElementById('taskModal');
-        taskModal.style.display = 'none';
+        document.getElementById('taskModal').style.display = 'none';
     }
-
-    function openTeamMembersModal() {
-        const teamMembersModal = document.getElementById('teamMembersModal');
-        teamMembersModal.style.display = 'flex';
-    }
-
-    function closeTeamMembersModal() {
-        const teamMembersModal = document.getElementById('teamMembersModal');
-        teamMembersModal.style.display = 'none';
-    }
-
-    // Close modals when clicking outside the modal
-    window.addEventListener('click', (event) => {
-        const taskModal = document.getElementById('taskModal');
-        const teamMembersModal = document.getElementById('teamMembersModal');
-
-        if (event.target === taskModal) {
-            taskModal.style.display = 'none';
-        }
-
-        if (event.target === teamMembersModal) {
-            teamMembersModal.style.display = 'none';
-        }
-    });
 
     function openTeamMembersModal() {
         document.getElementById('teamMembersModal').style.display = 'flex';
     }
 
-    // Close Team Members Modal
     function closeTeamMembersModal() {
         document.getElementById('teamMembersModal').style.display = 'none';
     }
 
-    // Open Member Analysis Modal
     function openMemberAnalysisModal(memberId) {
-        // Fetch member analysis data
+        const teamId = document.querySelector('.team-sidebar').getAttribute('data-team-id');
         fetch(`/team/${teamId}/member-analysis/${memberId}/`)
             .then(response => response.json())
             .then(data => {
-                // Update modal content with fetched data
                 document.getElementById('memberAnalysisTitle').innerText = `👤 ${data.member.username}'s Analysis`;
                 document.getElementById('memberAnalysisContent').innerHTML = `
                     <p><strong>Total Tasks:</strong> ${data.total_tasks}</p>
@@ -260,7 +304,6 @@
                     <p><strong>Score:</strong> ${data.score}</p>
                     <p><strong>Average Completion Time:</strong> ${data.average_completion_time || 'N/A'}</p>
                 `;
-                // Display the modal
                 document.getElementById('memberAnalysisModal').style.display = 'flex';
             })
             .catch(error => {
@@ -269,32 +312,37 @@
             });
     }
 
-    // Close Member Analysis Modal
     function closeMemberAnalysisModal() {
         document.getElementById('memberAnalysisModal').style.display = 'none';
     }
 
     // Attach click event to member links
     document.addEventListener('DOMContentLoaded', () => {
-        const memberLinks = document.querySelectorAll('.member-link');
-        memberLinks.forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                const memberId = link.getAttribute('data-member-id');
-                openMemberAnalysisModal(memberId);
-            });
-        });
+    const mobileToggle = document.getElementById('mobileSidebarToggle');
+    const sidebar = document.querySelector('.team-sidebar');
+    const closeSidebarButton = document.getElementById('closeSidebar');
+
+    // Open sidebar
+    mobileToggle.addEventListener('click', (event) => {
+        event.stopPropagation(); // Prevent immediate closing
+        sidebar.classList.add('active');
+        mobileToggle.style.display="none"
     });
 
-    // Close modals when clicking outside
-    window.addEventListener('click', (event) => {
-        const teamMembersModal = document.getElementById('teamMembersModal');
-        const memberAnalysisModal = document.getElementById('memberAnalysisModal');
-        if (event.target === teamMembersModal) {
-            closeTeamMembersModal();
-        }
-        if (event.target === memberAnalysisModal) {
-            closeMemberAnalysisModal();
+    // Close sidebar on clicking close button
+    closeSidebarButton.addEventListener('click', () => {
+        sidebar.classList.remove('active');
+        mobileToggle.style.display="block"
+    });
+
+    // Close sidebar only when clicking outside (not inside)
+    document.addEventListener('click', (event) => {
+        if (!sidebar.contains(event.target) && !mobileToggle.contains(event.target)) {
+            sidebar.classList.remove('active');
         }
     });
+});
+
+
+
 </script>

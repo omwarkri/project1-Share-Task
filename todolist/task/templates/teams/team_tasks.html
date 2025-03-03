@@ -15,6 +15,13 @@
         flex-grow: 1;
         overflow-y: auto; /* Enable vertical scrolling */
         height: 100vh; /* Full viewport height */
+
+    }
+
+    .header{
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
     }
 
     /* Filter Section Styles */
@@ -192,6 +199,109 @@
     form button:hover {
         background-color: #16a085;
     }
+
+    /* Mobile Responsiveness */
+@media (max-width: 768px) {
+    /* Container and Main Content */
+    .container {
+        flex-direction: column; /* Stack sidebar and main content vertically */
+    }
+
+    .main-content {
+        margin-left: 0; /* Remove sidebar margin */
+        padding: 10px; /* Reduce padding */
+    }
+
+    /* Header */
+    .header {
+        flex-direction: column; /* Stack header content vertically */
+        align-items: flex-start; /* Align items to the left */
+    }
+
+    .header h2 {
+        font-size: 1.5rem; /* Smaller header */
+    }
+
+    .header p {
+        font-size: 0.9rem; /* Smaller description */
+    }
+
+    .header a {
+        margin-top: 10px; /* Add spacing between elements */
+    }
+
+    /* Filter Section */
+    .filter-section {
+        margin-top: 20px; /* Add spacing between header and filters */
+    }
+
+    .filter-options {
+        flex-direction: column; /* Stack filter options vertically */
+        gap: 5px; /* Reduce gap between options */
+    }
+
+    .filter-select {
+        width: 100%; /* Full width for filter inputs */
+    }
+
+    .filter-button {
+        width: 100%; /* Full width for filter button */
+    }
+
+    /* Task Grid */
+    .task-grid {
+        grid-template-columns: 1fr; /* Single column for tasks */
+        gap: 10px; /* Reduce gap between tasks */
+        padding: 10px; /* Reduce padding */
+    }
+
+    .task-card {
+        padding: 10px; /* Reduce padding */
+    }
+
+    .task-title {
+        font-size: 1rem; /* Smaller title */
+    }
+
+    .task-body p {
+        font-size: 0.9rem; /* Smaller text */
+    }
+
+    .task-footer {
+        flex-direction: column; /* Stack buttons vertically */
+        gap: 5px; /* Reduce gap between buttons */
+    }
+
+    .task-action {
+        width: 100%; /* Full width for buttons */
+    }
+
+    /* Modals */
+    .modal-content {
+        width: 95%; /* Full width for modals */
+        max-width: none; /* Remove max-width */
+        padding: 15px; /* Reduce padding */
+    }
+
+    .modal-header h3 {
+        font-size: 1.2rem; /* Smaller header */
+    }
+
+    .close-modal {
+        font-size: 20px; /* Smaller close button */
+    }
+
+    /* Form Styles */
+    form input, form textarea {
+        font-size: 0.9rem; /* Smaller text */
+    }
+
+    form button {
+        font-size: 0.9rem; /* Smaller button text */
+    }
+}
+
+
 </style>
 
 <div class="container">
@@ -199,45 +309,49 @@
     {% include "teams/sidebar.html" %}
 
     <div class="main-content">
-        <h2>Team: {{ team.name }}</h2>
-        <p>{{ team.description }}</p>
-        <a id="invite-member-button" href="#" class="btn btn-success">Invite Member</a>
-
-        <!-- Filter Section -->
-        <div class="filter-section">
-            <h3>Filter Tasks</h3>
-            <div class="filter-options">
-                <!-- Status Filter -->
-                <select id="status-filter" class="filter-select">
-                    <option value="all">All Statuses</option>
-                    <option value="pending">Pending</option>
-                    <option value="in_progress">In Progress</option>
-                    <option value="completed">Completed</option>
-                    <option value="archived">Archived</option>
-                </select>
-
-                <!-- Priority Filter -->
-                <select id="priority-filter" class="filter-select">
-                    <option value="all">All Priorities</option>
-                    <option value="low">Low</option>
-                    <option value="medium">Medium</option>
-                    <option value="high">High</option>
-                    <option value="critical">Critical</option>
-                </select>
-
-                <!-- Due Date Filter -->
-                <input type="date" id="due-date-filter" class="filter-select" />
-
-                <!-- Assigned User Filter -->
-                <select id="assigned-user-filter" class="filter-select">
-                    <option value="all">All Users</option>
-                    {% for member in team.members.all %}
-                        <option value="{{ member.id }}">{{ member.username }}</option>
-                    {% endfor %}
-                </select>
-
-                <!-- Clear Filters Button -->
-                <button id="clear-filters" class="filter-button">Clear Filters</button>
+        <div class="header">
+            <div>
+                <h2>Team: {{ team.name }}</h2>
+                <p>{{ team.description }}</p>
+                <a id="invite-member-button" href="#" class="btn btn-success">Invite Member</a>
+            </div>
+    
+            <!-- Filter Section -->
+            <div class="filter-section">
+                <h3>Filter Tasks</h3>
+                <div class="filter-options">
+                    <!-- Status Filter -->
+                    <select id="status-filter" class="filter-select">
+                        <option value="all">All Statuses</option>
+                        <option value="pending">Pending</option>
+                        <option value="in_progress">In Progress</option>
+                        <option value="completed">Completed</option>
+                        <option value="archived">Archived</option>
+                    </select>
+    
+                    <!-- Priority Filter -->
+                    <select id="priority-filter" class="filter-select">
+                        <option value="all">All Priorities</option>
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                        <option value="critical">Critical</option>
+                    </select>
+    
+                    <!-- Due Date Filter -->
+                    <input type="date" id="due-date-filter" class="filter-select" />
+    
+                    <!-- Assigned User Filter -->
+                    <select id="assigned-user-filter" class="filter-select">
+                        <option value="all">All Users</option>
+                        {% for member in team.members.all %}
+                            <option value="{{ member.id }}">{{ member.username }}</option>
+                        {% endfor %}
+                    </select>
+    
+                    <!-- Clear Filters Button -->
+                    <button id="clear-filters" class="filter-button">Clear Filters</button>
+                </div>
             </div>
         </div>
 

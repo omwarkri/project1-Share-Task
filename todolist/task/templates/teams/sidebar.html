@@ -11,6 +11,7 @@
     top: 0;
     overflow-y: auto; /* Scrollable if content overflows */
     z-index: 1000; /* Ensure it's above other content */
+    padding-top:60px ;
 }
 
 .team-sidebar-header {
@@ -177,10 +178,7 @@
 
 <!-- Sidebar -->
 <div class="team-sidebar" data-team-id="{{ team.id }}">
-    <div class="team-sidebar-header">
-        <h2>📋</h2>
-        <button id="closeSidebar" class="close-sidebar">&times;</button> <!-- Close button for mobile -->
-    </div>
+
     <ul class="team-sidebar-links">
         <li>
             <a href="{% url 'view_team_tasks' team.id %}" title="All Teams">🏠</a>

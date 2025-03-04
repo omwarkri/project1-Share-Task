@@ -137,6 +137,10 @@
             {% for message in messages %}
                 <div class="message {% if message.sender == request.user %}message-right{% else %}message-left{% endif %}">
                     <strong>{{ message.sender.username }}</strong>: {{ message.message }}
+                    {% if message.attachment %}
+                        <br>
+                        <a href="{{ message.attachment.url }}" target="_blank">View Attachment</a>
+                    {% endif %}
                     <small class="text-muted float-end">{{ message.created_at }}</small>
                 </div>
             {% endfor %}
@@ -157,87 +161,113 @@
     </div>
 
     <script>
-
-    
-
         const protocol = window.location.protocol === "https:" ? "wss" : "ws";
-        const socket = new WebSocket(`${protocol}://${window.location.host}/ws/team/${teamId}/`)
-
+        const socket = new WebSocket(`${protocol}://${window.location.host}/ws/team/${teamId}/`);
+    
         socket.onopen = function () {
-                console.log("WebSocket connection established");
-            };
-
-        socket.onmessage = function(event) {
+            console.log("WebSocket connection established");
+        };
+    
+        socket.onmessage = function (event) {
             const data = JSON.parse(event.data);
             const messageBox = document.getElementById("chat-box");
             const isCurrentUser = data.sender === "{{ request.user.username }}"; // Check if the sender is the current user
-
+    
             // Create message element
             const messageElement = document.createElement("div");
             messageElement.className = `message ${isCurrentUser ? "message-right" : "message-left"}`;
             messageElement.innerHTML = `
                 <strong>${data.sender}</strong>: ${data.message}
+                ${data.attachment_url ? `<br><a href="${data.attachment_url}" target="_blank">View Attachment</a>` : ""}
                 <small class="text-muted float-end">${data.created_at}</small>
             `;
-
+    
             // Append message to chat box
             messageBox.appendChild(messageElement);
             messageBox.scrollTop = messageBox.scrollHeight;
-            messageBox.scrollTop = messageBox.scrollHeight;
         };
-
-        document.getElementById("chat-form").onsubmit = function(event) {
-            event.preventDefault();
-            var input = document.getElementById("message-input");
-            var message = input.value.trim();
-            if (message) {
-                socket.send(JSON.stringify({ "message": message }));
-                input.value = "";
-            }
-        };
-
-        $(document).ready(function () {
-            function fetchMessages() {
-                $.get(`/team/${teamId}/messages/`, function (data) {
-                    var chatBox = $("#chat-box");
-                    chatBox.html("");
-                    data.forEach(msg => {
-                        chatBox.append(
-                            `<div class="p-2 border-bottom">
-                                <strong>${msg.sender}</strong>: ${msg.message}
-                                <small class="text-muted float-end">${msg.created_at}</small>
-                            </div>`
-                        );
-                    });
-                    chatBox.scrollTop(chatBox[0].scrollHeight);
-                });
-            }
-
-            // Initial fetch to load messages
-            
-        });
+    
+        // Handle form submission
         $("#chat-form").submit(function (e) {
-        e.preventDefault();
-        var message = $("#message-input").val().trim();
-        if (!message) return;
+            e.preventDefault();
+            const message = $("#message-input").val().trim();
+            const attachment = $("#attachment-input")[0].files[0];  // Get the uploaded file
 
-        $.ajax({
-            url: `/team/${teamId}/send-message/`,
-            type: "POST",
-            headers: { "X-CSRFToken": "{{ csrf_token }}" },
-            contentType: "application/json",
-            data: JSON.stringify({ message: message }),
-            success: function (response) {
-                $("#message-input").val("");
-                fetchMessages();
-            },
-            error: function () {
-                alert("Error sending message.");
+            // Validate that either a message or an attachment is provided
+            if (!message && !attachment) {
+                alert("Message or attachment is required");
+                return;
             }
-        });
-    });
 
-        fetchMessages();
+            // Send the message via WebSocket (if needed)
+            // if (message) {
+            //     socket.send(JSON.stringify({ "message": message }));
+            // }
+
+            // Send the message and attachment via AJAX
+            const formData = new FormData();
+            formData.append("message", message);  // Append the message
+            if (attachment) {
+                formData.append("attachment", attachment);  // Append the file
+            }
+
+            $.ajax({
+                url: `/team/${teamId}/send-message/`,
+                type: "POST",
+                headers: {
+                    "X-CSRFToken": "{{ csrf_token }}",
+                },
+                processData: false,  // Prevent jQuery from processing the data
+                contentType: false,  // Prevent jQuery from setting the content type
+                data: formData,  // Send FormData
+                success: function (response) {
+                    $("#message-input").val("");  // Clear the input
+                    $("#attachment-input").val("");  // Clear the attachment input
+                    
+                },
+                error: function (xhr, status, error) {
+                    fetchMessages();  // Refresh the chat (if needed)
+                    alert("Error sending message: " + xhr.responseJSON.error);
+                },
+            });
+        });
+    
+        // Handle attachment button click
+        document.getElementById("attachment-button").onclick = function () {
+            document.getElementById("attachment-input").click();
+        };
+    
+        // Fetch messages on page load
+        function fetchMessages() {
+            fetch(`/team/${teamId}/messages/`)
+                .then((response) => response.json())
+                .then((data) => {
+                    const chatBox = document.getElementById("chat-box");
+                    chatBox.innerHTML = ""; // Clear existing messages
+                    data.forEach((msg) => {
+                        const isCurrentUser = msg.sender === "{{ request.user.username }}";
+                        const messageElement = document.createElement("div");
+                        messageElement.className = `message ${isCurrentUser ? "message-right" : "message-left"}`;
+                        messageElement.innerHTML = `
+                            <strong>${msg.sender}</strong>: ${msg.message}
+                            ${msg.attachment ? `<br><a href="${msg.attachment.url}" target="_blank">View Attachment</a>` : ""}
+                            <small class="text-muted float-end">${msg.created_at}</small>
+                        `;
+                        chatBox.appendChild(messageElement);
+                       
+                    });
+                    
+                    
+                });
+        }
+        function scrollToBottom() {
+    const chatBox = document.getElementById('chat-box');
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
+        window.onload = () => {
+    scrollToBottom();
+  };
+        fetchMessages(); // Initial fetch
     </script>
 </body>
 </html>

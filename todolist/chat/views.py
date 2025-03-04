@@ -134,52 +134,77 @@ def fetch_all_chats(request):
 
 
 
-from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.utils import timezone
 from django.contrib.auth.decorators import login_required
-from .models import TeamChat 
-from task.models import Team
-from django.views.decorators.csrf import csrf_exempt
-import json
-
-
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.utils.timezone import now
+from .models import Team, TeamChat  # Import your Team and TeamChat models
 import json
 
 @login_required
 @csrf_exempt
 def send_message(request, team_id):
     if request.method == "POST":
-        data = json.loads(request.body)
-        message_text = data.get("message")
-        sender = request.user  # Get the logged-in user
+        try:
+            # Fetch the Team object using team_id
+            try:
+                team = Team.objects.get(id=team_id)
+            except Team.DoesNotExist:
+                return JsonResponse({"error": "Team does not exist"}, status=404)
 
-        if message_text:
+            # Get the message and attachment from the request
+            message_text = request.POST.get("message")
+            attachment = request.FILES.get("attachment")  # Get the uploaded file
+
+            if not message_text and not attachment:
+                return JsonResponse({"error": "Message or attachment is required"}, status=400)
+
+            # Create and save the TeamChat object
             message = TeamChat.objects.create(
-                team_id=team_id, sender=sender, message=message_text, created_at=now()
+                team=team,  # Associate the message with the team
+                sender=request.user,
+                message=message_text,
+                attachment=attachment,  # Save the attachment (if any)
+                created_at=timezone.now()  # Use Django's timezone handling
             )
-            print(message)
-            return JsonResponse({"message": message.message, "sender": sender.username}, status=201)
-    return JsonResponse({"error": "Invalid request"}, status=400)
 
+            # Prepare the response data
+            response_data = {
+                "message": message.message,
+                "sender": message.sender.username,
+                "created_at": message.created_at.isoformat(),
+            }
+
+            # Include the attachment URL in the response (if an attachment was uploaded)
+            if message.attachment:
+                response_data["attachment_url"] = message.attachment.url
+
+            return JsonResponse(response_data, status=201)
+
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+
+    return JsonResponse({"error": "Invalid request method"}, status=405)
+
+
+from django.http import JsonResponse
 
 
 @login_required
 def get_messages(request, team_id):
-    team = get_object_or_404(Team, id=team_id)
-    messages = TeamChat.objects.filter(team=team).order_by("-created_at")[:50]  # Get last 50 messages
+    messages = TeamChat.objects.filter(team_id=team_id).order_by("created_at")
 
     return JsonResponse([
         {
             "id": msg.id,
-            "message": msg.message,
             "sender": msg.sender.username,
-            "created_at": msg.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+            "message": msg.message,
+            "attachment": msg.attachment.url if msg.attachment else None,  # Convert FieldFile to URL
+            "created_at": msg.created_at,
         }
         for msg in messages
     ], safe=False)
+
 
 
 @login_required

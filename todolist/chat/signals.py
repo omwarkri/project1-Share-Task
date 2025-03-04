@@ -41,35 +41,35 @@ from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 from .models import TeamChat
 
-# @receiver(post_save, sender=TeamChat)
-# def send_team_chat_notification(sender, instance, created, **kwargs):
-#     print("from team signal")
-#     if created:
-#         channel_layer = get_channel_layer()
-#         if channel_layer is None:
-#             print("❌ Channel layer not found!")  # ✅ Debugging statement
-#             return
+@receiver(post_save, sender=TeamChat)
+def send_team_chat_notification(sender, instance, created, **kwargs):
+    print("from team signal")
+    if created:
+        channel_layer = get_channel_layer()
+        if channel_layer is None:
+            print("❌ Channel layer not found!")  # ✅ Debugging statement
+            return
         
-#         print("✅ Channel layer is available.")
-#         print(instance)
+        print("✅ Channel layer is available.")
+        print(instance)
 
-#         sender = instance.sender.username
-#         team_id = instance.team.id
-#         attachment_url = instance.attachment.url if instance.attachment else None  # Handle attachment
+        sender = instance.sender.username
+        team_id = instance.team.id
+        attachment_url = instance.attachment.url if instance.attachment else None  # Handle attachment
 
-#         print(f"📢 Sending message to Team {team_id} from {sender}")
+        print(f"📢 Sending message to Team {team_id} from {sender}")
 
-#         # Define the unique WebSocket room name for the team
-#         room_name = f"team_chat_{team_id}"
-#         print(f"📌 WebSocket Room: {room_name}")
+        # Define the unique WebSocket room name for the team
+        room_name = f"team_chat_{team_id}"
+        print(f"📌 WebSocket Room: {room_name}")
 
-#         async_to_sync(channel_layer.group_send)(
-#             room_name,
-#             {
-#                 "type": "team_chat_message",
-#                 "message": instance.message,
-#                 "sender": sender,
-#                 "created_at": instance.created_at.isoformat(),
-#                 "attachment": attachment_url,  # Include attachment
-#             }
-#         )
+        async_to_sync(channel_layer.group_send)(
+            room_name,
+            {
+                "type": "team_chat_message",
+                "message": instance.message,
+                "sender": sender,
+                "created_at": "just now",
+                "attachment": attachment_url,  # Include attachment
+            }
+        )

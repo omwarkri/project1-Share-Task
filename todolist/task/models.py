@@ -162,6 +162,8 @@ class Task(models.Model):
 
 
 
+
+
 def update_team_member_score(member, team, points=10):
     """Increase the score of a team member when a task is completed."""
     if member and team:

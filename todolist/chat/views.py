@@ -134,3 +134,58 @@ def fetch_all_chats(request):
 
 
 
+from django.shortcuts import render, get_object_or_404
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+from .models import TeamChat 
+from task.models import Team
+from django.views.decorators.csrf import csrf_exempt
+import json
+
+
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.timezone import now
+import json
+
+@login_required
+@csrf_exempt
+def send_message(request, team_id):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        message_text = data.get("message")
+        sender = request.user  # Get the logged-in user
+
+        if message_text:
+            message = TeamChat.objects.create(
+                team_id=team_id, sender=sender, message=message_text, created_at=now()
+            )
+            print(message)
+            return JsonResponse({"message": message.message, "sender": sender.username}, status=201)
+    return JsonResponse({"error": "Invalid request"}, status=400)
+
+
+
+@login_required
+def get_messages(request, team_id):
+    team = get_object_or_404(Team, id=team_id)
+    messages = TeamChat.objects.filter(team=team).order_by("-created_at")[:50]  # Get last 50 messages
+
+    return JsonResponse([
+        {
+            "id": msg.id,
+            "message": msg.message,
+            "sender": msg.sender.username,
+            "created_at": msg.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+        }
+        for msg in messages
+    ], safe=False)
+
+
+@login_required
+def team_chatroom(request, team_id):
+    team = get_object_or_404(Team, id=team_id)
+    messages = TeamChat.objects.filter(team=team).order_by("created_at")
+
+    return render(request, "chatroom.html", {"team": team, "messages": messages})
+

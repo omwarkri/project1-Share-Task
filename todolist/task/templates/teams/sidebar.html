@@ -184,10 +184,8 @@
 <!-- Mobile Toggle Button -->
 <button id="mobileSidebarToggle" class="mobile-sidebar-toggle">></button>
 <button id="closeSidebar" class="mobile-sidebar-toggle">x</button>
-
 <!-- Sidebar -->
 <div class="team-sidebar" data-team-id="{{ team.id }}">
-
     <ul class="team-sidebar-links">
         <li>
             <a href="{% url 'view_team_tasks' team.id %}" title="All Teams">🏠</a>
@@ -201,8 +199,12 @@
         <li>
             <a href="#" onclick="openTeamMembersModal()" title="Team Members">👥</a>
         </li>
+        <li>
+            <a href="{% url 'team_chat' team.id %}" title="Group Chat">💬</a>
+        </li>
     </ul>
 </div>
+
 
 <!-- Add Task Modal -->
 <div id="taskModal" class="modal" style="display: none;">

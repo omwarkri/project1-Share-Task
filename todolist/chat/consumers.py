@@ -67,3 +67,66 @@ class ChatConsumer(AsyncWebsocketConsumer):
             "timestamp": event["timestamp"],
             "attachment": event["attachment"]
         }))
+
+
+import json
+from channels.generic.websocket import AsyncWebsocketConsumer
+from django.contrib.auth.models import AnonymousUser
+from asgiref.sync import sync_to_async
+from .models import TeamChat
+from user.models import CustomUser
+from task.models import Team
+
+class TeamChatConsumer(AsyncWebsocketConsumer):
+    async def connect(self):
+        self.team_id = self.scope["url_route"]["kwargs"]["team_id"]
+        self.room_group_name = f"team_chat_{self.team_id}"
+
+        print(self.room_group_name, "group name")
+
+        # Join team chat room
+        await self.channel_layer.group_add(self.room_group_name, self.channel_name)
+        await self.accept()
+
+    async def disconnect(self, close_code):
+        # Leave team chat room
+        await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
+
+    async def receive(self, text_data):
+        data = json.loads(text_data)
+        message = data.get("message", "")
+        attachment_url = data.get("attachment", None)
+        user = self.scope["user"]
+
+        if isinstance(user, AnonymousUser):
+            return
+
+        sender = user.username
+        team = await sync_to_async(Team.objects.get)(id=self.team_id)
+        sender_user = await sync_to_async(CustomUser.objects.get)(username=sender)
+
+        # Save message to database (handle attachment separately)
+        new_message = await sync_to_async(TeamChat.objects.create)(
+            team=team,
+            sender=sender_user,
+            message=message,
+            attachment=attachment_url if attachment_url else None,
+        )
+
+        # Send message to WebSocket group
+        await self.channel_layer.group_send(
+            self.room_group_name,
+            {
+                "type": "team_chat_message",
+                "message": new_message.message,
+                "sender": sender,
+                "created_at": "just now",
+                "attachment": new_message.attachment.url if new_message.attachment else None,
+            }
+        )
+
+    async def team_chat_message(self, event):
+        # Send message to WebSocket client
+        await self.send(text_data=json.dumps(event))
+
+

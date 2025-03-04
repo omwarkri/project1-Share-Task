@@ -47,4 +47,28 @@ class ChatAIMessage(models.Model):
 
     def __str__(self):
         return f"{self.sender}: {self.message[:50]}... ({self.timestamp})"
+    
+
+
+
+
+from django.db import models
+from django.utils import timezone
+from user.models import CustomUser  # Import your user model
+from task.models import Team  # Import the Team model
+
+class TeamChat(models.Model):
+    team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name="team_chats")
+    sender = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="team_sent_messages")
+    message = models.TextField()
+    attachment = models.FileField(
+        upload_to="chat_attachments/",  # Directory to store attachments
+        blank=True, 
+        null=True
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.sender.username}: {self.message[:30]}"
+
   

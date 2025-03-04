@@ -892,9 +892,25 @@ def view_team_tasks(request, team_id):
                 messages.success(request, "Task added successfully!")
                 return redirect('view_team_tasks', team_id=team.id)
 
+    tasks_with_due=[]    
+    for task in tasks:
+        print(task.assigned_to)
+        # Check if the task is overdue or approaching due date
+        is_overdue = task.is_overdue()
+        is_approaching = task.is_approaching_due_date()
+        
+        # Add notification flags
+        tasks_with_due.append({
+            'task': task,
+            'is_overdue': is_overdue,
+            'is_approaching': is_approaching,
+        })
+
+    print(tasks_with_due)
+
     return render(request, 'teams/team_tasks.html', {
         'team': team,
-        'tasks': tasks,
+        'tasks': tasks_with_due,
         'add_member_form': add_member_form,
         'task_form': task_form
     })

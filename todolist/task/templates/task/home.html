@@ -882,6 +882,75 @@
             
         }
     
+        .header {
+        flex-direction: column; /* Stack header content vertically */
+        align-items: flex-start;
+        padding: 10px;
+    }
+
+    .header-actions {
+        flex-direction: column; /* Stack header actions vertically */
+        gap: 10px;
+        width: 100%;
+    }
+
+    .search-bar {
+        width: 100%; /* Full width for search bar */
+    }
+
+    .filter-button, .clear-filter-button {
+        width: 100%; /* Full width for buttons */
+    }
+
+    /* Adjust task grid for mobile */
+    .task-grid {
+        grid-template-columns: 1fr; /* Single column layout for tasks */
+        gap: 10px;
+        padding: 10px;
+    }
+
+    /* Adjust task card for mobile */
+    .task-card {
+        padding: 10px;
+    }
+
+    .task-title {
+        font-size: 16px; /* Smaller font size for task titles */
+    }
+
+    .task-priority {
+        font-size: 10px; /* Smaller font size for priority */
+    }
+
+    /* Adjust modal for mobile */
+    .modal-content {
+        width: 95%; /* Full width for modals */
+        padding: 15px;
+    }
+
+    /* Adjust shutter container for mobile */
+    .shutter-container.expanded {
+        height: 150px; /* Smaller height for mobile */
+    }
+
+    /* Adjust floating add task button for mobile */
+    .floating-add-task-button {
+        width: 50px;
+        height: 50px;
+        font-size: 20px;
+        bottom: 10px;
+        right: 10px;
+    }
+
+    /* Adjust task footer buttons for mobile */
+    .task-footer {
+        flex-direction: column; /* Stack buttons vertically */
+        gap: 5px;
+    }
+
+    .task-action {
+        width: 100%; /* Full width for buttons */
+    }
     }
     </style>
 <div class="dashboard-container">

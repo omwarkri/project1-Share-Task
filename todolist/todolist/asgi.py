@@ -1,14 +1,19 @@
 import os
+import django  # Add this import
+
 from django.core.asgi import get_asgi_application
 from django.urls import re_path
 from channels.routing import ProtocolTypeRouter, URLRouter
 from channels.auth import AuthMiddlewareStack
-from chat.consumers import ChatConsumer,TeamChatConsumer
 
-# Set the Django settings module before importing get_asgi_application
+# Set Django settings before importing anything
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'todolist.settings')
+django.setup()  # 🔹 Add this line
 
-# Django ASGI application to handle HTTP requests
+# Now import consumers
+from chat.consumers import ChatConsumer, TeamChatConsumer
+
+# Django ASGI application
 django_asgi_app = get_asgi_application()
 
 # WebSocket URL routing

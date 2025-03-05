@@ -149,3 +149,37 @@ class TeamTaskForm(forms.ModelForm):
         widget=forms.CheckboxSelectMultiple,
         required=False,
     )
+
+
+
+
+
+from django import forms
+from django.contrib.auth import get_user_model
+from .models import Task
+
+User = get_user_model()
+
+class ReassignTaskForm(forms.ModelForm):
+    class Meta:
+        model = Task
+        fields = ['assigned_to','status']
+
+    def __init__(self, *args, **kwargs):
+        team = kwargs.pop('team', None)
+        super().__init__(*args, **kwargs)
+        if team:
+            # Limit the assignee choices to team members
+            self.fields['assigned_to'].queryset = team.members.all()
+
+
+class EscalateTaskForm(forms.ModelForm):
+    class Meta:
+        model = Task
+        fields = ['escalation_reason']
+        widgets = {
+            'escalation_reason': forms.Textarea(attrs={'rows': 4, 'placeholder': 'Enter the reason for escalation...'}),
+        }
+        labels = {
+            'escalation_reason': 'Reason for Escalation',
+        }

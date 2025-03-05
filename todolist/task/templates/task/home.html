@@ -300,6 +300,180 @@
         flex-wrap: wrap;
         gap: 10px;
     }
+
+    /* Header Actions */
+.header-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.search-bar {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    flex: 1;
+    max-width: 300px;
+}
+
+.filter-button, .clear-filter-button {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f8f9fa;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.filter-button:hover, .clear-filter-button:hover {
+    background-color: #1abc9c;
+    color: white;
+}
+
+.private-task-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 40px;
+    height: 20px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    border-radius: 20px;
+    transition: 0.3s;
+}
+
+.slider:before {
+    content: "";
+    position: absolute;
+    height: 16px;
+    width: 16px;
+    left: 2px;
+    bottom: 2px;
+    background-color: white;
+    border-radius: 50%;
+    transition: 0.3s;
+}
+
+input:checked + .slider {
+    background-color: #1abc9c;
+}
+
+input:checked + .slider:before {
+    transform: translateX(20px);
+}
+
+/* Dropdown */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    z-index: 1;
+}
+
+.dropdown-content button {
+    display: block;
+    width: 100%;
+    padding: 8px 12px;
+    text-align: left;
+    border: none;
+    background: none;
+    cursor: pointer;
+}
+
+.dropdown-content button:hover {
+    background-color: #f8f9fa;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+/* Modal */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 500px;
+}
+
+.filter-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.tab-button {
+    padding: 8px 12px;
+    border: none;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.tab-button.active {
+    background-color: #1abc9c;
+    color: white;
+}
+
+.filter-tab-content {
+    display: none;
+}
+
+.filter-tab-content.active {
+    display: block;
+}
+
+.apply-filters-button {
+    width: 100%;
+    padding: 10px;
+    background-color: #1abc9c;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 20px;
+}
     
     .modern-button {
         padding: 8px 16px;
@@ -998,27 +1172,35 @@
                 </button>
             </div>
             <div class="header-actions">
-                 <button id="clear-filter-button" class="clear-filter-button" onclick="displayAllTasks()">🗑️</button>
-                 <button class="filter-button" onclick="filterDailyTasks()">📅 Daily Tasks</button>
-                <button class="filter-button" onclick="showAssignedTasks()">👤 Show My Assigned Tasks</button>
+                <!-- Search Bar -->
                 <input type="text" id="search-bar" class="search-bar" placeholder="🔍 Search tasks..." oninput="searchTasks()" />
-                
-                <input type="text" id="date-filter" class="search-bar" placeholder="📅 Filter by date..." />
-                <div class="private-task-toggle" onclick="filterTasks()">
-                    🔒
-                    <label class="switch">
-                        
-                        <input type="checkbox" id="is-private-task" >
-                        <span class="slider">
-                            
-                        </span>
-                    </label>
+            
+                <!-- Filter Dropdown -->
+                <div class="dropdown">
+                    <button class="filter-button">⚙️ Filters</button>
+                    <div class="dropdown-content">
+                        <button onclick="filterDailyTasks()">📅 Daily Tasks</button>
+                        <button onclick="showAssignedTasks()">👤 My Assigned Tasks</button>
+                        <button onclick="openFilterModal()">⚙️ Advanced Filters</button>
+                    </div>
                 </div>
-                
-                <button class="filter-button" onclick="openFilterModal()">⚙️ Filters</button>
-                
-
+            
+                <!-- Date Filter -->
+                <input type="text" id="date-filter" class="search-bar" placeholder="📅 Filter by date..." />
+            
+                <!-- Private Task Toggle -->
+                <div class="private-task-toggle">
+                    <label class="switch">
+                        <input type="checkbox" id="is-private-task" onchange="filterTasks()">
+                        <span class="slider"></span>
+                    </label>
+                    <span>🔒 Private Tasks</span>
+                </div>
+            
+                <!-- Clear Filters Button -->
+                <button id="clear-filter-button" class="clear-filter-button" onclick="displayAllTasks()">🗑️ Clear Filters</button>
             </div>
+             
         </div>
 
 
@@ -1026,10 +1208,12 @@
         <div class="task-grid">
             {% for task_data in tasks_with_suggestions %}
                 <div class="task-card task-item" 
-                     data-status="{{ task_data.task.status }}" 
-                     data-priority="{{ task_data.task.priority }}" 
-                     data-assigned-to="{% if task_data.task.assigned_to %}{{ task_data.task.assigned_to.id }}{% endif %}"
-                     data-is-daily="{{ task_data.task.is_daily }}"> <!-- Add this line -->
+                data-status="{{ task_data.task.status }}" 
+                data-priority="{{ task_data.task.priority }}" 
+                data-assigned-to="{% if task_data.task.assigned_to %}{{ task_data.task.assigned_to.id }}{% endif %}"
+                data-is-daily="{{ task_data.task.is_daily }}"
+                data-due-datetime="{{ task_data.task.due_date|date:'Y-m-d H:i' }}"
+                data-private="{{ task_data.task.shareable  }}"> <!-- Add this line -->
                     <div class="task-header">
                         <strong class="task-title">📌 {{ task_data.task.title }}</strong>
                         <span class="task-priority {{ task_data.task.priority }}">
@@ -1123,8 +1307,41 @@
     <div class="modal-content">
         <span class="close-modal" onclick="closeFilterModal()">&times;</span>
         <h3>⚙️ Filters</h3>
-        <div class="filter-group">
-            <h4>🔀 Sort By:</h4>
+
+        <!-- Tabs for Filters -->
+        <div class="filter-tabs">
+            <button class="tab-button active" onclick="openFilterTab('status')">📊 Status</button>
+            <button class="tab-button" onclick="openFilterTab('priority')">🚦 Priority</button>
+            <button class="tab-button" onclick="openFilterTab('sort')">🔀 Sort By</button>
+        </div>
+
+        <!-- Status Filters -->
+        <div id="status-filters" class="filter-tab-content active">
+            <h4>Filter by Status:</h4>
+            <div class="filter-buttons">
+                <button onclick="filterTasks('all', 'all')" class="modern-button">🌐 All</button>
+                <button onclick="filterTasks('pending', 'all')" class="modern-button">⏳ Pending</button>
+                <button onclick="filterTasks('in_progress', 'all')" class="modern-button">🚧 In Progress</button>
+                <button onclick="filterTasks('completed', 'all')" class="modern-button">✅ Completed</button>
+                <button onclick="filterTasks('archived', 'all')" class="modern-button">🗄️ Archived</button>
+            </div>
+        </div>
+
+        <!-- Priority Filters -->
+        <div id="priority-filters" class="filter-tab-content">
+            <h4>Filter by Priority:</h4>
+            <div class="filter-buttons">
+                <button onclick="filterTasks('all', 'all')" class="modern-button">🌐 All</button>
+                <button onclick="filterTasks('all', 'low')" class="modern-button">✅ Low</button>
+                <button onclick="filterTasks('all', 'medium')" class="modern-button">⚠️ Medium</button>
+                <button onclick="filterTasks('all', 'high')" class="modern-button">🚨 High</button>
+                <button onclick="filterTasks('all', 'critical')" class="modern-button">🔥 Critical</button>
+            </div>
+        </div>
+
+        <!-- Sort Filters -->
+        <div id="sort-filters" class="filter-tab-content">
+            <h4>Sort By:</h4>
             <div class="filter-options">
                 <select id="sort-by" class="modern-select" onchange="applySorting()">
                     <option value="title">📝 Title</option>
@@ -1138,26 +1355,9 @@
                 </select>
             </div>
         </div>
-        <div class="filter-group">
-            <h4>📊 Filter by Status:</h4>
-            <div class="filter-buttons">
-                <button onclick="filterTasks('all', 'all')" class="modern-button">🌐 All</button>
-                <button onclick="filterTasks('pending', 'all')" class="modern-button">⏳ Pending</button>
-                <button onclick="filterTasks('in_progress', 'all')" class="modern-button">🚧 In Progress</button>
-                <button onclick="filterTasks('completed', 'all')" class="modern-button">✅ Completed</button>
-                <button onclick="filterTasks('archived', 'all')" class="modern-button">🗄️ Archived</button>  
-            </div>
-        </div>
-        <div class="filter-group">
-            <h4>🚦 Filter by Priority:</h4>
-            <div class="filter-buttons">
-                <button onclick="filterTasks('all', 'all')" class="modern-button">🌐 All</button>
-                <button onclick="filterTasks('all', 'low')" class="modern-button">✅ Low</button>
-                <button onclick="filterTasks('all', 'medium')" class="modern-button">⚠️ Medium</button>
-                <button onclick="filterTasks('all', 'high')" class="modern-button">🚨 High</button>
-                <button onclick="filterTasks('all', 'critical')" class="modern-button">🔥 Critical</button>
-            </div>
-        </div>
+
+        <!-- Apply Filters Button -->
+        <button class="apply-filters-button" onclick="applyFilters()">Apply Filters</button>
     </div>
 </div>
 
@@ -1286,49 +1486,80 @@
 }
      function displayAllTasks() {
     const taskItems = document.querySelectorAll('.task-item');
+    document.getElementById('is-private-task').checked=false
+    const clearFiltersButton = document.getElementById('clear-filters-button');
+    const dateFilterInput = flatpickr("#date-filter", {
+        enableTime: false,
+        dateFormat: "Y-m-d",
+        onChange: function (selectedDates, dateStr) {
+            filterTasks(); // Trigger filtering when the date changes
+        }
+    });
 
     taskItems.forEach(task => {
-        console.log(task)
+        dateFilterInput.clear();
         task.style.display = 'block'; // Show all tasks
     });
 }
 
     // Function to filter tasks by date
 
+    function openFilterTab(tabName) {
+    const tabContents = document.querySelectorAll('.filter-tab-content');
+    const tabButtons = document.querySelectorAll('.tab-button');
+
+    tabContents.forEach(content => content.classList.remove('active'));
+    tabButtons.forEach(button => button.classList.remove('active'));
+
+    document.getElementById(`${tabName}-filters`).classList.add('active');
+    document.querySelector(`[onclick="openFilterTab('${tabName}')"]`).classList.add('active');
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    const privateTaskToggle = document.getElementById('is-private-task');
+    console.log(privateTaskToggle)
+    if (privateTaskToggle) {
+        privateTaskToggle.addEventListener('change', function () {
+            filterTasks(); // Trigger filtering when the toggle changes
+        });
+    } else {
+        console.error('Private task toggle element not found.');
+    }
+});
+
 
 function filterTasks(statusFilter = 'all', priorityFilter = 'all') {
     const dateFilterInput = document.getElementById("date-filter");
     const selectedDate = dateFilterInput ? dateFilterInput.value.trim() : '';
-    const privateSwitch = document.getElementById('is-private-task'); // Get private task toggle state
-    
+    const privateSwitch = document.getElementById('is-private-task'); // Get private task toggle
+    console.log(privateSwitch.checked)
     if (!privateSwitch) {
         console.error("Private task switch element not found!");
         return;
     }
 
     const showPrivate = privateSwitch.checked; // Get toggle state
-    if (privateSwitch.checked==true){
-        privateSwitch.checked=false
-
-    }else{
-        privateSwitch.checked=true
-    }
-    console.log("Task privacy:", showPrivate);
-
     const taskItems = document.querySelectorAll('.task-item');
 
     taskItems.forEach(task => {
         const taskStatus = task.getAttribute('data-status'); // Get task status
         const taskPriority = task.getAttribute('data-priority'); // Get task priority
-        const taskDueDateTime = task.getAttribute('data-due-datetime'); // Full datetime string
-        const isPrivate = task.getAttribute('data-private') === 'false'; // Check if task is private
+        const taskDueDateTime = task.getAttribute('data-due-datetime'); // Get due date
+        console.log(task.getAttribute('data-private'))
+        const isPrivate = task.getAttribute('data-private') === 'False'; // Check if task is private
 
         // Match filters
         const matchesStatus = (statusFilter === 'all' || taskStatus === statusFilter);
         const matchesPriority = (priorityFilter === 'all' || taskPriority === priorityFilter);
         const matchesDate = (selectedDate === '' || taskDueDateTime.startsWith(selectedDate));
-        const matchesPrivacy = (showPrivate || isPrivate); // Show if private allowed OR task is not private
+        let matchesPrivacy=NaN
+        if (showPrivate && isPrivate ){
+            matchesPrivacy=true
 
+        }
+        if (!showPrivate){
+            matchesPrivacy=true
+        }
         if (matchesStatus && matchesPriority && matchesDate && matchesPrivacy) {
             task.style.display = 'block'; // Show the task
         } else {
@@ -1337,6 +1568,7 @@ function filterTasks(statusFilter = 'all', priorityFilter = 'all') {
     });
 }
 
+    
 
 
 

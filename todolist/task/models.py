@@ -16,6 +16,7 @@ from django.utils import timezone
 class Team(models.Model):
     name = models.CharField(max_length=255, unique=True)
     description = models.TextField(blank=True, null=True)
+    team_lead = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True, related_name="leading_teams")
     created_by = models.ForeignKey("user.CustomUser", on_delete=models.CASCADE, related_name="teams")
     members = models.ManyToManyField("user.CustomUser", related_name="team_members", blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -110,7 +111,8 @@ class Task(models.Model):
     reminder_sent = models.BooleanField(default=False)
 
     team = models.ForeignKey(Team, on_delete=models.CASCADE, null=True, blank=True, related_name="team_tasks")
-    
+    escalated_to = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, related_name="escalated_tasks", null=True, blank=True)
+    escalation_reason = models.TextField(blank=True, null=True)  # Add this field
     assigned_to = models.ForeignKey(
         CustomUser,
         related_name='assigned_tasks',
@@ -134,6 +136,12 @@ class Task(models.Model):
         if self.status == 'completed':
             return False
         return bool(self.due_date and 0 <= (self.due_date - timezone.now()).days <= 2)
+    
+    def escalate_task(self, escalated_to):
+        """Escalate task to another team member"""
+        self.status = "escalated"
+        self.escalated_to = escalated_to
+        self.save()
 
     def can_be_completed(self):
         """Check if all dependencies are completed before marking this task as completed."""

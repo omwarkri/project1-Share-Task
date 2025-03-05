@@ -1,0 +1,53 @@
+<!-- templates/emails/task_escalation.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Task Escalation</title>
+</head>
+<body style="font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border: 1px solid #dddddd;">
+        <tr>
+            <td style="padding: 20px; background-color: #007BFF; color: #ffffff; text-align: center;">
+                <h1 style="margin: 0; font-size: 24px;">Task Escalation Notification</h1>
+            </td>
+        </tr>
+        <tr>
+            <td style="padding: 20px;">
+                <p style="font-size: 16px; color: #333333;">Hello <strong>{{ escalated_user.username }}</strong>,</p>
+                <p style="font-size: 16px; color: #333333;">The following task has been escalated to you:</p>
+                <table width="100%" cellpadding="10" cellspacing="0" style="background-color: #f9f9f9; border: 1px solid #dddddd; border-radius: 5px;">
+                    <tr>
+                        <td style="font-size: 14px; color: #555555;"><strong>Task Title:</strong></td>
+                        <td style="font-size: 14px; color: #333333;">{{ task.title }}</td>
+                    </tr>
+                    <tr>
+                        <td style="font-size: 14px; color: #555555;"><strong>Description:</strong></td>
+                        <td style="font-size: 14px; color: #333333;">{{ task.description }}</td>
+                    </tr>
+                    <tr>
+                        <td style="font-size: 14px; color: #555555;"><strong>Assigned To:</strong></td>
+                        <td style="font-size: 14px; color: #333333;">{{ task.assigned_to.username }}</td>
+                    </tr>
+                    <tr>
+                        <td style="font-size: 14px; color: #555555;"><strong>Due Date:</strong></td>
+                        <td style="font-size: 14px; color: #333333;">{{ task.due_date }}</td>
+                    </tr>
+                    <tr>
+                        <td style="font-size: 14px; color: #555555;"><strong>Reason for Escalation:</strong></td>
+                        <td style="font-size: 14px; color: #333333;">{{ reason }}</td>
+                    </tr>
+                </table>
+                <p style="font-size: 16px; color: #333333; margin-top: 20px;">
+                    Please take appropriate action to resolve the task.
+                </p>
+            </td>
+        </tr>
+        <tr>
+            <td style="padding: 20px; background-color: #f4f4f4; text-align: center; font-size: 14px; color: #777777;">
+                <p style="margin: 0;">Thank you,</p>
+                <p style="margin: 0;">Your Task Management System</p>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

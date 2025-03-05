@@ -861,7 +861,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import Team, Task
-from .forms import AddMemberForm, TeamTaskForm # Import the TaskForm
+from .forms import AddMemberForm, TeamTaskForm , ReassignTaskForm,EscalateTaskForm # Import the TaskForm
 
 @login_required
 def view_team_tasks(request, team_id):
@@ -869,6 +869,8 @@ def view_team_tasks(request, team_id):
     tasks = Task.objects.filter(team=team)  # Fetch tasks for the team
     add_member_form = AddMemberForm()
     task_form = TeamTaskForm()  # Task creation form
+    reassigned_task_form=ReassignTaskForm()
+    escualeted_reason_form=EscalateTaskForm()
 
     if request.method == "POST":
         if "add_member" in request.POST:
@@ -912,7 +914,10 @@ def view_team_tasks(request, team_id):
         'team': team,
         'tasks': tasks_with_due,
         'add_member_form': add_member_form,
-        'task_form': task_form
+        'task_form': task_form,
+        'reassigned_task_form': reassigned_task_form,
+        'escualeted_reason_form': escualeted_reason_form
+      
     })
 
 
@@ -1094,3 +1099,107 @@ def member_analysis(request, team_id,member_id):
         'average_completion_time': average_completion_time,
     })
 
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+from .models import Task
+import logging
+from django.conf import settings
+import logging
+from django.shortcuts import get_object_or_404, render, redirect
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from .models import Task
+from .forms import EscalateTaskForm  # Import the form
+
+
+logger = logging.getLogger(__name__)
+
+@login_required
+def escalate_task(request, task_id):
+    # Get the task and ensure it is assigned to the current user
+    task = get_object_or_404(Task, id=task_id, assigned_to=request.user)
+    print("Escalating task")
+
+    # Get the team ID for redirection
+    team_id = task.team.id
+
+    # Check if the task is already escalated
+    if task.escalated_to:
+        messages.warning(request, "This task has already been escalated.")
+        return redirect("view_team_tasks", team_id=team_id)
+
+    if request.method == 'POST':
+        # Process the form
+        form = EscalateTaskForm(request.POST)
+        if form.is_valid():
+            reason = form.cleaned_data['escalation_reason']  # Get the escalation reason
+            
+            # Determine the user to escalate to
+            if task.team.team_lead:
+                escalated_user = task.team.team_lead
+                escalation_message = f"Task '{task.title}' has been escalated to the team lead: {escalated_user.username}."
+            elif task.assigned_to:
+                escalated_user = task.assigned_to
+                escalation_message = f"Task '{task.title}' has been escalated to the assigned user: {escalated_user.username}."
+            else:
+                # Handle edge case where neither team lead nor assigned user is available
+                messages.error(request, "No team lead or assigned user found to escalate the task.")
+                return redirect("view_team_tasks", team_id=team_id)
+
+            # Update the task with escalation details
+            task.status = 'escalated'
+            task.escalated_to = escalated_user
+            task.escalation_reason = reason  # Save the escalation reason
+            print("task escualating")
+            task.save()
+
+            # Log the escalation
+            logger.info(f"Task {task.id} escalated to {escalated_user.username} by {request.user.username}. Reason: {reason}")
+
+            # Notify the user
+            messages.success(request, escalation_message)
+
+           
+
+            # Redirect to the team tasks view
+            return redirect("view_team_tasks", team_id=team_id)
+    else:
+        # Display the form
+        form = EscalateTaskForm()
+
+    # Render the escalation form
+    return redirect("view_team_tasks", team_id=team_id)
+
+
+
+
+
+
+from django.shortcuts import get_object_or_404, render, redirect
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from .models import Task
+from .forms import ReassignTaskForm
+
+@login_required
+def reassign_task(request, task_id):
+    task = get_object_or_404(Task, id=task_id)
+
+    # Ensure the current user is the team lead
+    if request.user != task.team.team_lead and request.user != task.user:
+        messages.error(request, "You do not have permission to reassign this task.")
+        return redirect("view_team_tasks", team_id=task.team.id)
+
+    if request.method == 'POST':
+        print("reassigning task")
+        form = ReassignTaskForm(request.POST, instance=task, team=task.team)
+        if form.is_valid():
+            task = form.save()
+            task.escalated_to=None
+            task.save()
+            messages.success(request, f"Task '{task.title}' has been reassigned to {task.assigned_to.username}.")
+            return redirect("view_team_tasks", team_id=task.team.id)

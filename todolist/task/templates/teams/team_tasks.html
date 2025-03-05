@@ -105,6 +105,7 @@
         flex-grow: 1;
         overflow-y: auto; /* Enable vertical scrolling */
         height: 100vh; /* Full viewport height */
+        position: relative;
      
 
     }
@@ -533,6 +534,13 @@
                         <div class="task-mid">
                             <a href="{% url 'ai_task_management' task.task.id %}" class="suggested-users-button">🤖</a>
                             <a href="{% url 'suggested_users' task.task.id %}" class="suggested-users-button">👥</a>
+                            {% if task.task.status == 'escalated' %}
+                            <!-- Reassign Button -->
+                            <button class="task-action" onclick="openReassignModal({{ task.task.id }})">Reassign</button>
+                        {% elif request.user == task.task.assigned_to %}
+                            <!-- Escalate Button -->
+                            <button class="task-action" onclick="openEscalateModal({{ task.task.id }})">Escalate</button>
+                        {% endif %}
                             <div>
                                 {% if task.is_overdue %}
                                 <span class="badge badge-danger">⏳ Overdue</span>
@@ -554,6 +562,33 @@
         </div>
 
         <a href="{% url 'teams_list' %}">Back to Teams</a>
+    </div>
+</div>
+
+<div id="escalateModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeEscalateModal()">&times;</span>
+        <h3>Escalate Task</h3>
+        <form id="escalateForm" method="post" >
+            {% csrf_token %}
+           
+            {{ escualeted_reason_form.as_p }}
+        
+            <button type="submit" class="btn btn-primary">Escalate</button>
+        </form>
+    </div>
+</div>
+
+<div id="reassignModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeReassignModal()">&times;</span>
+        <h3>Reassign Task</h3>
+        
+        <form id="reassignForm" method="post">
+            {% csrf_token %}
+            {{ reassigned_task_form.as_p }}
+            <button type="submit" name="add_task">Reassigned Task</button>
+        </form>
     </div>
 </div>
 
@@ -775,6 +810,64 @@ const toggleButton = document.getElementById('toggle-shutter-button');
     function closeModal(taskId) {
         document.getElementById(`shareTaskModal-${taskId}`).style.display = 'none';
     }
+
+    function openReassignModal(taskId) {
+        // Update the form action URL with the task ID
+        const form = document.getElementById('reassignForm');
+        form.action = `/tasks/${taskId}/reassign/`;
+
+        // Load the reassign form dynamically
+        fetch(`/tasks/${taskId}/reassign/`)
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('reassignFormContent').innerHTML = html;
+            });
+
+        // Display the modal
+        document.getElementById('reassignModal').style.display = 'block';
+    }
+
+    // Function to close the reassign modal
+    function closeReassignModal() {
+        document.getElementById('reassignModal').style.display = 'none';
+    }
+
+    // Close the modal if the user clicks outside of it
+    window.onclick = function(event) {
+        const modal = document.getElementById('reassignModal');
+        if (event.target === modal) {
+            modal.style.display = 'none';
+        }
+    };
+
+    function openEscalateModal(taskId) {
+        // Update the form action URL with the task ID
+        const form = document.getElementById('escalateForm');
+        form.action = `/tasks/escalate/${taskId}/`;
+
+        // Load the escalate form dynamically
+        fetch(`/tasks/escalate/${taskId}/`)
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('escalateFormContent').innerHTML = html;
+            });
+
+        // Display the modal
+        document.getElementById('escalateModal').style.display = 'block';
+    }
+
+    // Function to close the escalate modal
+    function closeEscalateModal() {
+        document.getElementById('escalateModal').style.display = 'none';
+    }
+
+    // Close the modal if the user clicks outside of it
+    window.onclick = function(event) {
+        const modal = document.getElementById('escalateModal');
+        if (event.target === modal) {
+            modal.style.display = 'none';
+        }
+    };
 </script>
 
 {% endblock %}

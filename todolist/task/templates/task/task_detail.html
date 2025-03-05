@@ -490,7 +490,14 @@
             <!-- Display task completion details -->
             <div class="completion-detail">
                 <h2>Task Completion Details</h2>
-                <p><strong>Details:</strong> {{ task.completion_details.completion_details }}</p>
+               <!-- Option 1: Replace newlines with <br> tags -->
+
+
+<!-- Option 2: Use <pre> tag to preserve whitespace -->
+<p><strong>Details (with pre tag):</strong></p>
+<pre>{{ task.completion_details.completion_details }}</pre>
+
+
             
                 {% if task.completion_details.uploaded_image %}
                     <h3>Uploaded Image</h3>

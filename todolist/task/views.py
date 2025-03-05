@@ -1,7 +1,7 @@
 # myapp/views.py
 from django.shortcuts import render
 from .models import Task
-
+import re
 from notes_app.models import TaskNotes
 
 from django.shortcuts import render, redirect
@@ -9,6 +9,9 @@ from .models import Task
 from .forms import TaskForm
 
 from django.contrib.auth.decorators import login_required
+
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 
 
 from django.shortcuts import render, get_object_or_404
@@ -30,47 +33,133 @@ User = get_user_model()
 
 from django.contrib.auth import get_user_model
 
-def get_suggested_users(task, current_user):
+from sentence_transformers import SentenceTransformer
+
+# Load a pretrained transformer model (better than TF-IDF)
+model = SentenceTransformer("all-MiniLM-L6-v2")
+
+import re
+import numpy as np
+from django.db.models import Q
+from sklearn.metrics.pairwise import cosine_similarity
+from sentence_transformers import SentenceTransformer
+from nltk.corpus import stopwords
+from nltk.stem import WordNetLemmatizer
+from .models import Task
+from user.models import CustomUser
+
+# Load model once at startup (better than reloading every call)
+model = SentenceTransformer("all-MiniLM-L6-v2")
+
+# Load NLP utilities once
+lemmatizer = WordNetLemmatizer()
+stop_words = set(stopwords.words("english"))
+
+def preprocess_text(text):
+    if not text:
+        return ""
+    text = text.lower()
+    text = re.sub(r"[^a-zA-Z0-9\s]", "", text)  # Remove special characters
+    words = text.split()
+    words = [lemmatizer.lemmatize(word) for word in words if word not in stop_words]
+    
+    # Ensure at least 3 words remain (to avoid over-filtering)
+    if len(words) < 3:
+        return text.lower()  # Return original text if preprocessing removes too much
+    
+    return " ".join(words)
+
+
+def generate_task_vectors():
     """
-    Fetch users working on or who have completed similar tasks.
-    Exclude the current user and non-shareable tasks.
+    Generate and return embeddings for all shareable tasks.
     """
-    # Find shareable tasks with similar titles, excluding the current task
-    similar_tasks = Task.objects.filter(title__icontains=task.title, shareable=True).exclude(id=task.id)
-    print(similar_tasks)
-    # Users working on similar tasks (pending status)
+    tasks = Task.objects.filter(shareable=True).values_list("id", "title", "description")
+    
+    if not tasks:
+        return {}
+
+    task_texts = [preprocess_text(f"{title} {description}") for _, title, description in tasks]
+    task_ids = [task_id for task_id, _, _ in tasks]
+
+    # Compute embeddings
+    task_vectors = model.encode(task_texts, convert_to_numpy=True)
+
+    return {task_id: task_vectors[i] for i, task_id in enumerate(task_ids)}
+
+def get_suggested_users(task, current_user, top_n=5):
+    """
+    Suggest users based on task similarity using deep embeddings.
+    """
+    # Get all task embeddings
+    task_vector_dict = generate_task_vectors()
+
+    if not task_vector_dict:
+        return {"users_in_progress": [], "users_completed": []}
+
+    # Get embedding for the current task
+    current_text = preprocess_text(f"{task.title} {task.description}")
+    current_vector = model.encode([current_text])
+
+    # Compute cosine similarity
+    similarities = {
+    task_id: similarity
+    for task_id, similarity in sorted(
+        [
+            (task_id, cosine_similarity(current_vector, task_vector.reshape(1, -1))[0][0])
+            for task_id, task_vector in task_vector_dict.items()
+            if task_id != task.id
+        ],
+        key=lambda x: x[1],
+        reverse=True,
+    )
+    if similarity > 0.5  # Only include tasks with at least 50% similarity
+}
+
+
+    # Get top-N most similar tasks
+    ranked_tasks = sorted(similarities.items(), key=lambda x: x[1], reverse=True)[:top_n]
+    similar_task_ids = [task_id for task_id, _ in ranked_tasks]
+
+    if not similar_task_ids:
+        return {"users_in_progress": [], "users_completed": []}
+
+    # Fetch similar tasks in a single query
+    similar_tasks = Task.objects.filter(id__in=similar_task_ids)
+
+    # Get users who are working on similar tasks (pending/completed)
     users_in_progress = CustomUser.objects.filter(
-        task_user__in=similar_tasks.filter(status='pending')
-    ).exclude(id=current_user.id).distinct()
-    print(users_in_progress)
-    # Users who completed similar tasks
-    users_completed =  CustomUser.objects.filter(
-        task_user__in=similar_tasks.filter(status='completed')
+        task_user__in=similar_tasks.filter(status="pending")
     ).exclude(id=current_user.id).distinct()
 
-    print(users_completed,"completed users")
+    users_completed = CustomUser.objects.filter(
+        task_user__in=similar_tasks.filter(status="completed")
+    ).exclude(id=current_user.id).distinct()
 
-    # Collect user details with associated tasks
-    def get_user_tasks(users, task_status):
+    # Prepare response
+    def format_users(users):
         return [
             {
                 "user_id": user.id,
                 "username": user.username,
-                "email": user.email,
                 "tasks": [
-                    {"task_id": t.id, "task_title": t.title}
-                    for t in similar_tasks.filter(status=task_status, user=user)
+                    {
+                        "task_id": t.id,
+                        "task_title": t.title,
+                        "task_description": t.description,
+                        "task_due_date": t.due_date,
+                    }
+                    for t in similar_tasks.filter(user=user)
                 ],
             }
             for user in users
         ]
 
-    response = {
-        "users_in_progress": get_user_tasks(users_in_progress, "pending"),
-        "users_completed": get_user_tasks(users_completed, "completed"),
+    return {
+        "users_in_progress": format_users(users_in_progress),
+        "users_completed": format_users(users_completed),
     }
-    print("Suggested Users Response:", response)
-    return response
+
 
 
 

@@ -38,21 +38,24 @@
 
         .filter-button {
             padding: 10px 15px;
-            background-color: #0095f6;
+            background-color: #1abc9c; /* Updated color */
             color: white;
             text-decoration: none;
-            border-radius: 5px;
+            border-radius: 20px; /* Rounded corners like Instagram */
             font-size: 14px;
             transition: background-color 0.3s ease;
             margin: 5px; /* Add margin for better spacing on small screens */
+            border: 1px solid #1abc9c; /* Add border for better contrast */
         }
 
         .filter-button.active {
-            background-color: #007bb5;
+            background-color: #16a085; /* Darker shade for active state */
+            border-color: #16a085;
         }
 
         .filter-button:hover {
-            background-color: #0088cc;
+            background-color: #16a085; /* Darker shade on hover */
+            border-color: #16a085;
         }
 
         /* Task Feed Grid */
@@ -68,11 +71,18 @@
             border-radius: 10px;
             overflow: hidden;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .task-feed-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
 
         .task-feed-item img {
             width: 100%;
-            height: auto;
+            height: 200px; /* Fixed height for uniformity */
+            object-fit: cover; /* Ensure images cover the area */
             display: block;
         }
 
@@ -93,7 +103,7 @@
         }
 
         .task-feed-item a {
-            color: #0095f6;
+            color: #1abc9c; /* Updated color */
             text-decoration: none;
         }
 
@@ -111,7 +121,7 @@
         }
 
         .read-more-button {
-            color: #0095f6;
+            color: #1abc9c; /* Updated color */
             cursor: pointer;
             font-size: 14px;
             margin-top: 5px;

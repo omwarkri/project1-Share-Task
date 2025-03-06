@@ -332,139 +332,156 @@ form textarea {
             {% endif %}
     
  
-        <p><strong>Status:</strong> {{ task.status }}</p>
-        <p><strong>Description:</strong> {{ task.description }}</p>
-        <button onclick="getAiProcedure({{ task.id }})">AI Procedure</button>
-        <p id="procedure-{{ task.id }}"></p>
-        <form action="{% url 'ai_task_management' task.id %}" method="post">
-            {% csrf_token %}
-            <input type="hidden" name="task_id" value="{{ task.id }}">
-            <textarea name="procedure" placeholder="Enter procedure details here" value="{{ task.procedure }}"></textarea>
-            <button type="submit">Manage task with AI</button>
-        </form>
-        <p><strong>Priority:</strong> {{ task.get_priority_display }}</p>   
-        <p><strong>Due Date:</strong> {{ task.due_date }}</p>  
-        <p><strong>Created At:</strong> {{ task.created_at }}</p>
-
-        <div class="subtask">
-            <h3>Subtasks</h3>
-            <ul>
-                {% for subtask in subtasks %}
-                    <li>
-                        <form method="post" action="{% url 'toggle_subtask' subtask.id %}">
+            <div class="two-column-layout">
+                <!-- Left Column -->
+                <div class="left-column">
+                    <!-- Task Details -->
+                    <p><strong>Status:</strong> {{ task.status }}</p>
+                    <p><strong>Description:</strong> {{ task.description }}</p>
+                    <button onclick="getAiProcedure({{ task.id }})">AI Procedure</button>
+                    <p id="procedure-{{ task.id }}"></p>
+                    <form action="{% url 'ai_task_management' task.id %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="task_id" value="{{ task.id }}">
+                        <textarea name="procedure" placeholder="Enter procedure details here" value="{{ task.procedure }}"></textarea>
+                        <button type="submit">Manage task with AI</button>
+                    </form>
+                    <p><strong>Priority:</strong> {{ task.get_priority_display }}</p>   
+                    <p><strong>Due Date:</strong> {{ task.due_date }}</p>  
+                    <p><strong>Created At:</strong> {{ task.created_at }}</p>
+            
+                    <!-- Subtasks -->
+                    <div class="subtask">
+                        <h3>Subtasks</h3>
+                        <ul>
+                            {% for subtask in subtasks %}
+                                <li>
+                                    <form method="post" action="{% url 'toggle_subtask' subtask.id %}">
+                                        {% csrf_token %}
+                                        <input type="checkbox" onchange="this.form.submit();" {% if subtask.completed %}checked{% endif %}>
+                                        {{ subtask.title }}
+                                    </form>
+                                </li>
+                            {% empty %}
+                                <li>No subtasks added yet.</li>
+                            {% endfor %}
+                        </ul>
+                    
+                        <h4>Add Subtask</h4>
+                        <form method="post" action="{% url 'add_subtask' task.id %}">
                             {% csrf_token %}
-                            <input type="checkbox" onchange="this.form.submit();" {% if subtask.completed %}checked{% endif %}>
-                            {{ subtask.title }}
+                            {{ subtask_form.as_p }}
+                            <button type="submit">Add Subtask</button>
                         </form>
-                    </li>
-                {% empty %}
-                    <li>No subtasks added yet.</li>
-                {% endfor %}
-            </ul>
-        
-            <h4>Add Subtask</h4>
-            <form method="post" action="{% url 'add_subtask' task.id %}">
-                {% csrf_token %}
-                {{ subtask_form.as_p }}
-                <button type="submit">Add Subtask</button>
-            </form>
-        </div>
-
-        <div class="add-note-section">
-            <h3>Add a Note</h3>
-            <form method="POST" action="{% url 'add_task_note' task.id %}">
-                {% csrf_token %}
-                {{ form.as_p }}
-                <button type="submit" class="submit-button">Add Note</button>
-            </form>
-        </div>
-    
-        <!-- Display Existing Notes -->
-        <div class="notes-section">
-            <h3>Notes</h3>
-            {% if task.task_notes.all %}
-                <ul class="notes-list">
-                    {% for note in task.task_notes.all %}
-                        <li class="note-item">
-                            <p>{{ note.note_text }}</p>
-                            <small>Added by {{ note.user.username }} on {{ note.created_at|date:"F j, Y, g:i a" }}</small>
-                        </li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <p>No notes added yet.</p>
-            {% endif %}
-        </div>
-
-        <div class="activity-log">
-            <h3>Activity Log</h3>
-            <ul>
-                {% for log in task.activity_logs.all %}
-                    <li>
-                        <strong>{{ log.user.username }}</strong> {{ log.action }}:
-                        <span>{{ log.details }}</span>
-                        <small>{{ log.timestamp }}</small>
-                    </li>
-                {% empty %}
-                    <li>No activity yet.</li>
-                {% endfor %}
-            </ul>
-        </div>
-
-        <div class="comments-section">
-            <h2>Comments</h2>
-            <ul>
-                {% for comment in comments %}
-                    <li>
-                        <strong>{{ comment.user.username }}</strong>: {{ comment.text }}
-                        <br><small>{{ comment.created_at }}</small>
-                    </li>
-                {% empty %}
-                    <li>No comments yet.</li>
-                {% endfor %}
-            </ul>
-    
-            <!-- Add Comment Form -->
-            <form method="post">
-                {% csrf_token %}
-                {{ comment_form.as_p }}
-                <button type="submit" name="add_comment">Add Comment</button>
-            </form>
-        </div>
-
-        {% if task.status == "completed" %}
-            <!-- Display task completion details -->
+                    </div>
             
-                {% if task.user and task.user != request.user %}
-                    <h3>Task Completed By: {{ task.user.username }}</h3>
-                    <!-- Chat Button -->
-                    <a href="{% url 'chat' task.user.id %}?task_id={{task.id}}&task_title={{ task.title}}" class="chat-button">Chat with {{ task.user.username }}</a>
-                {% endif %}
-            </div>
-            
-        {% else %}
-            <!-- Show Edit Button if user is the creator -->
-            {% if task.user == request.user %}
-                <button id="editBtn" onclick="toggleEditForm()">Edit Task</button>
-
-                {% if request.user.subscription.is_subscription_valid %}
-                    <div id="editForm" style="display:none;">
-                        <h2>Edit Task</h2>
-                        <form method="post">
+                    <!-- Notes -->
+                    <div class="add-note-section">
+                        <h3>Add a Note</h3>
+                        <form method="POST" action="{% url 'add_task_note' task.id %}">
                             {% csrf_token %}
                             {{ form.as_p }}
-                            <button type="submit" name="edit_task">Save Changes</button>
+                            <button type="submit" class="submit-button">Add Note</button>
                         </form>
                     </div>
-                {% else %}
-                    <div class="subscription-required">
-                        <h1>Subscription Required</h1>
-                        <p>You need an active subscription to edit tasks.</p>
-                        <a href="{% url 'create_subscription' %}">Subscribe Now</a>
+                
+                    <!-- Display Existing Notes -->
+                    <div class="notes-section">
+                        <h3>Notes</h3>
+                        {% if task.task_notes.all %}
+                            <ul class="notes-list">
+                                {% for note in task.task_notes.all %}
+                                    <li class="note-item">
+                                        <p>{{ note.note_text }}</p>
+                                        <small>Added by {{ note.user.username }} on {{ note.created_at|date:"F j, Y, g:i a" }}</small>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p>No notes added yet.</p>
+                        {% endif %}
                     </div>
-                {% endif %}
-            {% endif %}
-        {% endif %}
+                </div>
+            
+                <!-- Right Column -->
+                <div class="right-column">
+                    <!-- Activity Log -->
+                    <div class="activity-log">
+                        <h3>Activity Log</h3>
+                        <ul>
+                            {% for log in task.activity_logs.all %}
+                                <li>
+                                    <strong>{{ log.user.username }}</strong> {{ log.action }}:
+                                    <span>{{ log.details }}</span>
+                                    <small>{{ log.timestamp }}</small>
+                                </li>
+                            {% empty %}
+                                <li>No activity yet.</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+            
+                    <!-- Comments -->
+                    <div class="comments-section">
+                        <h2>Comments</h2>
+                        <ul>
+                            {% for comment in comments %}
+                                <li>
+                                    <strong>{{ comment.user.username }}</strong>: {{ comment.text }}
+                                    <br><small>{{ comment.created_at }}</small>
+                                </li>
+                            {% empty %}
+                                <li>No comments yet.</li>
+                            {% endfor %}
+                        </ul>
+                
+                        <!-- Add Comment Form -->
+                        <form method="post">
+                            {% csrf_token %}
+                            {{ comment_form.as_p }}
+                            <button type="submit" name="add_comment">Add Comment</button>
+                        </form>
+                    </div>
+            
+                    <!-- Task Completion Details -->
+                    {% if task.status == "completed" %}
+                        <div class="completion-detail">
+                            <h2>Task Completion Details</h2>
+                            <p><strong>Details:</strong></p>
+                            <pre>{{ task.completion_details.completion_details }}</pre>
+                            {% if task.user and task.user != request.user %}
+                                <h3>Task Completed By: {{ task.user.username }}</h3>
+                                <!-- Chat Button -->
+                                <a href="{% url 'chat' task.user.id %}?task_id={{task.id}}&task_title={{ task.title}}" class="chat-button">Chat with {{ task.user.username }}</a>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        <!-- Edit Task Section -->
+                        {% if task.user == request.user %}
+                            <button id="editBtn" onclick="toggleEditForm()">Edit Task</button>
+                            {% if request.user.subscription.is_subscription_valid %}
+                                <div id="editForm" style="display:none;">
+                                    <h2>Edit Task</h2>
+                                    <form method="post">
+                                        {% csrf_token %}
+                                        {{ form.as_p }}
+                                        <button type="submit" name="edit_task">Save Changes</button>
+                                    </form>
+                                </div>
+                            {% else %}
+                                <div class="subscription-required">
+                                    <h1>Subscription Required</h1>
+                                    <p>You need an active subscription to edit tasks.</p>
+                                    <a href="{% url 'create_subscription' %}">Subscribe Now</a>
+                                </div>
+                            {% endif %}
+                        {% endif %}
+                    {% endif %}
+            
+                    <!-- Back Link -->
+                
+                </div>
+            </div>
 
         <div class="back-link">
             <a href="{% url 'home' %}">Back to Task List</a>

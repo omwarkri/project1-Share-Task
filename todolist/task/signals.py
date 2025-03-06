@@ -3,8 +3,33 @@ from django.dispatch import receiver
 from django.utils import timezone
 from django.db.models import Count, Avg, F, DurationField, ExpressionWrapper
 from django.db.models.functions import Coalesce
-from .models import Task    
+from sentence_transformers import SentenceTransformer
+from .models import Task
 from user.models import UserTaskAnalytics
+
+from nltk.corpus import stopwords
+from nltk.stem import WordNetLemmatizer
+
+lemmatizer = WordNetLemmatizer()
+stop_words = set(stopwords.words("english"))
+
+
+# Load model once at startup
+model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
+def preprocess_text(text):
+    if not text:
+        return ""
+    text = text.lower()
+    text = re.sub(r"[^a-zA-Z0-9\s]", "", text)  # Remove special characters
+    words = text.split()
+    words = [lemmatizer.lemmatize(word) for word in words if word not in stop_words]
+    
+    # Ensure at least 3 words remain (to avoid over-filtering)
+    if len(words) < 3:
+        return text.lower()  # Return original text if preprocessing removes too much
+    
+    return " ".join(words)
+
 
 @receiver([post_save, post_delete], sender=Task)
 def update_user_task_analytics(sender, instance, **kwargs):
@@ -12,56 +37,57 @@ def update_user_task_analytics(sender, instance, **kwargs):
     user = instance.user
     tasks = Task.objects.filter(user=user)
 
-    completed_tasks = tasks.filter(status='completed')
-    overdue_tasks = tasks.filter(due_date__lt=timezone.now(), status__in=['pending', 'in_progress'])
+    completed_tasks = tasks.filter(status="completed")
+    overdue_tasks = tasks.filter(due_date__lt=timezone.now(), status__in=["pending", "in_progress"])
 
     # Calculate average task completion time
     avg_completion_time = completed_tasks.aggregate(
         avg_time=Coalesce(
-            Avg(ExpressionWrapper(F('updated_at') - F('created_at'), output_field=DurationField())),
-            timezone.timedelta(seconds=0)  # Default value instead of 0
+            Avg(ExpressionWrapper(F("updated_at") - F("created_at"), output_field=DurationField())),
+            timezone.timedelta(seconds=0),  # Default value instead of 0
         )
-    )['avg_time']
+    )["avg_time"]
 
     # Find the most common category
-    most_common_category = tasks.values('category').annotate(count=Count('category')).order_by('-count').first()
-    
+    most_common_category = tasks.values("category").annotate(count=Count("category")).order_by("-count").first()
+
     # Ensure analytics entry exists, or create one
-    analytics, created = UserTaskAnalytics.objects.update_or_create(
+    UserTaskAnalytics.objects.update_or_create(
         user=user,
         defaults={
-            'total_tasks': tasks.count(),
-            'completed_tasks': completed_tasks.count(),
-            'overdue_tasks': overdue_tasks.count(),
-            'average_completion_time': avg_completion_time.total_seconds() / 3600 if avg_completion_time else 0,
-            'most_common_category': most_common_category['category'] if most_common_category else None
-        }
+            "total_tasks": tasks.count(),
+            "completed_tasks": completed_tasks.count(),
+            "overdue_tasks": overdue_tasks.count(),
+            "average_completion_time": avg_completion_time.total_seconds() / 3600 if avg_completion_time else 0,
+            "most_common_category": most_common_category["category"] if most_common_category else None,
+        },
     )
 
 
-
-# tasks/signals.py
-from django.db.models.signals import post_save
-from django.dispatch import receiver
-from .models import Task
-
-
 @receiver(post_save, sender=Task)
-def send_email_on_task_assignment_or_escalation(sender, instance, created, **kwargs):
+def handle_task_creation(sender, instance, created, **kwargs):
     """
-    Send an email when a task is assigned or escalated.
+    Handles various actions when a task is created or updated:
+    - Generates a vector embedding for shareable tasks.
+    - Sends an email when a task is assigned or escalated.
     """
+    if created and instance.shareable:
+        # Generate and store vector
+        task_text = f"{instance.title} {instance.description or ''}"
+        vector = model.encode(task_text).tolist()
+        instance.vector = vector
+        instance.save(update_fields=["vector"])
+
+    # Send email notifications
     if created:
-        # Task is newly created and assigned
         if instance.assigned_to:
             send_assignment_email(instance, instance.assigned_to)
     else:
-        # Task is updated (e.g., escalated)
-        if instance.escalated_to and instance.status == 'escalated':
+        if instance.escalated_to and instance.status == "escalated":
             send_escalation_email(instance, instance.escalated_to, instance.escalation_reason)
-
         elif instance.assigned_to:
             send_assignment_email(instance, instance.assigned_to)
+
 
 
 

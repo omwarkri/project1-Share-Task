@@ -539,7 +539,7 @@
                             <button class="task-action" onclick="openReassignModal({{ task.task.id }})">Reassign</button>
                         {% elif request.user == task.task.assigned_to %}
                             <!-- Escalate Button -->
-                            <button class="task-action" onclick="openEscalateModal({{ task.task.id }})">Escalate</button>
+                            <button class="task-action" onclick="openEscalateModal({{ task.task.id }})">Escalate</button>   
                         {% endif %}
                             <div>
                                 {% if task.is_overdue %}

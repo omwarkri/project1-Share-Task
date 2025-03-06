@@ -112,7 +112,7 @@ class Task(models.Model):
 
     team = models.ForeignKey(Team, on_delete=models.CASCADE, null=True, blank=True, related_name="team_tasks")
     escalated_to = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, related_name="escalated_tasks", null=True, blank=True)
-    escalation_reason = models.TextField(blank=True, null=True)  # Add this field
+    escalation_reason = models.TextField(blank=True, null=True)  # Add this field   
     assigned_to = models.ForeignKey(
         CustomUser,
         related_name='assigned_tasks',
@@ -121,6 +121,7 @@ class Task(models.Model):
         blank=True
     )
     is_daily = models.BooleanField(default=False)  # New field to mark daily tasks
+    vector = models.JSONField(null=True, blank=True)  # Store embedding directly
 
     def __str__(self):
         return self.title

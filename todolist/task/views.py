@@ -55,6 +55,35 @@ model = SentenceTransformer("all-MiniLM-L6-v2")
 lemmatizer = WordNetLemmatizer()
 stop_words = set(stopwords.words("english"))
 
+def generate_and_store_task_vectors():
+    """
+    Generate embeddings for all shareable tasks and store them in the database.
+    """
+    tasks = Task.objects.filter(shareable=True, vector__isnull=True)  # Only update if vector is missing
+    
+    if not tasks.exists():
+        return
+    
+    for task in tasks:
+        text = preprocess_text(f"{task.title} {task.description}")
+        vector = model.encode(["some text"], convert_to_numpy=True)[0]  # Get embedding
+        
+        task.vector = vector.tolist()  # Convert to list
+        task.save()  # Store in DB
+
+
+def get_stored_task_vectors():
+    """
+    Fetch stored task vectors from the database and convert them to a dictionary.
+    """
+    stored_tasks = Task.objects.filter(shareable=True).values("id", "vector")
+    task_vector_dict = {
+        task["id"]: np.array(task["vector"]) for task in stored_tasks if task["vector"]
+    }
+    return task_vector_dict
+
+
+
 def preprocess_text(text):
     if not text:
         return ""
@@ -70,29 +99,56 @@ def preprocess_text(text):
     return " ".join(words)
 
 
-def generate_task_vectors():
+def generate_and_store_task_vectors():
     """
-    Generate and return embeddings for all shareable tasks.
+    Generate embeddings for all shareable tasks and store them in the database.
     """
     tasks = Task.objects.filter(shareable=True).values_list("id", "title", "description")
-    
+
     if not tasks:
-        return {}
+        return
 
     task_texts = [preprocess_text(f"{title} {description}") for _, title, description in tasks]
     task_ids = [task_id for task_id, _, _ in tasks]
 
     # Compute embeddings
-    task_vectors = model.encode(task_texts, convert_to_numpy=True)
+    task_vectors = model.encode(task_texts, convert_to_numpy=True).tolist()  # Convert to list for JSON storage
 
-    return {task_id: task_vectors[i] for i, task_id in enumerate(task_ids)}
+    # Bulk update tasks with vectors
+    tasks_to_update = []
+    for i, task_id in enumerate(task_ids):
+        tasks_to_update.append(Task(id=task_id, vector=task_vectors[i]))
+
+    Task.objects.bulk_update(tasks_to_update, ["vector"])
+
+    print(f"Stored vectors for {len(tasks_to_update)} tasks.")
+
+
+
+from django.db.models import Q
+import numpy as np
+
+def get_all_task_vectors():
+    """
+    Retrieve all task vectors from the Task model.
+    Returns a dictionary with task_id as key and vector as numpy array.
+    """
+    generate_and_store_task_vectors()
+    tasks = Task.objects.filter(~Q(vector=None))  # Get tasks that have vectors
+
+    task_vectors = {}
+    for task in tasks:
+        if task.vector:
+            task_vectors[task.id] = np.array(task.vector, dtype=np.float32)  # Convert JSON list to numpy array
+
+    return task_vectors
 
 def get_suggested_users(task, current_user, top_n=5):
     """
     Suggest users based on task similarity using deep embeddings.
     """
     # Get all task embeddings
-    task_vector_dict = generate_task_vectors()
+    task_vector_dict =get_all_task_vectors()    
 
     if not task_vector_dict:
         return {"users_in_progress": [], "users_completed": []}
@@ -159,7 +215,6 @@ def get_suggested_users(task, current_user, top_n=5):
         "users_in_progress": format_users(users_in_progress),
         "users_completed": format_users(users_completed),
     }
-
 
 
 

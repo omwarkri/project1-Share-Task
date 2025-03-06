@@ -29,6 +29,6 @@ urlpatterns = [
     path("tasks/escalate/<int:task_id>/", escalate_task, name="escalate_task"),
     path("tasks/<int:task_id>/reassign/", reassign_task, name="reassigned_task"),
     
-    
+    path('completed-tasks-feed/', completed_tasks_feed, name='completed_tasks_feed'),
   
 ]

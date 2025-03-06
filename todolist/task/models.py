@@ -212,7 +212,6 @@ class PartnerFeedback(models.Model):
     class Meta:
         ordering = ['-created_at']  # Orders feedbacks by creation date (newest first)
 
-
 class TaskCompletionDetails(models.Model):
     task = models.OneToOneField(
         Task, 
@@ -242,6 +241,26 @@ class TaskCompletionDetails(models.Model):
 
     def __str__(self):
         return f"Completion Details for Task {self.task.id}"
+
+    def has_details(self):
+        """Check if completion details are provided."""
+        return bool(self.completion_details)
+
+    def has_files(self):
+        """Check if completion files are provided."""
+        return bool(self.completion_files)
+
+    def has_uploaded_file(self):
+        """Check if an uploaded file (e.g., video) is provided."""
+        return bool(self.uploaded_file)
+
+    def has_uploaded_image(self):
+        """Check if an uploaded image is provided."""
+        return bool(self.uploaded_image)
+
+    def has_partner_feedback(self):
+        """Check if partner feedback is provided."""
+        return bool(self.partner_feedback)
 
 
 

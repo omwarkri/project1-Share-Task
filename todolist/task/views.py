@@ -10,8 +10,7 @@ from .forms import TaskForm
 
 from django.contrib.auth.decorators import login_required
 
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
+
 
 
 from django.shortcuts import render, get_object_or_404
@@ -33,10 +32,9 @@ User = get_user_model()
 
 from django.contrib.auth import get_user_model
 
-from sentence_transformers import SentenceTransformer
 
-# Load a pretrained transformer model (better than TF-IDF)
-model = SentenceTransformer("all-MiniLM-L6-v2")
+
+
 import nltk
 import re
 import numpy as np
@@ -1344,3 +1342,59 @@ def reassign_task(request, task_id):
             task.save()
             messages.success(request, f"Task '{task.title}' has been reassigned to {task.assigned_to.username}.")
             return redirect("view_team_tasks", team_id=task.team.id)
+
+
+from django.shortcuts import render
+from .models import Task, TaskCompletionDetails
+
+def completed_tasks_feed(request):
+    # Fetch all completed tasks
+    completed_tasks = Task.objects.filter(status='completed')
+
+    # Get the filter type from the request (e.g., ?filter_type=detail, ?filter_type=video, etc.)
+    filter_type = request.GET.get('filter_type')
+
+    # Fetch completion details for these tasks
+    task_feed_data = []
+    for task in completed_tasks:
+        try:
+            completion_details = TaskCompletionDetails.objects.get(task=task)
+            # Apply filters based on the filter_type
+            if filter_type == 'detail' and completion_details.has_details():
+                task_feed_data.append({
+                    'task': task,
+                    'completion_details': completion_details
+                })
+            elif filter_type == 'video' and completion_details.has_uploaded_file():
+                task_feed_data.append({
+                    'task': task,
+                    'completion_details': completion_details
+                })
+            elif filter_type == 'post' and completion_details.has_files():
+                task_feed_data.append({
+                    'task': task,
+                    'completion_details': completion_details
+                })
+            elif filter_type == 'image' and completion_details.has_uploaded_image():
+                task_feed_data.append({
+                    'task': task,
+                    'completion_details': completion_details
+                })
+            elif filter_type == 'feedback' and completion_details.has_partner_feedback():
+                task_feed_data.append({
+                    'task': task,
+                    'completion_details': completion_details
+                })
+            elif not filter_type:  # No filter applied, show all tasks
+                task_feed_data.append({
+                    'task': task,
+                    'completion_details': completion_details
+                })
+        except TaskCompletionDetails.DoesNotExist:
+            # Skip tasks without completion details
+            continue
+
+    return render(request, 'feed/completed_tasks_feed.html', {
+        'task_feed_data': task_feed_data,
+        'filter_type': filter_type
+    })

@@ -1,0 +1,256 @@
+<!-- completed_tasks_feed.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Completed Tasks Feed</title>
+    <style>
+        /* General Styles */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #fafafa;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 935px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #262626;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        /* Filter Buttons */
+        .filters {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap; /* Allow buttons to wrap on smaller screens */
+        }
+
+        .filter-button {
+            padding: 10px 15px;
+            background-color: #0095f6;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+            margin: 5px; /* Add margin for better spacing on small screens */
+        }
+
+        .filter-button.active {
+            background-color: #007bb5;
+        }
+
+        .filter-button:hover {
+            background-color: #0088cc;
+        }
+
+        /* Task Feed Grid */
+        .task-feed-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .task-feed-item {
+            background-color: white;
+            border: 1px solid #e1e1e1;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .task-feed-item img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .task-feed-item .content {
+            padding: 15px;
+        }
+
+        .task-feed-item h2 {
+            font-size: 18px;
+            margin: 0 0 10px;
+            color: #262626;
+        }
+
+        .task-feed-item p {
+            font-size: 14px;
+            color: #555;
+            margin: 5px 0;
+        }
+
+        .task-feed-item a {
+            color: #0095f6;
+            text-decoration: none;
+        }
+
+        .task-feed-item a:hover {
+            text-decoration: underline;
+        }
+
+        /* Truncate Description */
+        .description {
+            display: -webkit-box;
+            -webkit-line-clamp: 2; /* Show only 2 lines */
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .read-more-button {
+            color: #0095f6;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 5px;
+            display: inline-block;
+        }
+
+        .read-more-button:hover {
+            text-decoration: underline;
+        }
+
+        /* No Tasks Message */
+        .no-tasks {
+            text-align: center;
+            color: #999;
+            font-size: 16px;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 20px; /* Smaller heading on mobile */
+            }
+
+            .filters {
+                gap: 5px; /* Reduce gap between filter buttons */
+            }
+
+            .filter-button {
+                padding: 8px 12px; /* Smaller buttons */
+                font-size: 12px;
+            }
+
+            .task-feed-grid {
+                grid-template-columns: 1fr; /* Single column layout on mobile */
+                gap: 15px;
+            }
+
+            .task-feed-item {
+                border-radius: 8px; /* Slightly smaller border radius */
+            }
+
+            .task-feed-item .content {
+                padding: 10px; /* Reduce padding */
+            }
+
+            .task-feed-item h2 {
+                font-size: 16px; /* Smaller title */
+            }
+
+            .task-feed-item p {
+                font-size: 12px; /* Smaller text */
+            }
+
+            .read-more-button {
+                font-size: 12px; /* Smaller "Read More" button */
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 10px; /* Reduce container padding */
+            }
+
+            h1 {
+                font-size: 18px; /* Even smaller heading */
+            }
+
+            .filter-button {
+                padding: 6px 10px; /* Even smaller buttons */
+                font-size: 11px;
+            }
+
+            .task-feed-item h2 {
+                font-size: 14px; /* Smaller title */
+            }
+
+            .task-feed-item p {
+                font-size: 11px; /* Smaller text */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Completed Tasks Feed</h1>
+
+        <!-- Filter Buttons -->
+        <div class="filters">
+            <a href="?filter_type=detail" class="filter-button {% if filter_type == 'detail' %}active{% endif %}">Details</a>
+            <a href="?filter_type=video" class="filter-button {% if filter_type == 'video' %}active{% endif %}">Videos</a>
+            <a href="?filter_type=post" class="filter-button {% if filter_type == 'post' %}active{% endif %}">Posts</a>
+            <a href="?filter_type=image" class="filter-button {% if filter_type == 'image' %}active{% endif %}">Images</a>
+            <a href="?filter_type=feedback" class="filter-button {% if filter_type == 'feedback' %}active{% endif %}">Feedback</a>
+            <a href="?" class="filter-button {% if not filter_type %}active{% endif %}">All</a>
+        </div>
+
+        <!-- Task Feed Grid -->
+        <div class="task-feed-grid">
+            {% for data in task_feed_data %}
+                <div class="task-feed-item">
+                    <!-- Display uploaded image -->
+                    {% if data.completion_details.uploaded_image %}
+                        <img src="{{ data.completion_details.uploaded_image.url }}" alt="Completion Image">
+                    {% endif %}
+
+                    <div class="content">
+                        <h2>{{ data.task.title }}</h2>
+
+                        <!-- Truncated Description -->
+                        <p class="description">{{ data.task.description }}</p>
+
+                        <!-- Read More Button -->
+                        <a href="{% url 'task_detail' data.task.id %}" class="read-more-button">Read More</a>
+
+                        <!-- Display uploaded files -->
+                        {% if data.completion_details.completion_files %}
+                            <p><strong>Files:</strong></p>
+                            <ul>
+                                {% for file_url in data.completion_details.completion_files %}
+                                    <li><a href="{{ file_url }}" target="_blank">{{ file_url }}</a></li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+
+                        <!-- Display uploaded file -->
+                        {% if data.completion_details.uploaded_file %}
+                            <p><strong>File:</strong> <a href="{{ data.completion_details.uploaded_file.url }}" target="_blank">Download File</a></p>
+                        {% endif %}
+
+                        <!-- Display partner feedback -->
+                        {% if data.completion_details.partner_feedback %}
+                            <p><strong>Partner Feedback:</strong> {{ data.completion_details.partner_feedback.feedback_text }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            {% empty %}
+                <p class="no-tasks">No completed tasks with completion details found.</p>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>

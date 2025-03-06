@@ -63,12 +63,12 @@ def handle_task_creation(sender, instance, created, **kwargs):
     - Generates a vector embedding for shareable tasks.
     - Sends an email when a task is assigned or escalated.
     """
-    if created and instance.shareable:
-        # Generate and store vector
-        task_text = f"{instance.title} {instance.description or ''}"
-        vector = model.encode(task_text).tolist()
-        instance.vector = vector
-        instance.save(update_fields=["vector"])
+    # if created and instance.shareable:
+    #     # Generate and store vector
+    #     task_text = f"{instance.title} {instance.description or ''}"
+    #     vector = model.encode(task_text).tolist()
+    #     instance.vector = vector
+    #     instance.save(update_fields=["vector"])
 
     # Send email notifications
     if created:

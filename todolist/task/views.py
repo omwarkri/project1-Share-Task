@@ -96,78 +96,122 @@ def get_all_task_vectors():
 
     return task_vectors
 
-def get_suggested_users(task, current_user, top_n=5):
+# def get_suggested_users(task, current_user, top_n=5):
+#     """
+#     Suggest users based on task similarity using deep embeddings.
+#     """
+#     # Get all task embeddings
+#     task_vector_dict =get_all_task_vectors()    
+
+#     if not task_vector_dict:
+#         return {"users_in_progress": [], "users_completed": []}
+
+#     # Get embedding for the current task
+#     current_text = preprocess_text(f"{task.title} {task.description}")
+#     current_vector = model.encode([current_text])
+
+#     # Compute cosine similarity
+#     similarities = {
+#     task_id: similarity
+#     for task_id, similarity in sorted(
+#         [
+#             (task_id, cosine_similarity(current_vector, task_vector.reshape(1, -1))[0][0])
+#             for task_id, task_vector in task_vector_dict.items()
+#             if task_id != task.id
+#         ],
+#         key=lambda x: x[1],
+#         reverse=True,
+#     )
+#     if similarity > 0.5  # Only include tasks with at least 50% similarity
+# }
+
+
+#     # Get top-N most similar tasks
+#     ranked_tasks = sorted(similarities.items(), key=lambda x: x[1], reverse=True)[:top_n]
+#     similar_task_ids = [task_id for task_id, _ in ranked_tasks]
+
+#     if not similar_task_ids:
+#         return {"users_in_progress": [], "users_completed": []}
+
+#     # Fetch similar tasks in a single query
+#     similar_tasks = Task.objects.filter(id__in=similar_task_ids)
+
+#     # Get users who are working on similar tasks (pending/completed)
+#     users_in_progress = CustomUser.objects.filter(
+#         task_user__in=similar_tasks.filter(status="pending")
+#     ).exclude(id=current_user.id).distinct()
+
+#     users_completed = CustomUser.objects.filter(
+#         task_user__in=similar_tasks.filter(status="completed")
+#     ).exclude(id=current_user.id).distinct()
+
+#     # Prepare response
+#     def format_users(users):
+#         return [
+#             {
+#                 "user_id": user.id,
+#                 "username": user.username,
+#                 "tasks": [
+#                     {
+#                         "task_id": t.id,
+#                         "task_title": t.title,
+#                         "task_description": t.description,
+#                         "task_due_date": t.due_date,
+#                     }
+#                     for t in similar_tasks.filter(user=user)
+#                 ],
+#             }
+#             for user in users
+#         ]
+
+#     return {
+#         "users_in_progress": format_users(users_in_progress),
+#         "users_completed": format_users(users_completed),
+#     }
+
+
+
+def get_suggested_users(task, current_user):
     """
-    Suggest users based on task similarity using deep embeddings.
+    Fetch users working on or who have completed similar tasks.
+    Exclude the current user and non-shareable tasks.
     """
-    # Get all task embeddings
-    task_vector_dict =get_all_task_vectors()    
-
-    if not task_vector_dict:
-        return {"users_in_progress": [], "users_completed": []}
-
-    # Get embedding for the current task
-    current_text = preprocess_text(f"{task.title} {task.description}")
-    current_vector = model.encode([current_text])
-
-    # Compute cosine similarity
-    similarities = {
-    task_id: similarity
-    for task_id, similarity in sorted(
-        [
-            (task_id, cosine_similarity(current_vector, task_vector.reshape(1, -1))[0][0])
-            for task_id, task_vector in task_vector_dict.items()
-            if task_id != task.id
-        ],
-        key=lambda x: x[1],
-        reverse=True,
-    )
-    if similarity > 0.5  # Only include tasks with at least 50% similarity
-}
-
-
-    # Get top-N most similar tasks
-    ranked_tasks = sorted(similarities.items(), key=lambda x: x[1], reverse=True)[:top_n]
-    similar_task_ids = [task_id for task_id, _ in ranked_tasks]
-
-    if not similar_task_ids:
-        return {"users_in_progress": [], "users_completed": []}
-
-    # Fetch similar tasks in a single query
-    similar_tasks = Task.objects.filter(id__in=similar_task_ids)
-
-    # Get users who are working on similar tasks (pending/completed)
+    # Find shareable tasks with similar titles, excluding the current task
+    similar_tasks = Task.objects.filter(title__icontains=task.title, shareable=True).exclude(id=task.id)
+    print(similar_tasks)
+    # Users working on similar tasks (pending status)
     users_in_progress = CustomUser.objects.filter(
-        task_user__in=similar_tasks.filter(status="pending")
+        task_user__in=similar_tasks.filter(status='pending')
+    ).exclude(id=current_user.id).distinct()
+    print(users_in_progress)
+    # Users who completed similar tasks
+    users_completed =  CustomUser.objects.filter(
+        task_user__in=similar_tasks.filter(status='completed')
     ).exclude(id=current_user.id).distinct()
 
-    users_completed = CustomUser.objects.filter(
-        task_user__in=similar_tasks.filter(status="completed")
-    ).exclude(id=current_user.id).distinct()
+    print(users_completed,"completed users")
 
-    # Prepare response
-    def format_users(users):
+    # Collect user details with associated tasks
+    def get_user_tasks(users, task_status):
         return [
             {
                 "user_id": user.id,
                 "username": user.username,
+                "email": user.email,
                 "tasks": [
-                    {
-                        "task_id": t.id,
-                        "task_title": t.title,
-                        "task_description": t.description,
-                        "task_due_date": t.due_date,
-                    }
-                    for t in similar_tasks.filter(user=user)
+                    {"task_id": t.id, "task_title": t.title}
+                    for t in similar_tasks.filter(status=task_status, user=user)
                 ],
             }
             for user in users
         ]
 
-    return {
-        "users_in_progress": format_users(users_in_progress),
-        "users_completed": format_users(users_completed),
+    response = {
+        "users_in_progress": get_user_tasks(users_in_progress, "pending"),
+        "users_completed": get_user_tasks(users_completed, "completed"),
     }
+    print("Suggested Users Response:", response)
+    return response 
 
 
 

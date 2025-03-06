@@ -354,6 +354,68 @@ h1::after {
     font-size: 16px;
 }
 
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.action-button {
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    color: #555;
+    transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.action-button:hover {
+    color: #1abc9c;
+    transform: scale(1.1);
+}
+
+.action-button:active {
+    transform: scale(0.9);
+}
+
+/* Like Button */
+.like-button {
+    color: #e74c3c; /* Red color for like button */
+    font-size: 30px;
+}
+
+.like-button:hover {
+    color: #c0392b; /* Darker red on hover */
+}
+
+/* Comment Button */
+.comment-button {
+    color: #3498db; /* Blue color for comment button */
+    font-size: 20px;
+}
+
+.comment-button:hover {
+    color: #2980b9; /* Darker blue on hover */
+    
+}
+
+/* Share Button */
+.share-button {
+    color: #2ecc71; /* Green color for share button */
+    font-size: 20px;
+}
+
+.share-button:hover {
+    color: #27ae60; /* Darker green on hover */
+}
+
+.action-buttons-all{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
 /* Mobile Responsiveness */
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
@@ -423,6 +485,8 @@ h1::after {
     .read-more-button {
         font-size: 12px; /* Smaller font size */
     }
+
+    
 }
 
 @media (max-width: 480px) {
@@ -502,42 +566,51 @@ h1::after {
             <!-- Task Feed Grid -->
             <div class="task-feed-grid">
                 {% for data in task_feed_data %}
-                    <div class="task-feed-item">
-                        <!-- Display uploaded image -->
-                        {% if data.completion_details.uploaded_image %}
-                            <img src="{{ data.completion_details.uploaded_image.url }}" alt="Completion Image">
-                        {% endif %}
-
-                        <div class="content">
-                            <h2>{{ data.task.title }}</h2>
-
-                            <!-- Truncated Description -->
-                            <p class="description">{{ data.task.description }}</p>
-
+                <div class="task-feed-item">
+                    <!-- Display uploaded image -->
+                    {% if data.completion_details.uploaded_image %}
+                        <img src="{{ data.completion_details.uploaded_image.url }}" alt="Completion Image">
+                    {% endif %}
+                
+                    <div class="content">
+                        <h2>{{ data.task.title }}</h2>
+                
+                        <!-- Truncated Description -->
+                        <p class="description">{{ data.task.description }}</p>
+                
+                        <!-- Like, Comment, Share Buttons -->
+                        <div class="action-buttons-all">
+                            <div class="action-buttons">
+                                <button class="action-button like-button" title="Like">&#x2665;</button> <!-- Heart symbol -->
+                                <button class="action-button comment-button" title="Comment">&#x1F4AC;</button> <!-- Speech bubble symbol -->
+                                <button class="action-button share-button" title="Share">&#x1F4E4;</button> <!-- Outbox tray symbol -->
+                            </div>
+                    
                             <!-- Read More Button -->
                             <a href="{% url 'task_detail' data.task.id %}" class="read-more-button">Read More</a>
-
-                            <!-- Display uploaded files -->
-                            {% if data.completion_details.completion_files %}
-                                <p><strong>Files:</strong></p>
-                                <ul>
-                                    {% for file_url in data.completion_details.completion_files %}
-                                        <li><a href="{{ file_url }}" target="_blank">{{ file_url }}</a></li>
-                                    {% endfor %}
-                                </ul>
-                            {% endif %}
-
-                            <!-- Display uploaded file -->
-                            {% if data.completion_details.uploaded_file %}
-                                <p><strong>File:</strong> <a href="{{ data.completion_details.uploaded_file.url }}" target="_blank">Download File</a></p>
-                            {% endif %}
-
-                            <!-- Display partner feedback -->
-                            {% if data.completion_details.partner_feedback %}
-                                <p><strong>Partner Feedback:</strong> {{ data.completion_details.partner_feedback.feedback_text }}</p>
-                            {% endif %}
+                    
                         </div>
+                        <!-- Display uploaded files -->
+                        {% if data.completion_details.completion_files %}
+                            <p><strong>Files:</strong></p>
+                            <ul>
+                                {% for file_url in data.completion_details.completion_files %}
+                                    <li><a href="{{ file_url }}" target="_blank">{{ file_url }}</a></li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                
+                        <!-- Display uploaded file -->
+                        {% if data.completion_details.uploaded_file %}
+                            <p><strong>File:</strong> <a href="{{ data.completion_details.uploaded_file.url }}" target="_blank">Download File</a></p>
+                        {% endif %}
+                
+                        <!-- Display partner feedback -->
+                        {% if data.completion_details.partner_feedback %}
+                            <p><strong>Partner Feedback:</strong> {{ data.completion_details.partner_feedback.feedback_text }}</p>
+                        {% endif %}
                     </div>
+                </div>
                 {% empty %}
                     <p class="no-tasks">No completed tasks with completion details found.</p>
                 {% endfor %}

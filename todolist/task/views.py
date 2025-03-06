@@ -448,7 +448,7 @@ from django.contrib.auth.decorators import login_required
 from .models import Task,  Comment,SubTask
 from .forms import TaskForm, TaskCommentForm, SubTaskForm
 
-@login_required
+
 def task_detail(request, task_id):
     task = get_object_or_404(Task, id=task_id)
     subtasks = task.subtasks.all()

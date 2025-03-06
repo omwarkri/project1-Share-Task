@@ -9,7 +9,7 @@ from user.models import UserTaskAnalytics
 import nltk
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
-
+nltk.download('stopwords')
 lemmatizer = WordNetLemmatizer()
 stop_words = set(stopwords.words("english"))
 

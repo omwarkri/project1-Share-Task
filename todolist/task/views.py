@@ -1347,6 +1347,10 @@ def reassign_task(request, task_id):
 from django.shortcuts import render
 from .models import Task, TaskCompletionDetails
 
+from django.shortcuts import render
+from django.db.models import Count
+from .models import Task, TaskCompletionDetails, User
+
 def completed_tasks_feed(request):
     # Fetch all completed tasks
     completed_tasks = Task.objects.filter(status='completed')
@@ -1394,7 +1398,11 @@ def completed_tasks_feed(request):
             # Skip tasks without completion details
             continue
 
+    # Fetch top 5 users with the most followers (even if they have 0 followers)
+    top_users = User.objects.annotate(follower_count=Count('followers')).order_by('-follower_count')[:5]
+
     return render(request, 'feed/completed_tasks_feed.html', {
         'task_feed_data': task_feed_data,
-        'filter_type': filter_type
+        'filter_type': filter_type,
+        'top_users': top_users  # Pass top_users to the template
     })

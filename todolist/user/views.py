@@ -454,3 +454,43 @@ def download_task_report_pdf(request, report_type):
     return response
 
 
+from django.shortcuts import render, get_object_or_404
+from .models import CustomUser
+
+@login_required
+def followers_list(request, user_id):
+    user = get_object_or_404(CustomUser, id=user_id)
+    followers = user.followers.all()
+    return render(request, 'followers_list.html', {'user': user, 'followers': followers})
+
+@login_required
+def following_list(request, user_id):
+    user = get_object_or_404(CustomUser, id=user_id)
+    following = user.following.all()
+    return render(request, 'following_list.html', {'user': user, 'following': following})
+
+
+
+
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from .models import CustomUser
+
+@login_required
+def follow_user(request, user_id):
+    # Get the user to follow/unfollow
+    user_to_follow = get_object_or_404(CustomUser, id=user_id)
+
+    # Check if the current user is already following the user
+    if request.user in user_to_follow.followers.all():
+        # Unfollow the user
+        user_to_follow.followers.remove(request.user)
+        messages.success(request, f'You have unfollowed {user_to_follow.username}.')
+    else:
+        # Follow the user
+        user_to_follow.followers.add(request.user)
+        messages.success(request, f'You are now following {user_to_follow.username}.')
+
+    # Redirect back to the completed tasks feed
+    return redirect('completed_tasks_feed')

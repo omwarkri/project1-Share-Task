@@ -1,7 +1,7 @@
 from django.urls import path
 from . import views
 from .views import UserRegistrationView, CustomTokenObtainPairView, ProtectedView, get_user_analytics,download_task_report, download_task_report_pdf
-
+from .views import *
 
 urlpatterns = [
    
@@ -11,6 +11,9 @@ urlpatterns = [
     path('register/<str:token>/', views.register_view, name='register_with_token'),
     path('profile/', views.profile_view, name='profile'),
     path('profile/<int:user_id>/', views.profile_view_id, name='view_profile_id'),
+    path('followers/<int:user_id>/', followers_list, name='followers_list'),
+    path('following/<int:user_id>/', following_list, name='following_list'),
+    path('follow-user/<int:user_id>/', views.follow_user, name='follow_user'),
     path('api/user-analytics/', get_user_analytics, name='user-analytics'),
     path('download-report/<str:report_type>/', download_task_report, name='download_task_report'),
     path('download-report/pdf/<str:report_type>/', download_task_report_pdf, name='download_task_report_pdf'),

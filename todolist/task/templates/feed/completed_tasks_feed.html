@@ -9,264 +9,398 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Completed Tasks Feed</title>
     <style>
-        /* General Styles */
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #fafafa;
-            margin: 0;
-            padding: 0;
-        }
+       /* Reset default margin and padding */
+body, h1, h2, p, ul, li {
+    margin: 0;
+    padding: 0;
+}
 
-        .container {
-            max-width: 935px;
-            margin: 0 auto;
-            padding: 20px;
-        }
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #fafafa;
+}
 
-        h1 {
-            text-align: center;
-            color: #262626;
-            font-size: 24px;
-            margin-bottom: 20px;
-        }
+.feed-main-content {
+    display: flex;
+    height: 100vh;
+}
 
-        /* Filter Buttons */
-        .filters {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 20px;
-            flex-wrap: wrap; /* Allow buttons to wrap on smaller screens */
-        }
+.feed-main-content .container {
+    flex: 1;
+    padding: 24px;
+    padding-top: 16px;
+    overflow-y: auto;
+}
 
-        .filter-button {
-            padding: 10px 15px;
-            background-color: #1abc9c; /* Updated color */
-            color: white;
-            text-decoration: none;
-            border-radius: 20px; /* Rounded corners like Instagram */
-            font-size: 14px;
-            transition: background-color 0.3s ease;
-            margin: 5px; /* Add margin for better spacing on small screens */
-            border: 1px solid #1abc9c; /* Add border for better contrast */
-        }
+h1 {
+    text-align: center;
+    color: #262626;
+    font-size: 24px;
+    margin-bottom: 20px;
+    position: relative;
+}
 
-        .filter-button.active {
-            background-color: #16a085; /* Darker shade for active state */
-            border-color: #16a085;
-        }
+h1::after {
+    content: '';
+    display: block;
+    width: 60px;
+    height: 3px;
+    background-color: #1abc9c;
+    margin: 10px auto 0;
+    border-radius: 2px;
+}
 
-        .filter-button:hover {
-            background-color: #16a085; /* Darker shade on hover */
-            border-color: #16a085;
-        }
+/* Sidebar Styles */
+.users {
+    width: 300px; /* Fixed width for the sidebar */
+    padding: 20px;
+    background-color: white;
+    border-left: 1px solid #e1e1e1;
+    overflow-y: auto; /* Allow scrolling if content overflows */
+    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.05);
+}
 
-        /* Task Feed Grid */
-        .task-feed-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-        }
+.users h2 {
+    font-size: 18px;
+    color: #262626;
+    margin-bottom: 20px;
+    font-weight: 600;
+    text-align: center;
+    position: relative;
+}
 
-        .task-feed-item {
-            background-color: white;
-            border: 1px solid #e1e1e1;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
+.users h2::after {
+    content: '';
+    display: block;
+    width: 50px;
+    height: 3px;
+    background-color: #1abc9c;
+    margin: 10px auto 0;
+    border-radius: 2px;
+}
 
-        .task-feed-item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
+.user-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
 
-        .task-feed-item img {
-            width: 100%;
-            height: 200px; /* Fixed height for uniformity */
-            object-fit: cover; /* Ensure images cover the area */
-            display: block;
-        }
+.user-list li {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    padding: 12px;
+    border-radius: 10px;
+    background-color: white;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
 
-        .task-feed-item .content {
-            padding: 15px;
-        }
+.user-list li:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
 
-        .task-feed-item h2 {
-            font-size: 18px;
-            margin: 0 0 10px;
-            color: #262626;
-        }
+.user-list li img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-right: 12px;
+    object-fit: cover;
+    border: 2px solid #e1e1e1;
+    transition: transform 0.3s ease;
+}
 
-        .task-feed-item p {
-            font-size: 14px;
-            color: #555;
-            margin: 5px 0;
-        }
+.user-list li:hover img {
+    transform: scale(1.1);
+}
 
-        .task-feed-item a {
-            color: #1abc9c; /* Updated color */
-            text-decoration: none;
-        }
+.user-list li .user-info {
+    flex: 1;
+}
 
-        .task-feed-item a:hover {
-            text-decoration: underline;
-        }
+.user-list li .user-info span {
+    display: block;
+    font-size: 14px;
+    color: #262626;
+}
 
-        /* Truncate Description */
-        .description {
-            display: -webkit-box;
-            -webkit-line-clamp: 2; /* Show only 2 lines */
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
+.user-list li .user-info .username {
+    font-weight: 600;
+    color: #1abc9c;
+}
 
-        .read-more-button {
-            color: #1abc9c; /* Updated color */
-            cursor: pointer;
-            font-size: 14px;
-            margin-top: 5px;
-            display: inline-block;
-        }
+.user-list li .user-info .follower-count {
+    font-size: 12px;
+    color: #888;
+}
 
-        .read-more-button:hover {
-            text-decoration: underline;
-        }
+/* Follow Button Styles */
+.follow-form {
+    margin-left: auto;
+}
 
-        /* No Tasks Message */
-        .no-tasks {
-            text-align: center;
-            color: #999;
-            font-size: 16px;
-        }
+.follow-button {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    transition: background-color 0.3s ease, color 0.3s ease, transform 0.3s ease;
+}
 
-        /* Mobile Responsiveness */
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 20px; /* Smaller heading on mobile */
-            }
+.follow-button.follow {
+    background-color: #1abc9c;
+    color: white;
+}
 
-            .filters {
-                gap: 5px; /* Reduce gap between filter buttons */
-            }
+.follow-button.unfollow {
+    background-color: #e74c3c;
+    color: white;
+}
 
-            .filter-button {
-                padding: 8px 12px; /* Smaller buttons */
-                font-size: 12px;
-            }
+.follow-button:hover {
+    transform: scale(1.05);
+    opacity: 0.9;
+}
 
-            .task-feed-grid {
-                grid-template-columns: 1fr; /* Single column layout on mobile */
-                gap: 15px;
-            }
+/* Filter Buttons */
+.filters {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
 
-            .task-feed-item {
-                border-radius: 8px; /* Slightly smaller border radius */
-            }
+.filter-button {
+    padding: 10px 15px;
+    background-color: #1abc9c;
+    color: white;
+    text-decoration: none;
+    border-radius: 20px;
+    font-size: 14px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    margin: 5px;
+    border: 1px solid #1abc9c;
+}
 
-            .task-feed-item .content {
-                padding: 10px; /* Reduce padding */
-            }
+.filter-button.active {
+    background-color: #16a085;
+    border-color: #16a085;
+}
 
-            .task-feed-item h2 {
-                font-size: 16px; /* Smaller title */
-            }
+.filter-button:hover {
+    background-color: #16a085;
+    border-color: #16a085;
+    transform: translateY(-2px);
+}
 
-            .task-feed-item p {
-                font-size: 12px; /* Smaller text */
-            }
+/* Task Feed Grid */
+.task-feed-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
 
-            .read-more-button {
-                font-size: 12px; /* Smaller "Read More" button */
-            }
-        }
+.task-feed-item {
+    background-color: white;
+    border: 1px solid #e1e1e1;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
 
-        @media (max-width: 480px) {
-            .container {
-                padding: 10px; /* Reduce container padding */
-            }
+.task-feed-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
 
-            h1 {
-                font-size: 18px; /* Even smaller heading */
-            }
+.task-feed-item img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.3s ease;
+}
 
-            .filter-button {
-                padding: 6px 10px; /* Even smaller buttons */
-                font-size: 11px;
-            }
+.task-feed-item:hover img {
+    transform: scale(1.05);
+}
 
-            .task-feed-item h2 {
-                font-size: 14px; /* Smaller title */
-            }
+.task-feed-item .content {
+    padding: 15px;
+}
 
-            .task-feed-item p {
-                font-size: 11px; /* Smaller text */
-            }
-        }
+.task-feed-item h2 {
+    font-size: 18px;
+    margin: 0 0 10px;
+    color: #262626;
+}
+
+.task-feed-item p {
+    font-size: 14px;
+    color: #555;
+    margin: 5px 0;
+}
+
+.task-feed-item a {
+    color: #1abc9c;
+    text-decoration: none;
+}
+
+.task-feed-item a:hover {
+    text-decoration: underline;
+}
+
+/* Truncate Description */
+.description {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.read-more-button {
+    color: #1abc9c;
+    cursor: pointer;
+    font-size: 14px;
+    margin-top: 5px;
+    display: inline-block;
+    transition: color 0.3s ease;
+}
+
+.read-more-button:hover {
+    color: #16a085;
+}
+
+/* No Tasks Message */
+.no-tasks {
+    text-align: center;
+    color: #999;
+    font-size: 16px;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .feed-main-content {
+        flex-direction: column;
+    }
+
+    .users {
+        width: 100%;
+        border-left: none;
+        border-top: 1px solid #e1e1e1;
+        box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .container {
+        max-width: 100%;
+    }
+}
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Completed Tasks Feed</h1>
+    <div class="feed-main-content">
+        <!-- Main Content -->
+        <div class="container">
+            <h1>Completed Tasks Feed</h1>
 
-        <!-- Filter Buttons -->
-        <div class="filters">
-            <a href="?filter_type=detail" class="filter-button {% if filter_type == 'detail' %}active{% endif %}">Details</a>
-            <a href="?filter_type=video" class="filter-button {% if filter_type == 'video' %}active{% endif %}">Videos</a>
-            <a href="?filter_type=post" class="filter-button {% if filter_type == 'post' %}active{% endif %}">Posts</a>
-            <a href="?filter_type=image" class="filter-button {% if filter_type == 'image' %}active{% endif %}">Images</a>
-            <a href="?filter_type=feedback" class="filter-button {% if filter_type == 'feedback' %}active{% endif %}">Feedback</a>
-            <a href="?" class="filter-button {% if not filter_type %}active{% endif %}">All</a>
+            <!-- Filter Buttons -->
+            <div class="filters">
+                <a href="?filter_type=detail" class="filter-button {% if filter_type == 'detail' %}active{% endif %}">Details</a>
+                <a href="?filter_type=video" class="filter-button {% if filter_type == 'video' %}active{% endif %}">Videos</a>
+                <a href="?filter_type=post" class="filter-button {% if filter_type == 'post' %}active{% endif %}">Posts</a>
+                <a href="?filter_type=image" class="filter-button {% if filter_type == 'image' %}active{% endif %}">Images</a>
+                <a href="?filter_type=feedback" class="filter-button {% if filter_type == 'feedback' %}active{% endif %}">Feedback</a>
+                <a href="?" class="filter-button {% if not filter_type %}active{% endif %}">All</a>
+            </div>
+
+            <!-- Task Feed Grid -->
+            <div class="task-feed-grid">
+                {% for data in task_feed_data %}
+                    <div class="task-feed-item">
+                        <!-- Display uploaded image -->
+                        {% if data.completion_details.uploaded_image %}
+                            <img src="{{ data.completion_details.uploaded_image.url }}" alt="Completion Image">
+                        {% endif %}
+
+                        <div class="content">
+                            <h2>{{ data.task.title }}</h2>
+
+                            <!-- Truncated Description -->
+                            <p class="description">{{ data.task.description }}</p>
+
+                            <!-- Read More Button -->
+                            <a href="{% url 'task_detail' data.task.id %}" class="read-more-button">Read More</a>
+
+                            <!-- Display uploaded files -->
+                            {% if data.completion_details.completion_files %}
+                                <p><strong>Files:</strong></p>
+                                <ul>
+                                    {% for file_url in data.completion_details.completion_files %}
+                                        <li><a href="{{ file_url }}" target="_blank">{{ file_url }}</a></li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+
+                            <!-- Display uploaded file -->
+                            {% if data.completion_details.uploaded_file %}
+                                <p><strong>File:</strong> <a href="{{ data.completion_details.uploaded_file.url }}" target="_blank">Download File</a></p>
+                            {% endif %}
+
+                            <!-- Display partner feedback -->
+                            {% if data.completion_details.partner_feedback %}
+                                <p><strong>Partner Feedback:</strong> {{ data.completion_details.partner_feedback.feedback_text }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% empty %}
+                    <p class="no-tasks">No completed tasks with completion details found.</p>
+                {% endfor %}
+            </div>
         </div>
 
-        <!-- Task Feed Grid -->
-        <div class="task-feed-grid">
-            {% for data in task_feed_data %}
-                <div class="task-feed-item">
-                    <!-- Display uploaded image -->
-                    {% if data.completion_details.uploaded_image %}
-                        <img src="{{ data.completion_details.uploaded_image.url }}" alt="Completion Image">
-                    {% endif %}
-
-                    <div class="content">
-                        <h2>{{ data.task.title }}</h2>
-
-                        <!-- Truncated Description -->
-                        <p class="description">{{ data.task.description }}</p>
-
-                        <!-- Read More Button -->
-                        <a href="{% url 'task_detail' data.task.id %}" class="read-more-button">Read More</a>
-
-                        <!-- Display uploaded files -->
-                        {% if data.completion_details.completion_files %}
-                            <p><strong>Files:</strong></p>
-                            <ul>
-                                {% for file_url in data.completion_details.completion_files %}
-                                    <li><a href="{{ file_url }}" target="_blank">{{ file_url }}</a></li>
-                                {% endfor %}
-                            </ul>
+        <!-- Sidebar for Top 5 Users -->
+        <div class="users">
+            <h2>Top Followers</h2>
+            <ul class="user-list">
+                {% for user in top_users %}
+                    <li>
+                        <!-- Check if profile_picture exists -->
+                        {% if user.profile_picture %}
+                            <img src="{{ user.profile_picture.url }}" alt="{{ user.username }}">
+                        {% else %}
+                            <!-- Display a default image or placeholder if no profile picture exists -->
+                            <img src="/media/symbols/default-profile-pic.jpg" alt="Default Profile Picture">
                         {% endif %}
 
-                        <!-- Display uploaded file -->
-                        {% if data.completion_details.uploaded_file %}
-                            <p><strong>File:</strong> <a href="{{ data.completion_details.uploaded_file.url }}" target="_blank">Download File</a></p>
-                        {% endif %}
+                        <!-- User Info -->
+                        <div class="user-info">
+                            <span class="username">{{ user.username }}</span>
+                            <span class="follower-count">{{ user.follower_count }} followers</span>
+                        </div>
 
-                        <!-- Display partner feedback -->
-                        {% if data.completion_details.partner_feedback %}
-                            <p><strong>Partner Feedback:</strong> {{ data.completion_details.partner_feedback.feedback_text }}</p>
-                        {% endif %}
-                    </div>
-                </div>
-            {% empty %}
-                <p class="no-tasks">No completed tasks with completion details found.</p>
-            {% endfor %}
+                        <!-- Follow/Unfollow Button -->
+                        <form action="{% url 'follow_user' user.id %}" method="post" class="follow-form">
+                            {% csrf_token %}
+                            {% if request.user in user.followers.all %}
+                                <button type="submit" class="follow-button unfollow">Unfollow</button>
+                            {% else %}
+                                <button type="submit" class="follow-button follow">Follow</button>
+                            {% endif %}
+                        </form>
+                    </li>
+                {% empty %}
+                    <li>No users found.</li>
+                {% endfor %}
+            </ul>
         </div>
     </div>
 </body>
 </html>
-
-
-{% endblock %}	
+{% endblock %}

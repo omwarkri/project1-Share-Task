@@ -27,8 +27,8 @@ body {
 .task-detail-content {
     display: flex;
     flex-direction: column;
-    margin-top: 60px;
-    height: 90vh;
+    margin-top: 80px;
+    height: 88vh;
     overflow: hidden;
 }
 
@@ -269,6 +269,41 @@ form textarea {
     resize: vertical;
 }
 
+/* Container for Two Columns */
+.two-column-layout {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem; /* Space between columns */
+}
+
+/* Left Column */
+.left-column {
+    flex: 1 1 60%; /* Takes 60% of the width */
+    max-width: 60%; /* Ensures it doesn't exceed 60% */
+}
+
+/* Right Column */
+.right-column {
+    flex: 1 1 35%; /* Takes 35% of the width */
+    max-width: 35%; /* Ensures it doesn't exceed 35% */
+}
+
+a.button-link {
+    display: inline-block;
+    padding: 8px 16px;
+    background-color: #2c3e50; /* Background color */
+    color: white; /* Text color */
+    border-radius: 5px; /* Rounded corners */
+    text-align: center;
+    text-decoration: none; /* Remove underline */
+    transition: background-color 0.3s ease; /* Smooth background transition */
+}
+
+a.button-link:hover {
+    background-color: #203952; /* Darker background on hover */
+}
+
+
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
     .task-detail-content {
@@ -301,7 +336,11 @@ form textarea {
     form textarea {
         font-size: 0.8rem;
     }
-  
+    
+    .left-column, .right-column {
+        flex: 1 1 100%; /* Full width on smaller screens */
+        max-width: 100%; /* Full width on smaller screens */
+    }
 }
     </style>
 </head>
@@ -309,12 +348,12 @@ form textarea {
     <div class="task-detail">
         <h1>{{ task.title }}</h1>
         {% if task.completion_details.uploaded_image %}
-                    <h3>Uploaded Image</h3>
+                    <h3>Image</h3>
                     <img src="{{ task.completion_details.uploaded_image.url }}" alt="Completion Image">
                 {% endif %}
             
                 {% if task.completion_details.uploaded_file %}
-                    <h3>Uploaded Video/File</h3>
+                    <h3>Video/File</h3>
                     <video controls>
                         <source src="{{ task.completion_details.uploaded_file.url }}" type="video/mp4">
                         Your browser does not support the video tag.
@@ -366,24 +405,32 @@ form textarea {
                                 <li>No subtasks added yet.</li>
                             {% endfor %}
                         </ul>
-                    
+
+                        {% if task.user == request.user %}
                         <h4>Add Subtask</h4>
                         <form method="post" action="{% url 'add_subtask' task.id %}">
                             {% csrf_token %}
                             {{ subtask_form.as_p }}
                             <button type="submit">Add Subtask</button>
                         </form>
+                    {% endif %}
+                    
+                       
                     </div>
+
+                    {% if task.user == request.user %}
+                        <div class="add-note-section">
+                            <h3>Add a Note</h3>
+                            <form method="POST" action="{% url 'add_task_note' task.id %}">
+                                {% csrf_token %}
+                                {{ form.as_p }}
+                                <button type="submit" class="submit-button">Add Note</button>
+                            </form>
+                        </div>
+                    {% endif %}
             
                     <!-- Notes -->
-                    <div class="add-note-section">
-                        <h3>Add a Note</h3>
-                        <form method="POST" action="{% url 'add_task_note' task.id %}">
-                            {% csrf_token %}
-                            {{ form.as_p }}
-                            <button type="submit" class="submit-button">Add Note</button>
-                        </form>
-                    </div>
+                    
                 
                     <!-- Display Existing Notes -->
                     <div class="notes-section">
@@ -434,25 +481,23 @@ form textarea {
                                 <li>No comments yet.</li>
                             {% endfor %}
                         </ul>
-                
+                        {% if task.user == request.user %}
                         <!-- Add Comment Form -->
                         <form method="post">
                             {% csrf_token %}
                             {{ comment_form.as_p }}
                             <button type="submit" name="add_comment">Add Comment</button>
                         </form>
+                        {% endif %}
                     </div>
             
                     <!-- Task Completion Details -->
                     {% if task.status == "completed" %}
                         <div class="completion-detail">
-                            <h2>Task Completion Details</h2>
-                            <p><strong>Details:</strong></p>
-                            <pre>{{ task.completion_details.completion_details }}</pre>
                             {% if task.user and task.user != request.user %}
                                 <h3>Task Completed By: {{ task.user.username }}</h3>
                                 <!-- Chat Button -->
-                                <a href="{% url 'chat' task.user.id %}?task_id={{task.id}}&task_title={{ task.title}}" class="chat-button">Chat with {{ task.user.username }}</a>
+                                <a class="button-link" href="{% url 'chat' task.id %}?receiver_id={{task.user.id}}" class="chat-button">Chat with {{ task.user.username }}</a>
                             {% endif %}
                         </div>
                     {% else %}
@@ -484,7 +529,7 @@ form textarea {
             </div>
 
         <div class="back-link">
-            <a href="{% url 'home' %}">Back to Task List</a>
+            <a class="button-link" href="{% url 'home' %}">Back to Task List</a>
         </div>
     </div>
 

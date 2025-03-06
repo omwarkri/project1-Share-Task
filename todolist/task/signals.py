@@ -6,7 +6,7 @@ from django.db.models.functions import Coalesce
 from sentence_transformers import SentenceTransformer
 from .models import Task
 from user.models import UserTaskAnalytics
-
+import nltk
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 

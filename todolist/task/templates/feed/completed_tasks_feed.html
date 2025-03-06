@@ -24,13 +24,15 @@ body {
 .feed-main-content {
     display: flex;
     height: 100vh;
+    overflow-y: auto;
 }
 
 .feed-main-content .container {
     flex: 1;
     padding: 24px;
     padding-top: 16px;
-    overflow-y: auto;
+    margin-right:300px ;
+    
 }
 
 h1 {
@@ -53,8 +55,12 @@ h1::after {
 
 /* Sidebar Styles */
 .users {
+    position: fixed;
+    right: 0;
+    top:10;
     width: 300px; /* Fixed width for the sidebar */
     padding: 20px;
+    height:100vh;
     background-color: white;
     border-left: 1px solid #e1e1e1;
     overflow-y: auto; /* Allow scrolling if content overflows */
@@ -135,6 +141,30 @@ h1::after {
     font-size: 12px;
     color: #888;
 }
+/* User Link Styles */
+.user-link {
+    text-decoration: none;
+    color: inherit;
+
+}
+
+.user-link:hover {
+    text-decoration: none;
+}
+
+.user-link img {
+    margin-right: 12px;
+}
+
+.user-link .username {
+    color: #1abc9c;
+    font-weight: 600;
+}
+
+.user-link .follower-count {
+    color: #888;
+    font-size: 12px;
+}
 
 /* Follow Button Styles */
 .follow-form {
@@ -167,35 +197,74 @@ h1::after {
 }
 
 /* Filter Buttons */
+/* Filter Buttons Container */
 .filters {
     display: flex;
     justify-content: center;
     gap: 10px;
     margin-bottom: 20px;
-    flex-wrap: wrap;
+    flex-wrap: wrap; /* Allow buttons to wrap on smaller screens */
 }
 
+/* Base Button Style */
 .filter-button {
-    padding: 10px 15px;
-    background-color: #1abc9c;
+    padding: 12px 20px;
+    background: linear-gradient(45deg, #1abc9c, #16a085); /* Gradient background */
     color: white;
     text-decoration: none;
-    border-radius: 20px;
+    border-radius: 25px; /* Rounded corners */
     font-size: 14px;
-    transition: background-color 0.3s ease, transform 0.3s ease;
-    margin: 5px;
-    border: 1px solid #1abc9c;
+    font-weight: 600;
+    text-transform: uppercase; /* Uppercase text */
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    border: 2px solid transparent; /* Transparent border */
+    position: relative;
+    overflow: hidden; /* Ensure the sliding effect stays within the button */
 }
 
+/* Sliding Animation */
+.filter-button::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background-color: white; /* Color of the sliding line */
+    transform: translateX(-100%); /* Start the line off-screen */
+    transition: transform 0.3s ease;
+}
+
+/* Hover Effect */
+.filter-button:hover::after {
+    transform: translateX(0); /* Slide the line in on hover */
+}
+
+/* Active Button Style */
 .filter-button.active {
-    background-color: #16a085;
-    border-color: #16a085;
+    background: linear-gradient(45deg, #1de9b6, #1abc9c); /* Brighter gradient for active state */
+    border: 2px solid #ffffff; /* White border for active state */
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2); /* Larger shadow for active state */
 }
 
-.filter-button:hover {
-    background-color: #16a085;
-    border-color: #16a085;
-    transform: translateY(-2px);
+.filter-button.active::after {
+    transform: translateX(0); /* Keep the line visible for active state */
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .filter-button {
+        padding: 10px 15px; /* Smaller padding for mobile */
+        font-size: 12px; /* Smaller font size for mobile */
+    }
+}
+
+@media (max-width: 480px) {
+    .filter-button {
+        padding: 8px 12px; /* Even smaller padding for small screens */
+        font-size: 11px; /* Smaller font size for small screens */
+    }
 }
 
 /* Task Feed Grid */
@@ -286,20 +355,131 @@ h1::after {
 }
 
 /* Mobile Responsiveness */
+/* Mobile Responsiveness */
 @media (max-width: 768px) {
     .feed-main-content {
-        flex-direction: column;
+        flex-direction: column; /* Stack sidebar and main content vertically */
+    }
+
+    .feed-main-content .container {
+        margin-right: 0; /* Remove the right margin */
+        padding: 16px; /* Adjust padding for smaller screens */
     }
 
     .users {
-        width: 100%;
-        border-left: none;
-        border-top: 1px solid #e1e1e1;
-        box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+        position: static; /* Remove fixed positioning */
+        width: 100%; /* Full width on mobile */
+        height: auto; /* Auto height */
+        border-left: none; /* Remove left border */
+        border-top: 1px solid #e1e1e1; /* Add top border */
+        box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1); /* Adjust shadow */
+        padding: 16px; /* Adjust padding */
     }
 
-    .container {
-        max-width: 100%;
+    .user-list li {
+        padding: 10px; /* Reduce padding for smaller screens */
+    }
+
+    .user-list li img {
+        width: 40px; /* Smaller profile picture */
+        height: 40px;
+    }
+
+    .user-list li .user-info .username {
+        font-size: 14px; /* Smaller font size */
+    }
+
+    .user-list li .user-info .follower-count {
+        font-size: 11px; /* Smaller font size */
+    }
+
+    .follow-button {
+        padding: 5px 10px; /* Smaller button */
+        font-size: 11px; /* Smaller font size */
+    }
+
+    .filters {
+        gap: 8px; /* Reduce gap between filter buttons */
+    }
+
+    .filter-button {
+        padding: 10px 15px; /* Smaller padding */
+        font-size: 12px; /* Smaller font size */
+    }
+
+    .task-feed-grid {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* Adjust grid columns */
+        gap: 15px; /* Reduce gap between items */
+    }
+
+    .task-feed-item h2 {
+        font-size: 16px; /* Smaller font size */
+    }
+
+    .task-feed-item p {
+        font-size: 12px; /* Smaller font size */
+    }
+
+    .read-more-button {
+        font-size: 12px; /* Smaller font size */
+    }
+}
+
+@media (max-width: 480px) {
+    .feed-main-content .container {
+        padding: 12px; /* Further reduce padding */
+    }
+
+    .users {
+        padding: 12px; /* Further reduce padding */
+    }
+
+    .user-list li {
+        padding: 8px; /* Further reduce padding */
+    }
+
+    .user-list li img {
+        width: 35px; /* Even smaller profile picture */
+        height: 35px;
+    }
+
+    .user-list li .user-info .username {
+        font-size: 13px; /* Even smaller font size */
+    }
+
+    .user-list li .user-info .follower-count {
+        font-size: 10px; /* Even smaller font size */
+    }
+
+    .follow-button {
+        padding: 4px 8px; /* Even smaller button */
+        font-size: 10px; /* Even smaller font size */
+    }
+
+    .filters {
+        gap: 6px; /* Further reduce gap between filter buttons */
+    }
+
+    .filter-button {
+        padding: 8px 12px; /* Even smaller padding */
+        font-size: 11px; /* Even smaller font size */
+    }
+
+    .task-feed-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Adjust grid columns */
+        gap: 10px; /* Further reduce gap between items */
+    }
+
+    .task-feed-item h2 {
+        font-size: 14px; /* Even smaller font size */
+    }
+
+    .task-feed-item p {
+        font-size: 11px; /* Even smaller font size */
+    }
+
+    .read-more-button {
+        font-size: 11px; /* Even smaller font size */
     }
 }
     </style>
@@ -308,13 +488,12 @@ h1::after {
     <div class="feed-main-content">
         <!-- Main Content -->
         <div class="container">
-            <h1>Completed Tasks Feed</h1>
 
             <!-- Filter Buttons -->
             <div class="filters">
                 <a href="?filter_type=detail" class="filter-button {% if filter_type == 'detail' %}active{% endif %}">Details</a>
                 <a href="?filter_type=video" class="filter-button {% if filter_type == 'video' %}active{% endif %}">Videos</a>
-                <a href="?filter_type=post" class="filter-button {% if filter_type == 'post' %}active{% endif %}">Posts</a>
+                <!-- <a href="?filter_type=post" class="filter-button {% if filter_type == 'post' %}active{% endif %}">Posts</a> -->
                 <a href="?filter_type=image" class="filter-button {% if filter_type == 'image' %}active{% endif %}">Images</a>
                 <a href="?filter_type=feedback" class="filter-button {% if filter_type == 'feedback' %}active{% endif %}">Feedback</a>
                 <a href="?" class="filter-button {% if not filter_type %}active{% endif %}">All</a>
@@ -366,40 +545,45 @@ h1::after {
         </div>
 
         <!-- Sidebar for Top 5 Users -->
-        <div class="users">
-            <h2>Top Followers</h2>
-            <ul class="user-list">
-                {% for user in top_users %}
-                    <li>
-                        <!-- Check if profile_picture exists -->
-                        {% if user.profile_picture %}
-                            <img src="{{ user.profile_picture.url }}" alt="{{ user.username }}">
-                        {% else %}
-                            <!-- Display a default image or placeholder if no profile picture exists -->
-                            <img src="/media/symbols/default-profile-pic.jpg" alt="Default Profile Picture">
-                        {% endif %}
+        <!-- Sidebar for Top 5 Users -->
+<div class="users">
+    <h2>Suggested for you</h2>
+    <ul class="user-list">
+        {% for user in top_users %}
+            <li>
+                <!-- Check if profile_picture exists -->
+                <a href="{% url 'view_profile_id' user.id %}" class="user-link">
+                    {% if user.profile_picture %}
+                        <img src="{{ user.profile_picture.url }}" alt="{{ user.username }}">
+                    {% else %}
+                        <!-- Display a default image or placeholder if no profile picture exists -->
+                        <img src="/media/symbols/default-profile-pic.jpg" alt="Default Profile Picture">
+                    {% endif %}
+                </a>
 
-                        <!-- User Info -->
-                        <div class="user-info">
-                            <span class="username">{{ user.username }}</span>
-                            <span class="follower-count">{{ user.follower_count }} followers</span>
-                        </div>
+                <!-- User Info -->
+                <div class="user-info">
+                    <a href="{% url 'view_profile_id' user.id %}" class="user-link">
+                        <span class="username">{{ user.username }}</span>
+                        <span class="follower-count">{{ user.follower_count }} followers</span>
+                    </a>
+                </div>
 
-                        <!-- Follow/Unfollow Button -->
-                        <form action="{% url 'follow_user' user.id %}" method="post" class="follow-form">
-                            {% csrf_token %}
-                            {% if request.user in user.followers.all %}
-                                <button type="submit" class="follow-button unfollow">Unfollow</button>
-                            {% else %}
-                                <button type="submit" class="follow-button follow">Follow</button>
-                            {% endif %}
-                        </form>
-                    </li>
-                {% empty %}
-                    <li>No users found.</li>
-                {% endfor %}
-            </ul>
-        </div>
+                <!-- Follow/Unfollow Button -->
+                <form action="{% url 'follow_user' user.id %}" method="post" class="follow-form">
+                    {% csrf_token %}
+                    {% if request.user in user.followers.all %}
+                        <button type="submit" class="follow-button unfollow">Unfollow</button>
+                    {% else %}
+                        <button type="submit" class="follow-button follow">Follow</button>
+                    {% endif %}
+                </form>
+            </li>
+        {% empty %}
+            <li>No users found.</li>
+        {% endfor %}
+    </ul>
+</div>
     </div>
 </body>
 </html>

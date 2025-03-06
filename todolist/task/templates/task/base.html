@@ -357,7 +357,14 @@
                     <span>Welcome, <a href="{% url 'profile' %}">{{ user.username }}</a>!</span>
                 </div>
             </div>
-            <button class="view-chats-button" onclick="openChatModal()">💬 Chats</button>
+            <div class="header-right">
+                {% if user.is_authenticated %}
+                    <button class="view-chats-button" onclick="openChatModal()">💬 Chats</button>
+                {% else %}
+                    <a href="{% url 'login' %}" class="view-chats-button">Login</a>
+                    <a href="{% url 'register' %}" class="view-chats-button">Signup</a>
+                {% endif %}
+            </div>
         </div>
     </header>
 

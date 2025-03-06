@@ -30,5 +30,6 @@ urlpatterns = [
     path("tasks/<int:task_id>/reassign/", reassign_task, name="reassigned_task"),
     
     path('completed-tasks-feed/', completed_tasks_feed, name='completed_tasks_feed'),
+    path('like-task/<int:task_id>/', like_task, name='like_task'),
   
 ]

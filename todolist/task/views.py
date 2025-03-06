@@ -1406,3 +1406,22 @@ def completed_tasks_feed(request):
         'filter_type': filter_type,
         'top_users': top_users  # Pass top_users to the template
     })
+
+
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+from .models import Like, Task
+
+@login_required
+def like_task(request, task_id):
+    task = Task.objects.get(id=task_id)
+    like, created = Like.objects.get_or_create(user=request.user, task=task)
+    
+    if not created:
+        like.delete()  # Unlike the task if it was already liked
+        liked = False
+    else:
+        liked = True
+
+    like_count = task.likes.count()
+    return JsonResponse({'liked': liked, 'like_count': like_count})

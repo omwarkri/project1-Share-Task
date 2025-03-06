@@ -169,6 +169,18 @@ class Task(models.Model):
     class Meta:
         ordering = ['-created_at']
 
+    
+from django.db import models
+from django.conf import settings
+
+class Like(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='likes')
+    task = models.ForeignKey('Task', on_delete=models.CASCADE, related_name='likes')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'task')  # Ensure a user can like a task only once
+
 
 
 

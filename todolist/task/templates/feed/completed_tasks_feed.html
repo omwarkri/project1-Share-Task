@@ -252,6 +252,9 @@ h1::after {
     transform: translateX(0); /* Keep the line visible for active state */
 }
 
+
+
+
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
     .filter-button {
@@ -279,7 +282,7 @@ h1::after {
     border: 1px solid #e1e1e1;
     border-radius: 10px;
     overflow: hidden;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -381,12 +384,12 @@ h1::after {
 
 /* Like Button */
 .like-button {
-    color: #e74c3c; /* Red color for like button */
+    
     font-size: 30px;
 }
 
 .like-button:hover {
-    color: #c0392b; /* Darker red on hover */
+    background-color: #c0392b; /* Darker red on hover */
 }
 
 /* Comment Button */
@@ -414,6 +417,12 @@ h1::after {
     display: flex;
     justify-content: space-between;
     align-items: center;
+}
+
+.action-buttons-all img{
+    height: 16px;
+    width: 16px;
+    
 }
 
 /* Mobile Responsiveness */
@@ -581,9 +590,15 @@ h1::after {
                         <!-- Like, Comment, Share Buttons -->
                         <div class="action-buttons-all">
                             <div class="action-buttons">
-                                <button class="action-button like-button" title="Like">&#x2665;</button> <!-- Heart symbol -->
-                                <button class="action-button comment-button" title="Comment">&#x1F4AC;</button> <!-- Speech bubble symbol -->
-                                <button class="action-button share-button" title="Share">&#x1F4E4;</button> <!-- Outbox tray symbol -->
+                                
+                                <div class="like-section">
+                                    <button id="like-button-{{ data.task.id }}" class="like-button" onclick="likeTask({{ data.task.id }})">
+                                        {% if request.user in data.task.likes.all %}<img src="/media/symbols/love.png" alt="heart"> unlike{% else %}<img src="/media/symbols/heart.png" alt="heart">{% endif %}
+                                    </button>
+                                    <span id="like-count-{{ task.id }}">{{ data.task.likes.count }}</span> Likes
+                                </div>
+                                <button class="action-button comment-button" title="Comment"><img src="/media/symbols/chat.png" alt="chat"></button> <!-- Speech bubble symbol -->
+                                <button class="action-button share-button" title="Share"><img src="/media/symbols/share.png" alt="share"></button> <!-- Outbox tray symbol -->
                             </div>
                     
                             <!-- Read More Button -->
@@ -659,5 +674,34 @@ h1::after {
 </div>
     </div>
 </body>
+<script>
+  
+    function likeTask(taskId) {
+        fetch(`/like-task/${taskId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            const likeButton = document.getElementById(`like-button-${taskId}`);
+            const likeCount = document.getElementById(`like-count-${taskId}`);
+
+            if (data.liked) {
+                likeButton.textContent = 'Unlike';
+            } else {
+                likeButton.textContent = 'Like';
+            }
+
+            likeCount.textContent = data.like_count;
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
+
+</script>
 </html>
 {% endblock %}

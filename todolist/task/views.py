@@ -37,7 +37,7 @@ from sentence_transformers import SentenceTransformer
 
 # Load a pretrained transformer model (better than TF-IDF)
 model = SentenceTransformer("all-MiniLM-L6-v2")
-
+import nltk
 import re
 import numpy as np
 from django.db.models import Q
@@ -47,6 +47,8 @@ from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 from .models import Task
 from user.models import CustomUser
+nltk.download('stopwords')
+nltk.download('wordnet')
 
 # Load model once at startup (better than reloading every call)
 model = SentenceTransformer("all-MiniLM-L6-v2")
@@ -55,32 +57,8 @@ model = SentenceTransformer("all-MiniLM-L6-v2")
 lemmatizer = WordNetLemmatizer()
 stop_words = set(stopwords.words("english"))
 
-def generate_and_store_task_vectors():
-    """
-    Generate embeddings for all shareable tasks and store them in the database.
-    """
-    tasks = Task.objects.filter(shareable=True, vector__isnull=True)  # Only update if vector is missing
-    
-    if not tasks.exists():
-        return
-    
-    for task in tasks:
-        text = preprocess_text(f"{task.title} {task.description}")
-        vector = model.encode(["some text"], convert_to_numpy=True)[0]  # Get embedding
-        
-        task.vector = vector.tolist()  # Convert to list
-        task.save()  # Store in DB
 
 
-def get_stored_task_vectors():
-    """
-    Fetch stored task vectors from the database and convert them to a dictionary.
-    """
-    stored_tasks = Task.objects.filter(shareable=True).values("id", "vector")
-    task_vector_dict = {
-        task["id"]: np.array(task["vector"]) for task in stored_tasks if task["vector"]
-    }
-    return task_vector_dict
 
 
 
@@ -99,29 +77,6 @@ def preprocess_text(text):
     return " ".join(words)
 
 
-def generate_and_store_task_vectors():
-    """
-    Generate embeddings for all shareable tasks and store them in the database.
-    """
-    tasks = Task.objects.filter(shareable=True).values_list("id", "title", "description")
-
-    if not tasks:
-        return
-
-    task_texts = [preprocess_text(f"{title} {description}") for _, title, description in tasks]
-    task_ids = [task_id for task_id, _, _ in tasks]
-
-    # Compute embeddings
-    task_vectors = model.encode(task_texts, convert_to_numpy=True).tolist()  # Convert to list for JSON storage
-
-    # Bulk update tasks with vectors
-    tasks_to_update = []
-    for i, task_id in enumerate(task_ids):
-        tasks_to_update.append(Task(id=task_id, vector=task_vectors[i]))
-
-    Task.objects.bulk_update(tasks_to_update, ["vector"])
-
-    print(f"Stored vectors for {len(tasks_to_update)} tasks.")
 
 
 
@@ -133,7 +88,7 @@ def get_all_task_vectors():
     Retrieve all task vectors from the Task model.
     Returns a dictionary with task_id as key and vector as numpy array.
     """
-    generate_and_store_task_vectors()
+   
     tasks = Task.objects.filter(~Q(vector=None))  # Get tasks that have vectors
 
     task_vectors = {}

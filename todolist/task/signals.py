@@ -6,31 +6,22 @@ from django.db.models.functions import Coalesce
 from sentence_transformers import SentenceTransformer
 from .models import Task
 from user.models import UserTaskAnalytics
-import nltk
-from nltk.corpus import stopwords
-from nltk.stem import WordNetLemmatizer
-nltk.download('stopwords')
-nltk.download('wordnet')
-lemmatizer = WordNetLemmatizer()
-stop_words = set(stopwords.words("english"))
+import re
+STOP_WORDS = {"the", "is", "in", "and", "to", "of", "a", "for", "on", "with", "this", "that", "it", "as", "at", "by", "an", "be", "from"}
 
 
-# Load model once at startup
-model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
 def preprocess_text(text):
+    """Preprocess text by removing special characters, stopwords, and redundant spaces."""
     if not text:
         return ""
-    text = text.lower()
-    text = re.sub(r"[^a-zA-Z0-9\s]", "", text)  # Remove special characters
-    words = text.split()
-    words = [lemmatizer.lemmatize(word) for word in words if word not in stop_words]
-    
-    # Ensure at least 3 words remain (to avoid over-filtering)
-    if len(words) < 3:
-        return text.lower()  # Return original text if preprocessing removes too much
-    
-    return " ".join(words)
 
+    text = text.lower()  # Convert to lowercase
+    text = re.sub(r"[^a-z0-9\s]", "", text)  # Remove special characters
+    words = text.split()
+    words = [word for word in words if word not in STOP_WORDS]  # Remove stopwords
+
+    # Ensure at least 3 words remain (to avoid over-filtering)
+    return " ".join(words) if len(words) >= 3 else text.lower()
 
 @receiver([post_save, post_delete], sender=Task)
 def update_user_task_analytics(sender, instance, **kwargs):

@@ -43,38 +43,36 @@ import numpy as np
 from django.db.models import Q
 from sklearn.metrics.pairwise import cosine_similarity
 from sentence_transformers import SentenceTransformer
-from nltk.corpus import stopwords
-from nltk.stem import WordNetLemmatizer
+
 from .models import Task
 from user.models import CustomUser
-nltk.download('stopwords')
-nltk.download('wordnet')
+
 
 # Load model once at startup (better than reloading every call)
 model = SentenceTransformer("all-MiniLM-L6-v2")
 
-# Load NLP utilities once
-lemmatizer = WordNetLemmatizer()
-stop_words = set(stopwords.words("english"))
 
 
 
 
+
+
+
+STOP_WORDS = {"the", "is", "in", "and", "to", "of", "a", "for", "on", "with", "this", "that", "it", "as", "at", "by", "an", "be", "from"}
 
 
 def preprocess_text(text):
+    """Preprocess text by removing special characters, stopwords, and redundant spaces."""
     if not text:
         return ""
-    text = text.lower()
-    text = re.sub(r"[^a-zA-Z0-9\s]", "", text)  # Remove special characters
+
+    text = text.lower()  # Convert to lowercase
+    text = re.sub(r"[^a-z0-9\s]", "", text)  # Remove special characters
     words = text.split()
-    words = [lemmatizer.lemmatize(word) for word in words if word not in stop_words]
-    
+    words = [word for word in words if word not in STOP_WORDS]  # Remove stopwords
+
     # Ensure at least 3 words remain (to avoid over-filtering)
-    if len(words) < 3:
-        return text.lower()  # Return original text if preprocessing removes too much
-    
-    return " ".join(words)
+    return " ".join(words) if len(words) >= 3 else text.lower()
 
 
 

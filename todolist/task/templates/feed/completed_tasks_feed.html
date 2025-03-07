@@ -455,9 +455,11 @@ h1::after {
 .modal-left {
     flex: 2;
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    align-items: start;
     justify-content: center;
-    padding: 20px;
+    gap: 16px;
+    padding: 16px;
 }
 
 .modal-left img {
@@ -722,17 +724,34 @@ h1::after {
                             <div class="action-buttons">
                                 
                                 <div class="like-section">
-                                    <button id="like-button-{{ data.task.id }}" class="like-button" onclick="likeTask({{ data.task }})">
-                                        {% if request.user in data.task.likes.all %}<img src="/media/symbols/love.png" alt="heart">{% else %}<img src="/media/symbols/heart.png" alt="heart">{% endif %}
+                                    <button id="like-button-{{ data.task.id }}" class="like-button" onclick="likeTask({{ data.task.id }})">
+                                        {% if request.user in data.task.likes.all %}
+                                            <img src="/media/symbols/love.png" alt="heart"> <!-- Liked state -->
+                                        {% else %}
+                                            <img src="/media/symbols/heart.png" alt="heart"> <!-- Unliked state -->
+                                        {% endif %}
                                     </button>
-                                    <span id="like-count-{{ data.task.id }}">{{ data.task.likes.count }}</span> Likes
+                                    <span id="like-count-{{ data.task.id }}">{{ data.task.likes.count }}</span>
                                 </div>
                                 <button class="action-button comment-button" 
         title="Comment" 
-        onclick="openModal('{{ data.completion_details.uploaded_image.url }}', {{ data.task.id }}, '{{ data.task.user.username }}', '{{ data.task.user.profile_picture.url }}')">
+        onclick="openModal('{{ data.completion_details.uploaded_image.url }}', {{ data.task.id }}, '{{ data.task.user.username }}', '{{ data.task.user.profile_picture.url }}', '', 'comments')">
     <img src="/media/symbols/chat.png" alt="chat">
 </button>
-                                <button class="action-button share-button" title="Share"><img src="/media/symbols/share.png" alt="share"></button> <!-- Outbox tray symbol -->
+{% if data.completion_details.completion_details %}
+<button class="action-button share-button"
+        title="Share"
+        onclick="openModal('{{ data.completion_details.uploaded_image.url }}', {{ data.task.id }}, '{{ data.task.user.username }}', '{{ data.task.user.profile_picture.url }}', '{{ data.completion_details.completion_details }}', 'completed-details')">
+    <img src="/media/symbols/completed-task.png" alt="share">
+</button>
+{% endif %}
+{% if data.task.description  %}
+<button class="action-button share-button" 
+        title="Share"
+        onclick="openModal('{{ data.completion_details.uploaded_image.url }}', {{ data.task.id }}, '{{ data.task.user.username }}', '{{ data.task.user.profile_picture.url }}', '{{ data.task.description }}', 'description')">
+    <img src="/media/symbols/document.png" alt="share">
+</button>
+{% endif %}
                             </div>
                     
                             <!-- Read More Button -->
@@ -815,31 +834,48 @@ h1::after {
     <span class="close">&times;</span>
     <div class="modal-content">
         <!-- User Info Section -->
-        <div class="modal-user-info">
-            <img id="user-image" src="" alt="User Image" class="user-image">
-            <span id="user-name" class="username"></span>
-        </div>
-
-        <!-- Left Column: Image -->
         <div class="modal-left">
-            <img id="modal-image" src="" alt="Completion Image">
+            <div class="modal-user-info">
+                <img id="user-image" src="" alt="User Image" class="user-image">
+                <span id="user-name" class="username"></span>
+            </div>
+    
+            <!-- Left Column: Image -->
+            <div >
+                <img id="modal-image" src="" alt="Completion Image">
+            </div>
         </div>
 
-        <!-- Right Column: Comments -->
+        <!-- Right Column: Dynamic Content -->
         <div class="modal-right">
-            <h2>Comments</h2>
-            <ul class="comment-list">
-                <!-- Comments will be dynamically populated here -->
-            </ul>
-            <form method="post" action="{% url 'add_comment' 0 %}" id="comment-form">
-                {% csrf_token %}
-                <input type="hidden" name="task_id" id="task-id-input">
-                <textarea name="text" placeholder="Add a comment..." required></textarea>
-                <button type="submit">Post Comment</button>
-            </form>
+            <!-- Comments Section -->
+            <div class="comments" style="display: none;">
+                <h2>Comments</h2>
+                <ul class="comment-list"></ul>
+                <form method="post" action="{% url 'add_comment' 0 %}" id="comment-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="task_id" id="task-id-input">
+                    <textarea name="text" placeholder="Add a comment..." required></textarea>
+                    <button type="submit">Post Comment</button>
+                </form>
+            </div>
+
+            <!-- Description Section -->
+            <div class="description-section" style="display: none;">
+                <h2>Task Description</h2>
+                <pre id="task-description"></pre>
+            </div>
+
+            <!-- Completion Details Section -->
+            <div class="completion-details-section" style="display: none;">
+                <h2>Completion Details</h2>
+                <pre id="completion-details"></pre>
+            </div>
         </div>
     </div>
 </div>
+
+ 
 </div>
 </body>
 <script>
@@ -875,7 +911,7 @@ h1::after {
 
     // Function to open the modal with the clicked image
     // Function to open the modal with the clicked image
-function openModal(imageSrc, taskId, username, profilePicture) {
+    function openModal(imageSrc, taskId, username, profilePicture, variabledata, type) {
     console.log("Opening modal for Task ID:", taskId);  // Debugging statement
 
     const modal = document.getElementById("image-modal");
@@ -894,21 +930,39 @@ function openModal(imageSrc, taskId, username, profilePicture) {
     userImage.alt = username;
     userNameSpan.textContent = username;
 
-    // Update the form action URL and hidden input with the task ID
-    const commentForm = document.getElementById('comment-form');
-    const taskIdInput = document.getElementById('task-id-input');
+    // Hide all sections initially
+    const commentsSection = document.querySelector(".comments");
+    const descriptionSection = document.querySelector(".description-section");
+    const completionDetailsSection = document.querySelector(".completion-details-section");
 
-    if (taskId) {
-        commentForm.action = `/task/${taskId}/add-comment/`;  // Update the form action URL
-        taskIdInput.value = taskId;  // Update the hidden input value
+    commentsSection.style.display = "none";
+    descriptionSection.style.display = "none";
+    completionDetailsSection.style.display = "none";
 
-        // Fetch and display comments for the task
-        fetchComments(taskId);
-    } else {
-        console.error("Task ID is undefined.");
+    // Show the appropriate section based on the type
+    if (type === "comments") {
+        commentsSection.style.display = "block";
+        // Update the form action URL and hidden input with the task ID
+        const commentForm = document.getElementById('comment-form');
+        const taskIdInput = document.getElementById('task-id-input');
+
+        if (taskId) {
+            commentForm.action = `/task/${taskId}/add-comment/`;  // Update the form action URL
+            taskIdInput.value = taskId;  // Update the hidden input value
+
+            // Fetch and display comments for the task
+            fetchComments(taskId);
+        } else {
+            console.error("Task ID is undefined.");
+        }
+    } else if (type === "description") {
+        descriptionSection.style.display = "block";
+        document.getElementById("task-description").textContent = variabledata;
+    } else if (type === "completed-details") {
+        completionDetailsSection.style.display = "block";
+        document.getElementById("completion-details").textContent = variabledata;
     }
 }
-
     // Function to close the modal
     function closeModal() {
         modal.style.display = "none";

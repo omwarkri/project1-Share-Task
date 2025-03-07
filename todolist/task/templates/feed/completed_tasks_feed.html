@@ -382,6 +382,12 @@ h1::after {
     transform: scale(0.9);
 }
 
+.like-section{
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
 /* Like Button */
 .like-button {
     color: #e74c3c; /* Red color for like button */
@@ -544,6 +550,7 @@ h1::after {
     font-weight: bold;
     transition: 0.3s;
     cursor: pointer;
+    z-index: 500;
 }
 
 .close:hover,
@@ -568,6 +575,13 @@ h1::after {
 /* Mobile Responsiveness */
 /* Mobile Responsiveness for Modal */
 @media (max-width: 768px) {
+    .feed-main-content .container{
+        margin: 0;
+    }   
+    .users{
+        display: none;
+    }
+
     .modal-content {
         flex-direction: column; /* Stack modal content vertically */
         width: 90%; /* Reduce modal width for smaller screens */
@@ -708,7 +722,7 @@ h1::after {
                     {% if data.completion_details.uploaded_image.url %}
                     <img src="{{ data.completion_details.uploaded_image.url }}" 
      alt="Completion Image" 
-     onclick="openModal('{{ data.completion_details.uploaded_image.url }}', {{ data.task.id }}, '{{ data.task.user.username }}', '{{ data.task.user.profile_picture.url }}')" 
+     onclick="openModal('{{ data.completion_details.uploaded_image.url }}', {{ data.task.id }}, '{{ data.task.user.username }}', '{{ data.task.user.profile_picture.url }}',type='all')" 
      style="cursor: pointer;">
                 {% endif %}
     
@@ -724,32 +738,37 @@ h1::after {
                             <div class="action-buttons">
                                 
                                 <div class="like-section">
-                                    <button id="like-button-{{ data.task.id }}" class="like-button" onclick="likeTask({{ data.task.id }})">
-                                        {% if request.user in data.task.likes.all %}
+                                    <span id="like-button-{{ data.task.id }}" class="like-button" onclick="likeTask({{ data.task.id }})">
+                                       
+                                        {% if request.user in data.task.get_users_who_liked %}
                                             <img src="/media/symbols/love.png" alt="heart"> <!-- Liked state -->
+                                            
                                         {% else %}
                                             <img src="/media/symbols/heart.png" alt="heart"> <!-- Unliked state -->
                                         {% endif %}
-                                    </button>
-                                    <span id="like-count-{{ data.task.id }}">{{ data.task.likes.count }}</span>
+                                    </span>
+                                    <span id="like-count-{{ data.task.id }}"  style="cursor: pointer;" onclick="openModal('{{ data.completion_details.uploaded_image.url }}', {{ data.task.id }}, '{{ data.task.user.username }}', '{{ data.task.user.profile_picture.url }}',  type= 'liked-users')">{{ data.task.likes.count }}</span>
                                 </div>
                                 <button class="action-button comment-button" 
         title="Comment" 
-        onclick="openModal('{{ data.completion_details.uploaded_image.url }}', {{ data.task.id }}, '{{ data.task.user.username }}', '{{ data.task.user.profile_picture.url }}', '', 'comments')">
+        onclick="openModal('{{ data.completion_details.uploaded_image.url }}', {{ data.task.id }}, '{{ data.task.user.username }}', '{{ data.task.user.profile_picture.url }}',type='comments')">
     <img src="/media/symbols/chat.png" alt="chat">
 </button>
-{% if data.completion_details.completion_details %}
-<button class="action-button share-button"
-        title="Share"
-        onclick="openModal('{{ data.completion_details.uploaded_image.url }}', {{ data.task.id }}, '{{ data.task.user.username }}', '{{ data.task.user.profile_picture.url }}', '{{ data.completion_details.completion_details }}', 'completed-details')">
-    <img src="/media/symbols/completed-task.png" alt="share">
-</button>
-{% endif %}
+
 {% if data.task.description  %}
 <button class="action-button share-button" 
         title="Share"
-        onclick="openModal('{{ data.completion_details.uploaded_image.url }}', {{ data.task.id }}, '{{ data.task.user.username }}', '{{ data.task.user.profile_picture.url }}', '{{ data.task.description }}', 'description')">
+        onclick="openModal('{{ data.completion_details.uploaded_image.url }}', {{ data.task.id }}, '{{ data.task.user.username }}', '{{ data.task.user.profile_picture.url }}',  type= 'description')">
     <img src="/media/symbols/document.png" alt="share">
+</button>
+{% endif %}
+
+{% if data.completion_details.completion_details %}
+<button class="action-button share-button"
+        title="Share"
+        
+        onclick="openModal('{{ data.completion_details.uploaded_image.url }}', {{ data.task.id }}, '{{ data.task.user.username }}', '{{ data.task.user.profile_picture.url }}',  type='completed-details')">
+    <img src="/media/symbols/completed-task.png" alt="share">
 </button>
 {% endif %}
                             </div>
@@ -866,6 +885,11 @@ h1::after {
                 <pre id="task-description"></pre>
             </div>
 
+            <div class="likes-section" style="display: none;">
+                <h2>Task Description</h2>
+                <pre id="task-likes"></pre>
+            </div>
+
             <!-- Completion Details Section -->
             <div class="completion-details-section" style="display: none;">
                 <h2>Completion Details</h2>
@@ -894,10 +918,11 @@ h1::after {
             const likeCount = document.getElementById(`like-count-${taskId}`);
 
             if (data.liked) {
-                likeButton.textContent = 'Unlike';
-            } else {
-                likeButton.textContent = 'Like';
-            }
+    likeButton.innerHTML = '<img src="/media/symbols/love.png" alt="heart">';
+} else {
+    likeButton.innerHTML = '<img src="/media/symbols/heart.png" alt="heart">';
+}
+
 
             likeCount.textContent = data.like_count;
         })
@@ -911,7 +936,7 @@ h1::after {
 
     // Function to open the modal with the clicked image
     // Function to open the modal with the clicked image
-    function openModal(imageSrc, taskId, username, profilePicture, variabledata, type) {
+    function openModal(imageSrc, taskId, username, profilePicture, type) {
     console.log("Opening modal for Task ID:", taskId);  // Debugging statement
 
     const modal = document.getElementById("image-modal");
@@ -956,16 +981,114 @@ h1::after {
             console.error("Task ID is undefined.");
         }
     } else if (type === "description") {
-        descriptionSection.style.display = "block";
-        document.getElementById("task-description").textContent = variabledata;
+        fetchTaskDetails(taskId)
     } else if (type === "completed-details") {
-        completionDetailsSection.style.display = "block";
-        document.getElementById("completion-details").textContent = variabledata;
+        fetchCompletionDetails(taskId)
+    } else if (type=== "liked-users"){
+        fetchTaskLikedUsers(taskId)
+    } else if (type==='all'){
+         commentsSection.style.display = "block";
+        document.querySelector(".completion-details-section").style.display = "block";
+        document.querySelector(".likes-section").style.display="block";
+        document.querySelector(".description-section").style.display = "block";
+        fetchCompletionDetails(taskId)
+        fetchCompletionDetails(taskId)
+        fetchComments(taskId);
+        fetchTaskLikedUsers(taskId)
+        
     }
 }
+
+function fetchTaskDetails(taskId) {
+            fetch(`/task/${taskId}/details/`)
+                .then(response => response.json())
+                .then(data => {
+                    document.querySelector(".description-section").style.display = "block";
+                    document.getElementById("task-description").textContent = data.description || "No description available.";
+                })
+                .catch(error => {
+                    console.error("Error fetching task details:", error);
+                });
+        }
+        function fetchTaskLikedUsers(taskId) {
+    fetch(`/task/${taskId}/details/`)
+        .then(response => response.json())
+        .then(data => {
+            console.log(data.liked_users);
+
+            const likesSection = document.querySelector(".likes-section");
+            const likesList = document.getElementById("task-likes");
+
+            // Show the likes section
+            likesSection.style.display = "block";
+
+            // Clear any existing content in the likes list
+            likesList.innerHTML = "";
+
+            // Check if there are liked users
+            if (data.liked_users && data.liked_users.length > 0) {
+                for (let user of data.liked_users) {
+                    const listItem = document.createElement("li");
+                    listItem.style.display = "flex";
+                    listItem.style.alignItems = "center";
+                    listItem.style.marginBottom = "10px";
+                   
+
+                    // Create an image element
+                    const profileImg = document.createElement("img");
+                    profileImg.src = user.profile_picture;
+                    profileImg.alt = `${user.username}'s profile picture`;
+                    profileImg.style.width = "40px";
+                    profileImg.style.height = "40px";
+                    profileImg.style.borderRadius = "50%";
+                    profileImg.style.marginRight = "10px";
+
+                    // Create a link to the user's profile
+                    const profileLink = document.createElement("a");
+                    profileLink.href = `/user/profile/${user.id}/`;
+                    profileLink.textContent = user.username;
+                    profileLink.style.textDecoration = "none";
+                    profileLink.style.textDecoration = "none";
+                    profileLink.style.color = "#1abc9c";
+                    profileLink.style.fontSize = "14px";
+
+                    // Append the image and link to the list item
+                    listItem.appendChild(profileImg);
+                    listItem.appendChild(profileLink);
+
+                    // Append the list item to the likes list
+                    likesList.appendChild(listItem);
+                }
+            } else {
+                // Display a message if no users have liked the task
+                const noLikesMessage = document.createElement("li");
+                noLikesMessage.textContent = "No likes yet.";
+                likesList.appendChild(noLikesMessage);
+            }
+        })
+        .catch(error => {
+            console.error("Error fetching task details:", error);
+        });
+}
+
+
+        // Function to fetch completion details
+        function fetchCompletionDetails(taskId) {
+            fetch(`/task/${taskId}/details/`)
+                .then(response => response.json())
+                .then(data => {
+                    document.querySelector(".completion-details-section").style.display = "block";
+                    document.getElementById("completion-details").textContent = data.completion_details || "No completion details available.";
+                })
+                .catch(error => {
+                    console.error("Error fetching completion details:", error);
+                });}
     // Function to close the modal
     function closeModal() {
         modal.style.display = "none";
+        document.querySelector(".completion-details-section").style.display = "none";
+        document.querySelector(".likes-section").style.display="none";
+        document.querySelector(".description-section").style.display = "none";
     }
 
     // Event listener for closing the modal

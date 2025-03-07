@@ -165,7 +165,16 @@ class Task(models.Model):
             if self.assigned_to and self.team:
                 TeamScoreboard.update_or_create_score(self.assigned_to, self.team, points=10)  # Update team score
 
-
+    def get_all_likes(self):
+        """
+        Returns all Like objects associated with this task.
+        """
+        return self.likes.all()
+    def get_users_who_liked(self):
+        """
+        Returns a list of users who liked this task.
+        """
+        return [like.user for like in self.likes.all()]
     class Meta:
         ordering = ['-created_at']
 
@@ -177,6 +186,9 @@ class Like(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='likes')
     task = models.ForeignKey('Task', on_delete=models.CASCADE, related_name='likes')
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username} liked {self.task.title}"
 
     class Meta:
         unique_together = ('user', 'task')  # Ensure a user can like a task only once

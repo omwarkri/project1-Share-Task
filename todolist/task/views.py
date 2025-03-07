@@ -689,6 +689,28 @@ def get_comments(request, task_id):
         'comments': comments_list,
     })
 
+from django.http import JsonResponse
+from .models import Task, Comment
+
+from django.http import JsonResponse
+from .models import Task, CustomUser
+
+def get_task_details(request, task_id):
+    task = Task.objects.get(id=task_id)
+   
+       
+
+    data = {
+        "task_id": task.id,
+        'description':task.description,
+        'completion_details':task.completion_details.completion_details,
+        "task_title": task.title,
+       
+    }
+
+    return JsonResponse(data)
+
+
 @csrf_exempt
 def toggle_subtask(request, subtask_id):
     subtask = SubTask.objects.get(id=subtask_id)
@@ -1444,7 +1466,7 @@ def completed_tasks_feed(request):
             if filter_type == 'detail' and completion_details.has_details():
                 task_feed_data.append({
                     'task': task,
-                    'completion_details': completion_details
+                    'completio  n_details': completion_details
                 })
             elif filter_type == 'video' and completion_details.has_uploaded_file():
                 task_feed_data.append({

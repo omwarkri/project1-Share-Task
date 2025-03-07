@@ -33,5 +33,6 @@ urlpatterns = [
     path('like-task/<int:task_id>/', like_task, name='like_task'),
     path('task/<int:task_id>/add-comment/', add_comment, name='add_comment'),
     path('task/<int:task_id>/get-comments/', get_comments, name='get_comments'),
+    path('task/<int:task_id>/details/', get_task_details, name='get_task_details'),
   
 ]

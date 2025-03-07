@@ -550,77 +550,74 @@ h1::after {
     text-decoration: none;
     cursor: pointer;
 }
+
+.modal-user-info{
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    gap: 16px;
+}
+.user-image{
+    height: 30px;
+    width: 30px;
+    border-radius: 50%;
+}
 /* Mobile Responsiveness */
 /* Mobile Responsiveness */
+/* Mobile Responsiveness for Modal */
 @media (max-width: 768px) {
-    .feed-main-content {
-        flex-direction: column; /* Stack sidebar and main content vertically */
+    .modal-content {
+        flex-direction: column; /* Stack modal content vertically */
+        width: 90%; /* Reduce modal width for smaller screens */
+        max-width: 100%; /* Allow modal to take full width */
+        padding: 10px; /* Reduce padding */
     }
 
-    .feed-main-content .container {
-        margin-right: 0; /* Remove the right margin */
-        padding: 16px; /* Adjust padding for smaller screens */
+    .modal-left,
+    .modal-right {
+        flex: 1; /* Ensure both sections take equal space */
+        width: 100%; /* Full width for both sections */
+        padding: 10px; /* Reduce padding */
     }
 
-    .users {
-        position: static; /* Remove fixed positioning */
-        width: 100%; /* Full width on mobile */
-        height: auto; /* Auto height */
+    .modal-left img {
+        max-width: 100%; /* Ensure image fits within the modal */
+        max-height: 300px; /* Limit image height */
+        border-radius: 10px; /* Add rounded corners */
+    }
+
+    .modal-right {
         border-left: none; /* Remove left border */
         border-top: 1px solid #e1e1e1; /* Add top border */
-        box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1); /* Adjust shadow */
-        padding: 16px; /* Adjust padding */
+        padding-top: 20px; /* Add spacing between image and comments */
     }
 
-    .user-list li {
-        padding: 10px; /* Reduce padding for smaller screens */
+    .comment-list {
+        max-height: 200px; /* Limit comment list height */
+        overflow-y: auto; /* Add scroll for overflow */
     }
 
-    .user-list li img {
-        width: 40px; /* Smaller profile picture */
-        height: 40px;
+    .comment-item {
+        padding: 8px; /* Reduce padding for comments */
+        margin-bottom: 8px; /* Reduce margin between comments */
     }
 
-    .user-list li .user-info .username {
-        font-size: 14px; /* Smaller font size */
+    .comment-item p {
+        font-size: 12px; /* Reduce font size for comments */
     }
 
-    .user-list li .user-info .follower-count {
-        font-size: 11px; /* Smaller font size */
+    .comment-item small {
+        font-size: 10px; /* Reduce font size for comment metadata */
     }
 
-    .follow-button {
-        padding: 5px 10px; /* Smaller button */
-        font-size: 11px; /* Smaller font size */
+    .modal-right textarea {
+        font-size: 12px; /* Reduce font size for textarea */
     }
 
-    .filters {
-        gap: 8px; /* Reduce gap between filter buttons */
+    .modal-right button {
+        font-size: 12px; /* Reduce font size for button */
+        padding: 6px 12px; /* Reduce button padding */
     }
-
-    .filter-button {
-        padding: 10px 15px; /* Smaller padding */
-        font-size: 12px; /* Smaller font size */
-    }
-
-    .task-feed-grid {
-        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* Adjust grid columns */
-        gap: 15px; /* Reduce gap between items */
-    }
-
-    .task-feed-item h2 {
-        font-size: 16px; /* Smaller font size */
-    }
-
-    .task-feed-item p {
-        font-size: 12px; /* Smaller font size */
-    }
-
-    .read-more-button {
-        font-size: 12px; /* Smaller font size */
-    }
-
-    
 }
 
 @media (max-width: 480px) {
@@ -679,6 +676,10 @@ h1::after {
     .read-more-button {
         font-size: 11px; /* Even smaller font size */
     }
+
+    .modal-content{
+        flex-direction: column;
+    }
 }
     </style>
 </head>
@@ -703,7 +704,10 @@ h1::after {
                 <div class="task-feed-item">
                     <!-- Display uploaded image -->
                     {% if data.completion_details.uploaded_image.url %}
-                    <img src="{{ data.completion_details.uploaded_image.url }}" alt="Completion Image" onclick="openModal('{{ data.completion_details.uploaded_image.url }}')" style="cursor: pointer;">
+                    <img src="{{ data.completion_details.uploaded_image.url }}" 
+     alt="Completion Image" 
+     onclick="openModal('{{ data.completion_details.uploaded_image.url }}', {{ data.task.id }}, '{{ data.task.user.username }}', '{{ data.task.user.profile_picture.url }}')" 
+     style="cursor: pointer;">
                 {% endif %}
     
                 
@@ -718,12 +722,16 @@ h1::after {
                             <div class="action-buttons">
                                 
                                 <div class="like-section">
-                                    <button id="like-button-{{ data.task.id }}" class="like-button" onclick="likeTask({{ data.task.id }})">
+                                    <button id="like-button-{{ data.task.id }}" class="like-button" onclick="likeTask({{ data.task }})">
                                         {% if request.user in data.task.likes.all %}<img src="/media/symbols/love.png" alt="heart">{% else %}<img src="/media/symbols/heart.png" alt="heart">{% endif %}
                                     </button>
                                     <span id="like-count-{{ data.task.id }}">{{ data.task.likes.count }}</span> Likes
                                 </div>
-                                <button class="action-button comment-button" title="Comment" onclick="openModal('{{ data.completion_details.uploaded_image.url }}')"><img src="/media/symbols/chat.png" alt="chat"></button> <!-- Speech bubble symbol -->
+                                <button class="action-button comment-button" 
+        title="Comment" 
+        onclick="openModal('{{ data.completion_details.uploaded_image.url }}', {{ data.task.id }}, '{{ data.task.user.username }}', '{{ data.task.user.profile_picture.url }}')">
+    <img src="/media/symbols/chat.png" alt="chat">
+</button>
                                 <button class="action-button share-button" title="Share"><img src="/media/symbols/share.png" alt="share"></button> <!-- Outbox tray symbol -->
                             </div>
                     
@@ -764,7 +772,7 @@ h1::after {
     <h2>Suggested for you</h2>
     <ul class="user-list">
         {% for user in top_users %}
-            <li>
+            <li  user>
                 <!-- Check if profile_picture exists -->
                 <a href="{% url 'view_profile_id' user.id %}" class="user-link">
                     {% if user.profile_picture %}
@@ -800,36 +808,38 @@ h1::after {
 </div>
     </div>
    <!-- Modal Structure -->
+    <!-- Modal Structure -->
+    <!-- Modal Structure -->
+<<!-- Modal Structure -->
 <div id="image-modal" class="modal">
     <span class="close">&times;</span>
     <div class="modal-content">
+        <!-- User Info Section -->
+        <div class="modal-user-info">
+            <img id="user-image" src="" alt="User Image" class="user-image">
+            <span id="user-name" class="username"></span>
+        </div>
+
         <!-- Left Column: Image -->
         <div class="modal-left">
             <img id="modal-image" src="" alt="Completion Image">
         </div>
+
         <!-- Right Column: Comments -->
         <div class="modal-right">
             <h2>Comments</h2>
             <ul class="comment-list">
-                {% for comment in task.comments.all %}
-                    <li class="comment-item">
-                        <p>{{ comment.text }}</p>
-                        <small>By {{ comment.user.username }} on {{ comment.created_at|date:"F j, Y, g:i a" }}</small>
-                    </li>
-                {% empty %}
-                    <li>No comments yet.</li>
-                {% endfor %}
+                <!-- Comments will be dynamically populated here -->
             </ul>
-            <!-- Add Comment Form -->
-            {% if task.user == request.user %}
-                <form method="post" action="{% url 'add_comment' task.id %}">
-                    {% csrf_token %}
-                    <textarea name="text" placeholder="Add a comment..." required></textarea>
-                    <button type="submit">Post Comment</button>
-                </form>
-            {% endif %}
+            <form method="post" action="{% url 'add_comment' 0 %}" id="comment-form">
+                {% csrf_token %}
+                <input type="hidden" name="task_id" id="task-id-input">
+                <textarea name="text" placeholder="Add a comment..." required></textarea>
+                <button type="submit">Post Comment</button>
+            </form>
         </div>
     </div>
+</div>
 </div>
 </body>
 <script>
@@ -864,10 +874,40 @@ h1::after {
     const closeBtn = document.querySelector(".close");
 
     // Function to open the modal with the clicked image
-    function openModal(imageSrc) {
-        modal.style.display = "block";
-        modalImg.src = imageSrc;
+    // Function to open the modal with the clicked image
+function openModal(imageSrc, taskId, username, profilePicture) {
+    console.log("Opening modal for Task ID:", taskId);  // Debugging statement
+
+    const modal = document.getElementById("image-modal");
+    const modalImg = document.getElementById("modal-image");
+    const userImage = document.getElementById("user-image");
+    const userNameSpan = document.getElementById("user-name");
+
+    // Display the modal
+    modal.style.display = "block";
+
+    // Set the task image
+    modalImg.src = imageSrc;
+
+    // Set the user's profile picture and username
+    userImage.src = profilePicture || "/media/symbols/default-profile-pic.jpg";  // Use default image if profile picture is missing
+    userImage.alt = username;
+    userNameSpan.textContent = username;
+
+    // Update the form action URL and hidden input with the task ID
+    const commentForm = document.getElementById('comment-form');
+    const taskIdInput = document.getElementById('task-id-input');
+
+    if (taskId) {
+        commentForm.action = `/task/${taskId}/add-comment/`;  // Update the form action URL
+        taskIdInput.value = taskId;  // Update the hidden input value
+
+        // Fetch and display comments for the task
+        fetchComments(taskId);
+    } else {
+        console.error("Task ID is undefined.");
     }
+}
 
     // Function to close the modal
     function closeModal() {
@@ -883,6 +923,84 @@ h1::after {
             closeModal();
         }
     });
+
+    // Handle comment form submission via AJAX
+document.getElementById('comment-form').addEventListener('submit', function (event) {
+    event.preventDefault();  // Prevent the default form submission
+
+    const formData = new FormData(this);  // Get form data
+    const taskId = document.getElementById('task-id-input').value;  // Get the task ID
+
+    fetch(`/task/${taskId}/add-comment/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',  // Include the CSRF token
+            'X-Requested-With': 'XMLHttpRequest',  // Indicate this is an AJAX request
+        },
+        body: formData,  // Send form data
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok.');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            // Append the new comment to the comment list
+            const commentList = document.querySelector('.comment-list');
+            const commentItem = document.createElement('li');
+            commentItem.classList.add('comment-item');
+            commentItem.innerHTML = `
+                <p>${data.comment.text}</p>
+                <small>By ${data.comment.user.username} on ${new Date(data.comment.created_at).toLocaleString()}</small>
+            `;
+            commentList.appendChild(commentItem);
+
+            // Clear the comment form textarea
+            this.querySelector('textarea').value = '';
+        } else {
+            alert('Failed to add comment: ' + data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred. Please try again.');
+    });
+});
+
+    // Handle comment form submission via AJAX
+    function fetchComments(taskId) {
+    fetch(`/task/${taskId}/get-comments/`)  // Ensure the URL is correct
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok.');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                const commentList = document.querySelector('.comment-list');
+                commentList.innerHTML = '';  // Clear existing comments
+                console.log(data.comments)
+                // Append each comment to the comment list
+                data.comments.forEach(comment => {
+                    const commentItem = document.createElement('li');
+                    commentItem.classList.add('comment-item');
+                    commentItem.innerHTML = `
+                        <p>${comment.text}</p>
+                        <small>By ${comment.user__username} on ${new Date(comment.created_at).toLocaleString()}</small>
+                    `;
+                    commentList.appendChild(commentItem);
+                });
+            } else {
+                console.error('Failed to fetch comments:', data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching comments:', error);
+        });
+}
 </script>
 </html>
 {% endblock %}

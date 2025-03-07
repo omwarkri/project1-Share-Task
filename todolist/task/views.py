@@ -611,6 +611,83 @@ def add_subtask(request, task_id):
         print(task,)
         subtask = SubTask.objects.create(task=task, title=data["title"], completed=False)
         return JsonResponse({"id": subtask.id, "title": subtask.title, "completed": subtask.completed})
+    
+
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+from django.utils import timezone
+from .models import Task, Comment
+from .forms import CommentForm  # Assuming you have a form for comments
+
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseRedirect
+from .models import Task, Comment
+from .forms import CommentForm
+
+from django.http import JsonResponse
+from django.template.loader import render_to_string
+
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+from django.views.decorators.http import require_POST
+from .models import Task, Comment
+from .forms import CommentForm
+
+@require_POST
+def add_comment(request, task_id):
+    # Get the task or return a 404 error if not found
+    task = get_object_or_404(Task, id=task_id)
+
+    # Create a form instance and populate it with data from the request
+    form = CommentForm(request.POST)
+    if form.is_valid():
+        # Create a new comment but don't save it to the database yet
+        comment = form.save(commit=False)
+        # Associate the comment with the current task and user
+        comment.task = task
+        comment.user = request.user
+        # Save the comment to the database
+        comment.save()
+
+        # Return a JSON response with the new comment data
+        return JsonResponse({
+            'success': True,
+            'comment': {
+                'text': comment.text,
+                'user': {
+                    'username': comment.user.username,
+                },
+                'created_at': comment.created_at.isoformat(),
+            },
+        })
+    else:
+        # Return an error response if the form is invalid
+        return JsonResponse({
+            'success': False,
+            'error': 'Invalid form data.',
+        }, status=400)
+    
+
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+from .models import Task, Comment
+
+def get_comments(request, task_id):
+    # Get the task or return a 404 error if not found
+    task = get_object_or_404(Task, id=task_id)
+
+    # Get all comments for the task
+    comments = task.comments.all().values('id', 'text', 'user__username', 'created_at')
+
+    # Convert the comments queryset to a list of dictionaries
+    comments_list = list(comments)
+
+    # Return the comments as a JSON response
+    return JsonResponse({
+        'success': True,
+        'comments': comments_list,
+    })
 
 @csrf_exempt
 def toggle_subtask(request, subtask_id):

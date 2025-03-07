@@ -31,5 +31,7 @@ urlpatterns = [
     
     path('completed-tasks-feed/', completed_tasks_feed, name='completed_tasks_feed'),
     path('like-task/<int:task_id>/', like_task, name='like_task'),
+    path('task/<int:task_id>/add-comment/', add_comment, name='add_comment'),
+    path('task/<int:task_id>/get-comments/', get_comments, name='get_comments'),
   
 ]

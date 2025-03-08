@@ -1277,27 +1277,23 @@ def accept_invite(request, token):
 
 
 
-
-from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
+from django.http import JsonResponse
 from django.utils import timezone
-from .models import Team, Task, TeamScoreboard
-from django.db.models import (
-    F,  # For referencing model fields in queries
-    Avg,  # For calculating averages
-    ExpressionWrapper,  # For creating expressions in queries
-    fields,  # For defining field types (e.g., DurationField)
-)
-from django.db.models.functions import Extract  # Optional, for advanced date/time extraction
-from django.utils import timezone  # For working with timezone-aware datetimes
+from datetime import timedelta
+from django.db.models import Avg, F, ExpressionWrapper, fields
 
-def member_analysis(request, team_id,member_id):
-    """Fetch task analysis data for a specific team member."""
-    print(member_id)
+from task.models import  Team, Task, TeamScoreboard  # Update with actual app name
+from task.models import CustomUser
+
+
+
+
+def member_analysis(request, team_id, member_id):
+    """Fetch task analysis data for a specific team member, including daily, weekly, and monthly reports."""
+
     member = get_object_or_404(CustomUser, id=member_id)
-    print(member)
-    print(team_id)
-    team = get_object_or_404(Team, id=team_id) # Pass team_id in the request
+    team = get_object_or_404(Team, id=team_id)
 
     # Get tasks assigned to the member in this team
     tasks = Task.objects.filter(team=team, assigned_to=member)
@@ -1309,13 +1305,10 @@ def member_analysis(request, team_id,member_id):
     in_progress_tasks = tasks.filter(status='in_progress').count()
     overdue_tasks = tasks.filter(status__in=['pending', 'in_progress'], due_date__lt=timezone.now()).count()
 
-    # Calculate average completion time for completed tasks
+    # Average completion time for completed tasks
     if completed_tasks.exists():
         average_completion_time = completed_tasks.annotate(
-            completion_time=ExpressionWrapper(
-                F('updated_at') - F('created_at'),
-                output_field=fields.DurationField()
-            )
+            completion_time=ExpressionWrapper(F('updated_at') - F('created_at'), output_field=fields.DurationField())
         ).aggregate(avg_completion_time=Avg('completion_time'))['avg_completion_time']
         average_completion_time = str(average_completion_time)  # Convert to string for JSON
     else:
@@ -1325,17 +1318,68 @@ def member_analysis(request, team_id,member_id):
     scoreboard_entry = TeamScoreboard.objects.filter(team=team, member=member).first()
     score = scoreboard_entry.score if scoreboard_entry else 0
 
-    # Return analysis data as JSON
+    # Define time periods
+    now = timezone.now()
+    last_24_hours = now - timedelta(days=1)
+    last_7_days = now - timedelta(days=7)
+    last_30_days = now - timedelta(days=30)
+
+    # Daily, Weekly, Monthly Reports
+    daily_completed = completed_tasks.filter(updated_at__gte=last_24_hours).count()
+    weekly_completed = completed_tasks.filter(updated_at__gte=last_7_days).count()
+    monthly_completed = completed_tasks.filter(updated_at__gte=last_30_days).count()
+
+    # Filter tasks into daily, weekly, and monthly lists
+    daily_tasks = tasks.filter(updated_at__gte=last_24_hours)
+    weekly_tasks = tasks.filter(updated_at__gte=last_7_days)
+    monthly_tasks = tasks.filter(updated_at__gte=last_30_days)
+
+    # Serialize tasks
+    def serialize_tasks(task_queryset):
+        return [
+            {
+                'id': task.id,
+                'title': task.title,
+                'description': task.description,
+                'status': task.status,
+                'due_date': task.due_date.strftime('%Y-%m-%d') if task.due_date else None,
+                'created_at': task.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+                'updated_at': task.updated_at.strftime('%Y-%m-%d %H:%M:%S'),
+            }
+            for task in task_queryset
+        ]
+
+    # Serialize all tasks and filtered tasks
+    task_list = serialize_tasks(tasks)
+    daily_task_list = serialize_tasks(daily_tasks)
+    weekly_task_list = serialize_tasks(weekly_tasks)
+    monthly_task_list = serialize_tasks(monthly_tasks)
+
     return JsonResponse({
         'member': {'username': member.username},
-        'total_tasks': total_tasks,
-        'completed_tasks': completed_tasks.count(),
-        'pending_tasks': pending_tasks,
-        'in_progress_tasks': in_progress_tasks,
-        'overdue_tasks': overdue_tasks,
-        'score': score,
-        'average_completion_time': average_completion_time,
+        'task_summary': {
+            'total_tasks': total_tasks,
+            'completed_tasks': completed_tasks.count(),
+            'pending_tasks': pending_tasks,
+            'in_progress_tasks': in_progress_tasks,
+            'overdue_tasks': overdue_tasks,
+            'average_completion_time': average_completion_time,
+        },
+        'performance': {
+            'score': score,
+            'daily_completed': daily_completed,
+            'weekly_completed': weekly_completed,
+            'monthly_completed': monthly_completed,
+        },
+        'tasks': {
+            'all': task_list,  # All tasks
+            'daily': daily_task_list,  # Tasks updated in the last 24 hours
+            'weekly': weekly_task_list,  # Tasks updated in the last 7 days
+            'monthly': monthly_task_list,  # Tasks updated in the last 30 days
+        },
     })
+
+
 
 from django.shortcuts import get_object_or_404, redirect
 from django.contrib import messages

@@ -1,380 +1,530 @@
-<style>
-    /* Sidebar Styles */
-.team-sidebar {
-    width: 60px; /* Narrow sidebar for icons */
-    background-color: #e4fff9; /* Light background */
-    padding: 10px;
-    border-right: 1px solid #ccffeea1;
-    height: 100vh; /* Full height */
-    position: fixed; /* Fixed position */
-    left: 0;
-    top: 0;
-    overflow-y: auto; /* Scrollable if content overflows */
-    z-index: 500; /* Ensure it's above other content */
-    padding-top:60px ;
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Dashboard</title>
+    <style>
+        /* Sidebar Styles */
+        .team-sidebar {
+            width: 60px; /* Narrow sidebar for icons */
+            background-color: #e4fff9; /* Light background */
+            padding: 10px;
+            border-right: 1px solid #ccffeea1;
+            height: 100vh; /* Full height */
+            position: fixed; /* Fixed position */
+            left: 0;
+            top: 0;
+            overflow-y: auto; /* Scrollable if content overflows */
+            z-index: 500; /* Ensure it's above other content */
+            padding-top: 60px;
+        }
 
-.team-sidebar-header {
-    text-align: center;
-    margin-bottom: 20px;
-}
+        .team-sidebar-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
 
-.team-sidebar-header h2 {
-    color: #333; /* Dark text for the header */
-    font-size: 24px;
-}
+        .team-sidebar-header h2 {
+            color: #333; /* Dark text for the header */
+            font-size: 24px;
+        }
 
-.team-sidebar-links {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-}
+        .team-sidebar-links {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
 
-.team-sidebar-links li {
-    margin-bottom: 20px;
-    text-align: center;
-}
+        .team-sidebar-links li {
+            margin-bottom: 20px;
+            text-align: center;
+        }
 
-.team-sidebar-links li a {
-    color: #333; /* Dark text for links */
-    text-decoration: none;
-    font-size: 24px;
-    display: block;
-    transition: transform 0.2s ease, color 0.2s ease;
-}
+        .team-sidebar-links li a {
+            color: #333; /* Dark text for links */
+            text-decoration: none;
+            font-size: 24px;
+            display: block;
+            transition: transform 0.2s ease, color 0.2s ease;
+        }
 
-.team-sidebar-links li a:hover {
-    transform: scale(1.2); /* Slightly enlarge on hover */
-    color: #16a085; /* Teal color for hover */
-}
+        .team-sidebar-links li a:hover {
+            transform: scale(1.2); /* Slightly enlarge on hover */
+            color: #16a085; /* Teal color for hover */
+        }
 
-.team-sidebar-links li a[title]:hover::after {
-    content: attr(title);
-    position: absolute;
-    background-color: #333;
-    color: #fff;
-    padding: 5px 10px;
-    border-radius: 5px;
-    font-size: 14px;
-    margin-left: 10px;
-    white-space: nowrap;
-}
+        .team-sidebar-links li a[title]:hover::after {
+            content: attr(title);
+            position: absolute;
+            background-color: #333;
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 14px;
+            margin-left: 10px;
+            white-space: nowrap;
+        }
 
-/* Modal Styles */
-.modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
 
-.modal-content {
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    width: 90%;
-    max-width: 400px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
+        .modal-content {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
 
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
 
-.modal-header h3 {
-    margin: 0;
-}
+        .modal-header h3 {
+            margin: 0;
+        }
 
-.close, .close-modal {
-    cursor: pointer;
-    font-size: 24px;
-    color: #666;
-}
+        .close, .close-modal {
+            cursor: pointer;
+            font-size: 24px;
+            color: #666;
+        }
 
-.close:hover, .close-modal:hover {
-    color: #333;
-}
+        .close:hover, .close-modal:hover {
+            color: #333;
+        }
 
-.team-members-list {
-    margin-top: 20px;
-}
+        .team-members-list {
+            margin-top: 20px;
+        }
 
-.team-members-list ul {
-    list-style-type: none;
-    padding: 0;
-}
+        .team-members-list ul {
+            list-style-type: none;
+            padding: 0;
+        }
 
-.team-members-list li {
-    padding: 10px;
-    margin-bottom: 10px;
-    background-color: #f9f9f9;
-    border-radius: 8px;
-    transition: background-color 0.3s ease;
-}
+        .team-members-list li {
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            transition: background-color 0.3s ease;
+        }
 
-.team-members-list li:hover {
-    background-color: #f0f0f0;
-}
+        .team-members-list li:hover {
+            background-color: #f0f0f0;
+        }
 
-/* Mobile Toggle Button */
-.mobile-sidebar-toggle {
-    display: none; /* Hidden by default */
-    position: fixed;
-    top: 50%;
-    left: 0px;
-    font-size: 24px;
-    background: #16a085;
-    color: #fff;
-    border: none;
-    padding: 6px;
-    border-radius: 5px;
-    z-index: 501;
-    cursor: pointer;
-}
+        /* Mobile Toggle Button */
+        .mobile-sidebar-toggle {
+            display: none; /* Hidden by default */
+            position: fixed;
+            top: 50%;
+            left: 0px;
+            font-size: 24px;
+            background: #16a085;
+            color: #fff;
+            border: none;
+            padding: 6px;
+            border-radius: 5px;
+            z-index: 501;
+            cursor: pointer;
+        }
 
+        #memberAnalysisModal {
+            min-width: 600px;
+        }
 
-/* Mobile Responsiveness */
-@media (max-width: 768px) {
-    .mobile-sidebar-toggle {
-        display: block; /* Show toggle button on mobile */
-    }
+        /* Collapsible Task Sections */
+        .task-section {
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            overflow: hidden;
+        }
 
-    .team-sidebar {
-        left: -60px; /* Slightly off-screen */
-        transition: left 0.3s ease;
-    }
+        .task-section-header {
+            width: 100%;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border: none;
+            text-align: left;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 16px;
+        }
 
-    .team-sidebar.active {
-        left: 0; /* Make it visible when active */
-    }
+        .task-section-header:hover {
+            background-color: #f0f0f0;
+        }
 
-    #closeSidebar {
-        display: none; /* Hidden by default */
-    position: fixed;
-    top: 50%;
-    left: 0px;
-    font-size: 24px;
-    background: #16a085;
-    color: #fff;
-    border: none;
-    padding: 6px;
-    border-radius: 5px;
-    z-index: 501;
-    cursor: pointer;
+        .task-section-content {
+            padding: 10px;
+            background-color: #fff;
+            display: none; /* Hidden by default */
+        }
 
-    }
-    #closeSidebar {
-        display: none; /* Hide initially */
-    }
+        .task-section-content.visible {
+            display: block; /* Visible when the class is added */
+        }
 
-    .team-sidebar.active + #closeSidebar {
-        display: block; /* Show close button when sidebar is open */
-    }
-}
-</style>
-<!-- Mobile Toggle Button -->
-<button id="mobileSidebarToggle" class="mobile-sidebar-toggle">></button>
-<button id="closeSidebar" class="mobile-sidebar-toggle">x</button>
-<!-- Sidebar -->
-<div class="team-sidebar" data-team-id="{{ team.id }}">
-    <ul class="team-sidebar-links">
-        <li>
-            <a href="{% url 'view_team_tasks' team.id %}" title="All Teams">🏠</a>
-        </li>
-        <li>
-            <a href="#" onclick="openAddTaskModal()" title="Create Task">➕</a>
-        </li>
-        <li>
-            <a href="{% url 'team_leaderboard' team.id %}" title="Leaderboard">🏆</a>
-        </li>
-        <li>
-            <a href="#" onclick="openTeamMembersModal()" title="Team Members">👥</a>
-        </li>
-        <li>
-            <a href="{% url 'team_chat' team.id %}" title="Group Chat">💬</a>
-        </li>
-        <!-- Add Appreciations Link -->
-        <li>
-            <a href="{% url 'team_appreciations' team.id %}" title="Appreciations">🌟</a>
-        </li>
-    </ul>
-</div>
+        .toggle-icon {
+            font-size: 12px;
+        }
 
-
-<!-- Add Task Modal -->
-<div id="taskModal" class="modal" style="display: none;">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3>Add Task</h3>
-            <span class="close" onclick="closeAddTaskModal()">&times;</span>
-        </div>
-        <form method="post">
-            {% csrf_token %}
-            {{ task_form.as_p }}
-            <button type="submit" name="add_task">Create Task</button>
-        </form>
-    </div>
-</div>
-
-<!-- Team Members Modal -->
-<div id="teamMembersModal" class="modal" style="display: none;">
-    <div class="modal-content">
-        <span class="close-modal" onclick="closeTeamMembersModal()">&times;</span>
-        <h3>👥 Team Members</h3>
-        <div class="team-members-list">
-            <ul>
-                {% for member in team.members.all %}
-                    <li>
-                        <a href="#" class="member-link" data-member-id="{{ member.id }}">{{ member.username }}</a>
-                    </li>
-                {% endfor %}
-            </ul>
-        </div>
-    </div>
-</div>
-
-<!-- Member Analysis Modal -->
-<div id="memberAnalysisModal" class="modal" style="display: none;">
-    <div class="modal-content">
-        <span class="close-modal" onclick="closeMemberAnalysisModal()">&times;</span>
-        <h3 id="memberAnalysisTitle">👤 Member Analysis</h3>
-        <div id="memberAnalysisContent">
-            <!-- Analysis data will be loaded here dynamically -->
-            <p>Loading analysis...</p>
-        </div>
-    </div>
-</div>
-
-
-
-<script>
-    const teamSidebar = document.querySelector('.team-sidebar');
-    const teamId = teamSidebar.getAttribute('data-team-id');
-    // Toggle Sidebar on Mobile
-    document.addEventListener('DOMContentLoaded', () => {
-        
-        const mobileToggle = document.getElementById('mobileSidebarToggle');
-        const sidebar = document.querySelector('.team-sidebar');
-        const closeSidebarButton = document.getElementById('closeSidebar');
-
-        // Open sidebar
-        mobileToggle.addEventListener('click', () => {
-            console.log("hii")
-            sidebar.classList.add('active');
-        });
-
-        // Close sidebar
-        closeSidebarButton.addEventListener('click', () => {
-            sidebar.classList.remove('active');
-        });
-
-        // Close sidebar when clicking outside
-        window.addEventListener('click', (event) => {
-            if (!sidebar.contains(event.target)) {
-                sidebar.classList.remove('active');
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .mobile-sidebar-toggle {
+                display: block; /* Show toggle button on mobile */
             }
-        });
-    });
 
-    // Modal Functions
-    function openAddTaskModal() {
-        document.getElementById('taskModal').style.display = 'flex';
-    }
+            .team-sidebar {
+                left: -60px; /* Slightly off-screen */
+                transition: left 0.3s ease;
+            }
 
-    function closeAddTaskModal() {
-        document.getElementById('taskModal').style.display = 'none';
-    }
+            .team-sidebar.active {
+                left: 0; /* Make it visible when active */
+            }
 
-    function openTeamMembersModal() {
-        document.getElementById('teamMembersModal').style.display = 'flex';
-    }
+            #closeSidebar {
+                display: none; /* Hidden by default */
+                position: fixed;
+                top: 50%;
+                left: 0px;
+                font-size: 24px;
+                background: #16a085;
+                color: #fff;
+                border: none;
+                padding: 6px;
+                border-radius: 5px;
+                z-index: 501;
+                cursor: pointer;
+            }
 
-    function closeTeamMembersModal() {
-        document.getElementById('teamMembersModal').style.display = 'none';
-    }
+            .team-sidebar.active + #closeSidebar {
+                display: block; /* Show close button when sidebar is open */
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Mobile Toggle Button -->
+    <button id="mobileSidebarToggle" class="mobile-sidebar-toggle">></button>
+    <button id="closeSidebar" class="mobile-sidebar-toggle">x</button>
 
+    <!-- Sidebar -->
+    <div class="team-sidebar" data-team-id="{{ team.id }}">
+        <ul class="team-sidebar-links">
+            <li>
+                <a href="{% url 'view_team_tasks' team.id %}" title="All Teams">🏠</a>
+            </li>
+            <li>
+                <a href="#" onclick="openAddTaskModal()" title="Create Task">➕</a>
+            </li>
+            <li>
+                <a href="{% url 'team_leaderboard' team.id %}" title="Leaderboard">🏆</a>
+            </li>
+            <li>
+                <a href="#" onclick="openTeamMembersModal()" title="Team Members">👥</a>
+            </li>
+            <li>
+                <a href="{% url 'team_chat' team.id %}" title="Group Chat">💬</a>
+            </li>
+            <!-- Add Appreciations Link -->
+            <li>
+                <a href="{% url 'team_appreciations' team.id %}" title="Appreciations">🌟</a>
+            </li>
+        </ul>
+    </div>
 
-    function openMemberAnalysisModal(memberId) {
-        console.log("member analysis model")
-        
-        fetch(`/team/${teamId}/member-analysis/${memberId}/`)
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('memberAnalysisTitle').innerText = `👤 ${data.member.username}'s Analysis`;
-                document.getElementById('memberAnalysisContent').innerHTML = `
-                    <p><strong>Total Tasks:</strong> ${data.total_tasks}</p>
-                    <p><strong>Completed Tasks:</strong> ${data.completed_tasks}</p>
-                    <p><strong>Pending Tasks:</strong> ${data.pending_tasks}</p>
-                    <p><strong>In Progress Tasks:</strong> ${data.in_progress_tasks}</p>
-                    <p><strong>Overdue Tasks:</strong> ${data.overdue_tasks}</p>
-                    <p><strong>Score:</strong> ${data.score}</p>
-                    <p><strong>Average Completion Time:</strong> ${data.average_completion_time || 'N/A'}</p>
-                `;
-                document.getElementById('memberAnalysisModal').style.display = 'flex';
-            })
-            .catch(error => {
-                console.error('Error fetching member analysis:', error);
-                document.getElementById('memberAnalysisContent').innerHTML = '<p>Error loading analysis. Please try again.</p>';
+    <!-- Add Task Modal -->
+    <div id="taskModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add Task</h3>
+                <span class="close" onclick="closeAddTaskModal()">&times;</span>
+            </div>
+            <form method="post">
+                {% csrf_token %}
+                {{ task_form.as_p }}
+                <button type="submit" name="add_task">Create Task</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Team Members Modal -->
+    <div id="teamMembersModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeTeamMembersModal()">&times;</span>
+            <h3>👥 Team Members</h3>
+            <div class="team-members-list">
+                <ul>
+                    {% for member in team.members.all %}
+                        <li>
+                            <a href="#" class="member-link" data-member-id="{{ member.id }}">{{ member.username }}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Member Analysis Modal -->
+    <div id="memberAnalysisModal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 800px;">
+            <span class="close-modal" onclick="closeMemberAnalysisModal()">&times;</span>
+            <h3 id="memberAnalysisTitle">👤 Member Analysis</h3>
+
+            <div id="memberAnalysisContent">
+                <h4>📊 Task Summary</h4>
+                <p><strong>Total Tasks:</strong> <span id="totalTasks"></span></p>
+                <p><strong>Completed Tasks:</strong> <span id="completedTasks"></span></p>
+                <p><strong>Pending Tasks:</strong> <span id="pendingTasks"></span></p>
+                <p><strong>In Progress Tasks:</strong> <span id="inProgressTasks"></span></p>
+                <p><strong>Overdue Tasks:</strong> <span id="overdueTasks"></span></p>
+                <p><strong>Avg Completion Time:</strong> <span id="avgCompletionTime"></span></p>
+
+                <h4>🏆 Performance</h4>
+                <p><strong>Score:</strong> <span id="performanceScore"></span></p>
+                <p><strong>Daily Completed:</strong> <span id="dailyCompleted"></span></p>
+                <p><strong>Weekly Completed:</strong> <span id="weeklyCompleted"></span></p>
+                <p><strong>Monthly Completed:</strong> <span id="monthlyCompleted"></span></p>
+
+                <h4>📌 Recent Tasks</h4>
+
+                <!-- Collapsible Sections for Daily, Weekly, Monthly Tasks -->
+                <div class="task-section">
+                    <button class="task-section-header" onclick="toggleSection('dailyTasks')">
+                        <span>Daily Tasks</span>
+                        <span class="toggle-icon">▼</span>
+                    </button>
+                    <div id="dailyTasks" class="task-section-content">
+                        <table border="1" width="100%">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Status</th>
+                                    <th>Due Date</th>
+                                    <th>Created At</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dailyTaskList">
+                                <!-- Daily tasks will be inserted here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="task-section">
+                    <button class="task-section-header" onclick="toggleSection('weeklyTasks')">
+                        <span>Weekly Tasks</span>
+                        <span class="toggle-icon">▼</span>
+                    </button>
+                    <div id="weeklyTasks" class="task-section-content">
+                        <table border="1" width="100%">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Status</th>
+                                    <th>Due Date</th>
+                                    <th>Created At</th>
+                                </tr>
+                            </thead>
+                            <tbody id="weeklyTaskList">
+                                <!-- Weekly tasks will be inserted here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="task-section">
+                    <button class="task-section-header" onclick="toggleSection('monthlyTasks')">
+                        <span>Monthly Tasks</span>
+                        <span class="toggle-icon">▼</span>
+                    </button>
+                    <div id="monthlyTasks" class="task-section-content">
+                        <table border="1" width="100%">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Status</th>
+                                    <th>Due Date</th>
+                                    <th>Created At</th>
+                                </tr>
+                            </thead>
+                            <tbody id="monthlyTaskList">
+                                <!-- Monthly tasks will be inserted here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const teamSidebar = document.querySelector('.team-sidebar');
+        const teamId = teamSidebar.getAttribute('data-team-id');
+        let allTasks = []; // Store all tasks globally
+
+        // Toggle Sidebar on Mobile
+        document.addEventListener('DOMContentLoaded', () => {
+            const mobileToggle = document.getElementById('mobileSidebarToggle');
+            const sidebar = document.querySelector('.team-sidebar');
+            const closeSidebarButton = document.getElementById('closeSidebar');
+
+            // Open sidebar
+            mobileToggle.addEventListener('click', () => {
+                sidebar.classList.add('active');
             });
-    }
 
-    function closeMemberAnalysisModal() {
-        document.getElementById('memberAnalysisModal').style.display = 'none';
-    }
+            // Close sidebar
+            closeSidebarButton.addEventListener('click', () => {
+                sidebar.classList.remove('active');
+            });
 
-    document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('.member-link').forEach(link => {
-        link.addEventListener('click', function(event) {
-            event.preventDefault(); // Prevent default anchor behavior
-            const memberId = this.getAttribute('data-member-id');
-            openMemberAnalysisModal(memberId);
+            // Close sidebar when clicking outside
+            window.addEventListener('click', (event) => {
+                if (!sidebar.contains(event.target)) {
+                    sidebar.classList.remove('active');
+                }
+            });
         });
-    });
-});
 
+        // Modal Functions
+        function openAddTaskModal() {
+            document.getElementById('taskModal').style.display = 'flex';
+        }
 
-    // Attach click event to member links
-    document.addEventListener('DOMContentLoaded', () => {
-    const mobileToggle = document.getElementById('mobileSidebarToggle');
-    const sidebar = document.querySelector('.team-sidebar');
-    const closeSidebarButton = document.getElementById('closeSidebar');
+        function closeAddTaskModal() {
+            document.getElementById('taskModal').style.display = 'none';
+        }
 
-    // Open sidebar
-    mobileToggle.addEventListener('click', (event) => {
-        event.stopPropagation();
-        sidebar.classList.add('active');
-        closeSidebarButton.style.display = 'block';
-    });
+        function openTeamMembersModal() {
+            document.getElementById('teamMembersModal').style.display = 'flex';
+        }
 
-    // Close sidebar
-    closeSidebarButton.addEventListener('click', (event) => {
-        event.stopPropagation();
-        sidebar.classList.remove('active');
-        closeSidebarButton.style.display = 'none';
-    });
+        function closeTeamMembersModal() {
+            document.getElementById('teamMembersModal').style.display = 'none';
+        }
 
-    // Prevent closing when clicking inside the sidebar
-    sidebar.addEventListener('click', (event) => {
-        event.stopPropagation();
-    });
+        // Toggle collapsible sections
+        function toggleSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            const toggleIcon = section.previousElementSibling.querySelector('.toggle-icon');
 
-    // Close when clicking outside
-    document.addEventListener('click', () => {
-        sidebar.classList.remove('active');
-        closeSidebarButton.style.display = 'none';
-    });
-});
+            // Toggle the visibility of the section
+            section.classList.toggle('visible');
 
+            // Update the toggle icon
+            if (section.classList.contains('visible')) {
+                toggleIcon.textContent = "▲"; // Expanded state
+            } else {
+                toggleIcon.textContent = "▼"; // Collapsed state
+            }
+        }
 
+        // Populate tasks in the modal
+        function populateTasks(tasks, sectionId) {
+            const taskList = document.getElementById(sectionId);
+            taskList.innerHTML = ""; // Clear previous data
 
+            tasks.forEach(task => {
+                let row = `<tr>
+                    <td>${task.title}</td>
+                    <td>${task.status}</td>
+                    <td>${task.due_date || 'N/A'}</td>
+                    <td>${task.created_at}</td>
+                </tr>`;
+                taskList.innerHTML += row;
+            });
+        }
 
-</script>
+        // Open Member Analysis Modal
+        function openMemberAnalysisModal(memberId) {
+            const teamId = document.querySelector('.team-sidebar').getAttribute('data-team-id');
+
+            fetch(`/team/${teamId}/member-analysis/${memberId}/`)
+                .then(response => response.json())
+                .then(data => {
+                    console.log("Fetched data:", data); // Debugging
+
+                    // Update modal title with username
+                    document.getElementById('memberAnalysisTitle').innerText = `👤 ${data.member.username}'s Analysis`;
+
+                    // Task Summary
+                    document.getElementById('totalTasks').innerText = data.task_summary.total_tasks;
+                    document.getElementById('completedTasks').innerText = data.task_summary.completed_tasks;
+                    document.getElementById('pendingTasks').innerText = data.task_summary.pending_tasks;
+                    document.getElementById('inProgressTasks').innerText = data.task_summary.in_progress_tasks;
+                    document.getElementById('overdueTasks').innerText = data.task_summary.overdue_tasks;
+                    document.getElementById('avgCompletionTime').innerText = data.task_summary.average_completion_time;
+
+                    // Performance Metrics
+                    document.getElementById('performanceScore').innerText = data.performance.score;
+                    document.getElementById('dailyCompleted').innerText = data.performance.daily_completed;
+                    document.getElementById('weeklyCompleted').innerText = data.performance.weekly_completed;
+                    document.getElementById('monthlyCompleted').innerText = data.performance.monthly_completed;
+
+                    // Store tasks globally
+                    allTasks = data.tasks;
+                    console.log("All tasks:", allTasks); // Debugging
+
+                    // Filter and populate tasks for each section
+                    const dailyTasks = allTasks.daily || [];
+                    const weeklyTasks = allTasks.weekly || [];
+                    const monthlyTasks = allTasks.monthly || [];
+
+                    populateTasks(dailyTasks, 'dailyTaskList');
+                    populateTasks(weeklyTasks, 'weeklyTaskList');
+                    populateTasks(monthlyTasks, 'monthlyTaskList');
+
+                    // Show modal
+                    document.getElementById('memberAnalysisModal').style.display = 'flex';
+                })
+                .catch(error => {
+                    console.error('Error fetching member analysis:', error);
+                });
+        }
+
+        // Close Member Analysis Modal
+        function closeMemberAnalysisModal() {
+            document.getElementById('memberAnalysisModal').style.display = 'none';
+        }
+
+        // Attach click event to member links
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.member-link').forEach(link => {
+                link.addEventListener('click', function (event) {
+                    event.preventDefault(); // Prevent default link behavior
+                    const memberId = this.getAttribute('data-member-id');
+                    if (memberId) {
+                        openMemberAnalysisModal(memberId);
+                    } else {
+                        console.error("Member ID is missing!");
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

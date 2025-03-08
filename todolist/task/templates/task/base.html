@@ -53,6 +53,7 @@
             align-items: center;
             justify-content: space-between;
             z-index: 800;
+            transition: transform 0.3s ease-in-out; /* Smooth transition for hiding/showing */
         }
 
         .header-left {
@@ -242,7 +243,6 @@
             overflow-y: auto;
             margin-top: 64px; /* Space for the fixed header */
             position: relative;
-          
         }
 
         /* Modal Styles */
@@ -552,6 +552,23 @@
                 leaderboardLink.classList.add('active');
             }
         });
+
+        let lastScrollTop = 0; // Variable to store the last scroll position
+
+    window.addEventListener("scroll", function () {
+        const header = document.querySelector("header");
+        const currentScrollTop = window.pageYOffset || document.documentElement.scrollTop;
+
+        if (currentScrollTop > lastScrollTop) {
+            // User is scrolling down
+            header.classList.add("hide-header");
+        } else {
+            // User is scrolling up
+            header.classList.remove("hide-header");
+        }
+
+        lastScrollTop = currentScrollTop <= 0 ? 0 : currentScrollTop; // Update last scroll position
+    });
     </script>
 </body>
 </html>

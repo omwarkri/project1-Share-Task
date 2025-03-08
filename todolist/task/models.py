@@ -17,15 +17,20 @@ class Team(models.Model):
     name = models.CharField(max_length=255, unique=True)
     description = models.TextField(blank=True, null=True)
     team_lead = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True, related_name="leading_teams")
-    created_by = models.ForeignKey("user.CustomUser", on_delete=models.CASCADE, related_name="teams")
-    members = models.ManyToManyField("user.CustomUser", related_name="team_members", blank=True)
+    created_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="teams")
+    members = models.ManyToManyField(CustomUser, related_name="team_members", blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def get_appreciations(self):
+        return self.appreciations.all()
 
     def __str__(self):
         return self.name
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.utils.crypto import get_random_string
+
+
 
 User = get_user_model()
 
@@ -68,6 +73,23 @@ class TeamScoreboard(models.Model):
 
     def __str__(self):
         return f"{self.member.username} - {self.score} points"
+
+
+from django.db import models
+from django.conf import settings
+
+class Appreciation(models.Model):
+    from_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="appreciations_given")
+    to_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="appreciations_received")
+    team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name="appreciations")
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('from_user', 'to_user', 'team')  # Prevent duplicate appreciations within the same team
+
+    def __str__(self):
+        return f"Appreciation from {self.from_user} to {self.to_user} in {self.team}"
 
 
 

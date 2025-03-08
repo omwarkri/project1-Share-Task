@@ -1,0 +1,271 @@
+{% extends 'task/base.html' %}  <!-- Assuming you have a base template -->
+
+{% block content %}
+<style>
+    /* General Styles */
+    body {
+        font-family: 'Arial', sans-serif;
+        background-color: #f8f9fa;
+        color: #333;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        height: 92vh;
+    }
+
+    .Appreciation {
+        overflow-y: auto;
+    }
+
+    h1 {
+        font-size: 2.5rem;
+        color: #2c3e50;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    p {
+        font-size: 1.1rem;
+        color: #555;
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    /* Modal Styles */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        justify-content: center;
+        align-items: center;
+    }
+
+    .modal-content {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        width: 90%;
+        max-width: 500px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .close {
+        font-size: 24px;
+        cursor: pointer;
+        float: right;
+    }
+
+    /* Form Styles */
+    .give-appreciation {
+        background-color: #ffffff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .give-appreciation h2 {
+        font-size: 1.8rem;
+        color: #2c3e50;
+        margin-bottom: 20px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        font-size: 1rem;
+        color: #555;
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 1rem;
+        transition: border-color 0.3s ease;
+    }
+
+    .form-control:focus {
+        border-color: #1abc9c;
+        outline: none;
+    }
+
+    textarea.form-control {
+        resize: vertical;
+        min-height: 120px;
+    }
+
+    .btn-primary {
+        background-color: #1abc9c;
+        border: none;
+        padding: 10px 20px;
+        font-size: 1rem;
+        color: #fff;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        background-color: #16a085;
+    }
+
+    /* Appreciations List Styles */
+    .appreciations-list {
+        background-color: #ffffff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .appreciations-list h2 {
+        font-size: 1.8rem;
+        color: #2c3e50;
+        margin-bottom: 20px;
+    }
+
+    .list-group {
+        list-style: none;
+        padding: 0;
+    }
+
+    .list-group-item {
+        background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 10px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .list-group-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .list-group-item strong {
+        color: #1abc9c;
+    }
+
+    .list-group-item p {
+        margin: 10px 0 0;
+        color: #555;
+        font-size: 1rem;
+    }
+
+    .text-muted {
+        font-size: 0.9rem;
+        color: #888;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        h1 {
+            font-size: 2rem;
+        }
+
+        .give-appreciation, .appreciations-list {
+            padding: 15px;
+        }
+
+        .btn-primary {
+            width: 100%;
+        }
+    }
+</style>
+
+<div class="container">
+    {% include "teams/sidebar.html" %}
+    <div class="Appreciation">
+        <h1>{{ team.name }} - Appreciations</h1>
+        <p>{{ team.description }}</p>
+
+        <!-- Button to Open Modal -->
+        <button onclick="openModal()" class="btn btn-primary">Give Appreciation</button>
+
+        <!-- Modal for Appreciation Form -->
+        <div id="appreciationModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal()">&times;</span>
+                <div class="give-appreciation">
+                    <h2>Give Appreciation</h2>
+                    <form method="post" action="{% url 'team_appreciations' team.id %}">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="to_user">To:</label>
+                            <select name="to_user" id="to_user" class="form-control" required>
+                                <option value="" disabled selected>Select a team member</option>
+                                {% for member in team.members.all %}
+                                    {% if member != request.user %}
+                                        <option value="{{ member.id }}">{{ member.get_full_name|default:member.username }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="message">Message:</label>
+                            <textarea name="message" id="message" class="form-control" rows="4" placeholder="Write your appreciation message..." required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Send Appreciation</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Display All Appreciations -->
+        <div class="appreciations-list">
+            <h2>All Appreciations</h2>
+            {% if team.get_appreciations %}
+                <ul class="list-group">
+                    {% for appreciation in team.get_appreciations %}
+                        <li class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>{{ appreciation.from_user.get_full_name|default:appreciation.from_user.username }}</strong>
+                                    appreciated
+                                    <strong>{{ appreciation.to_user.get_full_name|default:appreciation.to_user.username }}</strong>:
+                                    <p>{{ appreciation.message }}</p>
+                                </div>
+                                <small class="text-muted">{{ appreciation.created_at|date:"F j, Y, g:i a" }}</small>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No appreciations have been given yet.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+    // JavaScript to handle modal
+    function openModal() {
+        document.getElementById("appreciationModal").style.display = "flex";
+    }
+
+    function closeModal() {
+        document.getElementById("appreciationModal").style.display = "none";
+    }
+
+    // Close modal when clicking outside the modal content
+    window.onclick = function (event) {
+        const modal = document.getElementById("appreciationModal");
+        if (event.target === modal) {
+            modal.style.display = "none";
+        }
+    };
+</script>
+{% endblock %}

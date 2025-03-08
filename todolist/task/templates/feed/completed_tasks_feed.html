@@ -23,14 +23,16 @@ body {
 
 .feed-main-content {
     display: flex;
-    height: 100vh;
+    height: 92vh;
     overflow-y: auto;
+    margin-top: 0px;
+    overflow-x: hidden;
 }
 
-.feed-main-content .container {
+.feed-main-content-container {
     flex: 1;
     padding: 24px;
-    padding-top: 16px;
+
     margin-right:300px ;
     
 }
@@ -203,21 +205,22 @@ h1::after {
     justify-content: center;
     gap: 10px;
     margin-bottom: 20px;
-    flex-wrap: wrap; /* Allow buttons to wrap on smaller screens */
+    overflow-y: auto;
+
 }
 
 /* Base Button Style */
 .filter-button {
-    padding: 12px 20px;
-    background: linear-gradient(45deg, #1abc9c, #16a085); /* Gradient background */
+    padding: 8px;
+    background: linear-gradient(45deg, #858585c3, #c6fff389); /* Gradient background */
     color: white;
     text-decoration: none;
-    border-radius: 25px; /* Rounded corners */
+    border-radius: 6px; /* Rounded corners */
     font-size: 14px;
     font-weight: 600;
     text-transform: uppercase; /* Uppercase text */
     transition: all 0.3s ease;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+
     border: 2px solid transparent; /* Transparent border */
     position: relative;
     overflow: hidden; /* Ensure the sliding effect stays within the button */
@@ -275,12 +278,16 @@ h1::after {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 20px;
+
+
 }
+
+
 
 .task-feed-item {
     background-color: white;
-    border: 1px solid #e1e1e1;
-    border-radius: 10px;
+
+    
     overflow: hidden;
 
     transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -297,6 +304,8 @@ h1::after {
     object-fit: cover;
     display: block;
     transition: transform 0.3s ease;
+    border: 1px solid #5e5e5e;
+    border-radius: 8px;
 }
 
 .task-feed-item:hover img {
@@ -407,6 +416,50 @@ h1::after {
 .comment-button:hover {
     color: #2980b9; /* Darker blue on hover */
     
+}
+
+.task-details-container {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 5px;
+}
+
+.property-section {
+    margin-bottom: 10px;
+}
+
+.toggle-button {
+    background: none;
+    border: none;
+    color: #007bff;
+    cursor: pointer;
+    padding: 5px;
+    text-align: left;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+}
+
+.toggle-button:hover {
+    color: #0056b3;
+}
+
+.toggle-button::before {
+    content: "▶";
+    margin-right: 5px;
+    font-size: 12px;
+    transition: transform 0.2s;
+}
+
+.toggle-button.expanded::before {
+    content: "▼";
+}
+
+.property-content {
+    margin-left: 20px;
+    padding: 10px;
+    border-left: 2px solid #007bff;
 }
 
 /* Share Button */
@@ -575,8 +628,9 @@ h1::after {
 /* Mobile Responsiveness */
 /* Mobile Responsiveness for Modal */
 @media (max-width: 768px) {
-    .feed-main-content .container{
+    .feed-main-content-container{
         margin: 0;
+        padding: 0;
     }   
     .users{
         display: none;
@@ -638,7 +692,7 @@ h1::after {
 
 @media (max-width: 480px) {
     .feed-main-content .container {
-        padding: 12px; /* Further reduce padding */
+        padding: 0px; /* Further reduce padding */
     }
 
     .users {
@@ -702,7 +756,7 @@ h1::after {
 <body>
     <div class="feed-main-content">
         <!-- Main Content -->
-        <div class="container">
+        <div class="feed-main-content-container">
 
             <!-- Filter Buttons -->
             <div class="filters">
@@ -867,6 +921,46 @@ h1::after {
 
         <!-- Right Column: Dynamic Content -->
         <div class="modal-right">
+
+            <div class="task-details-container">
+                <!-- Description Section -->
+                <div class="property-section">
+                    <button class="toggle-button" onclick="toggleSection('description')">▶ Description</button>
+                    <div id="description-content" class="property-content" style="display: none;">
+                        <pre id="task-description"></pre>
+                    </div>
+                </div>
+            
+                <!-- Comments Section -->
+                <div class="property-section">
+                    <button class="toggle-button" onclick="toggleSection('comments')">▶ Comments</button>
+                    <div id="comments-content" class="property-content" style="display: none;">
+                        <ul class="comment-list"></ul>
+                        <form method="post" action="{% url 'add_comment' 0 %}" id="comment-form">
+                            {% csrf_token %}
+                            <input type="hidden" name="task_id" id="task-id-input">
+                            <textarea name="text" placeholder="Add a comment..." required></textarea>
+                            <button type="submit">Post Comment</button>
+                        </form>
+                    </div>
+                </div>
+            
+                <!-- Likes Section -->
+                <div class="property-section">
+                    <button class="toggle-button" onclick="toggleSection('likes')">▶ Likes</button>
+                    <div id="likes-content" class="property-content" style="display: none;">
+                        <ul id="likes-list"></ul>
+                    </div>
+                </div>
+            
+                <!-- Completion Details Section -->
+                <div class="property-section">
+                    <button class="toggle-button" onclick="toggleSection('completion')">▶ Completion Details</button>
+                    <div id="completion-content" class="property-content" style="display: none;">
+                        <pre id="completion-details"></pre>
+                    </div>
+                </div>
+            </div>
             <!-- Comments Section -->
             <div class="comments" style="display: none;">
                 <h2>Comments</h2>
@@ -886,8 +980,7 @@ h1::after {
             </div>
 
             <div class="likes-section" style="display: none;">
-                <h2>Task Description</h2>
-                <pre id="task-likes"></pre>
+           
             </div>
 
             <!-- Completion Details Section -->
@@ -986,11 +1079,12 @@ h1::after {
         fetchCompletionDetails(taskId)
     } else if (type=== "liked-users"){
         fetchTaskLikedUsers(taskId)
-    } else if (type==='all'){
-         commentsSection.style.display = "block";
+    }  
+    else if (type==='all'){
+        // commentsSection.style.display = "block";
         document.querySelector(".completion-details-section").style.display = "block";
-        document.querySelector(".likes-section").style.display="block";
-        document.querySelector(".description-section").style.display = "block";
+        // document.querySelector(".likes-section").style.display="block";
+        // document.querySelector(".description-section").style.display = "block";
         fetchCompletionDetails(taskId)
         fetchCompletionDetails(taskId)
         fetchComments(taskId);
@@ -1101,6 +1195,19 @@ function fetchTaskDetails(taskId) {
         }
     });
 
+
+    function toggleSection(sectionId) {
+    const button = document.querySelector(`button[onclick="toggleSection('${sectionId}')"]`);
+    const content = document.getElementById(`${sectionId}-content`);
+
+    if (content.style.display === "none") {
+        content.style.display = "block";
+        button.classList.add("expanded");
+    } else {
+        content.style.display = "none";
+        button.classList.remove("expanded");
+    }
+}
     // Handle comment form submission via AJAX
 document.getElementById('comment-form').addEventListener('submit', function (event) {
     event.preventDefault();  // Prevent the default form submission

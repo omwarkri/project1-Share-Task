@@ -1524,3 +1524,31 @@ def like_task(request, task_id):
 
     like_count = task.likes.count()
     return JsonResponse({'liked': liked, 'like_count': like_count})
+
+
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from .models import Team, Appreciation
+from .forms import AppreciationForm
+
+@login_required
+def team_appreciations(request, team_id):
+    team = get_object_or_404(Team, id=team_id)
+
+    # Handle form submission
+    if request.method == 'POST':
+        form = AppreciationForm(request.POST)
+        if form.is_valid():
+            appreciation = form.save(commit=False)
+            appreciation.from_user = request.user
+            appreciation.team = team
+            appreciation.save()
+            return redirect('team_appreciations', team_id=team.id)
+    else:
+        form = AppreciationForm()
+
+    # Render the template with the form and appreciations
+    return render(request, 'teams/appreciations.html', {
+        'team': team,
+        'form': form,
+    })

@@ -197,3 +197,12 @@ class EscalateTaskForm(forms.ModelForm):
         labels = {
             'escalation_reason': 'Reason for Escalation',
         }
+
+
+from django import forms
+from .models import Appreciation
+
+class AppreciationForm(forms.ModelForm):
+    class Meta:
+        model = Appreciation
+        fields = ['to_user', 'message']

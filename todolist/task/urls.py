@@ -27,6 +27,8 @@ urlpatterns = [
     path("teams/<int:team_id>/invite/", send_team_invite, name="send_team_invite"),
     path('team/<int:team_id>/member-analysis/<int:member_id>/', member_analysis, name='member_analysis'),
     path('team/<int:team_id>/appreciations/', team_appreciations, name='team_appreciations'),
+    path('team/<int:team_id>/permissions/', fetch_permissions, name='fetch_permissions'),
+    path('team/<int:team_id>/update-permissions/<int:user_id>/', update_permissions, name='update_permissions'),
     path("tasks/escalate/<int:task_id>/", escalate_task, name="escalate_task"),
     path("tasks/<int:task_id>/reassign/", reassign_task, name="reassigned_task"),
     

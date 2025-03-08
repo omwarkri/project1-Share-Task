@@ -366,6 +366,16 @@ from django.utils import timezone
 activity_date = timezone.localdate()  # This gives the current date in the active timezone
 
 
+
+
+
+
+
+
+from django.core.exceptions import PermissionDenied
+from django.shortcuts import get_object_or_404
+from django.utils import timezone
+
 @login_required
 def add_task(request):
     if request.method == 'POST':
@@ -373,9 +383,24 @@ def add_task(request):
         if form.is_valid():
             task = form.save(commit=False)
             task.user = request.user
+
+            # Check if the task is being added to a team
+            team_id = request.POST.get('team')
+            if team_id:
+                team = get_object_or_404(Team, id=team_id)
+
+                # Check if the user has permission to add tasks to the team
+                if not team.has_permission(request.user, "add_task"):
+                    raise PermissionDenied("You do not have permission to add tasks to this team.")
+
+                # Assign the task to the team
+                task.team = team
+
+            # Handle private and shareable tasks
             is_private = request.POST.get('private') == 'on'  # 'on' is the value when the checkbox is checked
             task.shareable = not is_private  # If private is True, shareable is False, and vice versa
 
+            # Save the task
             task.save()
 
             # Log the task creation
@@ -397,7 +422,9 @@ def add_task(request):
     else:
         form = TaskForm()
 
-    return render(request, 'task/add_task.html', {'form': form})
+    # Pass the list of teams the user is part of to the template
+    teams = Team.objects.filter(members=request.user)
+    return render(request, 'task/add_task.html', {'form': form, 'teams': teams})
 
 
 
@@ -1596,3 +1623,64 @@ def team_appreciations(request, team_id):
         'team': team,
         'form': form,
     })
+
+
+
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from .models import Team, TeamPermission, Permission
+from django.contrib.auth import get_user_model
+import json
+
+CustomUser = get_user_model()
+
+
+def fetch_permissions(request, team_id):
+    # Fetch the team or return a 404 if not found
+    team = get_object_or_404(Team, id=team_id)
+
+    # Check if the request user is the team owner
+    is_team_owner = request.user == team.created_by
+
+    # Fetch all team members
+    members = team.members.all()
+    permissions_data = []
+
+    for member in members:
+        # Fetch permissions for each member
+        permissions = {
+            "add_task": TeamPermission.objects.filter(team=team, user=member, permission__codename="add_task").exists(),
+            "delete_task": TeamPermission.objects.filter(team=team, user=member, permission__codename="delete_task").exists(),
+            "edit_team": TeamPermission.objects.filter(team=team, user=member, permission__codename="edit_team").exists(),
+        }
+        print(request.user ,team.created_by)
+        # Add the "manage_permissions" option only for the team owner
+        if request.user == team.created_by and request.user==member:
+            permissions["manage_permissions"] = True
+        
+        permissions_data.append({
+            "id": member.id,
+            "username": member.username,
+            "permissions": permissions,
+        })
+
+    return JsonResponse({"members": permissions_data})
+
+@csrf_exempt
+def update_permissions(request, team_id, user_id):
+    if request.method == 'POST':
+        team = Team.objects.get(id=team_id)
+        user = CustomUser.objects.get(id=user_id)
+        data = json.loads(request.body)
+
+        # Update permissions
+        for codename, has_permission in data.items():
+            permission = Permission.objects.get(codename=codename)
+            if has_permission:
+                TeamPermission.objects.get_or_create(team=team, user=user, permission=permission)
+            else:
+                TeamPermission.objects.filter(team=team, user=user, permission=permission).delete()
+
+        return JsonResponse({"success": True})
+    return JsonResponse({"success": False}, status=400)
+

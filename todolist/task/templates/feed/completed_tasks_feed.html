@@ -23,7 +23,7 @@ body {
 
 .feed-main-content {
     display: flex;
-    height: 92vh;
+    height: 96vh;
     overflow-y: auto;
     margin-top: 0px;
     overflow-x: hidden;
@@ -31,8 +31,6 @@ body {
 
 .feed-main-content-container {
     flex: 1;
-    padding: 24px;
-    padding-top: 20px;
     margin-right:300px ;
     
 }
@@ -204,14 +202,17 @@ h1::after {
     display: flex;
     justify-content: center;
     gap: 10px;
-    margin-bottom: 20px;
+    width: 100%;
+    padding: 16px;
     overflow-y: auto;
-
+    border-bottom:1px solid rgba(255, 255, 255, 0.778) ;
+    margin-top: -10px;
+    
 }
 
 /* Base Button Style */
 .filter-button {
-    padding: 8px;
+    padding: 0px;
     background: rgba(235, 235, 235, 0.7); /* Gradient background */
     color: rgb(59, 73, 72);
     text-decoration: none;
@@ -222,6 +223,10 @@ h1::after {
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden; /* Ensure the sliding effect stays within the button */
+    font-family: "Roboto", "Arial", sans-serif;
+    font-size: 1.4rem;
+    line-height: 1rem;
+    font-weight: 500;
 }
 
 /* Sliding Animation */
@@ -275,7 +280,8 @@ h1::after {
 .task-feed-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 20px;
+    gap: 16px;
+    padding: 16px 0px;
 
 
 }
@@ -311,19 +317,22 @@ h1::after {
 }
 
 .task-feed-item .content {
-    padding: 15px;
+    padding: 8px;
+    line-height: 1rem;
+    font-weight: 500;
 }
 
 .task-feed-item h2 {
-    font-size: 18px;
-    margin: 0 0 10px;
+    font-size: 16px;
+    margin: 0 0 8px;
     color: #262626;
 }
 
 .task-feed-item p {
-    font-size: 14px;
-    color: #555;
+    font-size: 12px;
+    color: #9e9e9e;
     margin: 5px 0;
+
 }
 
 .task-feed-item a {
@@ -630,6 +639,9 @@ h1::after {
         margin: 0;
         padding: 0;
     }   
+    .task-feed-grid {
+        grid-template-columns: 1fr; /* Ensures only one column */
+    }
     .users{
         display: none;
     }

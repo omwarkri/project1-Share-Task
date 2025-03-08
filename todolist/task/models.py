@@ -12,6 +12,9 @@ from user.models import CustomUser
 
 from django.db import models
 from django.utils import timezone
+from django.db import models
+from django.contrib.auth.models import Permission
+from django.contrib.contenttypes.models import ContentType
 
 class Team(models.Model):
     name = models.CharField(max_length=255, unique=True)
@@ -21,16 +24,62 @@ class Team(models.Model):
     members = models.ManyToManyField(CustomUser, related_name="team_members", blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return self.name
+
     def get_appreciations(self):
         return self.appreciations.all()
 
-    def __str__(self):
-        return self.name
+    def is_team_lead(self, user):
+        """Check if the user is the team lead."""
+        return self.team_lead == user
+
+    def is_member(self, user):
+        """Check if the user is a member of the team."""
+        return self.members.filter(id=user.id).exists()
+
+    def has_permission(self, user, permission_codename):
+        """
+        Check if the user has a specific permission in the team.
+        """
+        if self.is_team_lead(user):
+            return True  # Team lead has all permissions
+
+        # Check if the user has the permission via TeamPermission
+        return TeamPermission.objects.filter(
+            team=self,
+            user=user,
+            permission__codename=permission_codename
+        ).exists()
+
+    def add_permission(self, user, permission_codename):
+        """
+        Add a permission to a user in the team.
+        """
+        permission = Permission.objects.get(codename=permission_codename)
+        TeamPermission.objects.get_or_create(team=self, user=user, permission=permission)
+
+    def remove_permission(self, user, permission_codename):
+        """
+        Remove a permission from a user in the team.
+        """
+        permission = Permission.objects.get(codename=permission_codename)
+        TeamPermission.objects.filter(team=self, user=user, permission=permission).delete()
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.utils.crypto import get_random_string
 
 
+class TeamPermission(models.Model):
+    team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name="team_permissions")
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="team_permissions")
+    permission = models.ForeignKey(Permission, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ("team", "user", "permission")  # Ensure no duplicate permissions
+
+    def __str__(self):
+        return f"{self.user.username} - {self.permission.codename} in {self.team.name}"
 
 User = get_user_model()
 

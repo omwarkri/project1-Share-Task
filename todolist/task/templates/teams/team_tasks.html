@@ -466,6 +466,11 @@
                 <h2>Team: {{ team.name }}</h2>
                 <p>{{ team.description }}</p>
                 <a id="invite-member-button" href="#" class="btn btn-success">Invite Member</a>
+                {% if request.user == team.created_by %}
+                <button id="manage-permissions-button" class="btn btn-primary" onclick="openPermissionModal()">
+                    🛠️ Manage Permissions
+                </button>
+            {% endif %}
             </div>
     
             <!-- Filter Section -->
@@ -628,6 +633,17 @@
     </div>
 </div>
 
+<!-- Permission Modal -->
+<div id="permissionModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closePermissionModal()">&times;</span>
+        <h3>👥 Manage Team Permissions</h3>
+        <div id="permissionContent">
+            <p>Loading permissions...</p>
+        </div>
+    </div>
+</div>
+
 <!-- Share Task Modals -->
 {% for task in tasks  %}
 <div id="shareTaskModal-{{ task.task.id }}" class="modal" style="display: none;">
@@ -665,6 +681,152 @@
 {% endfor %}
 
 <script>
+
+function fetchPermissions() {
+    const teamId = {{ team.id }}; // Pass the team ID from the template
+    const permissionContent = document.getElementById('permissionContent');
+
+    // Fetch permissions from the backend
+    fetch(`/team/${teamId}/permissions/`)
+        .then(response => response.json())
+        .then(data => {
+            let html = '<ul>';
+            data.members.forEach(member => {
+                html += `
+                    <li>
+                        <strong>${member.username}</strong>
+                        <form class="permission-form" data-user-id="${member.id}">
+                            <label>
+                                <input type="checkbox" name="add_task" ${member.permissions.add_task ? 'checked' : ''}>
+                                Add Task
+                            </label>
+                            <label>
+                                <input type="checkbox" name="delete_task" ${member.permissions.delete_task ? 'checked' : ''}>
+                                Delete Task
+                            </label>
+                            <label>
+                                <input type="checkbox" name="edit_team" ${member.permissions.edit_team ? 'checked' : ''}>
+                                Edit Team
+                            </label>
+                            <button type="submit">Update Permissions</button>
+                        </form>
+                    </li>
+                `;
+            });
+            html += '</ul>';
+            permissionContent.innerHTML = html;
+
+            // Attach form submission handlers
+            document.querySelectorAll('.permission-form').forEach(form => {
+                form.addEventListener('submit', handlePermissionUpdate);
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching permissions:', error);
+            permissionContent.innerHTML = '<p>Error loading permissions.</p>';
+        });
+}
+
+
+function handlePermissionUpdate(event) {
+    event.preventDefault();
+
+    const form = event.target;
+    const userId = form.getAttribute('data-user-id');
+    const teamId = {{ team.id }}; // Pass the team ID from the template
+
+    const formData = new FormData(form);
+    const permissions = {
+        add_task: formData.get('add_task') === 'on',
+        delete_task: formData.get('delete_task') === 'on',
+        edit_team: formData.get('edit_team') === 'on',
+    };
+
+    // Send the updated permissions to the backend
+    fetch(`/team/${teamId}/update-permissions/${userId}/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}', // Include CSRF token
+        },
+        body: JSON.stringify(permissions),
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Permissions updated successfully!');
+            } else {
+                alert('Failed to update permissions.');
+            }
+        })
+        .catch(error => {
+            console.error('Error updating permissions:', error);
+            alert('An error occurred while updating permissions.');
+        });
+}
+
+
+
+function handlePermissionUpdate(event) {
+    event.preventDefault();
+
+    const form = event.target;
+    const userId = form.getAttribute('data-user-id');
+    const teamId = {{ team.id }}; // Pass the team ID from the template
+
+    const formData = new FormData(form);
+    const permissions = {
+        add_task: formData.get('add_task') === 'on',
+        delete_task: formData.get('delete_task') === 'on',
+        edit_team: formData.get('edit_team') === 'on',
+    };
+
+    // Send the updated permissions to the backend
+    fetch(`/team/${teamId}/update-permissions/${userId}/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}', // Include CSRF token
+        },
+        body: JSON.stringify(permissions),
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Permissions updated successfully!');
+            } else {
+                alert('Failed to update permissions.');
+            }
+        })
+        .catch(error => {
+            console.error('Error updating permissions:', error);
+            alert('An error occurred while updating permissions.');
+        });
+}
+
+// Open Permission Modal
+function openPermissionModal() {
+    console.log("opening permission model")
+    const permissionModal = document.getElementById('permissionModal');
+    permissionModal.style.display = 'flex';
+
+    // Fetch and populate permissions
+    fetchPermissions();
+}
+
+// Close Permission Modal
+function closePermissionModal() {
+    document.getElementById('permissionModal').style.display = 'none';
+}
+
+// Close modal when clicking outside of it
+window.addEventListener('click', (event) => {
+    const modal = document.getElementById('permissionModal');
+    if (event.target === modal) {
+        modal.style.display = 'none';
+    }
+});
+
 
 const toggleButton = document.getElementById('toggle-shutter-button');
         const shutterContainer = document.getElementById('shutter-container');

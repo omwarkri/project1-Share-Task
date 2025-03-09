@@ -317,6 +317,182 @@
     max-width: 300px;
 }
 
+/* Base Styles */
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+    background-color: #022f26; /* Dark background like VS Code */
+    border-radius: 4px;
+    color: #fff;
+}
+
+.header-actions-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+/* Search Bar */
+.search-container {
+    flex: 1;
+    min-width: 150px;
+}
+
+.search-bar {
+    width: 100%;
+    padding: 6px 8px;
+    border: 1px solid #444;
+    border-radius: 4px;
+    background-color: #1e1e1e;
+    color: #fff;
+    font-size: 14px;
+}
+
+.search-bar::placeholder {
+    color: #888;
+}
+
+/* Dropdown */
+.dropdown {
+    position: relative;
+}
+
+.filter-button {
+    background: none;
+    border: 1px solid #444;
+    border-radius: 4px;
+    padding: 6px 8px;
+    color: #fff;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.filter-button:hover {
+    background-color: #444;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+   
+    background-color: #1c2e2b;
+    border: 1px solid #393858;
+    border-radius: 4px;
+    z-index: 1000;
+    min-width: 160px;
+}
+
+.dropdown-content button {
+    display: block;
+    width: 100%;
+    padding: 8px 12px;
+    text-align: left;
+    background: none;
+    border: none;
+    color: #000000;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.dropdown-content button:hover {
+    background-color: #444;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+/* Date Filter */
+.date-filter-container {
+    flex: 1;
+    min-width: 150px;
+}
+
+/* Private Task Toggle */
+.private-task-toggle {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 30px;
+    height: 16px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #444;
+    border-radius: 8px;
+    transition: 0.3s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 12px;
+    width: 12px;
+    left: 2px;
+    bottom: 2px;
+    background-color: #fff;
+    border-radius: 50%;
+    transition: 0.3s;
+}
+
+input:checked + .slider {
+    background-color: #4caf50;
+}
+
+input:checked + .slider:before {
+    transform: translateX(14px);
+}
+
+/* Clear Filters Button */
+.clear-filter-button {
+    background: none;
+    border: 1px solid #444;
+    border-radius: 4px;
+    padding: 6px 8px;
+    color: #fff;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.clear-filter-button:hover {
+    background-color: #444;
+}
+
+/* Mobile Toggle Button */
+.mobile-toggle-button {
+    display: none;
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+
+
+
 .filter-button, .clear-filter-button {
     padding: 8px 12px;
     border: 1px solid #ddd;
@@ -1073,7 +1249,7 @@ input:checked + .slider:before {
     }
 
     .filter-button, .clear-filter-button {
-        width: 40%; /* Full width for buttons */
+        width: 100%; /* Full width for buttons */
         padding: 8px;
         border: 1px solid black;
     }
@@ -1117,7 +1293,37 @@ input:checked + .slider:before {
         bottom: 10px;
         right: 10px;
     }
+    .mobile-toggle-button {
+        display: block;
+    }
 
+    .header-actions-container {
+        margin-top: 16px;
+    display: none;
+    grid-template-columns: repeat(2, 1fr); /* Two columns */
+    gap: 8px;
+    width: 100%;
+    padding: 8px;
+    background-color: rgba(10, 52, 49, 0.4); /* Semi-transparent background */
+    border-radius: 8px; /* Rounded corners */
+    color: black;
+    backdrop-filter: blur(10px); /* Blur effect for glassy look */
+    -webkit-backdrop-filter: blur(10px); /* Safari support */
+    border: 1px solid rgba(255, 255, 255, 0.2); /* Subtle border for depth */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Soft shadow for elevation */
+}
+
+    .header-actions-container.active {
+        display: grid; /* Show as grid when toggled */
+    }
+
+    .search-container, .date-filter-container {
+        grid-column: span 2; /* Make search and date filter span full width */
+    }
+
+    .private-task-toggle, .clear-filter-button, .dropdown {
+        grid-column: span 1; /* Each takes one column */
+    }
     /* Adjust task footer buttons for mobile */
     .task-footer {
         flex-direction: column; /* Stack buttons vertically */
@@ -1172,33 +1378,43 @@ input:checked + .slider:before {
                 </button>
             </div>
             <div class="header-actions">
-                <!-- Search Bar -->
-                <input type="text" id="search-bar" class="search-bar" placeholder="🔍 Search tasks..." oninput="searchTasks()" />
+                <!-- Toggle Button for Mobile View -->
+                <button class="mobile-toggle-button" onclick="toggleHeaderActions()" title="Toggle Menu">☰</button>
             
-                <!-- Filter Dropdown -->
-                <div class="dropdown">
-                    <button class="filter-button">⚙️ Filters</button>
-                    <div class="dropdown-content">
-                        <button onclick="filterDailyTasks()">📅 Daily Tasks</button>
-                        <button onclick="showAssignedTasks()">👤 My Assigned Tasks</button>
-                        <button onclick="openFilterModal()">⚙️ Advanced Filters</button>
+                <!-- Header Actions Container -->
+                <div id="header-actions-container" class="header-actions-container">
+                    <!-- Search Bar -->
+                    <div class="search-container">
+                        <input type="text" id="search-bar" class="search-bar" placeholder="🔍 Search tasks..." oninput="searchTasks()" title="Search tasks" />
                     </div>
+            
+                    <!-- Filter Dropdown -->
+                    <div class="dropdown">
+                        <button class="filter-button" title="Filters">⚙️</button>
+                        <div class="dropdown-content">
+                            <button onclick="filterDailyTasks()" title="Daily Tasks">📅 Daily Tasks</button>
+                            <button onclick="showAssignedTasks()" title="My Assigned Tasks">👤 My Assigned Tasks</button>
+                            <button onclick="openFilterModal()" title="Advanced Filters">⚙️ Advanced Filters</button>
+                        </div>
+                    </div>
+            
+                    <!-- Date Filter -->
+                    <div class="date-filter-container">
+                        <input type="text" id="date-filter" class="search-bar" placeholder="📅 Filter by date..." title="Filter by date" />
+                    </div>
+            
+                    <!-- Private Task Toggle -->
+                    <div class="private-task-toggle" title="Show Private Tasks">
+                        <label class="switch">
+                            <input type="checkbox" id="is-private-task" onchange="filterTasks()">
+                            <span class="slider"></span>
+                        </label>
+                        <span>🔒</span>
+                    </div>
+            
+                    <!-- Clear Filters Button -->
+                    <button id="clear-filter-button" class="clear-filter-button" onclick="displayAllTasks()" title="Clear Filters">🗑️</button>
                 </div>
-            
-                <!-- Date Filter -->
-                <input type="text" id="date-filter" class="search-bar" placeholder="📅 Filter by date..." />
-            
-                <!-- Private Task Toggle -->
-                <div class="private-task-toggle">
-                    <label class="switch">
-                        <input type="checkbox" id="is-private-task" onchange="filterTasks()">
-                        <span class="slider"></span>
-                    </label>
-                    <span>🔒 Private Tasks</span>
-                </div>
-            
-                <!-- Clear Filters Button -->
-                <button id="clear-filter-button" class="clear-filter-button" onclick="displayAllTasks()">🗑️ Clear Filters</button>
             </div>
              
         </div>
@@ -1513,6 +1729,11 @@ input:checked + .slider:before {
 
     document.getElementById(`${tabName}-filters`).classList.add('active');
     document.querySelector(`[onclick="openFilterTab('${tabName}')"]`).classList.add('active');
+}
+
+function toggleHeaderActions() {
+    const container = document.getElementById("header-actions-container");
+    container.classList.toggle("active");
 }
 
 document.addEventListener('DOMContentLoaded', function () {

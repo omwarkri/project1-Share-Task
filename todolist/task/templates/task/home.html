@@ -379,12 +379,14 @@
     position: absolute;
     top: 100%;
     left: 0;
-   
+    margin-top: 0px;
+    max-width: 100px;
     background-color: #1c2e2b;
     border: 1px solid #393858;
     border-radius: 4px;
     z-index: 1000;
     min-width: 160px;
+    
 }
 
 .dropdown-content button {
@@ -394,7 +396,8 @@
     text-align: left;
     background: none;
     border: none;
-    color: #000000;
+    background: #0e433bd2;
+    color: #ffffff;
     cursor: pointer;
     font-size: 14px;
 }
@@ -562,25 +565,34 @@ input:checked + .slider:before {
 .dropdown {
     position: relative;
     display: inline-block;
+    
 }
 
 .dropdown-content {
     display: none;
     position: absolute;
-    background-color: white;
+    background-color: rgba(15, 32, 30, 0.8); /* Semi-transparent background */
+    backdrop-filter: blur(10px); /* Blur effect for glassy look */
+    -webkit-backdrop-filter: blur(100px); /* Safari support */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
     z-index: 1;
+    left: -54px; /* Adjust as needed */
+    border: 1px solid rgba(255, 255, 255, 0.1); /* Subtle border for depth */
+   
+    margin-right: 100px;
 }
 
 .dropdown-content button {
     display: block;
     width: 100%;
-    padding: 8px 12px;
+    padding: 8px 8px;
     text-align: left;
     border: none;
     background: none;
     cursor: pointer;
+    border-bottom: 0.6px solid rgba(177, 177, 177, 0.8);
+
 }
 
 .dropdown-content button:hover {
@@ -1205,7 +1217,7 @@ input:checked + .slider:before {
     
     
         .header {
-            flex-direction: column; /* Stack header content vertically */
+            
             align-items: flex-start;
             margin-bottom: 0;
            
@@ -1216,13 +1228,14 @@ input:checked + .slider:before {
             flex: end;
             align-items: center;
             justify-content: space-between;
-      
+            position: absolute;
+            right:24px ;
            
         }
     
         .search-bar {
-            width: 100%; /* Full width on mobile */
-            height: 60%;
+            width: 60%;
+            height: 80%;
         }
     
         .task-grid {
@@ -1233,7 +1246,7 @@ input:checked + .slider:before {
         }
     
         .header {
-        flex-direction: column; /* Stack header content vertically */
+        
         align-items: flex-start;
         padding: 10px;
     }
@@ -1241,7 +1254,7 @@ input:checked + .slider:before {
     .header-actions {
         flex-direction: column; /* Stack header actions vertically */
         gap: 10px;
-        width: 100%;
+        
     }
 
     .search-bar {
@@ -1249,8 +1262,7 @@ input:checked + .slider:before {
     }
 
     .filter-button, .clear-filter-button {
-        width: 100%; /* Full width for buttons */
-        padding: 8px;
+        
         border: 1px solid black;
     }
 
@@ -1300,7 +1312,7 @@ input:checked + .slider:before {
     .header-actions-container {
         margin-top: 16px;
     display: none;
-    grid-template-columns: repeat(2, 1fr); /* Two columns */
+    grid-template-columns: repeat(3, 1fr); /* Two columns */
     gap: 8px;
     width: 100%;
     padding: 8px;
@@ -1379,7 +1391,7 @@ input:checked + .slider:before {
             </div>
             <div class="header-actions">
                 <!-- Toggle Button for Mobile View -->
-                <button class="mobile-toggle-button" onclick="toggleHeaderActions()" title="Toggle Menu">☰</button>
+                <button class="mobile-toggle-button" onclick="toggleHeaderActions()" title="Toggle Menu"> ⚙️</button>
             
                 <!-- Header Actions Container -->
                 <div id="header-actions-container" class="header-actions-container">

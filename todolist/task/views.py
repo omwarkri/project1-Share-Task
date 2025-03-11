@@ -729,6 +729,10 @@ from django.http import JsonResponse
 from django.forms.models import model_to_dict
 from .models import Task, TaskCompletionDetails, PartnerFeedback, Like
 
+from django.http import JsonResponse
+from django.forms.models import model_to_dict
+from .models import Task, TaskCompletionDetails, Like, Comment
+
 def get_task_details(request, task_id):
     try:
         task = Task.objects.get(id=task_id)
@@ -770,6 +774,22 @@ def get_task_details(request, task_id):
             for like in likes
         ]
 
+        # Fetch comments for the task
+        comments = Comment.objects.filter(task=task)
+        comments_data = [
+            {
+                "id": comment.id,
+                "text": comment.text,
+                "user": {
+                    "id": comment.user.id,
+                    "username": comment.user.username,
+                    "profile_picture": comment.user.profile_picture.url if comment.user.profile_picture else None,
+                },
+                "created_at": comment.created_at.isoformat(),
+            }
+            for comment in comments
+        ]
+
         # Prepare the response data
         data = {
             "id": task.id,
@@ -782,6 +802,7 @@ def get_task_details(request, task_id):
             "updated_at": task.updated_at.isoformat(),
             "completion_details": completion_details_data,
             "likes": likes_data,
+            "comments": comments_data,  # Include comments in the response
         }
 
         return JsonResponse(data)

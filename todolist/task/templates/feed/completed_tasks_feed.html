@@ -683,6 +683,36 @@ h1::after {
 .likes-list li a:hover {
     color: #1abc9c;
 }
+
+/* Loading Spinner Styles */
+.loading-spinner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+}
+
+.spinner {
+    border: 4px solid rgba(0, 0, 0, 0.1);
+    border-top: 4px solid #1abc9c;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
 /* Mobile Responsiveness */
 /* Mobile Responsiveness */
 /* Mobile Responsiveness for Modal */
@@ -1058,8 +1088,14 @@ h1::after {
 
         <!-- Right Column: Task Details, Comments, Likes, etc. -->
         <div class="modal-right">
+            <div id="loading-spinner" class="loading-spinner" style="display: none;">
+                <div class="spinner">hii</div>
+            </div>
+                      
+            
             <div class="task-details-container">
-                <!-- Description Section -->
+                <!-- Loading Spinner -->
+      <!-- Description Section -->
                 <div class="property-section">
                     <button class="toggle-button" onclick="toggleSection('description')">▶ Description</button>
                     <div id="description-content" class="property-content" style="display: none;">
@@ -1067,9 +1103,6 @@ h1::after {
                     </div>
                 </div>
         
-                <!-- Likes Section -->
-                <!-- Likes Section -->
-
         
                 <!-- Completion Details Section -->
                 <div class="property-section">
@@ -1169,12 +1202,19 @@ h1::after {
     userImage.alt = username;
     userNameSpan.textContent = username;
 
+    // Show the loading spinner
+    const loadingSpinner = document.getElementById("loading-spinner");
+    loadingSpinner.style.display = "flex";
+
     // Fetch and display task details
     fetchTaskDetails(taskId);
 }
 
-
 function fetchTaskDetails(taskId) {
+    // Show the loading spinner
+    const loadingSpinner = document.getElementById("loading-spinner");
+    loadingSpinner.style.display = "flex";
+
     fetch(`/task/${taskId}/details/`)
         .then(response => response.json())
         .then(data => {
@@ -1263,9 +1303,15 @@ function fetchTaskDetails(taskId) {
 
             // Set the task ID in the comment form
             document.getElementById('task-id-input').value = taskId;
+
+            // Hide the loading spinner
+            loadingSpinner.style.display = "none";
         })
         .catch(error => {
             console.error("Error fetching task details:", error);
+
+            // Hide the loading spinner in case of an error
+            loadingSpinner.style.display = "none";
         });
 }
 
@@ -1320,7 +1366,12 @@ const closeBtn = document.querySelector(".close");
 
 // Function to close the modal
 function closeModal() {
+    const modal = document.getElementById("image-modal");
+    const loadingSpinner = document.getElementById("loading-spinner");
+
+    // Hide the modal and spinner
     modal.style.display = "none";
+    loadingSpinner.style.display = "block";
 }
 
 // Add event listener to the close button

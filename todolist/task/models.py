@@ -246,6 +246,8 @@ class Task(models.Model):
         Returns a list of users who liked this task.
         """
         return [like.user for like in self.likes.all()]
+    
+    
     class Meta:
         ordering = ['-created_at']
 

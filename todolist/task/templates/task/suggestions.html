@@ -1,0 +1,185 @@
+<style>
+    /* Modal Styles */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Black background with opacity */
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* Ensure it's on top */
+}
+
+.modal-content {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    position: relative;
+    animation: modalFadeIn 0.3s ease;
+}
+
+.close-modal {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 24px;
+    cursor: pointer;
+    color: #666;
+    transition: color 0.3s ease;
+}
+
+.close-modal:hover {
+    color: #333;
+}
+
+/* Form Styles */
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+form label {
+    font-weight: 500;
+    color: #333;
+}
+
+form input[type="text"],
+form textarea,
+form select {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    background-color: #f9f9f9;
+    transition: border-color 0.3s ease;
+}
+
+form input[type="text"]:focus,
+form textarea:focus,
+form select:focus {
+    border-color: #1abc9c;
+    outline: none;
+}
+
+.submit-button {
+    padding: 10px;
+    background-color: #1abc9c;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.submit-button:hover {
+    background-color: #16a085;
+}
+
+/* Suggestions List Styles */
+.suggestions-list {
+    list-style-type: none;
+    padding-left: 0;
+    margin-top: 10px;
+}
+
+.suggestions-list li {
+    padding: 8px;
+    background-color: #f8f9fa;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    font-size: 14px;
+    color: #555;
+    transition: background-color 0.3s ease;
+}
+
+.suggestions-list li:hover {
+    background-color: #e9ecef;
+}
+
+/* Modal Trigger Button */
+.modal-trigger-button {
+    padding: 10px 20px;
+    background-color: #1abc9c;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.modal-trigger-button:hover {
+    background-color: #16a085;
+}
+
+/* Animation for Modal */
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+</style>
+<!-- Modal Trigger Button -->
+<button onclick="openModal()" class="modal-trigger-button">Set Interests and Goals</button>
+
+<!-- Modal Structure -->
+<div id="interestsModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeModal()">&times;</span>
+        <h2>Set Your Interests and Goals</h2>
+        <form method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="submit-button">Save and Get Suggestions</button>
+        </form>
+
+        <hr>
+
+      
+    </div>
+</div>
+
+<h2>Suggested Tasks for You</h2>
+<ul class="suggestions-list">
+    {% for task in suggestions %}
+        <li>{{ task }}</li>
+    {% empty %}
+        <li>No suggestions available yet. Please set your interests and goals.</li>
+    {% endfor %}
+</ul>
+
+
+
+<script>
+    // Open the modal
+    function openModal() {
+        document.getElementById('interestsModal').style.display = 'flex';
+    }
+
+    // Close the modal
+    function closeModal() {
+        document.getElementById('interestsModal').style.display = 'none';
+    }
+
+    // Close modal if clicked outside the modal content
+    window.onclick = function (event) {
+        const modal = document.getElementById('interestsModal');
+        if (event.target === modal) {
+            modal.style.display = 'none';
+        }
+    };
+</script>

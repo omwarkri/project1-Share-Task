@@ -1756,3 +1756,102 @@ def update_permissions(request, team_id, user_id):
         return JsonResponse({"success": True})
     return JsonResponse({"success": False}, status=400)
 
+
+
+
+from google import generativeai
+
+
+# Configure Gemini API
+generativeai.configure(api_key="AIzaSyDx3rr0MzUPaumvdII3WIffmtsZqAz7JIs")
+
+# Initialize the Gemini model
+model = generativeai.GenerativeModel('gemini-1.5-flash')
+
+
+
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from user.forms import UserInterestGoalForm
+
+
+
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from user.forms import UserInterestGoalForm
+from user.models import CustomUser
+
+
+def generate_task_suggestions(user, task=Task):
+    print("Generating task suggestions...")
+    all_tasks = [task.title for task in task.objects.filter(user=user)]
+    print(f"User: {user}, Completed Tasks: {all_tasks}")
+    interests = user.interests
+    goals = user.goals
+
+    # Construct a detailed and structured prompt
+    prompt = f"""
+    You are a task recommendation system. Based on the user's completed tasks, interests, and goals, suggest 20 specific, actionable, and relevant tasks for the user.
+
+    **User Context:**
+    - Completed Tasks: {all_tasks}
+    - Interests: {interests}
+    - Goals: {goals}
+
+    **Task Attributes:**
+    - Specific: Each task should be clear and well-defined.
+    - Actionable: Each task should be something the user can start working on immediately.
+    - Relevant: Each task should align with the user's interests and goals.
+
+    **Output Format:**
+    - Provide exactly 20 tasks.
+    - Each task should be a single sentence.
+    - Start each task with a verb (e.g., "Learn", "Build", "Read").
+    - Avoid vague or generic tasks.
+
+    **Example Tasks:**
+    1. Learn advanced Python concepts like decorators and generators.
+    2. Build a personal portfolio website to showcase your projects.
+    3. Read a book on software development best practices.
+
+    **Task Suggestions:**
+    """
+
+    # Generate suggestions using the AI model
+    response = model.generate_content(prompt)
+    suggestions = response.text.strip().split('\n') if response and response.text else []
+
+    # Clean and format the suggestions
+    suggestions = [s.strip() for s in suggestions if s.strip()]
+    return suggestions[:20]  # Return up to 20 suggestions
+
+from django.shortcuts import get_object_or_404
+@login_required
+def task_suggestions_view(request):
+    user = request.user
+    
+
+    user = get_object_or_404(CustomUser, id=request.user.id)
+    suggestions = []
+    
+    if request.method == 'POST':
+        form = UserInterestGoalForm(request.POST)
+        if form.is_valid():
+            # Save interests and goals
+            user.interests = [i.strip() for i in form.cleaned_data['interests'].split(',')]
+            user.goals = [g.strip() for g in form.cleaned_data['goals'].split(',')]
+            user.save()
+            suggestions = generate_task_suggestions(user)
+    else:
+        form = UserInterestGoalForm(initial={
+            'interests': ', '.join(user.interests),
+            'goals': ', '.join(user.goals),
+        })
+        if user.interests and user.goals:
+            suggestions = generate_task_suggestions(user)
+
+    return render(request, 'task/suggestions.html', {'form': form, 'suggestions': suggestions})

@@ -323,9 +323,11 @@
     align-items: center;
     gap: 8px;
     padding: 8px;
-    background-color: #022f26; /* Dark background like VS Code */
-    border-radius: 4px;
-    color: #fff;
+    background-color: rgba(15, 32, 30, 0.8); /* Semi-transparent background */
+    backdrop-filter: blur(10px); /* Blur effect for glassy look */
+    -webkit-backdrop-filter: blur(100px); /* Safari support */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.1); /* Optional: subtle border for better contrast */
 }
 
 .header-actions-container {
@@ -381,7 +383,7 @@
     left: 0;
     margin-top: 0px;
     max-width: 100px;
-    background-color: #1c2e2b;
+   
     border: 1px solid #393858;
     border-radius: 4px;
     z-index: 1000;
@@ -568,19 +570,21 @@ input:checked + .slider:before {
     
 }
 
-.dropdown-content {
-    display: none;
-    position: absolute;
-    background-color: rgba(15, 32, 30, 0.8); /* Semi-transparent background */
-    backdrop-filter: blur(10px); /* Blur effect for glassy look */
-    -webkit-backdrop-filter: blur(100px); /* Safari support */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+    background: linear-gradient(
+        135deg,
+        rgba(127, 177, 172, 0.8), /* Start color */
+        rgba(2, 47, 38, 0.8)  /* End color */
+    );
     border-radius: 8px;
-    z-index: 1;
-    left: -54px; /* Adjust as needed */
-    border: 1px solid rgba(255, 255, 255, 0.1); /* Subtle border for depth */
-   
-    margin-right: 100px;
+    color: #fff;
+    backdrop-filter: blur(12px); /* Frosted glass effect */
+    border: 1px solid rgba(255, 255, 255, 0.2); /* Subtle border */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
 }
 
 .dropdown-content button {
@@ -1269,7 +1273,7 @@ input:checked + .slider:before {
         padding: 2px 8px;
     }
     .clear-filter-button{
-        width: 60%;
+        width: 6    0%;
         padding: 8px;
     }
 

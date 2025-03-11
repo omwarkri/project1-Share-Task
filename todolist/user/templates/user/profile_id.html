@@ -252,6 +252,7 @@
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            overflow-y: scroll;
         }
 
         .calendar-header {
@@ -566,5 +567,14 @@
         </div>
     </div>
 </body>
+<script>
+    window.onload = function() {
+    const calendar = document.querySelector('.calendar');
+    if (calendar) {
+        calendar.scrollLeft = calendar.scrollWidth; // Scroll to the end (right)
+    }
+};
+
+</script>
 </html>
 {% endblock %}

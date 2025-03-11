@@ -540,18 +540,17 @@
         .logout-button:active {
             transform: translateY(0);
         }
-
-        /* Calendar Styles */
         .calendar {
             display: grid;
             grid-template-rows: repeat(10, 15px); /* Arrange days vertically */
             grid-auto-flow: column; /* Flow days into columns */
-            gap: 10px;
+            gap: 3px;
             margin-top: 20px;
             background-color: #fff;
-            
+            padding: 20px;
             border-radius: 10px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            overflow-y: scroll;
         }
 
         .calendar-header {
@@ -567,6 +566,19 @@
 
         .calendar-header span {
             margin: 0 5px;
+        }
+
+        .day {
+            width: 15px;
+            height: 15px;
+            background-color: #e0e0e0;
+            border-radius: 3px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .day:hover {
+            transform: scale(1.2);
+            opacity: 0.8;
         }
 
         .day {
@@ -776,18 +788,14 @@
 
             /* Adjust calendar for mobile */
             .calendar {
-                grid-template-rows: repeat(24, 10px); /* Smaller rows for mobile */
-                gap: 1px; /* Reduce gap between days */
-                padding: 4px; /* Reduce padding */
+                grid-template-rows: repeat(10, 12px); /* Smaller rows for mobile */
+                gap: 2px; /* Reduce gap between days */
+                padding: 10px; /* Reduce padding */
             }
-            .right-section .day {
-    width: 19px;
-    height: 13px;
-    margin-bottom: 10px; 
-
-    border-radius: 3px;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-}
+            .day {
+                width: 10px; /* Smaller day size */
+                height: 8px; /* Smaller day size */
+            }
 
         
 
@@ -1043,6 +1051,14 @@ function fetchUserAnalytics() {
 
 // Initialize with Activity section visible
 showActivity();
+
+window.onload = function() {
+    const calendar = document.querySelector('.calendar');
+    if (calendar) {
+        calendar.scrollLeft = calendar.scrollWidth; // Scroll to the end (right)
+    }
+};
+
 
     // Close modal when clicking outside the modal content
     window.addEventListener('click', function (event) {

@@ -722,20 +722,71 @@ from .models import Task, Comment
 from django.http import JsonResponse
 from .models import Task, CustomUser
 
+from django.http import JsonResponse
+from .models import Task, Comment, Like
+
+from django.http import JsonResponse
+from django.forms.models import model_to_dict
+from .models import Task, TaskCompletionDetails, PartnerFeedback, Like
+
 def get_task_details(request, task_id):
-    task = Task.objects.get(id=task_id)
-   
-       
+    try:
+        task = Task.objects.get(id=task_id)
+        
+        # Fetch completion details
+        completion_details = TaskCompletionDetails.objects.filter(task=task).first()
 
-    data = {
-        "task_id": task.id,
-        'description':task.description,
-        'completion_details':task.completion_details.completion_details,
-        "task_title": task.title,
-       
-    }
+        # Serialize completion details
+        completion_details_data = None
+        if completion_details:
+            completion_details_data = model_to_dict(completion_details, exclude=["task", "partner_feedback"])
+            completion_details_data["uploaded_image"] = completion_details.uploaded_image.url if completion_details.uploaded_image else None
+            completion_details_data["uploaded_file"] = completion_details.uploaded_file.url if completion_details.uploaded_file else None
 
-    return JsonResponse(data)
+            # Serialize partner feedback if it exists
+            if completion_details.partner_feedback:
+                partner_feedback = completion_details.partner_feedback
+                completion_details_data["partner_feedback"] = {
+                    "rating": partner_feedback.rating,
+                    "comment": partner_feedback.comment,
+                    "partner": {
+                        "id": partner_feedback.partner.id,
+                        "username": partner_feedback.partner.username,
+                        "profile_picture": partner_feedback.partner.profile_picture.url if partner_feedback.partner.profile_picture else None,
+                    },
+                }
+
+        # Fetch likes for the task
+        likes = Like.objects.filter(task=task)
+        likes_data = [
+            {
+                "user": {
+                    "id": like.user.id,
+                    "username": like.user.username,
+                    "profile_picture": like.user.profile_picture.url if like.user.profile_picture else None,
+                },
+                "created_at": like.created_at.isoformat(),
+            }
+            for like in likes
+        ]
+
+        # Prepare the response data
+        data = {
+            "id": task.id,
+            "title": task.title,
+            "description": task.description,
+            "status": task.status,
+            "priority": task.priority,
+            "due_date": task.due_date.isoformat() if task.due_date else None,
+            "created_at": task.created_at.isoformat(),
+            "updated_at": task.updated_at.isoformat(),
+            "completion_details": completion_details_data,
+            "likes": likes_data,
+        }
+
+        return JsonResponse(data)
+    except Task.DoesNotExist:
+        return JsonResponse({"error": "Task not found"}, status=404)
 
 
 @csrf_exempt

@@ -200,11 +200,14 @@ h1::after {
 /* Filter Buttons Container */
 .filters {
     display: flex;
+    align-items: center;
     justify-content: center;
     gap: 10px;
     width: 100%;
     padding: 16px;
+    padding-top: 32px;
     overflow-y: auto;
+    background-color: rgb(142 189 189 / 16%);
     border-bottom:1px solid rgba(255, 255, 255, 0.778) ;
     margin-top: -10px;
     
@@ -431,8 +434,8 @@ h1::after {
 }
 
 .task-details-container {
-    border: 1px solid #ccc;
-    padding: 10px;
+   
+
     margin: 10px 0;
     border-radius: 5px;
 }
@@ -446,7 +449,7 @@ h1::after {
     border: none;
     color: #007bff;
     cursor: pointer;
-    padding: 5px;
+    padding: 2px;
     text-align: left;
     font-size: 16px;
     display: flex;
@@ -591,7 +594,7 @@ h1::after {
 
 .modal-right button {
     margin-top: 10px;
-    padding: 8px 16px;
+    padding: 8px;
     background-color: #1abc9c;
     color: white;
     border: none;
@@ -643,7 +646,8 @@ h1::after {
     .filters{
         border-bottom: 1px solid rgb(146 177 177 / 41%);
         background-color: rgb(142 189 189 / 16%);
-    
+
+        padding-top: 24px;
     }
     .feed-main-content-container{
         margin: 0;
@@ -796,10 +800,10 @@ h1::after {
                 {% for data in task_feed_data %}
                 <div class="task-feed-item">
                     <!-- Display uploaded image -->
-                    {% if data.completion_details.uploaded_image.url %}
-                    <img src="{{ data.completion_details.uploaded_image.url }}" 
+                    {% if data.completion_details.uploaded_image %}
+                    <img src="{% if data.completion_details.uploaded_image %}{{ data.completion_details.uploaded_image.url }}{% else %}/media/symbols/default-image.png{% endif %}" 
      alt="Completion Image" 
-     onclick="openModal('{{ data.completion_details.uploaded_image.url }}', {{ data.task.id }}, '{{ data.task.user.username }}', '{{ data.task.user.profile_picture.url }}',type='all')" 
+     onclick="openModal('{% if data.completion_details.uploaded_image %}{{ data.completion_details.uploaded_image.url }}{% else %}/media/symbols/default-image.png{% endif %}', {{ data.task.id }}, '{{ data.task.user.username }}', '{{ data.task.user.profile_picture.url }}', type='all')" 
      style="cursor: pointer;">
                 {% endif %}
     
@@ -824,7 +828,10 @@ h1::after {
                                             <img src="/media/symbols/heart.png" alt="heart"> <!-- Unliked state -->
                                         {% endif %}
                                     </span>
-                                    <span id="like-count-{{ data.task.id }}"  style="cursor: pointer;" onclick="openModal('{{ data.completion_details.uploaded_image.url }}', {{ data.task.id }}, '{{ data.task.user.username }}', '{{ data.task.user.profile_picture.url }}',  type= 'liked-users')">{{ data.task.likes.count }}</span>
+                                  <span id="like-count-{{ data.task.id }}" style="cursor: pointer;" 
+      onclick="openModal('{% if data.completion_details.uploaded_image %}{{ data.completion_details.uploaded_image.url }}{% else %}{% endif %}', {{ data.task.id }}, '{{ data.task.user.username }}', '{{ data.task.user.profile_picture.url }}', type='liked-users')">
+    {{ data.task.likes.count }}
+</span>
                                 </div>
                                 <button class="action-button comment-button" 
         title="Comment" 
@@ -925,7 +932,7 @@ h1::after {
    <!-- Modal Structure -->
     <!-- Modal Structure -->
     <!-- Modal Structure -->
-<<!-- Modal Structure -->
+<!-- Modal Structure -->
 <div id="image-modal" class="modal">
     <span class="close">&times;</span>
     <div class="modal-content">
@@ -944,21 +951,30 @@ h1::after {
 
         <!-- Right Column: Dynamic Content -->
         <div class="modal-right">
-
             <div class="task-details-container">
                 <!-- Description Section -->
                 <div class="property-section">
-                    <button class="toggle-button" onclick="toggleSection('description')">▶ Description</button>
+                    <button class="toggle-button" onclick="toggleSection('description')"> Description</button>
                     <div id="description-content" class="property-content" style="display: none;">
                         <pre id="task-description"></pre>
                     </div>
                 </div>
-            
-                <!-- Comments Section -->
+        
+                <!-- Likes Section -->
                 <div class="property-section">
-                    <button class="toggle-button" onclick="toggleSection('comments')">▶ Comments</button>
+                    <button class="toggle-button" onclick="toggleSection('likes')"> Likes</button>
+                    <div id="likes-content" class="property-content" style="display: none;">
+                        <ul id="likes-list"></ul>
+                    </div>
+                </div>
+
+                <div class="property-section">
+                    <button class="toggle-button" onclick="toggleSection('comments')"> Comments</button>
                     <div id="comments-content" class="property-content" style="display: none;">
+                        <!-- Comments List -->
                         <ul class="comment-list"></ul>
+        
+                        <!-- Add Comment Form -->
                         <form method="post" action="{% url 'add_comment' 0 %}" id="comment-form">
                             {% csrf_token %}
                             <input type="hidden" name="task_id" id="task-id-input">
@@ -967,7 +983,46 @@ h1::after {
                         </form>
                     </div>
                 </div>
-            
+        
+                <!-- Completion Details Section -->
+                <div class="property-section">
+                    <button class="toggle-button" onclick="toggleSection('completion')"> Completion Details</button>
+                    <div id="completion-content" class="property-content" style="display: none;">
+                        <pre id="completion-details"></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+  
+  
+
+ <!-- Modal Structure -->
+<div id="image-modal" class="modal">
+    <span class="close">&times;</span>
+    <div class="modal-content">
+        <!-- Left Column: Image and User Info -->
+        <div class="modal-left">
+            <div class="modal-user-info">
+                <img id="user-image" src="" alt="User Image" class="user-image">
+                <span id="user-name" class="username"></span>
+            </div>
+            <img id="modal-image" src="" alt="Completion Image">
+        </div>
+
+        <!-- Right Column: Task Details, Comments, Likes, etc. -->
+        <div class="modal-right">
+            <div class="task-details-container">
+                <!-- Description Section -->
+                <div class="property-section">
+                    <button class="toggle-button" onclick="toggleSection('description')">▶ Description</button>
+                    <div id="description-content" class="property-content" style="display: none;">
+                        <pre id="task-description"></pre>
+                    </div>
+                </div>
+        
                 <!-- Likes Section -->
                 <div class="property-section">
                     <button class="toggle-button" onclick="toggleSection('likes')">▶ Likes</button>
@@ -975,7 +1030,7 @@ h1::after {
                         <ul id="likes-list"></ul>
                     </div>
                 </div>
-            
+        
                 <!-- Completion Details Section -->
                 <div class="property-section">
                     <button class="toggle-button" onclick="toggleSection('completion')">▶ Completion Details</button>
@@ -983,35 +1038,29 @@ h1::after {
                         <pre id="completion-details"></pre>
                     </div>
                 </div>
-            </div>
-            <!-- Comments Section -->
-            <div class="comments" style="display: none;">
-                <h2>Comments</h2>
-                <ul class="comment-list"></ul>
-                <form method="post" action="{% url 'add_comment' 0 %}" id="comment-form">
-                    {% csrf_token %}
-                    <input type="hidden" name="task_id" id="task-id-input">
-                    <textarea name="text" placeholder="Add a comment..." required></textarea>
-                    <button type="submit">Post Comment</button>
-                </form>
-            </div>
-
-            <!-- Description Section -->
-            <div class="description-section" style="display: none;">
-                <h2>Task Description</h2>
-                <pre id="task-description"></pre>
-            </div>
-
-            <div class="likes-section" style="display: none;">
-           
-            </div>
-
-            <!-- Completion Details Section -->
-            <div class="completion-details-section" style="display: none;">
-                <h2>Completion Details</h2>
-                <pre id="completion-details"></pre>
+        
+                <!-- Comments Section -->
+                <div class="property-section">
+                    <button class="toggle-button" onclick="toggleSection('comments')">▶ Comments</button>
+                    <div id="comments-content" class="property-content" style="display: none;">
+                        <!-- Comments List -->
+                        <ul class="comment-list"></ul>
+        
+                        <!-- Add Comment Form -->
+                        <form method="post" action="{% url 'add_comment' 0 %}" id="comment-form">
+                            {% csrf_token %}
+                            <input type="hidden" name="task_id" id="task-id-input">
+                            <textarea name="text" placeholder="Add a comment..." required></textarea>
+                            <button type="submit">Post Comment</button>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
+
+             
+
+       
     </div>
 </div>
 
@@ -1046,14 +1095,10 @@ h1::after {
             console.error('Error:', error);
         });
     }
-    const modal = document.getElementById("image-modal");
-    const modalImg = document.getElementById("modal-image");
-    const closeBtn = document.querySelector(".close");
 
-    // Function to open the modal with the clicked image
-    // Function to open the modal with the clicked image
+
     function openModal(imageSrc, taskId, username, profilePicture, type) {
-    console.log("Opening modal for Task ID:", taskId);  // Debugging statement
+    console.log("Opening modal for Task ID:", taskId); // Debugging: Log the taskId
 
     const modal = document.getElementById("image-modal");
     const modalImg = document.getElementById("modal-image");
@@ -1067,94 +1112,48 @@ h1::after {
     modalImg.src = imageSrc;
 
     // Set the user's profile picture and username
-    userImage.src = profilePicture || "/media/symbols/default-profile-pic.jpg";  // Use default image if profile picture is missing
+    userImage.src = profilePicture || "/media/symbols/default-profile-pic.jpg";
     userImage.alt = username;
     userNameSpan.textContent = username;
 
-    // Hide all sections initially
-    const commentsSection = document.querySelector(".comments");
-    const descriptionSection = document.querySelector(".description-section");
-    const completionDetailsSection = document.querySelector(".completion-details-section");
-
-    commentsSection.style.display = "none";
-    descriptionSection.style.display = "none";
-    completionDetailsSection.style.display = "none";
-
-    // Show the appropriate section based on the type
-    if (type === "comments") {
-        commentsSection.style.display = "block";
-        // Update the form action URL and hidden input with the task ID
-        const commentForm = document.getElementById('comment-form');
-        const taskIdInput = document.getElementById('task-id-input');
-
-        if (taskId) {
-            commentForm.action = `/task/${taskId}/add-comment/`;  // Update the form action URL
-            taskIdInput.value = taskId;  // Update the hidden input value
-
-            // Fetch and display comments for the task
-            fetchComments(taskId);
-        } else {
-            console.error("Task ID is undefined.");
-        }
-    } else if (type === "description") {
-        fetchTaskDetails(taskId)
-    } else if (type === "completed-details") {
-        fetchCompletionDetails(taskId)
-    } else if (type=== "liked-users"){
-        fetchTaskLikedUsers(taskId)
-    }  
-    else if (type==='all'){
-        // commentsSection.style.display = "block";
-        document.querySelector(".completion-details-section").style.display = "block";
-        // document.querySelector(".likes-section").style.display="block";
-        // document.querySelector(".description-section").style.display = "block";
-        fetchCompletionDetails(taskId)
-        fetchCompletionDetails(taskId)
-        fetchComments(taskId);
-        fetchTaskLikedUsers(taskId)
-        
-    }
+    // Fetch and display task details
+    fetchTaskDetails(taskId);
 }
 
+
 function fetchTaskDetails(taskId) {
-            fetch(`/task/${taskId}/details/`)
-                .then(response => response.json())
-                .then(data => {
-                    document.querySelector(".description-section").style.display = "block";
-                    document.getElementById("task-description").textContent = data.description || "No description available.";
-                })
-                .catch(error => {
-                    console.error("Error fetching task details:", error);
-                });
-        }
-        function fetchTaskLikedUsers(taskId) {
     fetch(`/task/${taskId}/details/`)
         .then(response => response.json())
         .then(data => {
-            console.log(data.liked_users);
+            console.log("Fetched task details:", data); // Debugging: Log the fetched data
 
-            const likesSection = document.querySelector(".likes-section");
-            const likesList = document.getElementById("task-likes");
+            // Update the description section
+            const descriptionContent = document.getElementById("description-content");
+            descriptionContent.style.display = "block";
+            document.getElementById("task-description").textContent = data.description || "No description available.";
 
-            // Show the likes section
-            likesSection.style.display = "block";
+            // Update the completion details section
+            const completionContent = document.getElementById("completion-content");
+            completionContent.style.display = "block";
+            document.getElementById("completion-details").textContent = data.completion_details.completion_details || "No completion details available.";
 
-            // Clear any existing content in the likes list
-            likesList.innerHTML = "";
+            // Update the likes section
+            const likesContent = document.getElementById("likes-content");
+            likesContent.style.display = "block";
+            const likesList = document.getElementById("likes-list");
+            likesList.innerHTML = ""; // Clear existing likes
 
-            // Check if there are liked users
-            if (data.liked_users && data.liked_users.length > 0) {
-                for (let user of data.liked_users) {
+            if (data.likes && data.likes.length > 0) {
+                data.likes.forEach(like => {
                     const listItem = document.createElement("li");
                     listItem.style.display = "flex";
                     listItem.style.alignItems = "center";
                     listItem.style.marginBottom = "10px";
-                   
 
-                    // Create an image element
+                    // Create an image element for the user's profile picture
                     const profileImg = document.createElement("img");
-                    profileImg.src = user.profile_picture;
-                    profileImg.alt = `${user.username}'s profile picture`;
+                    profileImg.src = like.user.profile_picture || "/media/symbols/default-profile-pic.jpg";
+                    profileImg.alt = `${like.user.username}'s profile picture`;
                     profileImg.style.width = "40px";
                     profileImg.style.height = "40px";
                     profileImg.style.borderRadius = "50%";
@@ -1162,9 +1161,8 @@ function fetchTaskDetails(taskId) {
 
                     // Create a link to the user's profile
                     const profileLink = document.createElement("a");
-                    profileLink.href = `/user/profile/${user.id}/`;
-                    profileLink.textContent = user.username;
-                    profileLink.style.textDecoration = "none";
+                    profileLink.href = `/user/profile/${like.user.id}/`;
+                    profileLink.textContent = like.user.username;
                     profileLink.style.textDecoration = "none";
                     profileLink.style.color = "#1abc9c";
                     profileLink.style.fontSize = "14px";
@@ -1175,13 +1173,39 @@ function fetchTaskDetails(taskId) {
 
                     // Append the list item to the likes list
                     likesList.appendChild(listItem);
-                }
+                });
             } else {
                 // Display a message if no users have liked the task
                 const noLikesMessage = document.createElement("li");
                 noLikesMessage.textContent = "No likes yet.";
                 likesList.appendChild(noLikesMessage);
             }
+
+            // Update the comments section
+            const commentsContent = document.getElementById("comments-content");
+            commentsContent.style.display = "block";
+            const commentList = document.querySelector(".comment-list");
+            commentList.innerHTML = ""; // Clear existing comments
+
+            if (data.comments && data.comments.length > 0) {
+                data.comments.forEach(comment => {
+                    const commentItem = document.createElement("li");
+                    commentItem.classList.add("comment-item");
+                    commentItem.innerHTML = `
+                        <p>${comment.text}</p>
+                        <small>By ${comment.user.username} on ${new Date(comment.created_at).toLocaleString()}</small>
+                    `;
+                    commentList.appendChild(commentItem);
+                });
+            } else {
+                // Display a message if no comments are available
+                const noCommentsMessage = document.createElement("li");
+                noCommentsMessage.textContent = "No comments yet.";
+                commentList.appendChild(noCommentsMessage);
+            }
+
+            // Set the task ID in the comment form
+            document.getElementById('task-id-input').value = taskId;
         })
         .catch(error => {
             console.error("Error fetching task details:", error);
@@ -1189,69 +1213,22 @@ function fetchTaskDetails(taskId) {
 }
 
 
-        // Function to fetch completion details
-        function fetchCompletionDetails(taskId) {
-            fetch(`/task/${taskId}/details/`)
-                .then(response => response.json())
-                .then(data => {
-                    document.querySelector(".completion-details-section").style.display = "block";
-                    document.getElementById("completion-details").textContent = data.completion_details || "No completion details available.";
-                })
-                .catch(error => {
-                    console.error("Error fetching completion details:", error);
-                });}
-    // Function to close the modal
-    function closeModal() {
-        modal.style.display = "none";
-        document.querySelector(".completion-details-section").style.display = "none";
-        document.querySelector(".likes-section").style.display="none";
-        document.querySelector(".description-section").style.display = "none";
-    }
 
-    // Event listener for closing the modal
-    closeBtn.addEventListener("click", closeModal);
-
-    // Close the modal when clicking outside the image
-    window.addEventListener("click", (event) => {
-        if (event.target === modal) {
-            closeModal();
-        }
-    });
-
-
-    function toggleSection(sectionId) {
-    const button = document.querySelector(`button[onclick="toggleSection('${sectionId}')"]`);
-    const content = document.getElementById(`${sectionId}-content`);
-
-    if (content.style.display === "none") {
-        content.style.display = "block";
-        button.classList.add("expanded");
-    } else {
-        content.style.display = "none";
-        button.classList.remove("expanded");
-    }
-}
-    // Handle comment form submission via AJAX
 document.getElementById('comment-form').addEventListener('submit', function (event) {
-    event.preventDefault();  // Prevent the default form submission
+    event.preventDefault(); // Prevent the default form submission
 
-    const formData = new FormData(this);  // Get form data
-    const taskId = document.getElementById('task-id-input').value;  // Get the task ID
+    const formData = new FormData(this); // Get form data
+    const taskId = document.getElementById('task-id-input').value; // Get the task ID
 
     fetch(`/task/${taskId}/add-comment/`, {
         method: 'POST',
         headers: {
-            'X-CSRFToken': '{{ csrf_token }}',  // Include the CSRF token
-            'X-Requested-With': 'XMLHttpRequest',  // Indicate this is an AJAX request
+            'X-CSRFToken': '{{ csrf_token }}', // Include the CSRF token
+            'X-Requested-With': 'XMLHttpRequest', // Indicate this is an AJAX request
         },
-        body: formData,  // Send form data
+        body: formData, // Send form data
     })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok.');
-        }
-        return response.json();
-    })
+    .then(response => response.json())
     .then(data => {
         if (data.success) {
             // Append the new comment to the comment list
@@ -1274,40 +1251,20 @@ document.getElementById('comment-form').addEventListener('submit', function (eve
         console.error('Error:', error);
         alert('An error occurred. Please try again.');
     });
-});
+}); 
 
-    // Handle comment form submission via AJAX
-    function fetchComments(taskId) {
-    fetch(`/task/${taskId}/get-comments/`)  // Ensure the URL is correct
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok.');
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (data.success) {
-                const commentList = document.querySelector('.comment-list');
-                commentList.innerHTML = '';  // Clear existing comments
-                console.log(data.comments)
-                // Append each comment to the comment list
-                data.comments.forEach(comment => {
-                    const commentItem = document.createElement('li');
-                    commentItem.classList.add('comment-item');
-                    commentItem.innerHTML = `
-                        <p>${comment.text}</p>
-                        <small>By ${comment.user__username} on ${new Date(comment.created_at).toLocaleString()}</small>
-                    `;
-                    commentList.appendChild(commentItem);
-                });
-            } else {
-                console.error('Failed to fetch comments:', data.error);
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching comments:', error);
-        });
+const modal = document.getElementById("image-modal");
+const closeBtn = document.querySelector(".close");
+
+// Function to close the modal
+function closeModal() {
+    modal.style.display = "none";
 }
+
+// Add event listener to the close button
+closeBtn.addEventListener("click", closeModal);   
+
+
 </script>
 </html>
 {% endblock %}

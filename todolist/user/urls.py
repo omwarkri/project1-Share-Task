@@ -19,5 +19,6 @@ urlpatterns = [
     path('download-report/pdf/<str:report_type>/', download_task_report_pdf, name='download_task_report_pdf'),
     path('api/register/', UserRegistrationView.as_view(), name='user_register'),  # User registration
     path('api/login/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'), 
-    path('api/protected/', ProtectedView.as_view(), name='protected_view'), 
+    path('api/protected/', ProtectedView.as_view(), name='protected_view'),
+    path('api/update-interests-goals/', update_user_interests_goals, name='update_interests_goals'), 
 ]

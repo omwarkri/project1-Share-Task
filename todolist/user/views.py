@@ -494,3 +494,33 @@ def follow_user(request, user_id):
 
     # Redirect back to the completed tasks feed
     return redirect('completed_tasks_feed')
+
+
+
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import login_required
+import json
+from task.views import generate_task_suggestions
+
+@login_required
+@csrf_exempt  # Required if CSRF token isn't included; ideally, use CSRF token
+def update_user_interests_goals(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            interests = str(data.get('interests', '')).strip()
+            goals = str(data.get('goals', '')).strip()
+            print(interests)
+            user = request.user
+            user.interests = interests
+            user.goals = goals
+            user.save()
+            user = get_object_or_404(CustomUser, id=request.user.id)
+            suggestions=generate_task_suggestions(user, task=Task)
+            print(suggestions)
+            return JsonResponse({'status': 'success', 'message': 'Interests and goals updated successfully.','suggestions':suggestions})
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=405)

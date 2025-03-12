@@ -230,6 +230,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from .models import Task
 from .forms import TaskForm, TaskDependenciesForm
+from user.forms import UserInterestGoalForm
 @login_required
 def home(request):
     # Get filter and sorting parameters from the request
@@ -238,7 +239,7 @@ def home(request):
     sort_by = request.GET.get('sort_by', 'created_at')  # Default: Sort by creation date
     order = request.GET.get('order', 'desc')  # Default: Descending order
     search_query = request.GET.get('q', None)  # Search query for tasks
-
+    UserInterestGoalForms=UserInterestGoalForm()
    
     tasks = Task.objects.filter(
         Q(user=request.user) | Q(assigned_to=request.user)
@@ -309,6 +310,7 @@ def home(request):
         'order': order,
         'search_query': search_query,
         'TaskDependenciesForm': TaskDependenciesForm(),
+        'UserInterestGoalForm':UserInterestGoalForms
         
     }
 
@@ -1828,30 +1830,49 @@ def generate_task_suggestions(user, task=Task):
     # Clean and format the suggestions
     suggestions = [s.strip() for s in suggestions if s.strip()]
     return suggestions[:20]  # Return up to 20 suggestions
-
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
+from django.contrib.auth.decorators import login_required
+import json
+
 @login_required
 def task_suggestions_view(request):
-    user = request.user
-    
-
     user = get_object_or_404(CustomUser, id=request.user.id)
     suggestions = []
-    
-    if request.method == 'POST':
-        form = UserInterestGoalForm(request.POST)
-        if form.is_valid():
-            # Save interests and goals
-            user.interests = [i.strip() for i in form.cleaned_data['interests'].split(',')]
-            user.goals = [g.strip() for g in form.cleaned_data['goals'].split(',')]
-            user.save()
-            suggestions = generate_task_suggestions(user)
-    else:
+    form = UserInterestGoalForm(request.POST or None)
+
+    if request.method == 'POST' and form.is_valid():
+        # Save interests and goals
+        user.interests = [i.strip() for i in form.cleaned_data['interests'].split(',')]
+        user.goals = [g.strip() for g in form.cleaned_data['goals'].split(',')]
+        user.save()
+        suggestions = generate_task_suggestions(user)
+        return JsonResponse({
+            'status': 'success',
+            'suggestions': suggestions,
+        })
+    elif request.method == 'GET':
         form = UserInterestGoalForm(initial={
-            'interests': ', '.join(user.interests),
-            'goals': ', '.join(user.goals),
+            'interests': user.interests,
+            'goals': user.goals
         })
         if user.interests and user.goals:
             suggestions = generate_task_suggestions(user)
+        return JsonResponse({
+            'status': 'success',
+            'form_data': {
+                'interests': form.initial['interests'],
+                'goals': form.initial['goals'],
+            },
+            'suggestions': suggestions,
+        })
+    else:
+        return JsonResponse({
+            'status': 'error',
+            'message': 'Invalid request method or form data',
+        }, status=400)
 
-    return render(request, 'task/suggestions.html', {'form': form, 'suggestions': suggestions})
+
+
+
+

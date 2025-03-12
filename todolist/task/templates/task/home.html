@@ -50,7 +50,7 @@
         margin-top: -10px;
         transform: translateX(-50%); /* Adjust for exact centering */
         transition: top 0.5s ease-out; /* Smooth transition for movement */
-        z-index:900;
+        z-index:700;
     
     }
     
@@ -385,7 +385,10 @@
     left: 0;
     margin-top: 0px;
     max-width: 100px;
-   
+    background-color: rgba(15, 32, 30, 0.8); /* Semi-transparent background */
+    backdrop-filter: blur(10px); /* Blur effect for glassy look */
+    -webkit-backdrop-filter: blur(10px); /* Safari support */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     border: 1px solid #393858;
     border-radius: 4px;
     z-index: 1000;
@@ -400,7 +403,7 @@
     text-align: left;
     background: none;
     border: none;
-    background: #0e433bd2;
+    background: #0f4840d2;
     color: #ffffff;
     cursor: pointer;
     font-size: 14px;
@@ -408,6 +411,7 @@
 
 .dropdown-content button:hover {
     background-color: #444;
+    color: black;
 }
 
 .dropdown:hover .dropdown-content {
@@ -630,6 +634,12 @@ input:checked + .slider:before {
     width: 90%;
     max-width: 500px;
 }
+
+#addTaskModal{
+    z-index: 1000;
+}
+
+
 
 .filter-tabs {
     display: flex;
@@ -1082,7 +1092,7 @@ input:checked + .slider:before {
         display: flex;
         align-items: center;
         justify-content: center;
-        z-index: 900; /* Ensure it's above other content */
+        z-index: 700; /* Ensure it's above other content */
         transition: background-color 0.3s ease, transform 0.3s ease;
     }
     
@@ -1187,6 +1197,7 @@ input:checked + .slider:before {
     border: none;
     padding: 10px 20px;
     border-radius: 8px;
+    border: 1px solid rgb(102, 102, 102);
     transition: background-color 0.3s ease;
 }
 
@@ -1297,14 +1308,19 @@ input:checked + .slider:before {
        margin-bottom: 32px; 
     }
 
-
+    #taskSuggestionsModal {
+    z-index: 800;
+    margin-bottom: 30px;
+}
     /* Modal Styling */
 #taskSuggestionsModal .modal-content {
     border-radius: 16px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
     background-color: #ffffff;
-    padding: 20px;
+    padding: 0px;
     border: none;
+   
+
 }
 
 /* Modal Header */
@@ -1401,6 +1417,7 @@ input:checked + .slider:before {
     border: 1px solid #e9ecef;
     transition: background-color 0.3s ease;
     cursor: pointer;
+    display: flex;
 }
 
 #suggestionsList li:hover {
@@ -1446,15 +1463,30 @@ input:checked + .slider:before {
     background-color: #5a6268;
 }
 
-    
+.getSuggestionButton{
+          
+                border: 1px solid rgb(96, 92, 92);
+            }
+
+.add-task-btn{
+    margin-left: 32px;
+    height: 32px;
+}
     
     /* Mobile Responsiveness */
     @media (max-width: 768px) {
+
+
     
         .main-content {
                 overflow-y: auto; /* Enable scrolling on mobile */
                 height: calc(100vh - 100px); /* Adjust height for mobile header */
                 padding-bottom: 80px; /* Add padding for floating button */
+            }
+
+            .getSuggestionButton{
+                margin-right: 56px;
+                border: 1px solid rgb(96, 92, 92);
             }
     
             .task-grid {
@@ -1671,10 +1703,10 @@ input:checked + .slider:before {
     gap: 8px;
     width: 100%;
     padding: 8px;
-    background-color: rgba(10, 52, 49, 0.4); /* Semi-transparent background */
+    
     border-radius: 8px; /* Rounded corners */
     color: black;
-    backdrop-filter: blur(10px); /* Blur effect for glassy look */
+    backdrop-filter: blur(100px); /* Blur effect for glassy look */
     -webkit-backdrop-filter: blur(10px); /* Safari support */
     border: 1px solid rgba(255, 255, 255, 0.2); /* Subtle border for depth */
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Soft shadow for elevation */
@@ -1746,6 +1778,9 @@ input:checked + .slider:before {
                     <span class="plus-icon">➕</span>
                 </button>
             </div>
+            <button type="button" class="btn btn-primary getSuggestionButton" data-bs-toggle="modal" data-bs-target="#taskSuggestionsModal" onclick="fetchAndDisplaySuggestions()">
+                Get Task Suggestions
+            </button>
             <div class="header-actions">
                 <!-- Toggle Button for Mobile View -->
                 <button class="mobile-toggle-button" onclick="toggleHeaderActions()" title="Toggle Menu"> ⚙️</button>
@@ -1754,9 +1789,7 @@ input:checked + .slider:before {
 
 
 <!-- Button with onclick -->
-<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#taskSuggestionsModal" onclick="fetchAndDisplaySuggestions()">
-    Get Task Suggestions
-</button>
+
 
             
                 <!-- Header Actions Container -->
@@ -2577,20 +2610,45 @@ function populateForm(formData) {
     `;
 }
 
-// Function to populate suggestions list
+// Function to populate suggestions list with + button
 function populateSuggestions(suggestions) {
     const suggestionsList = document.getElementById('suggestionsList');
     suggestionsList.innerHTML = '';
+
     if (suggestions && suggestions.length > 0) {
         suggestions.forEach(suggestion => {
             const li = document.createElement('li');
             li.textContent = suggestion;
+
+            const addButton = document.createElement('button');
+            addButton.textContent = '➕';
+            addButton.classList.add('add-task-btn');
+            addButton.onclick = () => openAddTaskModal(suggestion);
+
+            li.appendChild(addButton);
             suggestionsList.appendChild(li);
         });
     } else {
         suggestionsList.innerHTML = '<li>No suggestions available.</li>';
     }
 }
+
+// Function to open the Add Task Modal and set title in form input
+function openAddTaskModal(suggestion) {
+    document.getElementById('addTaskModal').style.display = 'block';
+    
+    // Set the title field value with the selected suggestion
+    const titleInput = document.querySelector('#addTaskModal input[name="title"]');
+    if (titleInput) {
+        titleInput.value = suggestion;
+    }
+}
+
+// Function to close the Add Task Modal
+function closeAddTaskModal() {
+    document.getElementById('addTaskModal').style.display = 'none';
+}
+
 
 // Function to submit updated form data
 function submitInterestGoalForm() {

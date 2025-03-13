@@ -96,6 +96,17 @@
         height: 30px;
         width: 30px;
     }
+
+    .btn-primary{
+        background-color: white;
+        color: black;
+        border: 1px solid rgb(146, 146, 146);
+        padding: 8px;
+    }
+
+    #toggle-shutter-button{
+        z-index: 100;
+    }
     
 
     .main-content {
@@ -322,6 +333,224 @@
 }
 
 
+#taskModal{
+    z-index: 1000;
+}
+
+
+#teamTaskSuggestionsModal{
+    z-index: 800;
+}
+/* Modal Content Styling */
+#teamTaskSuggestionsModal .modal-content {
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    background-color: #f8f9fa;
+}
+
+/* Modal Header Styling */
+#editTeamGoalsTitle{
+    background-color: #16a085;
+    color: white;
+    border-radius: 10px;
+   
+    padding: 15px 20px;
+}
+
+
+#teamTaskSuggestionsModal .modal-header button:hover {
+    text-decoration: underline;
+}
+
+/* Modal Body Styling */
+
+#teamTaskSuggestionsModal .modal-body h5 {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: #343a40;
+}
+
+/* Form Styling */
+#teamGoalsForm .form-label {
+    font-weight: bold;
+    color: #495057;
+}
+
+#teamGoalsForm .form-control {
+    border-radius: 5px;
+    border: 1px solid #ced4da;
+    padding: 10px;
+    font-size: 14px;
+}
+
+#teamGoalsForm .form-control:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.25);
+}
+
+#teamGoalsForm .mb-3 {
+    margin-bottom: 15px !important;
+}
+
+/* Button Styling */
+#teamTaskSuggestionsModal .btn-primary {
+    background-color: #007bff;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+#teamTaskSuggestionsModal .btn-primary:hover {
+    background-color: #0056b3;
+}
+
+#teamTaskSuggestionsModal .btn-secondary {
+    background-color: #6c757d;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+#teamTaskSuggestionsModal .btn-secondary:hover {
+    background-color: #5a6268;
+}
+
+/* Suggestions Section Styling */
+#teamSuggestionsList {
+    list-style-type: none;
+    padding-left: 0;
+    margin-top: 15px;
+}
+
+#teamSuggestionsList li {
+    background-color: #e9ecef;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    font-size: 14px;
+    color: #495057;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* Loader Styling */
+#teamLoader {
+    margin-top: 20px;
+}
+
+#teamLoader .spinner-border {
+    width: 3rem;
+    height: 3rem;
+}
+
+#teamGoalsForm {
+    display: none;
+    animation: fadeIn 0.3s ease-in-out;
+}
+/* Form Container Styling */
+#teamGoalsForm {
+    background-color: #ffffff;
+    padding: 20px;
+    margin-bottom: 24px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Form Labels */
+#teamGoalsForm .form-label {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 8px;
+    display: block;
+}
+
+/* Form Input Fields */
+#teamGoalsForm .form-control {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    font-size: 14px;
+    color: #495057;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+#teamGoalsForm .form-control:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.25);
+    outline: none;
+}
+
+/* Textarea Specific Styling */
+#teamGoalsForm textarea.form-control {
+    resize: vertical; /* Allow vertical resizing */
+    min-height: 100px;
+}
+
+/* Form Group Spacing */
+#teamGoalsForm .mb-3 {
+    margin-bottom: 20px;
+}
+
+/* Submit Button Styling */
+#teamGoalsForm .btn-primary {
+    background-color: #007bff;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#teamGoalsForm .btn-primary:hover {
+    background-color: #0056b3;
+}
+
+#teamGoalsForm .btn-primary:active {
+    background-color: #004080;
+}
+
+/* Error State for Input Fields (Optional) */
+#teamGoalsForm .form-control.is-invalid {
+    border-color: #dc3545;
+}
+
+#teamGoalsForm .form-control.is-invalid:focus {
+    box-shadow: 0 0 5px rgba(220, 53, 69, 0.25);
+}
+
+/* Placeholder Text Styling */
+#teamGoalsForm .form-control::placeholder {
+    color: #6c757d;
+    opacity: 0.7;
+}
+
+.Create-Task{
+    border: 1px solid black;
+    padding: 8px;
+    border-radius: 50%;
+    background-color: #00a483;
+    color:white;
+    text-decoration: none;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+
 
     /* Mobile Responsiveness */
 @media (max-width: 768px) {
@@ -460,57 +689,66 @@
                 </ul>
             </div>
         </div>
-    
-        <div class="header">
-            <div>
-                <h2>Team: {{ team.name }}</h2>
-                <p>{{ team.description }}</p>
-                <a id="invite-member-button" href="#" class="btn btn-success">Invite Member</a>
-                {% if request.user == team.created_by %}
-                <button id="manage-permissions-button" class="btn btn-primary" onclick="openPermissionModal()">
-                    🛠️ Manage Permissions
-                </button>
-            {% endif %}
-            </div>
-    
-            <!-- Filter Section -->
-            <div class="filter-section">
-                <h3>Filter Tasks</h3>
-                <div class="filter-options">
-                    <!-- Status Filter -->
-                    <select id="status-filter" class="filter-select">
-                        <option value="all">All Statuses</option>
-                        <option value="pending">Pending</option>
-                        <option value="in_progress">In Progress</option>
-                        <option value="completed">Completed</option>
-                        <option value="archived">Archived</option>
-                    </select>
-    
-                    <!-- Priority Filter -->
-                    <select id="priority-filter" class="filter-select">
-                        <option value="all">All Priorities</option>
-                        <option value="low">Low</option>
-                        <option value="medium">Medium</option>
-                        <option value="high">High</option>
-                        <option value="critical">Critical</option>
-                    </select>
-    
-                    <!-- Due Date Filter -->
-                    <input type="date" id="due-date-filter" class="filter-select" />
-    
-                    <!-- Assigned User Filter -->
-                    <select id="assigned-user-filter" class="filter-select">
-                        <option value="all">All Users</option>
-                        {% for member in team.members.all %}
-                            <option value="{{ member.id }}">{{ member.username }}</option>
-                        {% endfor %}
-                    </select>
-    
-                    <!-- Clear Filters Button -->
-                    <button id="clear-filters" class="filter-button">Clear Filters</button>
+        <div class="header flex items-center justify-between gap-2">
+            <!-- Team Info Section -->
+            <div class="team-info">
+                <h2 class="text-lg font-semibold">{{ team.name }}</h2>
+                <p class="text-sm text-gray-500">{{ team.description }}</p>
+                <div class="flex gap-2 mt-1">
+                    <a id="invite-member-button" href="#" class="btn btn-sm btn-success" title="Invite Member">➕ Invite</a>
+        
+                    {% if request.user == team.created_by %}
+                        <button id="manage-permissions-button" class="btn btn-sm btn-primary" 
+                                onclick="openPermissionModal()" title="Manage Permissions">⚙️</button>
+        
+                        <button type="button" class="btn btn-sm btn-primary getTeamSuggestionButton" 
+                                data-bs-toggle="modal" data-bs-target="#teamTaskSuggestionsModal" 
+                                onclick="fetchAndDisplayTeamSuggestions(teamId)" title="Get Task Suggestions">💡</button>
+                    {% endif %}
                 </div>
             </div>
+        
+            <!-- Create Task Icon -->
+            <a class="Create-Task text-2xl" href="#" onclick="openAddTaskModal()" title="Create Task">➕</a>
+        
+            <!-- Filter Toggle -->
+            <button class="btn btn-sm btn-outline-secondary" onclick="toggleFilterSection()" title="Filter Tasks">🔍 Filter</button>
         </div>
+        
+        <!-- Filter Section (Initially Hidden) -->
+        <div id="filter-section" class="filter-section hidden mt-2">
+            <div class="grid grid-cols-2 gap-2">
+                <select id="status-filter" class="filter-select">
+                    <option value="all">All Statuses</option>
+                    <option value="pending">Pending</option>
+                    <option value="in_progress">In Progress</option>
+                    <option value="completed">Completed</option>
+                    <option value="archived">Archived</option>
+                </select>
+        
+                <select id="priority-filter" class="filter-select">
+                    <option value="all">All Priorities</option>
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                    <option value="critical">Critical</option>
+                </select>
+        
+                <input type="date" id="due-date-filter" class="filter-select" />
+        
+                <select id="assigned-user-filter" class="filter-select">
+                    <option value="all">All Users</option>
+                    {% for member in team.members.all %}
+                        <option value="{{ member.id }}">{{ member.username }}</option>
+                    {% endfor %}
+                </select>
+        
+                <button id="clear-filters" class="btn btn-sm btn-outline-danger col-span-2">Clear Filters</button>
+            </div>
+        </div>
+        
+      
+        
 
         <!-- Task Grid -->
         <div class="task-grid">
@@ -570,6 +808,20 @@
     </div>
 </div>
 
+<div id="taskModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Add Task</h3>
+            <span class="close" onclick="closeAddTaskModal()">&times;</span>
+        </div>
+        <form method="post">
+            {% csrf_token %}
+            {{ task_form.as_p }}
+            <button type="submit" name="add_task">Create Task</button>
+        </form>
+    </div>
+</div>
+
 <div id="escalateModal" class="modal">
     <div class="modal-content">
         <span class="close-modal" onclick="closeEscalateModal()">&times;</span>
@@ -610,6 +862,69 @@
             <textarea id="message" name="message" rows="4"></textarea>
             <button type="submit" class="submit-button">Send Invite</button>
         </form>
+    </div>
+</div>
+
+
+<!-- Team Task Suggestions Modal -->
+<div class="modal fade" id="teamTaskSuggestionsModal" tabindex="-1" aria-labelledby="teamTaskSuggestionsModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content" id="modalContent">
+            
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <button class="" id="editTeamGoalsTitle" style="cursor: pointer;" onclick="toggleTeamGoalForm()">
+                    Edit Team Goals and Vision
+                </button>
+            </div>
+
+         <!-- Modal Form Section -->
+<div class="modal-body">
+    <form id="teamGoalsForm">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="weekly_goal" class="form-label">Weekly Goal</label>
+            <input type="text" id="weekly_goal" name="weekly_goal" class="form-control" required>
+        </div>
+        
+        <div class="mb-3">
+            <label for="monthly_goal" class="form-label">Monthly Goal</label>
+            <input type="text" id="monthly_goal" name="monthly_goal" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="yearly_goal" class="form-label">Yearly Goal</label>
+            <input type="text" id="yearly_goal" name="yearly_goal" class="form-control" required>
+        </div>
+       
+
+        <div class="mb-3">
+            <label for="vision" class="form-label">Vision</label>
+            <textarea id="vision" name="vision" class="form-control" required></textarea>
+        </div>
+
+        <button type="button" class="btn btn-primary" onclick="submitTeamGoalsForm({{ team.id }})">
+            Submit Goals
+        </button>
+    </form>
+</div>
+
+
+                <!-- Suggestions Section -->
+                <h2 class="modal-title">Team Task Suggestions</h2>
+                <div id="teamLoader" style="display: none; text-align: center;">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+                <ul id="teamSuggestionsList"></ul>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+
+        </div>
     </div>
 </div>
 
@@ -681,6 +996,21 @@
 {% endfor %}
 
 <script>
+      
+            function toggleFilterSection() {
+                const filterSection = document.getElementById("filter-section");
+                filterSection.classList.toggle("hidden");
+            }
+      
+
+    // Modal Functions
+    function openAddTaskModal() {
+            document.getElementById('taskModal').style.display = 'flex';
+        }
+
+        function closeAddTaskModal() {
+            document.getElementById('taskModal').style.display = 'none';
+        }
 
 function fetchPermissions() {
     const teamId = {{ team.id }}; // Pass the team ID from the template
@@ -1022,6 +1352,130 @@ const toggleButton = document.getElementById('toggle-shutter-button');
     function closeEscalateModal() {
         document.getElementById('escalateModal').style.display = 'none';
     }
+
+
+    // Function to fetch and display team suggestions
+function fetchAndDisplayTeamSuggestions(teamId) {
+    const loader = document.getElementById('teamLoader');
+    const suggestionsList = document.getElementById('teamSuggestionsList');
+
+    loader.style.display = 'block';
+    suggestionsList.style.display = 'none';
+
+    fetch(`/teams/${teamId}/suggestions/`, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            populateTeamForm(data.form_data)
+            populateTeamSuggestions(data.suggestions);
+            loader.style.display = 'none';
+            suggestionsList.style.display = 'block';
+        } else {
+            console.error('Failed to load team data:', data);
+        }
+    })
+    .catch(error => {
+        console.error('Error fetching team data:', error);
+    });
+}
+
+// Populate team form fields
+function populateTeamForm(formData) {
+    document.getElementById('monthly_goal').value = formData.monthly_goal || '';
+    document.getElementById('yearly_goal').value = formData.yearly_goal || '';
+    document.getElementById('weekly_goal').value = formData.yearly_goal || '';
+    document.getElementById('vision').value = formData.vision || '';
+}
+
+
+// Populate team suggestions list
+function populateTeamSuggestions(suggestions) {
+    const suggestionsList = document.getElementById('teamSuggestionsList');
+    suggestionsList.innerHTML = '';
+
+    if (suggestions && suggestions.length > 0) {
+        suggestions.forEach(suggestion => {
+            const li = document.createElement('li');
+            li.textContent = suggestion;
+
+            const addButton = document.createElement('button');
+            addButton.textContent = '➕';
+            addButton.classList.add('add-task-btn');
+            addButton.onclick = () => openAddTaskModal(suggestion);
+
+            li.appendChild(addButton);
+            suggestionsList.appendChild(li);
+        });
+    } else {
+        suggestionsList.innerHTML = '<li>No suggestions available.</li>';
+    }
+}
+
+// Open the Add Task Modal and set title
+function openAddTaskModal(suggestion) {
+    document.getElementById('taskModal').style.display = 'block';
+    
+    const titleInput = document.querySelector('#taskModal input[name="title"]');
+    if (titleInput) {
+        titleInput.value = suggestion;
+    }
+}
+
+// Close Add Task Modal
+function closeAddTaskModal() {
+    document.getElementById('taskModal').style.display = 'none';
+}
+
+function submitTeamGoalsForm(teamId) {
+    const monthlyGoal = document.getElementById('monthly_goal').value;
+    const yearlyGoal = document.getElementById('yearly_goal').value;
+    const weeklyGoal = document.getElementById('weekly_goal').value;
+    const vision = document.getElementById('vision').value;
+
+    fetch(`/teams/${teamId}/suggestions/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCSRFToken(),
+        },
+        body: JSON.stringify({ monthly_goal: monthlyGoal, yearly_goal: yearlyGoal, vision: vision,weekly_goal: weeklyGoal }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            alert('Goals updated successfully!');
+            // Optionally hide modal or refresh data here
+        } else {
+            alert(`Error: ${data.message}`);
+        }
+    })
+    .catch(error => {
+        console.error('Error submitting data:', error);
+    });
+}
+
+// Helper to get CSRF token
+function getCSRFToken() {
+    return document.querySelector('[name=csrfmiddlewaretoken]').value;
+}
+
+
+// Get CSRF Token
+function getCSRFToken() {
+    return document.querySelector('[name=csrfmiddlewaretoken]').value;
+}
+
+// Toggle the display of the team goal form
+function toggleTeamGoalForm() {
+    const form = document.getElementById('teamGoalsForm');
+    form.style.display = (form.style.display === 'none' || form.style.display === '') ? 'block' : 'none';
+}
+
 
     // Close the modal if the user clicks outside of it
     window.onclick = function(event) {

@@ -111,18 +111,24 @@ def generate_html_email(title, content, button_text=None, button_link=None, home
     """
     return html_content
 
-# AI Response Generation
 def generate_ai_response(task_id):
-    """Generate AI-guided task procedure."""
+    """Generate AI-guided task procedure with a sense of urgency."""
     task = Task.objects.get(id=task_id)
     task_title = task.title
     task_description = task.description
 
     prompt = (
-        f"Generate a 5-step procedure for completing the task.\n\n"
+        f"Generate a 5-step procedure for completing the task. Each step must have exactly 16 words.\n\n"
         f"Task Title: {task_title}\n"
         f"Task Description: {task_description}\n\n"
-        f"Each step must have exactly 16 words:\n"
+        f"Make the steps actionable and include motivational language to create a sense of urgency.\n"
+        f"Example:\n"
+        f"1. Start immediately by gathering all necessary materials to avoid last-minute stress.\n"
+        f"2. Break the task into smaller parts and tackle the first part right now.\n"
+        f"3. Set a timer for 25 minutes and focus solely on the task without distractions.\n"
+        f"4. Review your progress and adjust your approach to stay on track today.\n"
+        f"5. Complete the task ahead of time to reduce stress and feel accomplished.\n\n"
+        f"Now generate the steps for this task:"
     )
 
     response = model.generate_content(prompt)
@@ -169,32 +175,28 @@ def send_task_reminders():
             # Generate task detail link
             task_detail_link = f"{settings.BASE_URL}/task/{task.id}/"  # Task detail URL
 
-            # Generate HTML email content
-            title = f"Reminder: '{task.title}' is due soon!"
-            content = (
-                f"<p>Hello,</p>"
-                f"<p>Your task <strong>{task.title}</strong> is due on <strong>{task.due_date.strftime('%Y-%m-%d %H:%M')}</strong>.</p>"
-                f"<p>Here’s a simple 5-step guide to complete it:</p>"
-                f"<p>{ai_procedure}</p>"
-                f"<p>Don't forget to complete it!</p>"
+            # Render HTML email template
+            html_content = render_to_string(
+                'emails/task_reminder.html',  # Path to your HTML template
+                {
+                    'task': task,
+                    'ai_procedure': ai_procedure,
+                    'task_detail_link': task_detail_link,
+                    'home_page_link': f"{settings.BASE_URL}",
+                }
             )
-            home_page_link = f"{settings.BASE_URL}"  # Home page URL
-            html_content = generate_html_email(
-                title,
-                content,
-                button_text="View Task Details",  # Button text
-                button_link=task_detail_link,  # Task detail link
-                home_page_link=home_page_link+"/task/"  # Home page link
-            )
+
+            # Plain text fallback
+            plain_text_content = strip_tags(html_content)
 
             # Send the email
             print("Sending mail")
             send_mail(
-                subject=title,
-                message=strip_tags(content),  # Plain text fallback
+                subject=f"Reminder: '{task.title}' is due soon!",
+                message=plain_text_content,
                 from_email=settings.EMAIL_HOST_USER,
                 recipient_list=[task.user.email],
-                html_message=html_content,  # HTML version
+                html_message=html_content,
             )
 
             # Update reminder count
@@ -244,6 +246,7 @@ def send_daily_task_schedule():
     for user in users:
         tasks = Task.objects.filter(
             user=user,
+            assigned_to =user,
             due_date__date=current_time.date(),
             status__in=['pending', 'in_progress']
         ).exclude(status='completed')
@@ -255,31 +258,220 @@ def send_daily_task_schedule():
         ai_schedule = generate_daily_schedule(user, tasks)
         ai_schedule_html = convert_markdown_to_html(ai_schedule)  # Convert to HTML format
 
-        # Generate HTML email content
+        # Render HTML email template
         user = CustomUser.objects.get(id=user)
-        title = "📅 Your AI-Powered Task Schedule for Today"
-        content = (
-            f"<p>Hello {user.username},</p>"
-            f"<p>Here is your <strong>AI-optimized task schedule</strong> for today:</p>"
-            f"{ai_schedule_html}"
-            f"<p>✅ Prioritize high-importance tasks in the morning.<br>"
-            f"☕ Take short breaks to stay focused.<br>"
-            f"📌 Adjust the schedule as needed.</p>"
-            f"<p>Stay productive! 🚀</p>"
+        html_content = render_to_string(
+            'emails/daily_task_schedule.html',  # Path to your HTML template
+            {
+                'user': user,
+                'ai_schedule': ai_schedule_html,
+                'home_page_link': f"{settings.BASE_URL}/task/",
+            }
         )
-        home_page_link = f"{settings.BASE_URL}/task/"  # Add your home page URL
-        html_content = generate_html_email(title, content, home_page_link=home_page_link)
+
+        # Plain text fallback
+        plain_text_content = strip_tags(html_content)
 
         # Send the email
         send_mail(
-            subject=title,
-            message=strip_tags(content),  # Plain text fallback
+            subject="📅 Your AI-Powered Task Schedule for Today",
+            message=plain_text_content,
             from_email=settings.EMAIL_HOST_USER,
-            recipient_list=["shantanuchavhan002@gmail.com"],  # Send to each user
-            html_message=html_content,  # HTML version
+            recipient_list=[user.email],
+            html_message=html_content,
         )
 
-    print("✅ Daily task schedules sent successfully!")
+    print("✅ Daily task schedules sent successfully! to",user.email)
+
+
+generativeai.configure(api_key="AIzaSyDx3rr0MzUPaumvdII3WIffmtsZqAz7JIs")
+
+# Initialize the Gemini model
+model = generativeai.GenerativeModel('gemini-1.5-flash')
+
+from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+from .models import Team, Task
+from user.models import CustomUser
+
+def generate_team_task_suggestions(team):
+    print("Generating team task suggestions...")
+    completed_tasks = [task.title for task in Task.objects.filter(team=team)]
+    monthly_goals = team.monthly_goals or []
+    yearly_goals = team.yearly_goals or []
+    vision = team.vision or ""
+
+    prompt = f"""
+    You are a task recommendation system. Based on the team's completed tasks, monthly goals, yearly goals, and vision, suggest 20 specific, actionable, and relevant tasks for the team.
+
+    **Team Context:**
+    - Completed Tasks: {completed_tasks}
+    - Monthly Goals: {monthly_goals}
+    - Yearly Goals: {yearly_goals}
+    - Vision: {vision}
+
+    **Task Attributes:**
+    - Specific: Each task should be clear and well-defined.
+    - Actionable: Each task should be something the team can start working on immediately.
+    - Relevant: Each task should align with the team's goals and vision.
+
+    **Output Format:**
+    - Provide exactly 10 tasks.
+    - Each task should be a single sentence.
+    - Start each task with a verb (e.g., "Develop", "Plan", "Research").
+
+    **Task Suggestions:**
+    """
+
+    # Simulating AI model response
+    response = model.generate_content(prompt)  # Replace with actual AI model call
+    suggestions = response.text.strip().split('\n') if response and response.text else []
+    suggestions = [s.strip() for s in suggestions if s.strip()]
+    return suggestions[:10] 
+ 
+def generate_task_suggestions(user, task=Task):
+    print("Generating task suggestions...")
+    all_tasks = [task.title for task in task.objects.filter(user=user)]
+    print(f"User: {user}, Completed Tasks: {all_tasks}")
+    interests = user.interests
+    goals = user.goals
+
+    # Construct a detailed and structured prompt
+    prompt = f"""
+    You are a task recommendation system. Based on the user's completed tasks, interests, and goals, suggest 20 specific, actionable, and relevant tasks for the user.
+
+    **User Context:**
+    - Completed Tasks: {all_tasks}
+    - Interests: {interests}
+    - Goals: {goals}
+
+    **Task Attributes:**
+    - Specific: Each task should be clear and well-defined.
+    - Actionable: Each task should be something the user can start working on immediately.
+    - Relevant: Each task should align with the user's interests and goals.
+
+    **Output Format:**
+    - Provide exactly 10 tasks.
+    - Each task should be a single sentence.
+    - Start each task with a verb (e.g., "Learn", "Build", "Read").
+    - Avoid vague or generic tasks.
+
+    **Example Tasks:**
+    1. Learn advanced Python concepts like decorators and generators.
+    2. Build a personal portfolio website to showcase your projects.
+    3. Read a book on software development best practices.
+
+    **Task Suggestions:**
+    """
+
+    # Generate suggestions using the AI model
+    response = model.generate_content(prompt)
+    suggestions = response.text.strip().split('\n') if response and response.text else []
+
+    # Clean and format the suggestions
+    suggestions = [s.strip() for s in suggestions if s.strip()]
+    return suggestions[:10]  # Return up to 20 suggestions  send 10 daily task ans use above functions to generate task
+
+
+from django.core.mail import send_mail
+from django.utils.html import strip_tags
+from django.conf import settings
+from django.utils.timezone import now
+from .models import Team, Task
+from user.models import CustomUser
+def send_daily_suggested_tasks_to_user():
+    """Send daily AI-suggested tasks to individual users."""
+    print("Generating and sending daily suggested tasks to users...")
+    users = CustomUser.objects.all()
+
+    for user in users:
+        # Generate task suggestions for the user
+        suggested_tasks = generate_task_suggestions(user)
+        if not suggested_tasks:
+            continue
+
+        # Limit to 10 tasks
+        suggested_tasks = suggested_tasks[:10]
+
+        # Render HTML email template
+        html_content = render_to_string(
+            'emails/daily_suggested_tasks.html',  # Path to your HTML template
+            {
+                'user': user,
+                'suggested_tasks': suggested_tasks,
+                'home_page_link': f"{settings.BASE_URL}/task/",
+            }
+        )
+
+        # Plain text fallback
+        plain_text_content = strip_tags(html_content)
+
+        # Send the email
+        send_mail(
+            subject="✨ Your AI-Suggested Tasks for Today",
+            message=plain_text_content,
+            from_email=settings.EMAIL_HOST_USER,
+            recipient_list=[user.email],
+            html_message=html_content,
+        )
+
+    print("✅ Suggested tasks sent to individual users successfully!")
+
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+from django.conf import settings
+
+def send_daily_suggested_tasks_to_team_owner():
+    print("Generating and sending daily suggested tasks to team owners...")
+    teams = Team.objects.all()
+
+    for team in teams:
+        team_owner = team.created_by
+        suggested_tasks = generate_team_task_suggestions(team)
+        if not suggested_tasks:
+            continue
+
+        # Limit to 10 tasks
+        suggested_tasks = suggested_tasks[:10]
+
+        # Render the HTML email template
+        html_content = render_to_string(
+            'emails/daily_suggested_teamtasks.html',  # Path to your HTML template
+            {
+                'team_owner': team_owner,
+                'team': team,
+                'suggested_tasks': suggested_tasks,
+                'home_page_link': f"{settings.BASE_URL}/team/{team.id}/tasks/",
+                'team_page_link': f"{settings.BASE_URL}/teams/{team.id}/",
+            }
+        )
+
+        # Plain text fallback for email clients that don't support HTML
+        plain_text_content = strip_tags(html_content)
+
+        # Send the email
+        send_mail(
+            subject=f"🚀 Suggested Tasks for Your Team: {team.name}",
+            message=plain_text_content,
+            from_email=settings.EMAIL_HOST_USER,
+            recipient_list=[team_owner.email],
+            html_message=html_content,
+        )
+    print("✅ Suggested tasks sent to team owners successfully!")
+
+def generate_html_email(title, content, home_page_link):
+    return (
+        f"<html>"
+        f"<body>"
+        f"<h2>{title}</h2>"
+        f"{content}"
+        f"<p><a href='{home_page_link}'>Visit Dashboard</a></p>"
+        f"</body>"
+        f"</html>"
+    )
+
 
 
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -295,11 +487,13 @@ def start_scheduler():
     """Start the scheduler when Django starts."""
     scheduler = BackgroundScheduler()
 
-    # Run `send_task_reminders` every 20 minutes
+     # Run `send_task_reminders` every 20 minutes
     scheduler.add_job(send_task_reminders, IntervalTrigger(minutes=20))
 
     # Run `send_daily_task_schedule` every day at 9 AM
     scheduler.add_job(send_daily_task_schedule, CronTrigger(hour=9, minute=0))
+    scheduler.add_job(send_daily_suggested_tasks_to_team_owner,  CronTrigger(hour=8, minute=0))
+    scheduler.add_job(send_daily_suggested_tasks_to_user, CronTrigger(hour=8, minute=0))
 
     # Run `update_daily_tasks` every day at midnight
     scheduler.add_job(update_daily_tasks, CronTrigger(hour=0, minute=0))

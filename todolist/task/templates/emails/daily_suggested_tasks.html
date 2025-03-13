@@ -1,8 +1,8 @@
-<!-- templates/emails/task_assignment.html -->
+<!-- templates/emails/daily_suggested_tasks.html -->
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Task Assignment</title>
+    <title>Daily Suggested Tasks</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -26,7 +26,7 @@
             border-top-left-radius: 8px;
             border-top-right-radius: 8px;
         }
-        .email-header h1 {
+        .email-header h2 {
             margin: 0;
             font-size: 24px;
         }
@@ -38,25 +38,18 @@
             color: #333333;
             margin: 10px 0;
         }
-        .task-details {
-            width: 100%;
+        .email-body ul {
+            padding-left: 20px;
+            list-style-type: none;
+        }
+        .email-body ul li {
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: #555555;
+            padding: 10px;
             background-color: #f9f9f9;
             border: 1px solid #dddddd;
             border-radius: 5px;
-            padding: 10px;
-            margin: 20px 0;
-        }
-        .task-details td {
-            padding: 8px;
-            font-size: 14px;
-        }
-        .task-details td:first-child {
-            color: #555555;
-            font-weight: bold;
-            width: 30%;
-        }
-        .task-details td:last-child {
-            color: #333333;
         }
         .email-footer {
             text-align: center;
@@ -89,37 +82,25 @@
     <div class="email-container">
         <!-- Header -->
         <div class="email-header">
-            <h1>Task Assignment Notification</h1>
+            <h2>✨ Your AI-Suggested Tasks for Today</h2>
         </div>
 
         <!-- Body -->
         <div class="email-body">
-            <p>Hello <strong>{{ assigned_user.username }}</strong>,</p>
-            <p>You have been assigned the following task:</p>
-
-            <!-- Task Details Table -->
-            <table class="task-details">
-                <tr>
-                    <td>Task Title:</td>
-                    <td>{{ task.title }}</td>
-                </tr>
-                <tr>
-                    <td>Description:</td>
-                    <td>{{ task.description }}</td>
-                </tr>
-                <tr>
-                    <td>Due Date:</td>
-                    <td>{{ task.due_date }}</td>
-                </tr>
-            </table>
-
-            <p>Please take appropriate action to complete the task.</p>
+            <p>Hello <strong>{{ user.username }}</strong>,</p>
+            <p>Here are your <strong>AI-suggested tasks</strong> for today:</p>
+            <ul>
+                {% for task in suggested_tasks %}
+                <li>{{ task }}</li>
+                {% endfor %}
+            </ul>
+            <p>Stay productive! 🚀</p>
+            <p><a href="{{ home_page_link }}" class="btn">Go to Home Page</a></p>
         </div>
 
         <!-- Footer -->
         <div class="email-footer">
-            <p>Thank you,</p>
-            <p>Your Task Management System</p>
+            <p>This is an automated message. Please do not reply.</p>
         </div>
     </div>
 </body>

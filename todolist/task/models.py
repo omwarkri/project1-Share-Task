@@ -16,6 +16,9 @@ from django.db import models
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 
+from django.db import models
+from django.contrib.auth.models import Permission
+
 class Team(models.Model):
     name = models.CharField(max_length=255, unique=True)
     description = models.TextField(blank=True, null=True)
@@ -23,6 +26,11 @@ class Team(models.Model):
     created_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="teams")
     members = models.ManyToManyField(CustomUser, related_name="team_members", blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    
+    monthly_goals = models.JSONField(blank=True, null=True, help_text="List of monthly goals")
+    yearly_goals = models.JSONField(blank=True, null=True, help_text="List of yearly goals")
+    weekly_goals = models.JSONField(blank=True, null=True, help_text="List of weekly goals")  # New field
+    vision = models.TextField(blank=True, null=True, help_text="Team vision statement")
 
     def __str__(self):
         return self.name
@@ -45,7 +53,6 @@ class Team(models.Model):
         if self.is_team_lead(user):
             return True  # Team lead has all permissions
 
-        # Check if the user has the permission via TeamPermission
         return TeamPermission.objects.filter(
             team=self,
             user=user,
@@ -65,6 +72,10 @@ class Team(models.Model):
         """
         permission = Permission.objects.get(codename=permission_codename)
         TeamPermission.objects.filter(team=self, user=user, permission=permission).delete()
+
+
+
+
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.utils.crypto import get_random_string

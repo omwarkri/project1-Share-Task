@@ -1876,3 +1876,124 @@ def task_suggestions_view(request):
 
 
 
+from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+from .models import Team, Task
+from user.models import CustomUser
+
+def generate_team_task_suggestions(team):
+    print("Generating team task suggestions...")
+    completed_tasks = [task.title for task in Task.objects.filter(team=team)]
+    monthly_goals = team.monthly_goals or []
+    yearly_goals = team.yearly_goals or []
+    vision = team.vision or ""
+
+    prompt = f"""
+    You are a task recommendation system. Based on the team's completed tasks, monthly goals, yearly goals, and vision, suggest 20 specific, actionable, and relevant tasks for the team.
+
+    **Team Context:**
+    - Completed Tasks: {completed_tasks}
+    - Monthly Goals: {monthly_goals}
+    - Yearly Goals: {yearly_goals}
+    - Vision: {vision}
+
+    **Task Attributes:**
+    - Specific: Each task should be clear and well-defined.
+    - Actionable: Each task should be something the team can start working on immediately.
+    - Relevant: Each task should align with the team's goals and vision.
+
+    **Output Format:**
+    - Provide exactly 20 tasks.
+    - Each task should be a single sentence.
+    - Start each task with a verb (e.g., "Develop", "Plan", "Research").
+
+    **Task Suggestions:**
+    """
+
+    # Simulating AI model response
+    response = model.generate_content(prompt)  # Replace with actual AI model call
+    suggestions = response.text.strip().split('\n') if response and response.text else []
+    suggestions = [s.strip() for s in suggestions if s.strip()]
+    return suggestions[:20]
+
+from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+from django.views.decorators.http import require_http_methods
+from django.core.exceptions import PermissionDenied
+import json
+
+@login_required
+@require_http_methods(["GET", "POST"])
+def team_task_suggestions_view(request, team_id):
+    # Fetch team and check user permissions
+    team = get_object_or_404(Team, id=team_id)
+
+    # Optional: Check if the user is part of the team
+    if request.user not in team.members.all():
+        return JsonResponse({'status': 'error', 'message': "You don't have access to this team."}, status=403)
+
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            monthly_goal = data.get('monthly_goal', '').strip()
+            yearly_goal = data.get('yearly_goal', '').strip()
+            weekly_goal= data.get('weekly_goal', '').strip()
+            vision = data.get('vision', '').strip()
+
+            # Update the team fields
+            team.monthly_goals = monthly_goal
+            team.yearly_goals = yearly_goal
+            team.weekly_goals= weekly_goal
+            team.vision = vision
+            team.save()
+
+            return JsonResponse({
+                'status': 'success',
+                'message': 'Team goals updated successfully.'
+            })
+
+        except json.JSONDecodeError:
+            return JsonResponse({'status': 'error', 'message': 'Invalid JSON format.'}, status=400)
+        
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+    else:  # GET Request for suggestions and form data
+        suggestions = generate_team_task_suggestions(team)
+
+        form_data = {
+            'monthly_goal': team.monthly_goals or '',
+            'yearly_goal': team.yearly_goals  or '',
+            'weekly_goal': team.weekly_goals  or '',
+            'vision': team.vision or '',
+        }
+
+        return JsonResponse({
+            'status': 'success',
+            'form_data': form_data,
+            'suggestions': suggestions,
+        })
+
+
+
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import json
+from .models import Team
+
+@csrf_exempt
+def update_team_goals(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        # Update the team goals here
+        # For simplicity, assuming 'team' is fetched
+        Team.monthly_goals = data.get('monthly_goals')
+        Team.yearly_goals = data.get('yearly_goals')
+        Team.vision = data.get('vision')
+        Team.save()
+        # Re-fetch suggestions
+        suggestions = generate_team_task_suggestions(Team)
+        return JsonResponse({'status': 'success', 'suggestions': suggestions})
+    return JsonResponse({'status': 'error'}, status=400)

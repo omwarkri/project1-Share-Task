@@ -689,66 +689,65 @@
                 </ul>
             </div>
         </div>
-        <div class="header flex items-center justify-between gap-2">
-            <!-- Team Info Section -->
-            <div class="team-info">
-                <h2 class="text-lg font-semibold">{{ team.name }}</h2>
-                <p class="text-sm text-gray-500">{{ team.description }}</p>
-                <div class="flex gap-2 mt-1">
-                    <a id="invite-member-button" href="#" class="btn btn-sm btn-success" title="Invite Member">➕ Invite</a>
-        
-                    {% if request.user == team.created_by %}
-                        <button id="manage-permissions-button" class="btn btn-sm btn-primary" 
-                                onclick="openPermissionModal()" title="Manage Permissions">⚙️</button>
-        
-                        <button type="button" class="btn btn-sm btn-primary getTeamSuggestionButton" 
-                                data-bs-toggle="modal" data-bs-target="#teamTaskSuggestionsModal" 
-                                onclick="fetchAndDisplayTeamSuggestions(teamId)" title="Get Task Suggestions">💡</button>
-                    {% endif %}
+    
+        <div class="header">
+            <div>
+                <h2>Team: {{ team.name }}</h2>
+                <p>{{ team.description }}</p>
+                <a id="invite-member-button" href="#" class="btn btn-success">Invite Member</a>
+                {% if request.user == team.created_by %}
+                <button id="manage-permissions-button" class="btn btn-primary" onclick="openPermissionModal()">
+                    🛠️ Manage Permissions
+                </button>
+                <button type="button" class="btn btn-primary getTeamSuggestionButton" 
+    data-bs-toggle="modal" data-bs-target="#teamTaskSuggestionsModal" 
+    onclick="fetchAndDisplayTeamSuggestions(teamId)">
+    Get Team Task Suggestions
+</button>
+            {% endif %}
+            </div>
+            <div class="">
+                <a class="Create-Task" href="#" onclick="openAddTaskModal()" title="Create Task">➕</a>
+            </div>
+    
+            <!-- Filter Section -->
+            <div class="filter-section">
+                <h3>Filter Tasks</h3>
+                <div class="filter-options">
+                    <!-- Status Filter -->
+                    <select id="status-filter" class="filter-select">
+                        <option value="all">All Statuses</option>
+                        <option value="pending">Pending</option>
+                        <option value="in_progress">In Progress</option>
+                        <option value="completed">Completed</option>
+                        <option value="archived">Archived</option>
+                    </select>
+    
+                    <!-- Priority Filter -->
+                    <select id="priority-filter" class="filter-select">
+                        <option value="all">All Priorities</option>
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                        <option value="critical">Critical</option>
+                    </select>
+    
+                    <!-- Due Date Filter -->
+                    <input type="date" id="due-date-filter" class="filter-select" />
+    
+                    <!-- Assigned User Filter -->
+                    <select id="assigned-user-filter" class="filter-select">
+                        <option value="all">All Users</option>
+                        {% for member in team.members.all %}
+                            <option value="{{ member.id }}">{{ member.username }}</option>
+                        {% endfor %}
+                    </select>
+    
+                    <!-- Clear Filters Button -->
+                    <button id="clear-filters" class="filter-button">Clear Filters</button>
                 </div>
             </div>
-        
-            <!-- Create Task Icon -->
-            <a class="Create-Task text-2xl" href="#" onclick="openAddTaskModal()" title="Create Task">➕</a>
-        
-            <!-- Filter Toggle -->
-            <button class="btn btn-sm btn-outline-secondary" onclick="toggleFilterSection()" title="Filter Tasks">🔍 Filter</button>
         </div>
-        
-        <!-- Filter Section (Initially Hidden) -->
-        <div id="filter-section" class="filter-section hidden mt-2">
-            <div class="grid grid-cols-2 gap-2">
-                <select id="status-filter" class="filter-select">
-                    <option value="all">All Statuses</option>
-                    <option value="pending">Pending</option>
-                    <option value="in_progress">In Progress</option>
-                    <option value="completed">Completed</option>
-                    <option value="archived">Archived</option>
-                </select>
-        
-                <select id="priority-filter" class="filter-select">
-                    <option value="all">All Priorities</option>
-                    <option value="low">Low</option>
-                    <option value="medium">Medium</option>
-                    <option value="high">High</option>
-                    <option value="critical">Critical</option>
-                </select>
-        
-                <input type="date" id="due-date-filter" class="filter-select" />
-        
-                <select id="assigned-user-filter" class="filter-select">
-                    <option value="all">All Users</option>
-                    {% for member in team.members.all %}
-                        <option value="{{ member.id }}">{{ member.username }}</option>
-                    {% endfor %}
-                </select>
-        
-                <button id="clear-filters" class="btn btn-sm btn-outline-danger col-span-2">Clear Filters</button>
-            </div>
-        </div>
-        
-      
-        
 
         <!-- Task Grid -->
         <div class="task-grid">
@@ -996,12 +995,6 @@
 {% endfor %}
 
 <script>
-      
-            function toggleFilterSection() {
-                const filterSection = document.getElementById("filter-section");
-                filterSection.classList.toggle("hidden");
-            }
-      
 
     // Modal Functions
     function openAddTaskModal() {
@@ -1486,4 +1479,4 @@ function toggleTeamGoalForm() {
     };
 </script>
 
-{% endblock %}
+{% endblock %}  

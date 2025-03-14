@@ -5,206 +5,248 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Share Task - Collaborate, Organize, Succeed</title>
   <style>
-    /* Your existing CSS styles */
-
+    /* General Styles */
     * {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  background-color: #f8f9fa;
-  color: #333;
-  line-height: 1.6;
-}
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      background-color: #f8f9fa;
+      color: #333;
+      line-height: 1.6;
+    }
 
-a {
-  text-decoration: none;
-  color: inherit;
-}
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
 
-/* Header Section */
-header {
-  background: linear-gradient(135deg, #16a085, #1abc9c);
-  color: white;
-  padding: 60px 20px;
-  text-align: center;
-  animation: fadeIn 1.5s ease-in-out;
-  position: relative;
-  overflow: hidden;
+    /* Header Section */
+    header {
+      background: linear-gradient(135deg, #16a085, #1abc9c);
+      color: white;
+      padding: 60px 20px;
+      text-align: center;
+      animation: fadeIn 1.5s ease-in-out;
+      position: relative;
+      overflow: hidden;
+    }
 
-}
+    header h1 {
+      font-size: 3rem;
+      margin-bottom: 15px;
+      font-weight: 700;
+      animation: slideInDown 1s ease-in-out;
+    }
 
-header h1 {
-  font-size: 3rem;
-  margin-bottom: 15px;
-  font-weight: 700;
-  animation: slideInDown 1s ease-in-out;
-}
+    header p {
+      font-size: 1.25rem;
+      margin-bottom: 30px;
+      opacity: 0.9;
+      animation: slideInUp 1s ease-in-out;
+    }
 
-header p {
-  font-size: 1.25rem;
-  margin-bottom: 30px;
-  opacity: 0.9;
-  animation: slideInUp 1s ease-in-out;
-}
+    /* Half Circles for Header */
+    header::before,
+    header::after {
+      content: '';
+      position: absolute;
+      width: 300px;
+      height: 300px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      z-index: 1;
+      pointer-events: none;
+    }
 
-/* Half Circles for Header */
-header::before,
-header::after {
-  content: '';
-  position: absolute;
-  width: 300px;
-  height: 300px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 50%;
-  z-index: 1;
-  pointer-events: none; /* Prevent blocking clicks */
-}
+    header::after {
+      top: 0px;
+      right: -100px;
+    }
 
-/* header::before {
-  top: 0px;
-  left: -200px;
-} */
+    /* Small Bubbles for Header */
+    header .bubbles {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      z-index: 1;
+      pointer-events: none;
+    }
 
-header::after {
-  top: 0px;
-  right: -100px;
-  
-}
+    header .bubbles .bubble {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      animation: float 3s infinite ease-in-out;
+    }
 
-/* Small Bubbles for Header */
-header .bubbles {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  z-index: 1;
-  pointer-events: none;
-}
+    header .bubbles .bubble:nth-child(1) {
+      top: 20%;
+      left: 10%;
+      animation-delay: 0s;
+    }
 
-header .bubbles .bubble {
-  position: absolute;
-  width: 20px;
-  height: 20px;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 50%;
-  animation: float 3s infinite ease-in-out;
-}
+    header .bubbles .bubble:nth-child(2) {
+      top: 40%;
+      left: 50%;
+      animation-delay: 1s;
+    }
 
-header .bubbles .bubble:nth-child(1) {
-  top: 20%;
-  left: 10%;
-  animation-delay: 0s;
-}
+    header .bubbles .bubble:nth-child(3) {
+      top: 60%;
+      left: 30%;
+      animation-delay: 2s;
+    }
 
-header .bubbles .bubble:nth-child(2) {
-  top: 40%;
-  left: 50%;
-  animation-delay: 1s;
-}
+    /* CTA Button */
+    .cta-button {
+      background: white;
+      color: #16a085;
+      padding: 14px 28px;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      transition: background 0.3s ease, transform 0.3s ease;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      animation: fadeIn 2s ease-in-out;
+      z-index: 10;
+    }
 
-header .bubbles .bubble:nth-child(3) {
-  top: 60%;
-  left: 30%;
-  animation-delay: 2s;
-}
+    .cta-button:hover {
+      background: #f0f4f8;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+    }
 
-/* CTA Button */
-.cta-button {
-  background: white;
-  color: #16a085;
-  padding: 14px 28px;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 600;
-  transition: background 0.3s ease, transform 0.3s ease;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  animation: fadeIn 2s ease-in-out;
-  z-index:10;
+    /* Features Section */
+    .features,
+    .how-it-works {
+      padding: 60px 20px;
+      background: white;
+      text-align: center;
+      animation: fadeIn 2s ease-in-out;
+    }
 
-}
+    .features h2,
+    .how-it-works h2 {
+      font-size: 2.5rem;
+      margin-bottom: 30px;
+      color: #2c3e50;
+      font-weight: 700;
+      animation: slideInDown 1s ease-in-out;
+    }
 
-.cta-button:hover {
-  background: #f0f4f8;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
-}
+    .feature-cards,
+    .steps {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 30px;
+      margin-top: 30px;
+    }
 
-/* Features Section */
-.features,
-.how-it-works {
-  padding: 60px 20px;
-  background: white;
-  text-align: center;
-  animation: fadeIn 2s ease-in-out;
-}
+    .feature-card,
+    .step-card {
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      padding: 30px;
+      width: 300px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      animation: fadeInUp 1s ease-in-out;
+    }
 
-.features h2,
-.how-it-works h2 {
-  font-size: 2.5rem;
-  margin-bottom: 30px;
-  color: #2c3e50;
-  font-weight: 700;
-  animation: slideInDown 1s ease-in-out;
-}
+    .feature-card:hover,
+    .step-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    }
 
-.feature-cards,
-.steps {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 30px;
-  margin-top: 30px;
-}
+    .feature-card img,
+    .step-card img {
+      width: 80px;
+      height: 80px;
+      margin-bottom: 20px;
+      object-fit: contain;
+      background-color: #f0f4f8;
+      border-radius: 12px;
+      animation: bounce 2s infinite;
+    }
 
-.feature-card,
-.step-card {
-  background: #ffffff;
-  border-radius: 16px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  padding: 30px;
-  width: 300px;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  animation: fadeInUp 1s ease-in-out;
-}
+    .feature-card h3,
+    .step-card h3 {
+      font-size: 1.5rem;
+      margin-bottom: 15px;
+      color: #2c3e50;
+      font-weight: 600;
+    }
 
-.feature-card:hover,
-.step-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-}
+    .feature-card p,
+    .step-card p {
+      font-size: 1rem;
+      color: #555;
+      line-height: 1.6;
+    }
 
-.feature-card img,
-.step-card img {
-  width: 80px;
-  height: 80px;
-  margin-bottom: 20px;
-  object-fit: contain;
-  background-color: #f0f4f8;
-  border-radius: 12px;
-  animation: bounce 2s infinite;
-}
+    /* Slideshow Styles */
+    .slideshow-container {
+      max-width: 800px;
+      margin: 0 auto;
+      position: relative;
+      overflow: hidden;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      height: 400px; /* Set a fixed height for the container */
+    }
 
-.feature-card h3,
-.step-card h3 {
-  font-size: 1.5rem;
-  margin-bottom: 15px;
-  color: #2c3e50;
-  font-weight: 600;
-}
+    .slideshow {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
 
-.feature-card p,
-.step-card p {
-  font-size: 1rem;
-  color: #555;
-  line-height: 1.6;
-}
+    .slide {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      transition: opacity 0.5s ease-in-out;
+      border-radius: 16px;
+      object-fit: cover; /* Ensure images fit nicely */
+    }
 
-/* CTA Section */
+    .slide.active {
+      opacity: 1;
+    }
+
+    section.demo{
+
+      display: block;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      
+      
+    }
+    section.demo h2{
+      display: flex;
+      align-items: center;
+      width: 100%;
+      justify-content: center;
+      font-size: 2.5rem;
+      margin-bottom: 40px;
+    }
+    
+    /* CTA Section */
 .cta-section {
   background: linear-gradient(135deg, #16a085, #1abc9c);
   color: white;
@@ -478,9 +520,8 @@ footer p {
 
       .demo-grid {
         grid-template-columns: 1fr;
-      }
-    }
-  </style>
+      }}
+</style>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -534,11 +575,17 @@ footer p {
   <!-- Demo Section -->
   <section class="demo">
     <h2>See It in Action</h2>
-    <div class="demo-grid">
-      <img src="/media/demo/demo1.png" alt="Demo 1">
-      <img src="/media/demo/demo2.png" alt="Demo 2">
-      <img src="/media/demo/demo3.png" alt="Demo 3">
-      <img src="/media/demo/demo4.png" alt="Demo 4">
+    <div class="slideshow-container">
+      <div class="slideshow">
+        <img src="/media/demo/hometask.png" alt="Demo 1" class="slide active">
+        <img src="/media/demo/aisuggestions.png" alt="Demo 2" class="slide">
+        <img src="/media/demo/aichat2.png" alt="Demo 3" class="slide">
+        <img src="/media/demo/chat.png" alt="Demo 4" class="slide">
+        <img src="/media/demo/team-task-app.png" alt="Demo 5" class="slide">
+        <img src="/media/demo/team page.png" alt="Demo 6" class="slide">
+        <img src="/media/demo/teamleaderboard.png" alt="Demo 7" class="slide">
+        <img src="/media/demo/team chat.png" alt="Demo 8" class="slide">
+      </div>
     </div>
   </section>
 
@@ -576,5 +623,31 @@ footer p {
   <footer>
     <p>&copy; 2025 Share Task. All rights reserved.</p>
   </footer>
+
+  <script>
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.slide');
+    const totalSlides = slides.length;
+
+    function showSlide(index) {
+      slides.forEach((slide, i) => {
+        slide.classList.remove('active');
+        if (i === index) {
+          slide.classList.add('active');
+        }
+      });
+    }
+
+    function nextSlide() {
+      currentSlide = (currentSlide + 1) % totalSlides;
+      showSlide(currentSlide);
+    }
+
+    // Automatically change slide every 1 second
+    setInterval(nextSlide, 1000);
+
+    // Show the first slide initially
+    showSlide(currentSlide);
+  </script>
 </body>
 </html>

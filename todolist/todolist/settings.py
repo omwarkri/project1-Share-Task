@@ -53,6 +53,13 @@ INSTALLED_APPS = [
     'channels',
     'ai_task_management',
     "django_apscheduler",
+    'django.contrib.sites',
+
+    # Authentication apps
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
 ]
 
 
@@ -94,6 +101,40 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # settings.py
 
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        },
+        'APP': {
+            'client_id': '352172698608-fe87fbsq3io2e3rgjnhh99bn8puu1i5r.apps.googleusercontent.com',
+            'secret': 'YGOCSPX-k1oju3GHCJ4ftCI4vj0Lmo3Va3VN',
+            'key': ''
+        }
+    }
+}
+
+
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+)
+
+
+SITE_ID = 1
+
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
+ACCOUNT_EMAIL_VERIFICATION = "none"
+ACCOUNT_AUTHENTICATION_METHOD = "username"
+ACCOUNT_EMAIL_REQUIRED = True
+
+
+
 
 
 # REST Framework settings
@@ -115,6 +156,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    'allauth.account.middleware.AccountMiddleware',
 ]
 CORS_ALLOWED_ORIGINS = [
     "https://share-task.onrender.com",

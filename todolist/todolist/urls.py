@@ -51,6 +51,7 @@ urlpatterns = [
     path('create-superuser/', create_superuser),  # Temporary endpoint
     path('user/',include('user.urls')),
     path('user/logout/', LogoutView.as_view(), name='logout'),
+    path('accounts/', include('allauth.urls')),  # Include allauth URLs
     path('task/', home,name='home'),
     path('', landing_page, name='landing_page'),  # Root URL
     path('add-task/', add_task, name='add_task'),

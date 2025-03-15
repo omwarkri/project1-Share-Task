@@ -47,7 +47,9 @@ from user.models import CustomUser
 
 
 # Load model once at startup (better than reloading every call)
-model = SentenceTransformer("all-MiniLM-L6-v2")
+
+
+SentenceTransformerModel = SentenceTransformer("all-MiniLM-L6-v2")
 
 
 
@@ -106,7 +108,7 @@ def get_suggested_users(task, current_user, top_n=5):
 
     # Get embedding for the current task
     current_text = preprocess_text(f"{task.title} {task.description}")
-    current_vector = model.encode([current_text])
+    current_vector = SentenceTransformerModel.encode([current_text])
 
     # Compute cosine similarity
     similarities = {

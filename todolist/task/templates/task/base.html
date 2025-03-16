@@ -624,6 +624,8 @@
             document.getElementById('loading-spinner').style.display = 'flex';
             const spinner = document.getElementById('loading-spinner');
             spinner.classList.add('show');
+            const sidebar = document.getElementById("sidebar");
+    sidebar.classList.remove("show"); // Remove the 'show' class to hide the sidebar
             
         }
 

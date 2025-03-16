@@ -176,13 +176,26 @@
             padding: 10px;
             border-radius: 8px;
         }
+        .sidebar-menu button {
+            color: #555;
+            background-color: transparent;
+            border: none;
+            text-decoration: none;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            border-radius: 8px;
+        }
 
-        .sidebar-menu a:hover {
+        .sidebar-menu a:hover,.sidebar-menu button:hover {
             background-color: #f0f0f0;
             color: #1abc9c;
         }
 
-        .sidebar-menu a.active {
+        .sidebar-menu a.active ,.sidebar-menu button:active{
             background-color: #1abc9c;
             color: white;
         }
@@ -394,7 +407,11 @@
                     <img class="header-site-logo" src="https://res.cloudinary.com/ddw1upvx3/image/upload/v1741984458/share-task-media/symbols/ufsei0znhklvfkovekjm.png" alt="Site Logo">
                 </a>
                 <div class="welcome-message">
-                    <span>Welcome, <a href="{% url 'profile' %}">{{ user.username }}</a>!</span>
+                    <span>
+                        {% if user.is_authenticated %}
+                            Welcome, <a href="{% url 'profile' %}">{{ user.username }}</a>!
+                        {% endif %}
+                    </span>
                 </div>
             </div>
             <div class="header-right">
@@ -434,9 +451,9 @@
                     </a>
                 </li>
                 <li>
-                    <a id="teams-link" href="#" onclick="openTeamsModal()">
+                    <button id="teams-link" href="#" onclick="checkAuthentication()">
                         <i class="fas fa-users"></i> My Teams
-                    </a>
+                    </button>
                 </li>
                 <li>
                     <a id="teams-link" href="{% url 'completed_tasks_feed' %}?filter_type=image">
@@ -498,6 +515,14 @@
     </div>
 
     <script>
+
+    function checkAuthentication() {
+            {% if user.is_authenticated %}
+                openTeamsModal(); // Open the teams modal for authenticated users
+            {% else %}
+                window.location.href = "{% url 'login' %}"; // Redirect to login page for unauthenticated users
+            {% endif %}
+        }
         function toggleSidebar() {
             const sidebar = document.getElementById("sidebar");
             sidebar.classList.toggle("show");

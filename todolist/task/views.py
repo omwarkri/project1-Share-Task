@@ -286,7 +286,7 @@ def home(request):
   
     
     for task in tasks:
-        print(task.assigned_to)
+        
         # Check if the task is overdue or approaching due date
         is_overdue = task.is_overdue()
         is_approaching = task.is_approaching_due_date()

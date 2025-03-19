@@ -2144,9 +2144,11 @@ input:checked + .slider:before {
 <div id="shareTaskModal-{{ task_data.task.id }}" class="modal" style="display: none;">
     <div class="modal-content">
         <span class="close-modal" onclick="closeModal({{ task_data.task.id }})">&times;</span>
-        <h3>📤 Share Your Task Completion</h3>
+        <div class="modal-header">
+            <h3>📤 Share Your Task Completion</h3>
         <p>Would you like to share how you completed this task?</p>
-        <form method="post" enctype="multipart/form-data" action="{% url 'complete_task' task_data.task.id %}">
+        </div>
+        <form class="modal-body" method="post" enctype="multipart/form-data" action="{% url 'complete_task' task_data.task.id %}">
             {% csrf_token %}
             <label for="completion_details">📝 How did you complete the task?</label>
             <textarea name="completion_details" id="completion_details" rows="4"></textarea>

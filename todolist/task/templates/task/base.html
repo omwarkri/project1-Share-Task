@@ -342,7 +342,7 @@
 
 
           /* Loading Spinner Styles */
-          #loading-spinner {
+        body.base-main-body #loading-spinner {
             display: none; /* Hidden by default */
             position: fixed;
             top: 0;
@@ -357,12 +357,12 @@
             transition: opacity 0.3s ease-in-out; /* Smooth fade-in/out effect */
         }
 
-        .spinner {
-            border: 4px solid #f3f3f3; /* Light grey */
-            border-top: 4px solid #132332; /* Teal */
+        body.base-main-body .spinner {
+            border: 8px solid #f3f3f3; /* Light grey */
+            border-top: 8px solid #132332; /* Teal */
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
+            width: 60px;
+            height: 60px;
             animation: spin 1s linear infinite; /* Spin animation */
     transform: scale(0); /* Start small */
     transition: transform 0.6s ease-in-out; /* Smooth scaling effect */
@@ -456,8 +456,8 @@
                     </button>
                 </li>
                 <li>
-                    <a id="teams-link" href="{% url 'completed_tasks_feed' %}?filter_type=image">
-                        <i class="fas fa-users"></i> Feed
+                    <a id="feed-link" href="{% url 'completed_tasks_feed' %}?filter_type=image">
+                        <i class="fas fa-rss"></i> Feed
                     </a>
                 </li>
             </ul>

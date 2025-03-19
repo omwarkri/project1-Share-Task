@@ -2860,8 +2860,7 @@ function submitTask() {
     .then(data => {
         if (data.success) {
             alert("Task created successfully!");
-            closeAddTaskModal(); // Close modal
-            resetFields(); // Clear form fields
+            location.reload();
         } else {
             alert("Error: " + data.message);
         }

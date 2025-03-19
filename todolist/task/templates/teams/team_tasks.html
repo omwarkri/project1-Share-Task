@@ -1661,7 +1661,7 @@ function submitTaskForm() {
     .then(result => {
         if (result.success) {
             alert("Task created successfully!");
-            closeTaskModal();
+            location.reload();
         } else {
             alert("Failed to create task: " + result.message);
         }

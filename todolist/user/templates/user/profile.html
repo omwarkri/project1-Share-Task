@@ -43,6 +43,10 @@
             
         }
 
+        .profile-main h3{
+            color: rgba(0, 26, 23, 0.76);
+        }
+
         /* Custom Scrollbar Styles */
         .profile-main::-webkit-scrollbar {
             width: 10px; /* Width of the scrollbar */
@@ -76,14 +80,14 @@
 
         .left-section::-webkit-scrollbar-thumb,
         .right-section::-webkit-scrollbar-thumb {
-            background: #1abc9c; /* Color of the scrollbar thumb */
+            background: #134f43c1; /* Color of the scrollbar thumb */
             border-radius: 10px; /* Rounded corners for the thumb */
             border: 2px solid #f1f1f1; /* Border around the thumb */
         }
 
         .left-section::-webkit-scrollbar-thumb:hover,
         .right-section::-webkit-scrollbar-thumb:hover {
-            background: #16a085; /* Color of the thumb on hover */
+            background: #134f43c1;
         }
 
         /* Flex Container */
@@ -115,7 +119,7 @@
     flex: 2; /* Take up 2 parts of the available space */
     overflow-y: auto; /* Enable scrolling if content overflows */
     padding: 20px; /* Add padding for better spacing */
-    background-color: #ffffff; /* White background for contrast */
+    background-color: #ffffff97; /* White background for contrast */
     border-radius: 12px; /* Rounded corners */
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Subtle shadow */
     margin-left: 20px; /* Space between left and right sections */
@@ -170,13 +174,13 @@
 /* Calendar Styles */
 .right-section .calendar {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(15px, 1fr)); /* Responsive grid */
+    grid-template-rows: repeat(10, 15px); /* Smaller rows for mobile */
     gap: 5px; /* Space between days */
     margin-top: 20px;
     background-color: #f8f9fa; /* Light background */
   
     border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  
 }
 
 .right-section .calendar-header {
@@ -195,7 +199,7 @@
 }
 
 .right-section .day {
-    width: 15px;
+    width: 20px;
     height: 15px;
     background-color: #e0e0e0; /* Default color */
     border-radius: 3px;
@@ -267,7 +271,7 @@
 .right-section #reportForm .form-select {
     width: 100%;
     padding: 10px;
-    border: 1px solid #e0e0e0;
+    border: 1px solid #ffffff72;
     border-radius: 8px;
     font-size: 1em;
     color: #555;
@@ -325,7 +329,7 @@
             height: 70px;
             border-radius: 50%;
             object-fit: cover;
-            border: 4px solid #1abc9c;
+            border: 2px solid #1abc9c;
             transition: transform 0.3s ease;
         }
 
@@ -465,26 +469,90 @@
     transform: translateY(-2px); /* Slight lift effect */
 }
 
-/* Analytics Section */
-#analyticsSection {
-    display: none; /* Hidden by default */
+/* Analytics Section Styles */
+.analytics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 32px;
+    margin-bottom: 32px;
+    margin-top: 32px;
 }
 
-#analyticsSection h2 {
-    color: #1abc9c; /* Accent color */
+.analytics-card {
+    background: #ffffff;
+    border: 0.6px solid rgba(171, 171, 171, 0.501);
+    border-radius: 12px;
+    padding: 16px;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.analytics-card:hover {
+    transform: translateY(-2px);
+ 
+}
+
+.analytics-icon {
+    font-size: 2em;
+    color: #1abc9c;
+    margin-bottom: 10px;
+}
+
+.analytics-content h3 {
+    font-size: 1.2em;
+
+    margin-bottom: 10px;
+}
+
+.analytics-content p {
+    font-size: 1.5em;
+    color: #1abc9c;
+    font-weight: bold;
+}
+
+/* Progress Bar Styles */
+.progress-section {
+    margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    gap:16px
+}
+
+.progress-bar {
+    width: 100%;
+    height: 10px;
+    background-color: #e0e0e0;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background-color: #073a30d2;
+    transition: width 0.5s ease;
+}
+
+.progress-section p {
+    font-size: 1em;
+    color: #928f8fcf;
+    margin-top: 8px;
+}
+
+/* Chart Section Styles */
+.chart-section {
+    margin-top: 30px;
+}
+
+.chart-section h3 {
+    font-size: 1.5em;
+    color: #1abc9c;
     margin-bottom: 20px;
 }
 
-#analyticsSection p {
-    font-size: 1.1em;
-    color: #555;
-    margin: 10px 0;
+#taskCategoriesChart {
+    max-width: 100%;
+    height: auto;
 }
-
-#analyticsSection strong {
-    color: #1abc9c; /* Accent color */
-}
-
 /* Modal Styles */
 .modal {
     display: none;
@@ -854,8 +922,9 @@
         <div class="right-section">
             <!-- Toggle Buttons -->
             <div class="toggle-buttons">
-                <button id="activityButton" class="toggle-button active" onclick="showActivity()">Activity</button>
-                <button id="analyticsButton" class="toggle-button" onclick="showAnalytics()">Analytics</button>
+                <button id="analyticsButton" class="toggle-button active" onclick="showAnalytics()">Analytics</button>
+                <button id="activityButton" class="toggle-button " onclick="showActivity()">Activity</button>
+                
             </div>
         
             <!-- Activity Section -->
@@ -910,15 +979,92 @@
             </div>
         
             <!-- Analytics Section -->
-            <div id="analyticsSection" class="card" style="display: none;">
-                <h2>User Analytics</h2>
-                <p><strong>Total Tasks:</strong> <span id="totalTasks">-</span></p>
-                <p><strong>Completed Tasks:</strong> <span id="completedTasks">-</span></p>
-                <p><strong>Overdue Tasks:</strong> <span id="overdueTasks">-</span></p>
-                <p><strong>Avg. Completion Time:</strong> <span id="averageTime">-</span> hours</p>
-                <p><strong>Most Common Category:</strong> <span id="commonCategory">-</span></p>
-                <p><strong>Last Updated:</strong> <span id="lastUpdated">-</span></p>
+           <!-- Analytics Section -->
+<div id="analyticsSection" class="card" style="display: none;">
+    <h2>User Analytics</h2>
+    <div class="analytics-grid">
+        <!-- Total Tasks Card -->
+        <div class="analytics-card">
+            <div class="analytics-icon">
+                <i class="fas fa-tasks"></i>
             </div>
+            <div class="analytics-content">
+                <h3>Total Tasks</h3>
+                <p id="totalTasks">-</p>
+            </div>
+        </div>
+
+        <!-- Completed Tasks Card -->
+        <div class="analytics-card">
+            <div class="analytics-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="analytics-content">
+                <h3>Completed Tasks</h3>
+                <p id="completedTasks">-</p>
+            </div>
+        </div>
+
+        <!-- Overdue Tasks Card -->
+        <div class="analytics-card">
+            <div class="analytics-icon">
+                <i class="fas fa-exclamation-circle"></i>
+            </div>
+            <div class="analytics-content">
+                <h3>Overdue Tasks</h3>
+                <p id="overdueTasks">-</p>
+            </div>
+        </div>
+
+        <!-- Average Completion Time Card -->
+        <div class="analytics-card">
+            <div class="analytics-icon">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="analytics-content">
+                <h3>Avg. Completion Time</h3>
+                <p id="averageTime">-</p>
+            </div>
+        </div>
+
+        <!-- Most Common Category Card -->
+        <div class="analytics-card">
+            <div class="analytics-icon">
+                <i class="fas fa-star"></i>
+            </div>
+            <div class="analytics-content">
+                <h3>Most Common Category</h3>
+                <p id="commonCategory">-</p>
+            </div>
+        </div>
+
+        <!-- Last Updated Card -->
+        <div class="analytics-card">
+            <div class="analytics-icon">
+                <i class="fas fa-calendar-alt"></i>
+            </div>
+            <div class="analytics-content">
+                <h3>Last Updated</h3>
+                <p id="lastUpdated">-</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Progress Bars for Task Completion -->
+    <div class="progress-section">
+        <h3>Task Completion Progress</h3>
+        <div class="progress-bar">
+            <div class="progress-fill" id="completedProgress" style="width: 0%;"></div>
+        </div>
+        <p><span id="completedPercentage">0%</span> of tasks completed</p>
+    </div>
+
+    <!-- Task Categories Pie Chart -->
+    <div class="chart-section">
+        <h3>Task Categories</h3>
+        <canvas id="taskCategoriesChart"></canvas>
+    </div>
+</div>
         </div>
     <!-- Modal for Profile Update -->
     <div id="editModal" class="modal">
@@ -948,71 +1094,65 @@
 </div>
 
 <script>
-    function fetchUserAnalytics() {
+// Function to fetch and update analytics data
+function fetchUserAnalytics() {
     fetch('/user/api/user-analytics/')
-    .then(response => response.json())
-    .then(data => {
-        if (data.error) {
-            alert("Error: " + data.error);
-            return;
-        }
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert("Error: " + data.error);
+                return;
+            }
 
-        // Populate modal with analytics data
-        document.getElementById("totalTasks").innerText = data.total_tasks;
-        document.getElementById("completedTasks").innerText = data.completed_tasks;
-        document.getElementById("overdueTasks").innerText = data.overdue_tasks;
-        document.getElementById("averageTime").innerText = data.average_completion_time;
-        document.getElementById("commonCategory").innerText = data.most_common_category || "N/A";
-        document.getElementById("lastUpdated").innerText = data.last_updated;
+            // Update analytics cards
+            document.getElementById("totalTasks").innerText = data.total_tasks;
+            document.getElementById("completedTasks").innerText = data.completed_tasks;
+            document.getElementById("overdueTasks").innerText = data.overdue_tasks;
+            const averageTime = Math.round(data.average_completion_time);
+            document.getElementById("averageTime").innerText = averageTime + " hour";
+            document.getElementById("commonCategory").innerText = data.most_common_category || "N/A";
+            document.getElementById("lastUpdated").innerText = data.last_updated;
 
-        // Show modal
-        document.getElementById("analyticsModal").style.display = "flex";
-    })
-    .catch(error => console.error("Error fetching analytics:", error));
+            // Update progress bar
+            const completedPercentage = (data.completed_tasks / data.total_tasks) * 100;
+            document.getElementById("completedProgress").style.width = completedPercentage + "%";
+            document.getElementById("completedPercentage").innerText = Math.round(completedPercentage) + "%";
+
+            // Update pie chart (using Chart.js)
+            updateTaskCategoriesChart(data.task_categories);
+        })
+        .catch(error => console.error("Error fetching analytics:", error));
 }
 
-function closeAnalyticsModal() {
-    document.getElementById("analyticsModal").style.display = "none";
-}
-    // Function to open the modal
-    function openProfileEditModal() {
-        const modal = document.getElementById('editModal');
-        if (modal) {
-            modal.style.display = 'flex'; // Ensure the modal is visible
-            console.log('Modal opened!'); // Debugging: Log to confirm the function is called
-        } else {
-            console.error('Modal not found!');
-        }
+// Function to update the task categories pie chart
+function updateTaskCategoriesChart(categories) {
+    const ctx = document.getElementById('taskCategoriesChart').getContext('2d');
+    if (window.taskCategoriesChart) {
+        window.taskCategoriesChart.destroy(); // Destroy existing chart instance
     }
 
-    // Function to close the modal
-    function closeProfileEditModal() {
-        const modal = document.getElementById('editModal');
-        if (modal) {
-            modal.style.display = 'none'; // Hide the modal
-            console.log('Modal closed!'); // Debugging: Log to confirm the function is called
+    window.taskCategoriesChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: Object.keys(categories),
+            datasets: [{
+                data: Object.values(categories),
+                backgroundColor: [
+                    '#1abc9c', '#3498db', '#9b59b6', '#e74c3c', '#f1c40f', '#2ecc71'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
         }
-    }
-
-    document.getElementById("downloadCsv").addEventListener("click", function() {
-    var reportType = document.getElementById("reportType").value;
-    window.location.href = "/user/download-report/" + reportType + "/";
-});
-
-document.getElementById("downloadPdf").addEventListener("click", function() {
-    var reportType = document.getElementById("reportType").value;
-    window.location.href = "/user/download-report/pdf/" + reportType + "/";
-});
-
-
-// Function to show the Activity section
-function showActivity() {
-    document.getElementById('activitySection').style.display = 'block';
-    document.getElementById('analyticsSection').style.display = 'none';
-
-    // Update button states
-    document.getElementById('activityButton').classList.add('active');
-    document.getElementById('analyticsButton').classList.remove('active');
+    });
 }
 
 // Function to show the Analytics section
@@ -1028,45 +1168,26 @@ function showAnalytics() {
     fetchUserAnalytics();
 }
 
-// Function to fetch analytics data
-function fetchUserAnalytics() {
-    fetch('/user/api/user-analytics/')
-        .then(response => response.json())
-        .then(data => {
-            if (data.error) {
-                alert("Error: " + data.error);
-                return;
-            }
+// Function to show the Activity section
+function showActivity() {
+    document.getElementById('activitySection').style.display = 'block';
+    document.getElementById('analyticsSection').style.display = 'none';
 
-            // Populate analytics data
-            document.getElementById("totalTasks").innerText = data.total_tasks;
-            document.getElementById("completedTasks").innerText = data.completed_tasks;
-            document.getElementById("overdueTasks").innerText = data.overdue_tasks;
-            document.getElementById("averageTime").innerText = data.average_completion_time;
-            document.getElementById("commonCategory").innerText = data.most_common_category || "N/A";
-            document.getElementById("lastUpdated").innerText = data.last_updated;
-        })
-        .catch(error => console.error("Error fetching analytics:", error));
+    // Update button states
+    document.getElementById('activityButton').classList.add('active');
+    document.getElementById('analyticsButton').classList.remove('active');
 }
 
-// Initialize with Activity section visible
-showActivity();
-
+// Initialize with Analytics section visible
 window.onload = function() {
     const calendar = document.querySelector('.calendar');
     if (calendar) {
         calendar.scrollLeft = calendar.scrollWidth; // Scroll to the end (right)
     }
+
+    // Show Analytics section by default
+    showAnalytics();
 };
-
-
-    // Close modal when clicking outside the modal content
-    window.addEventListener('click', function (event) {
-        const modal = document.getElementById('editModal');
-        if (event.target === modal) {
-            closeProfileEditModal();
-        }
-    });
 </script>
 
 {% endblock %}

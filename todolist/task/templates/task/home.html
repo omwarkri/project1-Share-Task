@@ -714,7 +714,123 @@ input:checked + .slider:before {
     .open-filter-modal-button:hover {
         background-color: #0056b3;  
     }
-    
+    /* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: #fff;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    animation: fadeIn 0.3s ease;
+}
+
+.modal-header {
+    background-color: #1abc9c;
+    color: white;
+    padding: 16px;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+.close-modal {
+    float: right;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.close-modal:hover {
+    color: #e74c3c;
+}
+
+.modal-body {
+    padding: 20px;
+}
+
+/* Form Group Styles */
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #2c3e50;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    color: #555;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    border-color: #1abc9c;
+    box-shadow: 0 0 5px rgba(26, 188, 156, 0.3);
+    outline: none;
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+/* Submit Button Styles */
+.submit-button {
+    width: 100%;
+    padding: 12px;
+    background-color: #1abc9c;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.submit-button:hover {
+    background-color: #16a085;
+}
+
+/* Animation for Modal */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
     
     
         /* Task Grid */
@@ -1822,33 +1938,63 @@ input:checked + .slider:before {
 <div id="addTaskModal" class="modal" style="display: none;">
     <div class="modal-content">
         <span class="close-modal" onclick="closeAddTaskModal()">&times;</span>
-        <h3 class="modal-header"> Add a New Task</h3>
-        <form class="modal-body" method="post" action="{% url 'add_task' %}">
-            {% csrf_token %}
-            {% for field in form %}
-    <div>
-        <label for="{{ field.id_for_label }}">
-            {{ field.label }}{% if field.field.required %} *{% endif %}
-        </label>
-        {{ field }}
-        {% if field.errors %}
-            <small class="error">{{ field.errors|striptags }}</small>
-        {% endif %}
-    </div>
-{% endfor %}
-            <!-- Calendar Input for Due Date -->
-          <!-- <div>
-                <label for="due-date">📅 Due Date:</label>
-                <input type="text" id="due-date" name="due_date" placeholder="Select due date" />
-            </div>    -->
-            <div class="private-task-toggle">
-                <label for="private-task-switch">Mark as Private:</label>
-                <input type="checkbox" id="is-private-task" name="private">
+        <h3 class="modal-header">Add a New Task</h3>
+        <div id="taskContainer" class="modal-body">
+            {% csrf_token %}  <!-- CSRF token for Django -->
+        
+            <div class="form-group">
+                <label for="title">Title</label>
+                <input type="text" id="title" name="title" required>
             </div>
-            
-                <button type="submit" class="submit-button">  Add Task</button>
-           
-        </form>
+        
+            <div class="form-group">
+                <label for="description">Description</label>
+                <textarea id="description" name="description" rows="4" required></textarea>
+            </div>
+        
+            <div class="form-group">
+                <label for="due_date">Due Date</label>
+                <input type="date" id="due_date" name="due_date" required>
+            </div>
+        
+            <div class="form-group">
+                <label for="priority">Priority</label>
+                <select id="priority" name="priority" required>
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                </select>
+            </div>
+        
+            <div class="form-group">
+                <label for="category">Category</label>
+                <input type="text" id="category" name="category" required>
+            </div>
+        
+            <div class="form-group">
+                <label for="status">Status</label>
+                <select id="status" name="status" required>
+                    <option value="pending">Pending</option>
+                    <option value="in_progress">In Progress</option>
+                    <option value="completed">Completed</option>
+                </select>
+            </div>
+        
+            <div class="form-group">
+                <label for="dependencies">Dependencies</label>
+                <input type="text" id="dependencies" name="dependencies">
+            </div>
+        
+            <div class="form-group">
+                <label for="is_daily">Is Daily Task?</label>
+                <input type="checkbox" id="is_daily" name="is_daily">
+            </div>
+        
+            <div class="form-group  modal-footer btn btn-primary">
+                <button onclick="submitTask()">Create Task</button>
+            </div>
+        </div>
+        
     </div>
 </div>
 <!-- Modal -->
@@ -2457,9 +2603,15 @@ function closeViewDependencyModal() {
 
 
     // JavaScript functions for modals
-    function openAddTaskModal() {
-        document.getElementById('addTaskModal').style.display = 'flex';
-    }
+    function openAddTaskModal(suggestion = "") {
+        console.log(suggestion,"suggetion")
+        const suggestionsList = document.getElementById('taskSuggestionsModal');
+
+suggestionsList.style.display = 'none';
+    document.getElementById("addTaskModal").style.display = "block";
+    document.getElementById("title").value = suggestion; // Set title input to suggestion
+}
+
     
 
     function closeAddTaskModal() {
@@ -2566,17 +2718,19 @@ function populateSuggestions(suggestions) {
 }
 
 // Function to open the Add Task Modal and set title in form input
-function openAddTaskModal(suggestion="") {
-    document.getElementById('addTaskModal').style.display = 'block';
+// function openAddTaskModal(suggestion="") {
+//     document.getElementById('addTaskModal').style.display = 'block';
     
-    // Set the title field value with the selected suggestion
-    const titleInput = document.querySelector('#addTaskModal input[name="title"]');
-    if (titleInput) {
-        titleInput.value = suggestion;
-    }
-}
+//     // Set the title field value with the selected suggestion
+//     const titleInput = document.querySelector('#addTaskModal input[name="title"]');
+//     if (titleInput) {
+//         titleInput.value = suggestion;
+//     }
+// }
 
-// Function to close the Add Task Modal
+
+
+// Close the modal
 function closeAddTaskModal() {
     document.getElementById('addTaskModal').style.display = 'none';
 }
@@ -2678,9 +2832,49 @@ function toggleInterestGoalForm() {
 //         });
 //     });
 // }
+function submitTask() {
+    const csrfToken = document.querySelector("[name=csrfmiddlewaretoken]").value;
 
+    const taskData = {
+        title: document.getElementById("title").value,
+        description: document.getElementById("description").value,
+        due_date: document.getElementById("due_date").value,
+        priority: document.getElementById("priority").value,
+        category: document.getElementById("category").value,
+        status: document.getElementById("status").value,
+        dependencies: document.getElementById("dependencies").value.split(",").map(id => parseInt(id)), // Convert to list of IDs
+        is_daily: document.getElementById("is_daily").checked,
+    };
 
+    fetch("/add-task/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": csrfToken,
+        },
+        body: JSON.stringify(taskData),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert("Task created successfully!");
+            closeAddTaskModal(); // Close modal
+            resetFields(); // Clear form fields
+        } else {
+            alert("Error: " + data.message);
+        }
+    })
+    .catch(error => console.error("Error:", error));
+}
 
+function closeAddTaskModal() {
+    console.log("closing")
+    document.getElementById("addTaskModal").style.display = "none";
+}
+
+function resetFields() {
+    document.getElementById("taskForm").reset();
+}
 
     // Initially show all tasks
     filterTasks('all', 'all');

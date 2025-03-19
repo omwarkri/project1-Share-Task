@@ -903,39 +903,69 @@
     <div class="modal-content">
         <div class="modal-header">
             <h3>Add Task</h3>
-           
         </div>
-        <form class="modal-body" method="post">
-            {% csrf_token %}
+        <div class="modal-body">
+            <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+            
             <div class="form-group">
-                <label for="id_title">Task Title</label>
-                {{ task_form.title }}
+                <label for="title">Task Title</label>
+                <input type="text" id="title" name="title" class="form-control">
             </div>
+            
             <div class="form-group">
-                <label for="id_description">Description</label>
-                {{ task_form.description }}
+                <label for="description">Description</label>
+                <textarea id="description" name="description" class="form-control"></textarea>
             </div>
+            
             <div class="form-group">
-                <label for="id_due_date">Due Date</label>
-                {{ task_form.due_date }}
+                <label for="due_date">Due Date</label>
+                <input type="date" id="due_date" name="due_date" class="form-control">
             </div>
+            
             <div class="form-group">
-                <label for="id_priority">Priority</label>
-                {{ task_form.priority }}
+                <label for="priority">Priority</label>
+                <select id="priority" name="priority" class="form-control">
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                </select>
             </div>
+            
             <div class="form-group">
-                <label for="id_assigned_to">Assigned To</label>
-                {{ task_form.assigned_to }}
+                <label for="category">Category</label>
+                <input type="text" id="category" name="category" class="form-control">
             </div>
+            
             <div class="form-group">
-                <button type="submit" name="add_task" class="submit-button">Create Task</button>
+                <label for="status">Status</label>
+                <select id="status" name="status" class="form-control">
+                    <option value="pending">Pending</option>
+                    <option value="in_progress">In Progress</option>
+                    <option value="completed">Completed</option>
+                </select>
             </div>
-        </form>
+            
+            <div class="form-group">
+                <label for="assigned_to">Assigned To</label>
+                <select id="assigned_to" name="assigned_to" class="form-control">
+                    <option value="">Select a team member</option>
+                    {% for member in team.members.all %}
+                        <option value="{{ member.id }}">{{ member.username }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            
+            <div class="form-group">
+                <button type="button" onclick="submitTaskForm()" class="submit-button">Create Task</button>
+            </div>
+        </div>
         <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" onclick="closeAddTeamTaskModal()" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-secondary" onclick="closeTaskModal()">Close</button>
         </div>
     </div>
 </div>
+
 
 <div id="escalateModal" class="modal">
     <div class="modal-content">
@@ -1605,6 +1635,47 @@ function submitTeamGoalsForm(teamId) {
         console.error('Error submitting data:', error);
     });
 }
+
+function submitTaskForm() {
+    const formData = {
+    title: document.getElementById("title").value,
+    description: document.getElementById("description").value,
+    due_date: document.getElementById("due_date").value,
+    priority: document.getElementById("priority").value,
+    category: document.getElementById("category").value,
+    status: document.getElementById("status").value,
+    assigned_to: document.getElementById("assigned_to").value,
+    team_id:'{{ team.id}}'
+};
+
+
+    fetch("/add-task/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value
+        },
+        body: JSON.stringify(formData)
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.success) {
+            alert("Task created successfully!");
+            closeTaskModal();
+        } else {
+            alert("Failed to create task: " + result.message);
+        }
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        alert("An error occurred while creating the task.");
+    });
+}
+
+function closeTaskModal() {
+    document.getElementById("taskModal").style.display = "none";
+}
+
 
 // Helper to get CSRF token
 function getCSRFToken() {

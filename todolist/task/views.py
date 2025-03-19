@@ -376,59 +376,62 @@ activity_date = timezone.localdate()  # This gives the current date in the activ
 
 
 
-from django.core.exceptions import PermissionDenied
-from django.shortcuts import get_object_or_404
-from django.utils import timezone
+from django.http import JsonResponse
+import json
+from .models import Task
 
-@login_required
 def add_task(request):
-    if request.method == 'POST':
-        form = TaskForm(request.POST)
-        if form.is_valid():
-            task = form.save(commit=False)
-            task.user = request.user
+    if request.method == "POST":
+        
+        try:
+            data = json.loads(request.body)  # Load JSON data
+            print("Received Data:", data)
+            team=None
+            if data.get("team_id"):
+                try:
+                    team = Team.objects.get(id=data["team_id"])
+                except Team.DoesNotExist:
+                    return JsonResponse({"success": False, "message": "Team not found."}, status=400)
+            else:
+                team = None  # Set default value if no team_id is provided
 
-            # Check if the task is being added to a team
-            team_id = request.POST.get('team')
-            if team_id:
-                team = get_object_or_404(Team, id=team_id)
+            # Extract dependencies as a list of task IDs
+            dependency_ids = data.get("dependencies", [])  # Expecting a list of IDs
 
-                # Check if the user has permission to add tasks to the team
-                if not team.has_permission(request.user, "add_task"):
-                    raise PermissionDenied("You do not have permission to add tasks to this team.")
+            # Get the assigned user (Handle case where user might not exist)
+            assigned_user = None
+            if data.get("assigned_to"):
+                try:
+                    assigned_user = CustomUser.objects.get(id=data["assigned_to"])
+                except CustomUser.DoesNotExist:
+                    return JsonResponse({"success": False, "message": "Assigned user not found."}, status=400)
 
-                # Assign the task to the team
-                task.team = team
+            print("Creating Task:", data.get("title"), "Description:", data.get("description"))
 
-            # Handle private and shareable tasks
-            is_private = request.POST.get('private') == 'on'  # 'on' is the value when the checkbox is checked
-            task.shareable = not is_private  # If private is True, shareable is False, and vice versa
-
-            # Save the task
-            task.save()
-
-            # Log the task creation
-            ActivityLog.objects.create(
-                task=task,
-                user=request.user,
-                action='created',
-                details=f"Task '{task.title}' was created."
+            # Create the task
+            task = Task.objects.create(
+                title=data.get("title", ""),
+                description=data.get("description", ""),
+                due_date=data.get("due_date"),
+                priority=data.get("priority", "low"),  # Default priority
+                category=data.get("category", ""),
+                status=data.get("status", "pending"),  # Default status
+                is_daily=data.get("is_daily", False),  # Default False
+                assigned_to=assigned_user,
+                team=team
             )
 
-            # UserActivity logic (optional)
-            activity, created = UserActivity.objects.get_or_create(
-                user=task.user,
-                activity_date=timezone.localdate(),
-                defaults={'activity_type': 'Task Created'}
-            )
+            # Add dependencies (only if there are valid task IDs)
+            if dependency_ids:
+                task.dependencies.set(Task.objects.filter(id__in=dependency_ids))
 
-            return redirect('home')
-    else:
-        form = TaskForm()
+            return JsonResponse({"success": True, "message": "Task created successfully!"})
 
-    # Pass the list of teams the user is part of to the template
-    teams = Team.objects.filter(members=request.user)
-    return render(request, 'task/add_task.html', {'form': form, 'teams': teams})
+        except Exception as e:
+            return JsonResponse({"success": False, "message": f"An error occurred: {str(e)}"})
+
+    return JsonResponse({"success": False, "message": "Invalid request method."})
+
 
 
 

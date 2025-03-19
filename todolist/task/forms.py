@@ -149,7 +149,7 @@ class TaskForm(forms.ModelForm):
 class TeamTaskForm(forms.ModelForm):
     class Meta:
         model = Task
-        fields = ['title', 'description', 'due_date', 'priority', 'category', 'status', 'assigned_to']
+        fields = ['title', 'description', 'due_date', 'priority', 'category', 'status', 'assigned_to' ]
         widgets = {
             'due_date': forms.DateTimeInput(attrs={'type': 'datetime-local'}),  # Use HTML5 datetime input
         }

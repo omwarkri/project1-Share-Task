@@ -662,6 +662,19 @@
 
         }
 
+        window.addEventListener("pageshow", function(event) {
+    const spinner = document.getElementById('loading-spinner');
+    if (spinner) {
+        spinner.style.display = 'none'; // Hide the spinner
+        spinner.classList.remove('show'); // Ensure class is removed
+    }
+
+    const sidebar = document.getElementById("sidebar");
+    if (sidebar) {
+        sidebar.classList.remove("show"); // Hide the sidebar if it's open
+    }
+});
+
         // Show spinner when a link is clicked (for page transitions)
         document.addEventListener('DOMContentLoaded', function () {
             const links = document.querySelectorAll('a');

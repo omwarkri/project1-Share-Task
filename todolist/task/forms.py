@@ -11,8 +11,10 @@ class TaskForm(forms.ModelForm):
         model = Task
         fields = ['title', 'description', 'due_date', 'priority', 'category', 'status', 'dependencies','is_daily']
         widgets = {
-            'due_date': forms.DateTimeInput(attrs={'type': 'datetime-local'}),  # Use HTML5 datetime input
+            'title': forms.TextInput(attrs={}),  # Ensure empty attrs
+            'due_date': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
         }
+
 
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user', None)  # Get the current user from kwargs
@@ -120,8 +122,10 @@ class TaskForm(forms.ModelForm):
         model = Task
         fields = ['title', 'description', 'due_date', 'priority', 'category', 'status', 'dependencies','is_daily']
         widgets = {
-            'due_date': forms.DateTimeInput(attrs={'type': 'datetime-local'}),  # Use HTML5 datetime input
+            'title': forms.TextInput(attrs={}),  # Ensure empty attrs
+            'due_date': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
         }
+
 
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user', None)  # Get the current user from kwargs

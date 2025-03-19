@@ -252,7 +252,7 @@
         top: 0;
         left: 0;
         width: 100%;
-        height: 100%;
+     
         background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
         justify-content: center;
         align-items: center;
@@ -261,7 +261,7 @@
 
     .modal-content {
         background-color: white;
-        padding: 20px;
+      
         border-radius: 8px;
         width: 90%;
         max-width: 500px;
@@ -338,9 +338,7 @@
 }
 
 
-#teamTaskSuggestionsModal{
-    z-index: 800;
-}
+
 /* Modal Content Styling */
 #teamTaskSuggestionsModal .modal-content {
     border-radius: 10px;
@@ -462,6 +460,7 @@
     margin-bottom: 24px;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
 }
 
 /* Form Labels */
@@ -550,6 +549,99 @@
     to { opacity: 1; transform: translateY(0); }
 }
 
+/* Modal Styles */
+
+
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+.modal-header .close {
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.modal-header .close:hover {
+    color: #e74c3c;
+}
+
+.modal-body {
+    padding: 20px;
+}
+
+/* Form Group Styles */
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #2c3e50;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    color: #555;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    border-color: #1abc9c;
+    box-shadow: 0 0 5px rgba(26, 188, 156, 0.3);
+    outline: none;
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+/* Submit Button Styles */
+.submit-button {
+    width: 100%;
+    padding: 12px;
+    background-color: #1abc9c;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.submit-button:hover {
+    background-color: #16a085;
+}
+
+#taskModal{
+    z-index: 2000;
+}
+
+/* Animation for Modal */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
 
 
     /* Mobile Responsiveness */
@@ -632,7 +724,7 @@
     .modal-content {
         width: 95%; /* Full width for modals */
         max-width: none; /* Remove max-width */
-        padding: 15px; /* Reduce padding */
+    
     }
 
     .modal-header h3 {
@@ -707,7 +799,7 @@
             {% endif %}
             </div>
             <div class="">
-                <a class="Create-Task" href="#" onclick="openAddTaskModal()" title="Create Task">➕</a>
+                <div class="Create-Task" href="#" onclick="openAddTeamTaskModal()" title="Create Task">➕</div>
             </div>
     
             <!-- Filter Section -->
@@ -811,21 +903,45 @@
     <div class="modal-content">
         <div class="modal-header">
             <h3>Add Task</h3>
-            <span class="close" onclick="closeAddTaskModal()">&times;</span>
+           
         </div>
-        <form method="post">
+        <form class="modal-body" method="post">
             {% csrf_token %}
-            {{ task_form.as_p }}
-            <button type="submit" name="add_task">Create Task</button>
+            <div class="form-group">
+                <label for="id_title">Task Title</label>
+                {{ task_form.title }}
+            </div>
+            <div class="form-group">
+                <label for="id_description">Description</label>
+                {{ task_form.description }}
+            </div>
+            <div class="form-group">
+                <label for="id_due_date">Due Date</label>
+                {{ task_form.due_date }}
+            </div>
+            <div class="form-group">
+                <label for="id_priority">Priority</label>
+                {{ task_form.priority }}
+            </div>
+            <div class="form-group">
+                <label for="id_assigned_to">Assigned To</label>
+                {{ task_form.assigned_to }}
+            </div>
+            <div class="form-group">
+                <button type="submit" name="add_task" class="submit-button">Create Task</button>
+            </div>
         </form>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="closeAddTeamTaskModal()" data-bs-dismiss="modal">Close</button>
+        </div>
     </div>
 </div>
 
 <div id="escalateModal" class="modal">
     <div class="modal-content">
         <span class="close-modal" onclick="closeEscalateModal()">&times;</span>
-        <h3>Escalate Task</h3>
-        <form id="escalateForm" method="post" >
+        <h3 class="modal-header">Escalate Task</h3>
+        <form class="modal-body" id="escalateForm" method="post" >
             {% csrf_token %}
            
             {{ escualeted_reason_form.as_p }}
@@ -838,9 +954,9 @@
 <div id="reassignModal" class="modal">
     <div class="modal-content">
         <span class="close-modal" onclick="closeReassignModal()">&times;</span>
-        <h3>Reassign Task</h3>
+        <h3 class="modal-header">Reassign Task</h3>
         
-        <form id="reassignForm" method="post">
+        <form  class="modal-body" id="reassignForm" method="post">
             {% csrf_token %}
             {{ reassigned_task_form.as_p }}
             <button type="submit" name="add_task">Reassigned Task</button>
@@ -852,8 +968,8 @@
 <div id="inviteMemberModal" class="modal" style="display: none;">
     <div class="modal-content">
         <span class="close-modal" onclick="closeInviteMemberModal()">&times;</span>
-        <h3>Invite Member</h3>
-        <form method="post" action="{% url 'send_team_invite' team.id %}">
+        <h3 class="modal-header">Invite Member</h3>
+        <form class="modal-body" method="post" action="{% url 'send_team_invite' team.id %}">
             {% csrf_token %}
             <label for="email">Email:</label>
             <input type="email" id="email" name="email" required>
@@ -875,38 +991,39 @@
                 <button class="" id="editTeamGoalsTitle" style="cursor: pointer;" onclick="toggleTeamGoalForm()">
                     Edit Team Goals and Vision
                 </button>
+                <form  id="teamGoalsForm">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="weekly_goal" class="form-label">Weekly Goal</label>
+                        <input type="text" id="weekly_goal" name="weekly_goal" class="form-control" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="monthly_goal" class="form-label">Monthly Goal</label>
+                        <input type="text" id="monthly_goal" name="monthly_goal" class="form-control" required>
+                    </div>
+            
+                    <div class="mb-3">
+                        <label for="yearly_goal" class="form-label">Yearly Goal</label>
+                        <input type="text" id="yearly_goal" name="yearly_goal" class="form-control" required>
+                    </div>
+                   
+            
+                    <div class="mb-3">
+                        <label for="vision" class="form-label">Vision</label>
+                        <textarea id="vision" name="vision" class="form-control" required></textarea>
+                    </div>
+            
+                    <button type="button" class="btn btn-primary" onclick="submitTeamGoalsForm({{ team.id }})">
+                        Submit Goals
+                    </button>
+                </form>
             </div>
 
          <!-- Modal Form Section -->
-<div class="modal-body">
-    <form id="teamGoalsForm">
-        {% csrf_token %}
-        <div class="mb-3">
-            <label for="weekly_goal" class="form-label">Weekly Goal</label>
-            <input type="text" id="weekly_goal" name="weekly_goal" class="form-control" required>
-        </div>
-        
-        <div class="mb-3">
-            <label for="monthly_goal" class="form-label">Monthly Goal</label>
-            <input type="text" id="monthly_goal" name="monthly_goal" class="form-control" required>
-        </div>
+        <div class="modal-body">
+   
 
-        <div class="mb-3">
-            <label for="yearly_goal" class="form-label">Yearly Goal</label>
-            <input type="text" id="yearly_goal" name="yearly_goal" class="form-control" required>
-        </div>
-       
-
-        <div class="mb-3">
-            <label for="vision" class="form-label">Vision</label>
-            <textarea id="vision" name="vision" class="form-control" required></textarea>
-        </div>
-
-        <button type="button" class="btn btn-primary" onclick="submitTeamGoalsForm({{ team.id }})">
-            Submit Goals
-        </button>
-    </form>
-</div>
 
 
                 <!-- Suggestions Section -->
@@ -917,12 +1034,13 @@
                     </div>
                 </div>
                 <ul id="teamSuggestionsList"></ul>
-            </div>
+            
 
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+           
             </div>
-
+            <div class="modal-footer" >
+                <button  type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
         </div>
     </div>
 </div>
@@ -931,14 +1049,14 @@
 <div id="viewTaskDependencies" style="display: none;">
     <div class="modal-content">
         <span class="close-modal" onclick="closeViewDependencyModal()">&times;</span>
-        <h3>🔗 Task Dependencies</h3>
+        <h3 class="modal-header">🔗 Task Dependencies</h3>
         <div class="task-dependencies">
             <h4>📌 Current Dependencies</h4>
             <ul id="dependency-list" class="dependency-list">
                 <li class="no-dependencies">No dependencies set for this task.</li>
             </ul>
         </div>
-        <form method="POST" id="update-dependencies-form" class="dependency-form">
+        <form class="modal-body" method="POST" id="update-dependencies-form" class="dependency-form">
             {% csrf_token %}
             <h4>🔄 Update Dependencies</h4>
             <select id="dependency-select" name="dependencies" multiple class="dependency-select"></select>
@@ -951,8 +1069,8 @@
 <div id="permissionModal" class="modal" style="display: none;">
     <div class="modal-content">
         <span class="close-modal" onclick="closePermissionModal()">&times;</span>
-        <h3>👥 Manage Team Permissions</h3>
-        <div id="permissionContent">
+        <h3 class="modal-header">👥 Manage Team Permissions</h3>
+        <div class="modal-body" id="permissionContent">
             <p>Loading permissions...</p>
         </div>
     </div>
@@ -963,9 +1081,13 @@
 <div id="shareTaskModal-{{ task.task.id }}" class="modal" style="display: none;">
     <div class="modal-content">
         <span class="close-modal" onclick="closeModal({{task.task.id }})">&times;</span>
-        <h3>📤 Share Your Task Completion</h3>
+        <div class=modal-header >
+            <h3 >📤 Share Your Task Completion  </h3>
         <p>Would you like to share how you completed this task?</p>
-        <form method="post" enctype="multipart/form-data" action="{% url 'complete_task' task.task.id %}">
+        </div>
+        <div class="modal-body">
+
+        <form  method="post" enctype="multipart/form-data" action="{% url 'complete_task' task.task.id %}">
             {% csrf_token %}
             <label for="completion_details">📝 How did you complete the task?</label>
             <textarea name="completion_details" id="completion_details" rows="4"></textarea>
@@ -991,15 +1113,13 @@
             <button type="submit" class="submit-button">📤 Submit</button>
         </form>
     </div>
+    </div>
 </div>
 {% endfor %}
 
 <script>
 
-    // Modal Functions
-    function openAddTaskModal() {
-            document.getElementById('taskModal').style.display = 'flex';
-        }
+    
 
         function closeAddTaskModal() {
             document.getElementById('taskModal').style.display = 'none';
@@ -1387,6 +1507,7 @@ function populateTeamForm(formData) {
 
 
 // Populate team suggestions list
+// Function to populate team suggestions list
 function populateTeamSuggestions(suggestions) {
     const suggestionsList = document.getElementById('teamSuggestionsList');
     suggestionsList.innerHTML = '';
@@ -1399,7 +1520,7 @@ function populateTeamSuggestions(suggestions) {
             const addButton = document.createElement('button');
             addButton.textContent = '➕';
             addButton.classList.add('add-task-btn');
-            addButton.onclick = () => openAddTaskModal(suggestion);
+            addButton.onclick = () => openAddTeamTaskModal(suggestion.slice(2));
 
             li.appendChild(addButton);
             suggestionsList.appendChild(li);
@@ -1410,18 +1531,51 @@ function populateTeamSuggestions(suggestions) {
 }
 
 // Open the Add Task Modal and set title
-function openAddTaskModal(suggestion) {
-    document.getElementById('taskModal').style.display = 'block';
-    
-    const titleInput = document.querySelector('#taskModal input[name="title"]');
+// Open the Add Task Modal and set title
+function openAddTeamTaskModal(suggestion = "") {
+    const taskModal = document.getElementById('taskModal');
+    const titleInput = taskModal.querySelector('input[name="title"]');
+
+    // Display the modal
+    taskModal.style.display = 'block';
+
+    // Set the input value and make it non-editable if a suggestion is provided
     if (titleInput) {
         titleInput.value = suggestion;
+     
     }
 }
 
+
+// Open the Add Task Modal and set title
+// Open the Add Task Modal and set title
+function    openAddTeamTaskModal(suggestion = "") {
+    const taskModal = document.getElementById('taskModal');
+    const titleInput = taskModal.querySelector('input[name="title"]');
+
+    // Display the modal
+    taskModal.style.display = 'block';
+
+    // Set the input value and make it non-editable if a suggestion is provided
+    if (titleInput) {
+        titleInput.value = suggestion;
+     
+    }
+}
+
+
 // Close Add Task Modal
-function closeAddTaskModal() {
+function closeAddTeamTaskModal() {
+    console.log("closing modal")
     document.getElementById('taskModal').style.display = 'none';
+    const loader = document.getElementById('teamLoader');
+    const spinner = document.getElementById('loading-spinner');
+    if (spinner) {
+        spinner.style.display = 'none'; // Hide the spinner
+        spinner.classList.remove('show'); // Ensure class is removed
+    }
+
+    loader.style.display = 'none';
 }
 
 function submitTeamGoalsForm(teamId) {

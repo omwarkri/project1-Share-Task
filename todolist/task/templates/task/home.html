@@ -801,26 +801,11 @@ input:checked + .slider:before {
         background-color: transparent; 
     }
     
-    /* Modal Styles */
-    .modal {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        justify-content: center;
-        align-items: center;
     
-        overflow-y: auto; /* Enable scrolling for the modal */
-        padding: 20px; /* Add padding to prevent content from touching the edges */
-        z-index: 3000;
-    }
     
     .modal-content {
         background-color: #fff;
-        padding: 25px;
+   
         border-radius: 12px;
         width: 90%;
         max-width: 500px;
@@ -892,7 +877,7 @@ input:checked + .slider:before {
         margin-top: 0;
         font-size: 22px;
         color: #2c3e50;
-        margin-bottom: 20px;
+     
     }
     
     .modal-content p {
@@ -1097,37 +1082,6 @@ input:checked + .slider:before {
     }
 
     /* Modal backdrop for better visibility */
-.modal-backdrop.show {
-    opacity: 0.7;
-}
-
-/* Modal Dialog Styling */
-.modal-dialog {
-    max-width: 500px;
-    margin: 1.75rem auto;
-}
-
-/* Modal Content Styling */
-.modal-content {
-    border-radius: 16px;
-    padding: 20px;
-    border: none;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-    background-color: #fff;
-}
-
-/* Modal Header */
-.modal-header {
-    border-bottom: none;
-    padding-bottom: 0;
-}
-
-/* Modal Title */
-.modal-title {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: #333;
-}
 
 /* Close Button */
 .btn-close {
@@ -1141,17 +1095,8 @@ input:checked + .slider:before {
     background-color: #e0e0e0;
 }
 
-/* Modal Body */
-.modal-body {
-    padding: 8px;
-    color: #555;
-}
 
 /* Modal Footer */
-.modal-footer {
-    border-top: none;
-    padding-top: 0;
-}
 
 /* Suggestions List Styling */
 #suggestionsList {
@@ -1190,11 +1135,7 @@ input:checked + .slider:before {
 .btn-secondary {
     border-radius: 8px;
 }
-.modal-header {
-        background-color: #f8f9fa;
-        border-bottom: 1px solid #dee2e6;
-        padding: 1rem 1.5rem;
-    }
+
 
     .modal-header button {
         background-color: #1abc9c;
@@ -1662,7 +1603,7 @@ input:checked + .slider:before {
     /* Adjust modal for mobile */
     .modal-content {
         width: 95%; /* Full width for modals */
-        padding: 15px;
+      
     }
 
     /* Adjust shutter container for mobile */
@@ -1881,20 +1822,20 @@ input:checked + .slider:before {
 <div id="addTaskModal" class="modal" style="display: none;">
     <div class="modal-content">
         <span class="close-modal" onclick="closeAddTaskModal()">&times;</span>
-        <h3>➕ Add a New Task</h3>
-        <form method="post" action="{% url 'add_task' %}">
+        <h3 class="modal-header"> Add a New Task</h3>
+        <form class="modal-body" method="post" action="{% url 'add_task' %}">
             {% csrf_token %}
             {% for field in form %}
-                <div>
-                    <label for="{{ field.id_for_label }}">
-                        {{ field.label }}{% if field.field.required %} *{% endif %}
-                    </label>
-                    {{ field }}
-                    {% if field.errors %}
-                        <small class="error">{{ field.errors|striptags }}</small>
-                    {% endif %}
-                </div>
-            {% endfor %}
+    <div>
+        <label for="{{ field.id_for_label }}">
+            {{ field.label }}{% if field.field.required %} *{% endif %}
+        </label>
+        {{ field }}
+        {% if field.errors %}
+            <small class="error">{{ field.errors|striptags }}</small>
+        {% endif %}
+    </div>
+{% endfor %}
             <!-- Calendar Input for Due Date -->
           <!-- <div>
                 <label for="due-date">📅 Due Date:</label>
@@ -1904,7 +1845,9 @@ input:checked + .slider:before {
                 <label for="private-task-switch">Mark as Private:</label>
                 <input type="checkbox" id="is-private-task" name="private">
             </div>
-            <button type="submit" class="submit-button">➕ Add Task</button>
+            
+                <button type="submit" class="submit-button">  Add Task</button>
+           
         </form>
     </div>
 </div>
@@ -2623,7 +2566,7 @@ function populateSuggestions(suggestions) {
 }
 
 // Function to open the Add Task Modal and set title in form input
-function openAddTaskModal(suggestion) {
+function openAddTaskModal(suggestion="") {
     document.getElementById('addTaskModal').style.display = 'block';
     
     // Set the title field value with the selected suggestion

@@ -66,35 +66,10 @@
             white-space: nowrap;
         }
 
-        /* Modal Styles */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
+        
 
-        .modal-content {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            width: 90%;
-            max-width: 600px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
+        
 
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
 
         .modal-header h3 {
             margin: 0;
@@ -110,9 +85,7 @@
             color: #333;
         }
 
-        .team-members-list {
-            margin-top: 20px;
-        }
+      
 
         .team-members-list ul {
             list-style-type: none;
@@ -129,6 +102,12 @@
 
         .team-members-list li:hover {
             background-color: #f0f0f0;
+        }
+
+        .team-member-button{
+            border: none;
+            background-color: transparent;
+            font-size: 26px;
         }
 
         /* Mobile Toggle Button */
@@ -199,10 +178,11 @@
             .team-sidebar {
                 left: -60px; /* Slightly off-screen */
                 transition: left 0.3s ease;
+                
             }
 
             .team-sidebar.active {
-                left: 0; /* Make it visible when active */
+                left: 0px; /* Make it visible when active */
             }
 
             #closeSidebar {
@@ -242,7 +222,7 @@
                 <a href="{% url 'team_leaderboard' team.id %}" title="Leaderboard">🏆</a>
             </li>
             <li>
-                <a href="#" onclick="openTeamMembersModal()" title="Team Members">👥</a>
+                <button class="team-member-button" href="#" onclick="openTeamMembersModal()" title="Team Members">👥</button>
             </li>
             <li>
                 <a href="{% url 'team_chat' team.id %}" title="Group Chat">💬</a>
@@ -261,8 +241,8 @@
     <div id="teamMembersModal" class="modal" style="display: none;">
         <div class="modal-content">
             <span class="close-modal" onclick="closeTeamMembersModal()">&times;</span>
-            <h3>👥 Team Members</h3>
-            <div class="team-members-list">
+            <h3 class="modal-header">👥 Team Members</h3>
+            <div class="team-members-list modal-body">
                 <ul>
                     {% for member in team.members.all %}
                         <li>
@@ -380,12 +360,18 @@
 
             // Open sidebar
             mobileToggle.addEventListener('click', () => {
-                sidebar.classList.add('active');
+                console.log("sidebar")
+               
+                sidebar.style.left="0px";
+                closeSidebarButton.style.display="block";
             });
 
             // Close sidebar
             closeSidebarButton.addEventListener('click', () => {
-                sidebar.classList.remove('active');
+              
+                sidebar.style.left="-60px";
+                closeSidebarButton.style.display="none";
+
             });
 
             // Close sidebar when clicking outside

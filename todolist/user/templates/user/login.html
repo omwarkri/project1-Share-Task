@@ -2,7 +2,6 @@
 
 {% block title %}Login - My Django Project{% endblock %}
 
-
 {% block content %}
 
 <!DOCTYPE html>
@@ -51,6 +50,10 @@
         button:hover {
             background-color: #00c8a0;
         }
+        button:disabled {
+            background-color: #aaaaaa;
+            cursor: not-allowed;
+        }
         .register-link {
             text-align: center;
             margin-top: 10px;
@@ -64,20 +67,37 @@
 <body>
     <div class="container">
         <h1>Login</h1>
-        <form method="post" action="{% if token %}{% url 'login_with_token' token %}{% else %}{% url 'login' %}{% endif %}">
+        <form method="post" action="{% if token %}{% url 'login_with_token' token %}{% else %}{% url 'login' %}{% endif %}" onsubmit="handleLogin(event)">
             {% csrf_token %}
             <input type="hidden" name="next" value="{{ request.GET.next }}">
             <input type="text" name="username" placeholder="Username" required>
             <input type="password" name="password" placeholder="Password" required>
-            <button type="submit">Login</button>
+            <button type="submit" id="login-button">Login</button>
         </form>
         
         <div class="register-link">
             <p>Don't have an account? <a href="{% url 'register' %}">Register here</a></p>
         </div>
     </div>
+
+    <script>
+        function handleLogin(event) {
+            const loginButton = document.getElementById('login-button');
+            loginButton.textContent = 'Loading...';
+            loginButton.disabled = true; // Disable button to prevent multiple submissions
+        }
+         // Reset button when navigating back (even from cache)
+    window.addEventListener("pageshow", function(event) {
+        const loginButton = document.getElementById('login-button');
+        if (loginButton) {
+            loginButton.textContent = 'Login';  // Reset button text
+            loginButton.disabled = false; // Enable the button again
+        }
+    });
+    </script>
 </body>
 </html>
+
 {% endblock %}
 
 {% block footer %}

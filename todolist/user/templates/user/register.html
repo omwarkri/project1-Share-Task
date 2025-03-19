@@ -1,6 +1,6 @@
 {% extends 'task/base.html' %}
 
-{% block title %}Login - My Django Project{% endblock %}
+{% block title %}Register - My Django Project{% endblock %}
 
 {% block header %}
 {# Empty block to hide the header #}
@@ -53,6 +53,10 @@
         button:hover {
             background-color: #00c8a0;
         }
+        button:disabled {
+            background-color: #aaaaaa;
+            cursor: not-allowed;
+        }
         .login-link {
             text-align: center;
             margin-top: 10px;
@@ -66,7 +70,7 @@
 <body>
     <div class="container">
         <h1>Register</h1>
-        <form method="post" action="{% if token %}{% url 'register_with_token' token %}{% else %}{% url 'register' %}{% endif %}">
+        <form method="post" action="{% if token %}{% url 'register_with_token' token %}{% else %}{% url 'register' %}{% endif %}" onsubmit="handleRegister(event)">
             {% csrf_token %}
             
             <input type="text" name="username" placeholder="Username" required>
@@ -79,13 +83,30 @@
             
             <input type="password" name="password" placeholder="Password" required>
             
-            <button type="submit">Register</button>
+            <button type="submit" id="register-button">Register</button>
         </form>
         
         <div class="login-link">
             <p>Already have an account? <a href="{% url 'login' %}">Login here</a></p>
         </div>
     </div>
+
+    <script>
+        function handleRegister(event) {
+            const registerButton = document.getElementById('register-button');
+            registerButton.textContent = 'Loading...';
+            registerButton.disabled = true; // Disable button to prevent multiple submissions
+        }
+
+        // Reset button when navigating back (even from cache)
+        window.addEventListener("pageshow", function(event) {
+            const registerButton = document.getElementById('register-button');
+            if (registerButton) {
+                registerButton.textContent = 'Register';  // Reset button text
+                registerButton.disabled = false; // Enable the button again
+            }
+        });
+    </script>
 </body>
 </html>
 {% endblock %}

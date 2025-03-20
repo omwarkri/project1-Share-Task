@@ -710,9 +710,8 @@
 
         /* Modal Header */
         .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            background-color: #ffffff84;
+            position: relative;
          
         }
 
@@ -793,6 +792,13 @@
 
         .submit-button:active {
             transform: translateY(0);
+        }
+
+        .close-button{
+            position: absolute;
+            right:10px;
+            top:10px;
+
         }
 
         /* Animation for Modal */
@@ -1044,13 +1050,13 @@
 </div>
         </div>
     <!-- Modal for Profile Update -->
-    <div id="editModal" class="modal">
+    <div id="editModal" class="modal" style="display: none;">
         <div class="modal-content">
             <div class="modal-header">
                 <h2>Edit Profile</h2>
                 <button class="close-button" onclick="closeProfileEditModal()">&times;</button>
             </div>
-            <form method="POST" enctype="multipart/form-data">
+            <form class="modal-body" method="POST" enctype="multipart/form-data">
                 {% csrf_token %}
                 <div class="form-group">
                     <label for="username">Username:</label>
@@ -1071,6 +1077,13 @@
 </div>
 
 <script>
+       function openProfileEditModal() {
+            document.getElementById('editModal').style.display = 'flex';
+        }
+
+        function closeProfileEditModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
 // Function to fetch and update analytics data
 function fetchUserAnalytics() {
     fetch('/user/api/user-analytics/')

@@ -18,6 +18,35 @@
     animation: slideDown 0.3s ease-in-out;
   }
 
+
+  /* Add this to your existing CSS */
+  #chat-form button {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  #chat-form button .send-box {
+    width: 12px;
+    height: 12px;
+    background: white;
+    border-radius: 2px;
+    animation: sendBoxAnimation 1s infinite;
+    display: none; /* Hidden by default */
+  }
+
+  @keyframes sendBoxAnimation {
+    0% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+    100% { transform: translateY(0); }
+  }
+
+  #chat-form button.loading .send-box {
+    display: block; /* Show when loading */
+  }
+
   @keyframes slideDown {
     from { transform: translateY(-20px); opacity: 0; }
     to { transform: translateY(0); opacity: 1; }
@@ -153,7 +182,10 @@
   <form id="chat-form" class="message-send">
     {% csrf_token %}
     <input type="text" id="message-input" placeholder="Ask AI..." required />
-    <button type="submit">Send</button>
+    <button type="submit">
+      <span class="send-box"></span> <!-- Add this box -->
+      Send
+    </button>
   </form>
 </div>
 
@@ -212,13 +244,12 @@ function formatBoldAiresponse(text) {
     const chatBox = document.getElementById('chat-box');
     chatBox.scrollTop = chatBox.scrollHeight;
   }
-
   async function sendMessage(message) {
     try {
       const chatBox = document.getElementById('chat-box');
       const taskId = chatBox.getAttribute('data-task-id');
+      const sendButton = document.getElementById('chat-form').querySelector('button');
 
-      const loadingSpinner = document.getElementById('loading-spinner');
       // Append user message instantly
       const userMessageDiv = document.createElement('div');
       userMessageDiv.className = 'chat-message user';
@@ -226,7 +257,8 @@ function formatBoldAiresponse(text) {
       chatBox.appendChild(userMessageDiv);
       scrollToBottom();
 
-      loadingSpinner.classList.remove('hide');
+      // Show loading state in send button
+      sendButton.classList.add('loading');
 
       const response = await fetch(`/chat_ai_view/${taskId}/`, {
         method: 'POST',
@@ -242,24 +274,24 @@ function formatBoldAiresponse(text) {
         let aiResponse = result.ai_response;
         aiResponse = formatBoldAiresponse(aiResponse);
         aiResponse = addLineBreaksAfterAiresponse(aiResponse);
-        
 
         // Append AI response with typewriter effect
         const aiMessageDiv = document.createElement('div');
         aiMessageDiv.className = 'chat-message ai';
         aiMessageDiv.innerHTML = `<strong>AI:</strong> <span class="message-content"></span>`;
         chatBox.appendChild(aiMessageDiv);
-        loadingSpinner.classList.add('hide');
         scrollToBottom();
 
         typeWriterEffect(aiMessageDiv.querySelector('.message-content'), aiResponse, 10);
       } else {
-        
-        loadingSpinner.classList.add('hide');
         console.error('Failed to send message:', result.message);
       }
     } catch (error) {
       console.error('Error sending message:', error);
+    } finally {
+      // Hide loading state in send button
+      const sendButton = document.getElementById('chat-form').querySelector('button');
+      sendButton.classList.remove('loading');
     }
   }
 

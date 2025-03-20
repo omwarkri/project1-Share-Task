@@ -22,7 +22,7 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            padding: 20px;
+          
         }
 
         /* Chat Container */
@@ -295,7 +295,11 @@
             background-color: #c0392b;
         }
 
-        
+        #settings-modal{
+            z-index: 10000;
+            position: fixed;
+            width: 100%;
+        }
 
         /* Animations */
         @keyframes fadeIn {
@@ -335,12 +339,14 @@
         {% if task.id %}
             <div class="back-link">
                 <a href="{% url 'task_detail' task.id %}">View Task</a>
+                {% if task.user == request.user and receiver != request.user %}
                 <button id="settings-btn" class="settings-btn">⚙️</button>
+                {% endif %}
             </div>
         {% endif %}
 
         <!-- Modal for Settings -->
-        <div id="settings-modal" class="modal" >
+        <div id="settings-modal" class="modal" style="display: none;" >
             <div class="modal-content">
                 <span class="close-modal">&times;</span>
                 <h3>Settings</h3>

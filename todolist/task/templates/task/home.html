@@ -45,9 +45,9 @@
         align-items: center; /* Center the icon and text vertically */
         gap: 8px; /* Space between icon and text */
         position: absolute;
-        top:10;
+        top:20;
         left:50%;
-        margin-top: -10px;
+        margin-top: 1px;
         transform: translateX(-50%); /* Adjust for exact centering */
         transition: top 0.5s ease-out; /* Smooth transition for movement */
         z-index:700;
@@ -715,31 +715,12 @@ input:checked + .slider:before {
         background-color: #0056b3;  
     }
     /* Modal Styles */
-.modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
 
-.modal-content {
-    background-color: #fff;
-    border-radius: 8px;
-    width: 90%;
-    max-width: 500px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    animation: fadeIn 0.3s ease;
-}
+
+
 
 .modal-header {
-    background-color: #1abc9c;
-    color: white;
+    
     padding: 16px;
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
@@ -872,9 +853,9 @@ input:checked + .slider:before {
         white-space: nowrap;
         overflow-y: hidden;
         overflow-x: scroll;
-        
+        padding-bottom: 8px;
    
-        max-width: 70%;
+        max-width: 78%;
     }
     
     .task-priority {
@@ -1235,15 +1216,6 @@ input:checked + .slider:before {
     background-color: #e2e6ea;
 }
 
-/* Primary Button Styling */
-.btn-primary {
-    background-color: #ffffff;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 8px;
-    border: 1px solid rgb(102, 102, 102);
-    transition: background-color 0.3s ease;
-}
 
 .btn-primary:hover {
     background-color: #cecece;
@@ -1512,6 +1484,27 @@ input:checked + .slider:before {
     margin-left: 32px;
     height: 32px;
 }
+#viewTaskDependencies{
+    position: absolute;
+}
+#viewTaskDependencies .loader {
+    border: 6px solid #f3f3f3;
+    border-top: 6px solid #3498db;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
     
     /* Mobile Responsiveness */
     @media (max-width: 768px) {
@@ -1734,7 +1727,7 @@ input:checked + .slider:before {
         width: 50px;
         height: 50px;
         font-size: 20px;
-        bottom: 10px;
+        bottom: 8px;
         right: 10px;
     }
     .mobile-toggle-button {
@@ -1781,6 +1774,8 @@ input:checked + .slider:before {
                 background-color: #aaaaaa;
             }
     }
+
+
     </style>
 <div class="dashboard-container">
     <!-- Button to toggle the shutter -->
@@ -1992,9 +1987,9 @@ input:checked + .slider:before {
                 <input type="checkbox" id="is_daily" name="is_daily">
             </div>
         
-            <div class="form-group  modal-footer btn btn-primary">
-                <button onclick="submitTask()">Create Task</button>
-            </div>
+          
+                <button class="btn btn-primary" onclick="submitTask()">Create Task</button>
+           
         </div>
         
     </div>
@@ -2026,7 +2021,7 @@ input:checked + .slider:before {
               
 
                 <!-- Suggestions Section -->
-                <h5 class="modal-title">Task Suggestions</h5>
+                <h2 class="modal-title">Task Suggestions</h2>
                 <div id="loader" style="display: none; text-align: center;">
                     <div class="spinner-border text-primary" role="status">
                         <span class="visually-hidden">Loading...</span>
@@ -2126,12 +2121,20 @@ input:checked + .slider:before {
     <div class="modal-content">
         <span class="close-modal" onclick="closeViewDependencyModal()">&times;</span>
         <h3>🔗 Task Dependencies</h3>
+        
+        <!-- Loader -->
+        <div id="loader" class="loader" style="display: none;"></div>
+
         <div class="task-dependencies">
             <h4>📌 Current Dependencies</h4>
             <ul id="dependency-list" class="dependency-list">
+                Loading
                 <li class="no-dependencies">No dependencies set for this task.</li>
             </ul>
         </div>
+
+
+
         <form method="POST" id="update-dependencies-form" class="dependency-form">
             {% csrf_token %}
             <h4>🔄 Update Dependencies</h4>
@@ -2140,6 +2143,7 @@ input:checked + .slider:before {
         </form>
     </div>
 </div>
+
 
 <!-- Share Task Modals -->
 {% for task_data in tasks_with_suggestions %}
@@ -2543,9 +2547,19 @@ function searchTasks() {
             console.error('Error fetching tasks:', error);
         });
 }
+function showLoader() {
+    document.getElementById('loader').style.display = 'block';
+}
 
+function hideLoader() {
+    document.getElementById('loader').style.display = 'none';
+}
 
 function openViewDependencyModal(taskId) {
+    const dependencyList = document.getElementById('dependency-list');
+    const dependencySelect = document.getElementById('dependency-select');
+    document.getElementById('viewTaskDependencies').style.display = 'flex';
+    showLoader();
     document.addEventListener('DOMContentLoaded', function () {
     flatpickr('#id_due_date', {
       dateFormat: 'Y-m-d',  // Format to match Django's expected format
@@ -2556,8 +2570,7 @@ function openViewDependencyModal(taskId) {
     fetch(`/get-task-dependencies/${taskId}/`)
         .then(response => response.json())
         .then(data => {
-            const dependencyList = document.getElementById('dependency-list');
-            const dependencySelect = document.getElementById('dependency-select');
+           
 
             // Clear existing content
             dependencyList.innerHTML = '';
@@ -2585,11 +2598,13 @@ function openViewDependencyModal(taskId) {
                 dependencySelect.appendChild(option);
             });
 
+            hideLoader()
+
             // Set the form action URL
             document.getElementById('update-dependencies-form').action = `/update-task-dependencies/${taskId}/`;
 
             // Display the modal
-            document.getElementById('viewTaskDependencies').style.display = 'flex';
+            
         })
         .catch(error => {
             console.error('Error fetching task dependencies:', error);

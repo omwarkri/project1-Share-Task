@@ -848,15 +848,34 @@ input:checked + .slider:before {
     }
     
     .task-title {
-        font-size: 18px;
-        color: #2c3e50; /* Dark text for task title */
-        white-space: nowrap;
-        overflow-y: hidden;
-        overflow-x: scroll;
-        padding-bottom: 8px;
-   
-        max-width: 78%;
-    }
+    font-size: 18px;
+    color: #2c3e50; /* Dark text for task title */
+    white-space: nowrap;
+    overflow-y: hidden;
+    overflow-x: hidden; /* Hide scrollbar by default */
+    padding-bottom: 8px;
+    max-width: 78%;
+}
+
+/* Show scrollbar on hover */
+.task-title:hover {
+    overflow-x: auto; /* Enable horizontal scroll on hover */
+}
+
+/* Custom scrollbar (Optional) */
+.task-title::-webkit-scrollbar {
+    height: 5px; /* Adjust scrollbar height */
+}
+
+.task-title::-webkit-scrollbar-thumb {
+    background-color: #888; /* Scrollbar color */
+    border-radius: 5px;
+}
+
+.task-title::-webkit-scrollbar-thumb:hover {
+    background-color: #555; /* Darker scrollbar on hover */
+}
+
     
     .task-priority {
         padding: 4px 8px;

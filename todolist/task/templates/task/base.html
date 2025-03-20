@@ -163,7 +163,7 @@
             margin: 15px 0;
         }
 
-        .sidebar-menu a {
+        .sidebar-menu .sidebar-link {
             color: #555;
             background-color: transparent;
             border: none;
@@ -175,20 +175,9 @@
             gap: 10px;
             padding: 10px;
             border-radius: 8px;
+            width: 100%;
         }
-        .sidebar-menu button {
-            color: #555;
-            background-color: transparent;
-            border: none;
-            text-decoration: none;
-            font-size: 16px;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px;
-            border-radius: 8px;
-        }
+    
 
         .sidebar-menu a:hover,.sidebar-menu button:hover {
             background-color: #f0f0f0;
@@ -268,7 +257,7 @@
 
     
         top: 0;
-        padding-top:40px ;
+      
     left: 0;
     width: 100%;
     height: 100%;
@@ -496,27 +485,27 @@
             </a>
             <ul class="sidebar-menu">
                 <li>
-                    <a id="all-tasks-link" href="{% url 'home' %}">
+                    <a id="all-tasks-link" class="sidebar-link" href="{% url 'home' %}">
                         <i class="fas fa-tasks"></i> All Tasks
                     </a>
                 </li>
                 <li>
-                    <a id="leaderboard-link" href="{% url 'leaderboard' %}">
+                    <a class="sidebar-link" id="leaderboard-link" href="{% url 'leaderboard' %}">
                         <i class="fas fa-trophy"></i> Leaderboard
                     </a>
                 </li>
                 <li>
-                    <button id="teams-link" href="#" onclick="checkAuthentication()">
+                    <button id="teams-link" class="sidebar-link" href="#" onclick="checkAuthentication()">
                         <i class="fas fa-users"></i> My Teams
                     </button>
                 </li>
                 <li>
-                    <a id="feed-link" href="{% url 'completed_tasks_feed' %}?filter_type=image">
+                    <a id="feed-link" class="sidebar-link" href="{% url 'completed_tasks_feed' %}?filter_type=image">
                         <i class="fas fa-rss"></i> Feed
                     </a>
                 </li>
             </ul>
-            <button class="add-task" onclick="openAddTaskModal()">
+            <button class="add-task" class="sidebar-link" onclick="openAddTaskModal()">
                 <i class="fas fa-plus"></i> Add Task
             </button>
         </div>

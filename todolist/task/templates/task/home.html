@@ -1529,6 +1529,8 @@ input:checked + .slider:before {
     @media (max-width: 768px) {
 
 
+
+
     
         .main-content {
                 overflow-y: auto; /* Enable scrolling on mobile */
@@ -1550,7 +1552,17 @@ input:checked + .slider:before {
                 grid-template-columns: 1fr; /* Single column layout on mobile */
                 margin-bottom: 10px; /* Reduce margin for better scrolling */
             }
-    
+        
+
+            .task-title {
+    font-size: 18px;
+    color: #2c3e50; /* Dark text for task title */
+    white-space: nowrap;
+    overflow-y: hidden;
+    overflow-x: scroll; /* Hide scrollbar by default */
+    padding-bottom: 8px;
+    max-width: 78%;
+}
     
             .mobile-bottom-bar {
             position: fixed;
@@ -2646,7 +2658,7 @@ function closeViewDependencyModal() {
         const suggestionsList = document.getElementById('taskSuggestionsModal');
 
 suggestionsList.style.display = 'none';
-    document.getElementById("addTaskModal").style.display = "block";
+    document.getElementById("addTaskModal").style.display = "flex";
     document.getElementById("title").value = suggestion; // Set title input to suggestion
 }
 

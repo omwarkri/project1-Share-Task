@@ -89,6 +89,17 @@
       line-height: 1.5;
     }
 
+    h2.title{
+        font-size: 18px;
+        color: rgba(255, 255, 255, 0.677); /* Dark text for task title */
+        white-space: nowrap;
+        overflow-y: hidden;
+        overflow-x: scroll;
+        background-color: #122436e9;
+        padding: 8px;
+        max-width: 93%;
+    }
+
     /* Right Section (Chat Box) */
     .right-section {
       display: flex;
@@ -378,6 +389,7 @@
     </div>
     <!-- Left Section (Procedure Info) -->
     <div class="left-section">
+      <h2 class="title">Task: {{ task.title }}</h2>
       <button class="maximize-button" onclick="toggleMaximize(document.querySelector('.left-section'), document.querySelector('.right-section'), this)">+</button>
       
       <div class="procedureSection">

@@ -1643,6 +1643,7 @@ def fetch_top_users():
     """Fetch top 5 users with the most followers"""
     return User.objects.annotate(follower_count=Count('followers')).order_by('-follower_count')[:5]
 
+@execution_time_logger
 def completed_tasks_feed(request):
     filter_type = request.GET.get('filter_type')
 

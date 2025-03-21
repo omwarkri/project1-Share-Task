@@ -215,6 +215,22 @@ def get_suggested_users(task, current_user, top_n=5):
 
 
 
+import time
+import functools
+import logging
+
+logger = logging.getLogger(__name__)
+
+def execution_time_logger(func):
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        start_time = time.time()
+        result = func(*args, **kwargs)  # No `await` since it's synchronous
+        elapsed_time = time.time() - start_time
+        print(f"{func.__name__} took {elapsed_time:.2f} seconds")
+        return result
+    return wrapper
+
 
 from .forms import TaskForm
 
@@ -234,13 +250,29 @@ from .models import Task
 from .forms import TaskForm, TaskDependenciesForm
 from user.forms import UserInterestGoalForm
 
-def fetch_tasks(user, status_filter, priority_filter, search_query, sort_by, order):
-    """Fetch tasks assigned to or created by the user, with filters and sorting."""
-    tasks = Task.objects.filter(Q(user=user) | Q(assigned_to=user)).distinct()
 
+
+@login_required
+@execution_time_logger
+def home(request):
+    # Get filter and sorting parameters from the request
+    status_filter = request.GET.get('status', None)
+    priority_filter = request.GET.get('priority', None)
+    sort_by = request.GET.get('sort_by', 'created_at')  # Default: Sort by creation date
+    order = request.GET.get('order', 'desc')  # Default: Descending order
+    search_query = request.GET.get('q', None)  # Search query for tasks
+    UserInterestGoalForms=UserInterestGoalForm()
+   
+    tasks = Task.objects.filter(
+        Q(user=request.user) | Q(assigned_to=request.user)
+    ).distinct()
+  
     # Apply search query filter
     if search_query:
-        tasks = tasks.filter(Q(title__icontains=search_query) | Q(description__icontains=search_query))
+        tasks = tasks.filter(
+            Q(title__icontains=search_query) |
+            Q(description__icontains=search_query)
+        )
 
     # Apply status filter if provided
     if status_filter:
@@ -263,39 +295,31 @@ def fetch_tasks(user, status_filter, priority_filter, search_query, sort_by, ord
     if sort_by not in sorting_fields:
         sort_by = 'created_at'  # Default to sorting by creation date if invalid
 
-    # Determine sorting order
+    # Determine the sorting order
     sort_by = f"-{sorting_fields[sort_by]}" if order == 'desc' else sorting_fields[sort_by]
 
-    return tasks.order_by(sort_by)
+    # Apply sorting to the tasks
+    tasks = tasks.order_by(sort_by)
 
-def process_task_notifications(tasks):
-    """Process overdue and approaching due date flags for tasks."""
+    # Add suggested users to each task
     tasks_with_suggestions = []
+  
+    
     for task in tasks:
+        
+        # Check if the task is overdue or approaching due date
+        is_overdue = task.is_overdue()
+        is_approaching = task.is_approaching_due_date()
+
+        # Add notification flags
         tasks_with_suggestions.append({
             'task': task,
+            
             'users_in_progress': [],
             'users_completed': [],
-            'is_overdue': task.is_overdue(),
-            'is_approaching': task.is_approaching_due_date(),
+            'is_overdue': is_overdue,
+            'is_approaching': is_approaching,
         })
-    return tasks_with_suggestions
-
-@login_required
-def home(request):
-    status_filter = request.GET.get('status', None)
-    priority_filter = request.GET.get('priority', None)
-    sort_by = request.GET.get('sort_by', 'created_at')  # Default: Sort by creation date
-    order = request.GET.get('order', 'desc')  # Default: Descending order
-    search_query = request.GET.get('q', None)  # Search query for tasks
-
-    # Use ThreadPoolExecutor for concurrent execution
-    with ThreadPoolExecutor() as executor:
-        future_tasks = executor.submit(fetch_tasks, request.user, status_filter, priority_filter, search_query, sort_by, order)
-        tasks = future_tasks.result()
-
-        future_notifications = executor.submit(process_task_notifications, tasks)
-        tasks_with_suggestions = future_notifications.result()
 
     # Prepare context
     context = {
@@ -308,11 +332,11 @@ def home(request):
         'order': order,
         'search_query': search_query,
         'TaskDependenciesForm': TaskDependenciesForm(),
-        'UserInterestGoalForm': UserInterestGoalForm()
+        'UserInterestGoalForm':UserInterestGoalForms
+        
     }
 
     return render(request, 'task/home.html', context)
-
 
 
 
@@ -1209,18 +1233,21 @@ def process_tasks(tasks):
             'is_approaching': task.is_approaching_due_date(),
         })
     return tasks_with_due
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from .models import Team, Task
+from .forms import AddMemberForm, TeamTaskForm , ReassignTaskForm,EscalateTaskForm # Import the TaskForm
 
 @login_required
+@execution_time_logger
 def view_team_tasks(request, team_id):
-    start_time = time.time()  # Start timer
-
     team = get_object_or_404(Team, id=team_id)
     tasks = Task.objects.filter(team=team)  # Fetch tasks for the team
-
     add_member_form = AddMemberForm()
-    task_form = TeamTaskForm()
-    reassigned_task_form = ReassignTaskForm()
-    escalated_reason_form = EscalateTaskForm()
+    task_form = TeamTaskForm()  # Task creation form
+    reassigned_task_form=ReassignTaskForm()
+    escualeted_reason_form=EscalateTaskForm()
 
     if request.method == "POST":
         if "add_member" in request.POST:
@@ -1238,20 +1265,27 @@ def view_team_tasks(request, team_id):
             task_form = TeamTaskForm(request.POST)
             if task_form.is_valid():
                 task = task_form.save(commit=False)
-                task.team = team
-                task.created_by = request.user
+                task.team = team  # Assign the task to the current team
+                task.created_by = request.user  # Assign task creator
                 task.save()
                 messages.success(request, "Task added successfully!")
                 return redirect('view_team_tasks', team_id=team.id)
 
-    # Process task due dates in a separate thread
-    with ThreadPoolExecutor() as executor:
-        future_tasks_with_due = executor.submit(process_tasks, tasks)
-        tasks_with_due = future_tasks_with_due.result()
+    tasks_with_due=[]    
+    for task in tasks:
+        
+        # Check if the task is overdue or approaching due date
+        is_overdue = task.is_overdue()
+        is_approaching = task.is_approaching_due_date()
+        
+        # Add notification flags
+        tasks_with_due.append({
+            'task': task,
+            'is_overdue': is_overdue,
+            'is_approaching': is_approaching,
+        })
 
-    end_time = time.time()  # End timer
-    execution_time = end_time - start_time  # Calculate execution time
-    print(f"Execution Time: {execution_time:.4f} seconds")  # Print execution time
+
 
     return render(request, 'teams/team_tasks.html', {
         'team': team,
@@ -1259,9 +1293,9 @@ def view_team_tasks(request, team_id):
         'add_member_form': add_member_form,
         'task_form': task_form,
         'reassigned_task_form': reassigned_task_form,
-        'escualeted_reason_form': escalated_reason_form,
-        'execution_time': execution_time  # Pass to template if needed
-    })
+        'escualeted_reason_form': escualeted_reason_form
+      
+    }) 
 
 
 

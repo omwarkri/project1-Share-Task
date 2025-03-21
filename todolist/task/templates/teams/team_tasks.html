@@ -117,6 +117,7 @@
         overflow-y: auto; /* Enable vertical scrolling */
         height: 100vh; /* Full viewport height */
         position: relative;
+        overflow-x: hidden;
      
 
     }
@@ -130,21 +131,38 @@
 
     /* Filter Section Styles */
     .filter-section {
-        margin-bottom: 20px;
+        
+        display: flex;
+        gap: 16px;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+      
     }
 
     .filter-options {
-        display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
-    }
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 18px;
+    color: #2c3e50;
+    overflow-y: hidden;
+    overflow-x: auto; /* Allow horizontal scrolling if needed */
 
-    .filter-select {
-        padding: 8px;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-        font-size: 14px;
-    }
+    width: 70%;
+    
+}
+
+.filter-select {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+    /* Remove fixed width */
+    
+    min-width: 150px; /* Set a minimum width to prevent squeezing */
+}
 
     .filter-button {
         padding: 8px 16px;
@@ -154,6 +172,7 @@
         border-radius: 5px;
         cursor: pointer;
         font-size: 14px;
+        width:200px;
     }
 
     .filter-button:hover {
@@ -248,15 +267,7 @@
     /* Modal Styles */
   
 
-    .modal-content {
-        background-color: white;
-      
-        border-radius: 8px;
-        width: 90%;
-        max-width: 500px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    }
-
+  
     .close-modal {
         float: right;
         font-size: 24px;
@@ -669,7 +680,7 @@
     }
 
     .filter-options {
-        flex-direction: column; /* Stack filter options vertically */
+
         gap: 5px; /* Reduce gap between options */
     }
 
@@ -781,7 +792,7 @@
                     🛠️ Manage Permissions
                 </button>
                 <button type="button" class="btn btn-primary getTeamSuggestionButton" 
-    data-bs-toggle="modal" data-bs-target="#teamTaskSuggestionsModal" 
+   
     onclick="fetchAndDisplayTeamSuggestions(teamId)">
     Get Team Task Suggestions
 </button>
@@ -1058,7 +1069,7 @@
            
             </div>
             <div class="modal-footer" >
-                <button  type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button  onclick="closeTeamTaskModal()"  type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
@@ -1477,7 +1488,7 @@ const toggleButton = document.getElementById('toggle-shutter-button');
             });
 
         // Display the modal
-        document.getElementById('escalateModal').style.display = 'block';
+        document.getElementById('escalateModal').style.display = 'flex';
     }
 
     // Function to close the escalate modal
@@ -1490,9 +1501,11 @@ const toggleButton = document.getElementById('toggle-shutter-button');
 function fetchAndDisplayTeamSuggestions(teamId) {
     const loader = document.getElementById('teamLoader');
     const suggestionsList = document.getElementById('teamSuggestionsList');
+    const teamTaskSuggestionsModals = document.getElementById('teamTaskSuggestionsModal');
 
     loader.style.display = 'block';
     suggestionsList.style.display = 'none';
+    teamTaskSuggestionsModals.style.display = 'flex';
 
     fetch(`/teams/${teamId}/suggestions/`, {
         method: 'GET',
@@ -1549,6 +1562,12 @@ function populateTeamSuggestions(suggestions) {
     }
 }
 
+function closeTeamTaskModal(){
+    const teamTaskSuggestionsModals = document.getElementById('teamTaskSuggestionsModal');
+    teamTaskSuggestionsModals.style.display="none"    
+
+}
+
 // Open the Add Task Modal and set title
 // Open the Add Task Modal and set title
 function openAddTeamTaskModal(suggestion = "") {
@@ -1556,7 +1575,7 @@ function openAddTeamTaskModal(suggestion = "") {
     const titleInput = taskModal.querySelector('input[name="title"]');
 
     // Display the modal
-    taskModal.style.display = 'block';
+    taskModal.style.display = 'flex';
 
     // Set the input value and make it non-editable if a suggestion is provided
     if (titleInput) {
@@ -1573,7 +1592,7 @@ function    openAddTeamTaskModal(suggestion = "") {
     const titleInput = taskModal.querySelector('input[name="title"]');
 
     // Display the modal
-    taskModal.style.display = 'block';
+    taskModal.style.display = 'flex';
 
     // Set the input value and make it non-editable if a suggestion is provided
     if (titleInput) {

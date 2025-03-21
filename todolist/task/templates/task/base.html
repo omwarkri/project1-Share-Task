@@ -541,7 +541,7 @@
         <div class="modal-content">
             <span class="close-modal" onclick="closeChatModal()">&times;</span>
             <h3 class="modal-header">💬 All Chats</h3>
-            <div class="chat-list medal-body">
+            <div class="chat-list modal-body">
                 <p>Loading chats...</p>
             </div>
         </div>
@@ -574,7 +574,7 @@
 
         function openChatModal() {
             const chatModal = document.getElementById('chatModal');
-            chatModal.style.display = 'block';
+            chatModal.style.display = 'flex';
 
             // Fetch chats from the backend
             fetch('/fetch-all-chats/')
@@ -616,7 +616,7 @@
 
         function openTeamsModal() {
             const teamsModal = document.getElementById('teamsModal');
-            teamsModal.style.display = 'block';
+            teamsModal.style.display = 'flex';
 
             // Fetch teams from the backend
             fetch('/teams/')

@@ -225,34 +225,22 @@ from .forms import TaskForm,TaskDependenciesForm
 
     
 
-
 from django.utils import timezone
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
+from concurrent.futures import ThreadPoolExecutor
 from .models import Task
 from .forms import TaskForm, TaskDependenciesForm
 from user.forms import UserInterestGoalForm
-@login_required
-def home(request):
-    # Get filter and sorting parameters from the request
-    status_filter = request.GET.get('status', None)
-    priority_filter = request.GET.get('priority', None)
-    sort_by = request.GET.get('sort_by', 'created_at')  # Default: Sort by creation date
-    order = request.GET.get('order', 'desc')  # Default: Descending order
-    search_query = request.GET.get('q', None)  # Search query for tasks
-    UserInterestGoalForms=UserInterestGoalForm()
-   
-    tasks = Task.objects.filter(
-        Q(user=request.user) | Q(assigned_to=request.user)
-    ).distinct()
-  
+
+def fetch_tasks(user, status_filter, priority_filter, search_query, sort_by, order):
+    """Fetch tasks assigned to or created by the user, with filters and sorting."""
+    tasks = Task.objects.filter(Q(user=user) | Q(assigned_to=user)).distinct()
+
     # Apply search query filter
     if search_query:
-        tasks = tasks.filter(
-            Q(title__icontains=search_query) |
-            Q(description__icontains=search_query)
-        )
+        tasks = tasks.filter(Q(title__icontains=search_query) | Q(description__icontains=search_query))
 
     # Apply status filter if provided
     if status_filter:
@@ -275,31 +263,39 @@ def home(request):
     if sort_by not in sorting_fields:
         sort_by = 'created_at'  # Default to sorting by creation date if invalid
 
-    # Determine the sorting order
+    # Determine sorting order
     sort_by = f"-{sorting_fields[sort_by]}" if order == 'desc' else sorting_fields[sort_by]
 
-    # Apply sorting to the tasks
-    tasks = tasks.order_by(sort_by)
+    return tasks.order_by(sort_by)
 
-    # Add suggested users to each task
+def process_task_notifications(tasks):
+    """Process overdue and approaching due date flags for tasks."""
     tasks_with_suggestions = []
-  
-    
     for task in tasks:
-        
-        # Check if the task is overdue or approaching due date
-        is_overdue = task.is_overdue()
-        is_approaching = task.is_approaching_due_date()
-
-        # Add notification flags
         tasks_with_suggestions.append({
             'task': task,
-            
             'users_in_progress': [],
             'users_completed': [],
-            'is_overdue': is_overdue,
-            'is_approaching': is_approaching,
+            'is_overdue': task.is_overdue(),
+            'is_approaching': task.is_approaching_due_date(),
         })
+    return tasks_with_suggestions
+
+@login_required
+def home(request):
+    status_filter = request.GET.get('status', None)
+    priority_filter = request.GET.get('priority', None)
+    sort_by = request.GET.get('sort_by', 'created_at')  # Default: Sort by creation date
+    order = request.GET.get('order', 'desc')  # Default: Descending order
+    search_query = request.GET.get('q', None)  # Search query for tasks
+
+    # Use ThreadPoolExecutor for concurrent execution
+    with ThreadPoolExecutor() as executor:
+        future_tasks = executor.submit(fetch_tasks, request.user, status_filter, priority_filter, search_query, sort_by, order)
+        tasks = future_tasks.result()
+
+        future_notifications = executor.submit(process_task_notifications, tasks)
+        tasks_with_suggestions = future_notifications.result()
 
     # Prepare context
     context = {
@@ -312,11 +308,11 @@ def home(request):
         'order': order,
         'search_query': search_query,
         'TaskDependenciesForm': TaskDependenciesForm(),
-        'UserInterestGoalForm':UserInterestGoalForms
-        
+        'UserInterestGoalForm': UserInterestGoalForm()
     }
 
     return render(request, 'task/home.html', context)
+
 
 
 
@@ -425,7 +421,7 @@ def add_task(request):
             if dependency_ids:
                 task.dependencies.set(Task.objects.filter(id__in=dependency_ids))
 
-            return JsonResponse({"success": True, "message": "Task created successfully!"})
+            return redirect('home')
 
         except Exception as e:
             return JsonResponse({"success": False, "message": f"An error occurred: {str(e)}"})
@@ -875,21 +871,36 @@ def edit_task(request, task_id):
     return render(request, 'task/edit_task.html', {'form': form, 'task': task})
 
 
-
+import threading
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib import messages
 from .models import Task, TaskCompletionDetails, PartnerFeedback, ActivityLog
 
+def log_activity_and_update_scores(task, user, completion=None, partner_feedback=None):
+    """Thread function to log activity and update scores asynchronously."""
+    # Log the task completion
+    ActivityLog.objects.create(
+        task=task,
+        user=user,
+        action='completed',
+        details=f"Task '{task.title}' was completed with details shared."
+    )
+
+    # Increment user score
+    task.user.score += 1
+    task.user.save()
+
+    # Award points to the task partner (if any)
+    if task.task_partner:
+        task.task_partner.score += 5  # Example: 5 points for helping
+        task.task_partner.save()
+
 @login_required
 def complete_task(request, task_id):
     task = get_object_or_404(Task, id=task_id)
 
-    
-
-
     if request.method == 'POST':
-
         if task.can_be_completed():
             skip_sharing = request.POST.get('skip_sharing')
 
@@ -897,17 +908,9 @@ def complete_task(request, task_id):
                 task.status = 'completed'
                 task.save()
 
-                # Log the task completion
-                ActivityLog.objects.create(
-                    task=task,
-                    user=request.user,
-                    action='completed',
-                    details=f"Task '{task.title}' was marked as completed without sharing details."
-                )
-
-                # Increment user score
-                task.user.score += 1
-                task.user.save()
+                # Run logging and score updates in a separate thread
+                thread = threading.Thread(target=log_activity_and_update_scores, args=(task, request.user))
+                thread.start()
 
                 messages.success(request, 'Task marked as completed without sharing completion details.')
                 return redirect('task_detail', task_id=task.id)
@@ -928,6 +931,7 @@ def complete_task(request, task_id):
             task.save()
 
             # Save partner feedback if provided
+            partner_feedback = None
             partner_rating = request.POST.get('partner_rating')
             partner_comment = request.POST.get('partner_comment')
             if partner_rating and partner_comment and task.task_partner:
@@ -940,32 +944,18 @@ def complete_task(request, task_id):
                 completion.partner_feedback = partner_feedback
                 completion.save()
 
-            # Award points to the task partner (if any)
-            if task.task_partner:
-                task.task_partner.score += 5  # Example: 5 points for helping
-                task.task_partner.save()
-
-            # Log the task completion
-            ActivityLog.objects.create(
-                task=task,
-                user=request.user,
-                action='completed',
-                details=f"Task '{task.title}' was completed with details shared."
-            )
-
-            # Increment user score
-            task.user.score += 1
-            task.user.save()
+            # Run logging and score updates in a separate thread
+            thread = threading.Thread(target=log_activity_and_update_scores, args=(task, request.user, completion, partner_feedback))
+            thread.start()
 
             messages.success(request, 'Task completed and details shared successfully.')
             return redirect('task_detail', task_id=task.id)
         
         else:
-            # Inform the user that task cannot be completed due to pending dependencies
             messages.error(request, "Cannot complete this task as some dependencies are not yet completed.")
-        
 
     return render(request, 'task/task_detail.html', {'task': task})
+
 
 
 from django.shortcuts import render
@@ -1201,20 +1191,36 @@ def teams_list(request):
 
 
 
+import time
+from concurrent.futures import ThreadPoolExecutor
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import Team, Task
-from .forms import AddMemberForm, TeamTaskForm , ReassignTaskForm,EscalateTaskForm # Import the TaskForm
+from .forms import AddMemberForm, TeamTaskForm, ReassignTaskForm, EscalateTaskForm
+
+def process_tasks(tasks):
+    """Process tasks to check if they are overdue or approaching due date."""
+    tasks_with_due = []
+    for task in tasks:
+        tasks_with_due.append({
+            'task': task,
+            'is_overdue': task.is_overdue(),
+            'is_approaching': task.is_approaching_due_date(),
+        })
+    return tasks_with_due
 
 @login_required
 def view_team_tasks(request, team_id):
+    start_time = time.time()  # Start timer
+
     team = get_object_or_404(Team, id=team_id)
     tasks = Task.objects.filter(team=team)  # Fetch tasks for the team
+
     add_member_form = AddMemberForm()
-    task_form = TeamTaskForm()  # Task creation form
-    reassigned_task_form=ReassignTaskForm()
-    escualeted_reason_form=EscalateTaskForm()
+    task_form = TeamTaskForm()
+    reassigned_task_form = ReassignTaskForm()
+    escalated_reason_form = EscalateTaskForm()
 
     if request.method == "POST":
         if "add_member" in request.POST:
@@ -1232,27 +1238,20 @@ def view_team_tasks(request, team_id):
             task_form = TeamTaskForm(request.POST)
             if task_form.is_valid():
                 task = task_form.save(commit=False)
-                task.team = team  # Assign the task to the current team
-                task.created_by = request.user  # Assign task creator
+                task.team = team
+                task.created_by = request.user
                 task.save()
                 messages.success(request, "Task added successfully!")
                 return redirect('view_team_tasks', team_id=team.id)
 
-    tasks_with_due=[]    
-    for task in tasks:
-        print(task.assigned_to)
-        # Check if the task is overdue or approaching due date
-        is_overdue = task.is_overdue()
-        is_approaching = task.is_approaching_due_date()
-        
-        # Add notification flags
-        tasks_with_due.append({
-            'task': task,
-            'is_overdue': is_overdue,
-            'is_approaching': is_approaching,
-        })
+    # Process task due dates in a separate thread
+    with ThreadPoolExecutor() as executor:
+        future_tasks_with_due = executor.submit(process_tasks, tasks)
+        tasks_with_due = future_tasks_with_due.result()
 
-    print(tasks_with_due)
+    end_time = time.time()  # End timer
+    execution_time = end_time - start_time  # Calculate execution time
+    print(f"Execution Time: {execution_time:.4f} seconds")  # Print execution time
 
     return render(request, 'teams/team_tasks.html', {
         'team': team,
@@ -1260,9 +1259,10 @@ def view_team_tasks(request, team_id):
         'add_member_form': add_member_form,
         'task_form': task_form,
         'reassigned_task_form': reassigned_task_form,
-        'escualeted_reason_form': escualeted_reason_form
-      
+        'escualeted_reason_form': escalated_reason_form,
+        'execution_time': execution_time  # Pass to template if needed
     })
+
 
 
 from django.shortcuts import render, get_object_or_404
@@ -1598,63 +1598,54 @@ from .models import Task, TaskCompletionDetails
 
 from django.shortcuts import render
 from django.db.models import Count
+from concurrent.futures import ThreadPoolExecutor
 from .models import Task, TaskCompletionDetails, User
 
-def completed_tasks_feed(request):
-    # Fetch all completed tasks
-    completed_tasks = Task.objects.filter(status='completed')
+def fetch_completed_tasks():
+    """Fetch all completed tasks with related completion details"""
+    return Task.objects.filter(status='completed').select_related('completion_details')
 
-    # Get the filter type from the request (e.g., ?filter_type=detail, ?filter_type=video, etc.)
+def fetch_top_users():
+    """Fetch top 5 users with the most followers"""
+    return User.objects.annotate(follower_count=Count('followers')).order_by('-follower_count')[:5]
+
+def completed_tasks_feed(request):
     filter_type = request.GET.get('filter_type')
 
-    # Fetch completion details for these tasks
-    task_feed_data = []
-    for task in completed_tasks:
-        try:
-            completion_details = TaskCompletionDetails.objects.get(task=task)
-            # Apply filters based on the filter_type
-            if filter_type == 'detail' and completion_details.has_details():
-                task_feed_data.append({
-                    'task': task,
-                    'completio  n_details': completion_details
-                })
-            elif filter_type == 'video' and completion_details.has_uploaded_file():
-                task_feed_data.append({
-                    'task': task,
-                    'completion_details': completion_details
-                })
-            elif filter_type == 'post' and completion_details.has_files():
-                task_feed_data.append({
-                    'task': task,
-                    'completion_details': completion_details
-                })
-            elif filter_type == 'image' and completion_details.has_uploaded_image():
-                task_feed_data.append({
-                    'task': task,
-                    'completion_details': completion_details
-                })
-            elif filter_type == 'feedback' and completion_details.has_partner_feedback():
-                task_feed_data.append({
-                    'task': task,
-                    'completion_details': completion_details
-                })
-            elif not filter_type:  # No filter applied, show all tasks
-                task_feed_data.append({
-                    'task': task,
-                    'completion_details': completion_details
-                })
-        except TaskCompletionDetails.DoesNotExist:
-            # Skip tasks without completion details
-            continue
+    # Use ThreadPoolExecutor to fetch tasks and top users concurrently
+    with ThreadPoolExecutor() as executor:
+        future_tasks = executor.submit(fetch_completed_tasks)
+        future_users = executor.submit(fetch_top_users)
 
-    # Fetch top 5 users with the most followers (even if they have 0 followers)
-    top_users = User.objects.annotate(follower_count=Count('followers')).order_by('-follower_count')[:5]
+        completed_tasks = future_tasks.result()
+        top_users = future_users.result()
+
+    task_feed_data = []
+
+    # Process tasks
+    for task in completed_tasks:
+        completion_details = getattr(task, 'completion_details', None)
+
+        if not completion_details:
+            continue  # Skip tasks without completion details
+
+        # Apply filters
+        if (
+            (filter_type == 'detail' and completion_details.has_details()) or
+            (filter_type == 'video' and completion_details.has_uploaded_file()) or
+            (filter_type == 'post' and completion_details.has_files()) or
+            (filter_type == 'image' and completion_details.has_uploaded_image()) or
+            (filter_type == 'feedback' and completion_details.has_partner_feedback()) or
+            (not filter_type)  # No filter applied
+        ):
+            task_feed_data.append({'task': task, 'completion_details': completion_details})
 
     return render(request, 'feed/completed_tasks_feed.html', {
         'task_feed_data': task_feed_data,
         'filter_type': filter_type,
-        'top_users': top_users  # Pass top_users to the template
+        'top_users': top_users,
     })
+
 
 
 from django.http import JsonResponse

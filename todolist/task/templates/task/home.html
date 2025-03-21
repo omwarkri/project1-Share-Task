@@ -936,11 +936,7 @@ input:checked + .slider:before {
     }
     
     /* Chat Modal Styles */
-    .chat-list {
-        max-height: 300px;
-        overflow-y: auto;
-        margin-top: 10px;
-    }
+    
     
     .chat-item {
         padding: 10px;
@@ -1339,9 +1335,8 @@ input:checked + .slider:before {
        margin-bottom: 32px; 
     }
 
-    #taskSuggestionsModal {
-   
-    margin-bottom: 30px;
+    #taskSuggestionsModal   .modal{
+        height: 60%;
 }
     /* Modal Styling */
 #taskSuggestionsModal .modal-content {
@@ -1350,6 +1345,7 @@ input:checked + .slider:before {
     background-color: #ffffff;
     padding: 0px;
     border: none;
+    height: 60%;
    
 
 }
@@ -1852,7 +1848,7 @@ input:checked + .slider:before {
                     <span class="plus-icon">➕</span>
                 </button>
             </div>
-            <button type="button" class="btn btn-primary getSuggestionButton" data-bs-toggle="modal" data-bs-target="#taskSuggestionsModal" onclick="fetchAndDisplaySuggestions()">
+            <button type="button" class="btn btn-primary getSuggestionButton"  onclick="fetchAndDisplaySuggestions()">
                 Get Task Suggestions
             </button>
             <div class="header-actions">
@@ -2699,10 +2695,12 @@ function closeChatModal() {
 function fetchAndDisplaySuggestions() {
     // Show loader and hide form initially
     const loader = document.getElementById('loader');
+    const taskSuggestionsModal = document.getElementById('taskSuggestionsModal');
     const suggestionsList = document.getElementById('suggestionsList');
 
     // Show loader and hide form initially
     loader.style.display = 'block';
+    taskSuggestionsModal.style.display = 'flex';
     suggestionsList.style.display = 'none';
  
     fetch('/tasks/suggestions/', {
@@ -2818,7 +2816,7 @@ function getCSRFToken() {
 }
 
 // Automatically load suggestions when the modal is shown
-document.getElementById('taskSuggestionsModal').addEventListener('show.bs.modal', loadTaskSuggestions);
+// document.getElementById('taskSuggestionsModal').addEventListener('show.bs.modal', loadTaskSuggestions);
 
 
 function toggleInterestGoalForm() {

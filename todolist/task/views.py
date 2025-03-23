@@ -2028,3 +2028,94 @@ def update_team_goals(request):
         suggestions = generate_team_task_suggestions(Team)
         return JsonResponse({'status': 'success', 'suggestions': suggestions})
     return JsonResponse({'status': 'error'}, status=400)
+
+
+
+
+import google.generativeai as genai
+
+from .models import Task
+
+# Configure Gemini API
+generativeai.configure(api_key="AIzaSyDx3rr0MzUPaumvdII3WIffmtsZqAz7JIs")
+model = generativeai.GenerativeModel('gemini-1.5-flash')
+
+# import requests
+
+# def get_latest_news(query):
+#     """
+#     Fetch the latest news related to the task topic.
+#     """
+#     NEWS_API_KEY = settings.NEWS_API_KEY  # Add NewsAPI key in settings
+#     url = f"https://newsapi.org/v2/everything?q={query}&sortBy=publishedAt&apiKey={NEWS_API_KEY}"
+#     response = requests.get(url)
+#     data = response.json()
+#     articles = data.get("articles", [])[:3]  # Get top 3 latest news
+
+#     if not articles:
+#         return ["No recent news available."]
+    
+#     return [f"📰 {article['title']} - {article['source']['name']} ({article['url']})" for article in articles]
+
+
+
+
+
+
+
+from django.shortcuts import render
+
+
+from django.shortcuts import render
+
+
+
+import json
+from django.shortcuts import render
+
+
+
+def get_ai_posts(request):
+    user = request.user
+    tasks = Task.objects.filter(user=user).order_by("-created_at")[:10]
+    task_titles = [task.title for task in tasks]
+
+    model = genai.GenerativeModel("gemini-1.5-flash")
+    prompt = f"""
+    User has recently planned or completed these tasks: {task_titles}.
+
+    Generate **20 unique insights** based on these tasks. Each insight should be a complete post with a mix of and informative for user and encouraging motivating:
+    - A short story 
+    - Facts 
+    - A productivity tip 
+
+    ### Response Format:
+    Return a **valid JSON array** inside markdown triple backticks like this:
+    ```
+    [
+        {{"post": "Your first post here..." }},
+        {{"post": "Your second post here..." }},
+        ...
+        {{"post": "Your twentieth post here..." }}
+    ]
+    ```
+    Ensure the response **only** contains the JSON inside backticks.
+    """
+
+    try:
+        response = model.generate_content(prompt)
+        ai_text = response.candidates[0].content.parts[0].text.strip()
+        json_text = ai_text.split("```")[1].strip()
+        posts = json.loads(json_text)  # Convert JSON string to Python list
+    except (IndexError, json.JSONDecodeError, KeyError):
+        posts = [{"post": "AI response is not valid JSON format. Please try again."}]
+
+    return posts  # ✅ Only return data, not a render() call
+
+
+from django.shortcuts import render
+
+def ai_stories(request):
+    posts = get_ai_posts(request)  # ✅ Correct parameter
+
+    return render(request, "stories/ai_stories.html", {"posts": posts})

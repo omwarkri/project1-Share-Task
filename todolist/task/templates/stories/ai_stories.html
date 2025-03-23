@@ -1,0 +1,95 @@
+{% extends "task/base.html" %}
+
+{% block content %}
+    <h1>📢 Insights for You</h1>
+
+    <div class="post-container">
+        {% for item in posts %}
+            <div class="post-card">
+                <div class="post-icon">
+                    <i class="fas fa-lightbulb"></i> <!-- Symbol for insights -->
+                </div>
+                <div class="post-content">
+                    <p>{{ item.post }}</p>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <style>
+        /* General Styles */
+        h1 {
+            font-size: 1.8rem; /* Even smaller font size for very small screens */
+            color: #4a90e2;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .post-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    overflow-y: auto; /* Enable vertical scrolling */
+    max-height: 80vh; /* Set a maximum height relative to the viewport */
+}
+
+        .post-card {
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
+            border-radius: 12px;
+            background: #ffffff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .post-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .post-icon {
+            font-size: 1.5rem;
+            color: #ff6b6b;
+            background: #ffe1e1;
+            padding: 15px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 50px;
+            height: 50px;
+        }
+
+        .post-content {
+            flex: 1;
+        }
+
+        .post-content p {
+            font-size: 1.1rem;
+            color: #333;
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .post-card {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .post-icon {
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+{% endblock %}

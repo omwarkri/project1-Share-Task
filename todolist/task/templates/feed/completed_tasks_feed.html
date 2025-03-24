@@ -535,6 +535,7 @@ h1::after {
     padding: 20px;
     overflow-y: auto;
     border-left: 1px solid #e1e1e1;
+    position: relative;
 }
 
 .modal-right h2 {
@@ -673,7 +674,7 @@ h1::after {
 }
 
 /* Loading Spinner Styles */
-.loading-spinner {
+.loading-spinner-feed {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -682,6 +683,7 @@ h1::after {
     left: 50%;
     transform: translate(-50%, -50%);
     z-index: 1000;
+    position: absolute;
 }
 
 .spinner {
@@ -1076,7 +1078,7 @@ h1::after {
 
         <!-- Right Column: Task Details, Comments, Likes, etc. -->
         <div class="modal-right">
-            <div id="loading-spinner" class="loading-spinner" style="display: none;">
+            <div id="loading-spinner-feed" class="loading-spinner-feed" style="display: none;">
                 <div class="spinner">hii</div>
             </div>
                       
@@ -1191,7 +1193,7 @@ h1::after {
     userNameSpan.textContent = username;
 
     // Show the loading spinner
-    const loadingSpinner = document.getElementById("loading-spinner");
+    const loadingSpinner = document.getElementById("loading-spinner-feed");
     loadingSpinner.style.display = "flex";
 
     // Fetch and display task details
@@ -1200,8 +1202,8 @@ h1::after {
 
 function fetchTaskDetails(taskId) {
     // Show the loading spinner
-    const loadingSpinner = document.getElementById("loading-spinner");
-    loadingSpinner.style.display = "flex";
+    // const loadingSpinner = document.getElementById("loading-spinner-feed");
+    // loadingSpinner.style.display = "flex";
 
     fetch(`/task/${taskId}/details/`)
         .then(response => response.json())
@@ -1355,11 +1357,11 @@ const closeBtn = document.querySelector(".close");
 // Function to close the modal
 function closeModal() {
     const modal = document.getElementById("image-modal");
-    const loadingSpinner = document.getElementById("loading-spinner");
+    const loadingSpinner = document.getElementById("loading-spinner-feed");
 
     // Hide the modal and spinner
     modal.style.display = "none";
-    loadingSpinner.style.display = "block";
+    loadingSpinner.style.display = "none";
 }
 
 // Add event listener to the close button

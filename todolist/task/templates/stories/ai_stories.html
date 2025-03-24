@@ -1,38 +1,42 @@
 {% extends "task/base.html" %}
 
 {% block content %}
-    <h1>📢 Insights for You</h1>
+<h1>📢 Insights for You</h1>
 
-    <div class="post-container">
-        {% for item in posts %}
-            <div class="post-card">
-                <div class="post-icon">
-                    <i class="fas fa-lightbulb"></i> <!-- Symbol for insights -->
-                </div>
-                <div class="post-content">
-                    <p>{{ item.post }}</p>
-                </div>
+<div class="post-container">
+    {% for item in posts %}
+        <div class="post-card">
+            <div class="post-icon">
+                <i class="fas fa-lightbulb"></i>
             </div>
-        {% endfor %}
-    </div>
+            <div class="post-content">
+                <p class="post-data">{{ item.post }}</p>
+                <p class="detailed-post" style="display: none;"></p>
+                <button class="view-more-btn" data-insight="{{ item.post }}">View More</button>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+
+
 
     <style>
-        /* General Styles */
         h1 {
-            font-size: 1.8rem; /* Even smaller font size for very small screens */
+            font-size: 1.8rem;
             color: #4a90e2;
             text-align: center;
             margin-bottom: 20px;
         }
 
         .post-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    justify-content: center;
-    overflow-y: auto; /* Enable vertical scrolling */
-    max-height: 80vh; /* Set a maximum height relative to the viewport */
-}
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            overflow-y: auto;
+            max-height: 80vh;
+        }
 
         .post-card {
             width: 100%;
@@ -45,6 +49,8 @@
             align-items: center;
             gap: 15px;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
+            flex-direction: column;
+            text-align: center;
         }
 
         .post-card:hover {
@@ -76,20 +82,46 @@
             line-height: 1.6;
         }
 
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 2rem;
-            }
+        .view-more-btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 8px 12px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-size: 1rem;
+        }
 
-            .post-card {
-                flex-direction: column;
-                text-align: center;
-            }
-
-            .post-icon {
-                margin-bottom: 10px;
-            }
+        .view-more-btn:hover {
+            background-color: #45a049;
         }
     </style>
+
+<script>
+   document.addEventListener("DOMContentLoaded", function() {
+    document.querySelectorAll(".view-more-btn").forEach(button => {
+        button.addEventListener("click", function() {
+            let insightText = this.getAttribute("data-insight");
+            let detailedPost = this.parentElement.querySelector(".detailed-post");
+
+            if (detailedPost.style.display === "block") {
+                detailedPost.style.display = "none";
+                this.textContent = "View More";
+                return;
+            }
+
+            fetch(`/ai_posts/extended?insight=${encodeURIComponent(insightText)}`)
+                .then(response => response.json())
+                .then(data => {
+                    detailedPost.textContent = data.detailed_post;
+                    detailedPost.style.display = "block";
+                    this.textContent = "Show Less";
+                })
+                .catch(error => console.error("Error fetching extended insight:", error));
+        });
+    });
+});
+
+</script>
 {% endblock %}

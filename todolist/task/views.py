@@ -2075,6 +2075,7 @@ from django.shortcuts import render
 
 
 
+@login_required
 def get_ai_posts(request):
     user = request.user
     tasks = Task.objects.filter(user=user).order_by("-created_at")[:10]
@@ -2110,12 +2111,84 @@ def get_ai_posts(request):
     except (IndexError, json.JSONDecodeError, KeyError):
         posts = [{"post": "AI response is not valid JSON format. Please try again."}]
 
-    return posts  # ✅ Only return data, not a render() call
+    return JsonResponse({"posts": posts})
+
+
 
 
 from django.shortcuts import render
+import json  # Needed to parse the JsonResponse
 
 def ai_stories(request):
-    posts = get_ai_posts(request)  # ✅ Correct parameter
+    response = get_ai_posts(request)  # Get JSON response
+    posts_data = json.loads(response.content)  # Convert JsonResponse to dict
+    posts = posts_data.get("posts", [])  # Extract 'posts' list
 
     return render(request, "stories/ai_stories.html", {"posts": posts})
+
+
+
+import json
+import random
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+import google.generativeai as genai
+from .models import Task
+
+
+
+from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+
+
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+import google.generativeai as genai
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+import google.generativeai as genai
+
+@login_required
+def get_extended_insight(request):
+    insight_text = request.GET.get("insight")
+    if not insight_text:
+        return JsonResponse({"error": "Missing insight text"}, status=400)
+
+    model = genai.GenerativeModel("gemini-1.5-flash")
+    
+    # Prompt to generate a motivational success story based on the insight
+    prompt = f"""
+    Expand on the following insight: '{insight_text}' in a **story-driven, motivational way**.  
+    - Start by elaborating on the insight, making it more vivid and engaging.  
+    - Then, smoothly transition into a **real-life success story** that embodies the insight.  
+    - The story should feel like a natural extension of the insight and should cover:  
+
+    1️⃣ **Background** – Who the person was, their struggles, and what made their journey difficult.  
+    2️⃣ **The Process** – How they applied the insight in their life (skills learned, mindset changes, persistence).  
+    3️⃣ **The Breakthrough** – The moment their efforts paid off (job offer, success, recognition, etc.).  
+    4️⃣ **Lessons for Others** – How this insight can help others in their own journey.  
+
+    The response should **flow naturally**, making the story feel like a continuation of the insight, rather than a separate addition.
+    """
+
+    try:
+        response = model.generate_content(prompt)
+
+        # Extract AI response safely
+        if response and response.candidates and response.candidates[0].content.parts:
+            success_story = response.candidates[0].content.parts[0].text.strip()
+        else:
+            raise ValueError("Unexpected AI response structure")
+
+        # Remove duplicate starting text (if AI starts with the same insight)
+        if success_story.startswith(insight_text):
+            success_story = success_story[len(insight_text):].strip()
+
+    except Exception as e:
+        print("Error:", e)  # Log error for debugging
+        success_story = "AI could not generate a relevant success story. Please try again."
+
+    return JsonResponse({"detailed_post": success_story})
+
+
+

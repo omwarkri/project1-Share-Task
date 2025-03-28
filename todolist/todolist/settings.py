@@ -161,6 +161,7 @@ MIDDLEWARE = [
 ]
 CORS_ALLOWED_ORIGINS = [
     "https://share-task.onrender.com",
+    'https://share-task-9r0e.onrender.com',
     'http://127.0.0.1:8000'
 ]
 CORS_ALLOW_CREDENTIALS = True

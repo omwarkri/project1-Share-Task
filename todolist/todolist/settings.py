@@ -196,17 +196,20 @@ WSGI_APPLICATION = 'todolist.wsgi.application'
 #     }
 # }
 
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'defaultdb',
         'USER': 'avnadmin',
-        'PASSWORD': 'AVNS_vEqaMldyHtujX4KVGbg',
-        'HOST': 'pg-b2f283-shantanuchavhan002-568b.l.aivencloud.com',  # or your server IP
-        'PORT': '11560',       # default PostgreSQL port
+        'PASSWORD': 'AVNS_wgp5e_Khn-9XrcTvxpQ',
+        'HOST': 'pg-23e5a587-shantanuchavhan002-568b.k.aivencloud.com',  
+        'PORT': '11560',
+        'OPTIONS': {
+            'sslmode': 'require',  # Enforce SSL connection
+        },
     }
 }
+
 
 
 BASE_URL='https://share-task.onrender.com'

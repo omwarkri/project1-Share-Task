@@ -26,6 +26,9 @@
             overflow: hidden; /* Prevent double scrollbars */
     
         }
+    .close-btn{
+        position: absolute;
+    }
     .button-container {
         display: flex;
         justify-content: center; /* Center horizontally */
@@ -1959,68 +1962,23 @@ input:checked + .slider:before {
 <!-- Modals -->
 <!-- Add Task Modal -->
 <!-- Add Task Modal -->
-<div id="addTaskModal" class="modal" style="display: none;">
+<div id="addTaskModal" class="modal">
     <div class="modal-content">
-        <span class="close-modal" onclick="closeAddTaskModal()">&times;</span>
-        <h3 class="modal-header">Add a New Task</h3>
-        <div id="taskContainer" class="modal-body">
-            {% csrf_token %}  <!-- CSRF token for Django -->
-        
-            <div class="form-group">
-                <label for="title">Title</label>
-                <input type="text" id="title" name="title" required>
-            </div>
-        
-            <div class="form-group">
-                <label for="description">Description</label>
-                <textarea id="description" name="description" rows="4" required></textarea>
-            </div>
-        
-            <div class="form-group">
-                <label for="due_date">Due Date</label>
-                <input type="date" id="due_date" name="due_date" required>
-            </div>
-        
-            <div class="form-group">
-                <label for="priority">Priority</label>
-                <select id="priority" name="priority" required>
-                    <option value="low">Low</option>
-                    <option value="medium">Medium</option>
-                    <option value="high">High</option>
-                </select>
-            </div>
-        
-            <div class="form-group">
-                <label for="category">Category</label>
-                <input type="text" id="category" name="category" required>
-            </div>
-        
-            <div class="form-group">
-                <label for="status">Status</label>
-                <select id="status" name="status" required>
-                    <option value="pending">Pending</option>
-                    <option value="in_progress">In Progress</option>
-                    <option value="completed">Completed</option>
-                </select>
-            </div>
-        
-            <div class="form-group">
-                <label for="dependencies">Dependencies</label>
-                <input type="text" id="dependencies" name="dependencies">
-            </div>
-        
-            <div class="form-group">
-                <label for="is_daily">Is Daily Task?</label>
-                <input type="checkbox" id="is_daily" name="is_daily">
-            </div>
-        
-          
-                <button class="btn btn-primary" onclick="submitTask()">Create Task</button>
-           
+        <div class="modal-header">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <h2>Add Task</h2>
         </div>
-        
+        <div class="modal-body">
+            <form method="POST" action="{% url 'add_task' %}">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="submit-btn">Add Task</button>
+            </form>
+        </div>
     </div>
 </div>
+
+
 <!-- Modal -->
 <div class="modal fade" id="taskSuggestionsModal" tabindex="-1" aria-labelledby="taskSuggestionsModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -2058,7 +2016,7 @@ input:checked + .slider:before {
             </div>
 
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-secondary" onclick="closeModal()">Close</button>
             </div>
 
         </div>
@@ -2655,7 +2613,9 @@ function closeViewDependencyModal() {
 
 suggestionsList.style.display = 'none';
     document.getElementById("addTaskModal").style.display = "flex";
-    document.getElementById("title").value = suggestion; // Set title input to suggestion
+    console.log( document.querySelector("#title-input"))
+    document.getElementById("id_title").value = suggestion;
+
 }
 
     
@@ -2913,6 +2873,11 @@ function submitTask() {
         }
     })
     .catch(error => console.error("Error:", error));
+}
+
+
+function closeModal() {
+    document.getElementById('taskSuggestionsModal').style.display = 'none';
 }
 
 function closeAddTaskModal() {

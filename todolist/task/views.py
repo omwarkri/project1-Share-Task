@@ -400,57 +400,16 @@ from django.http import JsonResponse
 import json
 from .models import Task
 
+from django.shortcuts import render, redirect
+from .forms import TaskForm  # Import your TaskForm
+
 def add_task(request):
     if request.method == "POST":
-        
-        try:
-            data = json.loads(request.body)  # Load JSON data
-            print("Received Data:", data)
-            team=None
-            if data.get("team_id"):
-                try:
-                    team = Team.objects.get(id=data["team_id"])
-                except Team.DoesNotExist:
-                    return JsonResponse({"success": False, "message": "Team not found."}, status=400)
-            else:
-                team = None  # Set default value if no team_id is provided
+        form = TaskForm(request.POST)
+        if form.is_valid():
+            form.save()  # Save the task to the database
+            return redirect('home')  # Redirect to the task list view after saving
 
-            # Extract dependencies as a list of task IDs
-            dependency_ids = data.get("dependencies", [])  # Expecting a list of IDs
-
-            # Get the assigned user (Handle case where user might not exist)
-            assigned_user = None
-            if data.get("assigned_to"):
-                try:
-                    assigned_user = CustomUser.objects.get(id=data["assigned_to"])
-                except CustomUser.DoesNotExist:
-                    return JsonResponse({"success": False, "message": "Assigned user not found."}, status=400)
-
-            print("Creating Task:", data.get("title"), "Description:", data.get("description"))
-
-            # Create the task
-            task = Task.objects.create(
-                title=data.get("title", ""),
-                description=data.get("description", ""),
-                due_date=data.get("due_date"),
-                priority=data.get("priority", "low"),  # Default priority
-                category=data.get("category", ""),
-                status=data.get("status", "pending"),  # Default status
-                is_daily=data.get("is_daily", False),  # Default False
-                assigned_to=assigned_user,
-                team=team
-            )
-
-            # Add dependencies (only if there are valid task IDs)
-            if dependency_ids:
-                task.dependencies.set(Task.objects.filter(id__in=dependency_ids))
-
-            return redirect('home')
-
-        except Exception as e:
-            return JsonResponse({"success": False, "message": f"An error occurred: {str(e)}"})
-
-    return JsonResponse({"success": False, "message": "Invalid request method."})
 
 
 

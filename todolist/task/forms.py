@@ -6,29 +6,29 @@ from django import forms
 from django.utils import timezone
 from .models import Task
 
+from django import forms
+from .models import Task
+
 class TaskForm(forms.ModelForm):
     class Meta:
         model = Task
-        fields = ['title', 'description', 'due_date', 'priority', 'category', 'status', 'dependencies','is_daily']
+        fields = ['title', 'description', 'due_date', 'priority', 'category', 'status', 'dependencies', 'is_daily']
         widgets = {
-            'title': forms.TextInput(attrs={}),  # Ensure empty attrs
+            'title': forms.TextInput(attrs={'id': 'title-input'}),  # ✅ Set an ID for JS
             'due_date': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
         }
-
 
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user', None)  # Get the current user from kwargs
         super().__init__(*args, **kwargs)
 
-        # Filter dependencies to only include tasks for the current user
-        if user:
-            self.fields['dependencies'].queryset = Task.objects.filter(user=user)
+        # ✅ Set dependencies field dynamically
+        self.fields['dependencies'] = forms.ModelMultipleChoiceField(
+            queryset=Task.objects.filter(user=user) if user else Task.objects.none(),
+            widget=forms.CheckboxSelectMultiple,
+            required=False,
+        )
 
-    dependencies = forms.ModelMultipleChoiceField(
-        queryset=Task.objects.none(),  # Start with an empty queryset
-        widget=forms.CheckboxSelectMultiple,
-        required=False,
-    )
 
 class TaskDependenciesForm(forms.ModelForm):
     class Meta:

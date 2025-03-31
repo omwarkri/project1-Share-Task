@@ -44,5 +44,7 @@ urlpatterns = [
     path('tasks/suggestions/', task_suggestions_view, name='task_suggestions'),
     path("stories/", ai_stories, name="stories"),
     path("ai_posts/extended/", get_extended_insight, name="extended_insight"),
+
+    path("ai_posts/chat/", ai_chat, name="ai_chat"),
   
 ]

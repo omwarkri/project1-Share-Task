@@ -2151,3 +2151,67 @@ def get_extended_insight(request):
 
 
 
+import openai
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import json
+
+openai.api_key = "YOUR_OPENAI_API_KEY"
+
+@csrf_exempt
+def ai_chat(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        question = data.get("question")
+        story = data.get("story")
+
+        prompt = f"Based on this story: {story}, answer: {question}"
+
+        response = openai.ChatCompletion.create(
+            model="gpt-4",
+            messages=[{"role": "system", "content": "You are a helpful assistant."},
+                      {"role": "user", "content": prompt}]
+        )
+
+        answer = response["choices"][0]["message"]["content"]
+        return JsonResponse({"response": answer})
+    
+    return JsonResponse({"error": "Invalid request"}, status=400)
+
+
+import json
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import google.generativeai as genai
+
+@csrf_exempt
+def ai_chat(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        question = data.get("question")
+        story = data.get("story")
+
+        if not question or not story:
+            return JsonResponse({"error": "Missing question or story"}, status=400)
+
+        # Initialize Gemini model
+        model = genai.GenerativeModel("gemini-1.5-flash")
+
+        prompt = f"Based on this story: {story}, answer relate quetion as well other than story: {question}"
+
+        try:
+            response = model.generate_content(prompt)
+            
+            # Extract AI response safely
+            if response and response.candidates and response.candidates[0].content.parts:
+                answer = response.candidates[0].content.parts[0].text.strip()
+            else:
+                answer = "I couldn't generate a response. Please try again."
+
+        except Exception as e:
+            print("Error:", e)  # Log error for debugging
+            answer = "AI is currently unavailable. Please try again later."
+
+        return JsonResponse({"response": answer})
+    
+    return JsonResponse({"error": "Invalid request"}, status=400)

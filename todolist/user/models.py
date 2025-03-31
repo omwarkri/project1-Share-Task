@@ -22,7 +22,7 @@ class CustomUser(AbstractUser):
         Group,
         related_name='customuser_set',  # Custom related name
         blank=True
-    )
+    ) 
     user_permissions = models.ManyToManyField(
         Permission,
         related_name='customuser_set',  # Custom related name

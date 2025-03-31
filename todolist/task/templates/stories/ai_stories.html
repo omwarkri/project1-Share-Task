@@ -12,101 +12,145 @@
             <div class="post-content">
                 <p class="post-data">{{ item.post }}</p>
                 <p class="detailed-post" style="display: none;"></p>
+                
                 <button class="view-more-btn" data-insight="{{ item.post }}">View More</button>
+                
+                <div class="qa-section" style="display: none;">
+                    <input type="text" class="question-input" placeholder="Ask a question..." />
+                    <button class="ask-btn">Get Answer</button>
+                    <div class="qa-history"></div>
+                </div>
             </div>
         </div>
     {% endfor %}
 </div>
 
+<style>
+    h1 {
+        font-size: 1.8rem;
+        color: #4a90e2;
+        text-align: center;
+        margin-bottom: 20px;
+    }
 
+    .post-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        justify-content: center;
+        overflow-y: auto;
+        max-height: 80vh;
+    }
 
+    .post-card {
+        width: 100%;
+        max-width: 600px;
+        padding: 20px;
+        border-radius: 12px;
+        background: #ffffff;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        flex-direction: column;
+        text-align: center;
+    }
 
-    <style>
-        h1 {
-            font-size: 1.8rem;
-            color: #4a90e2;
-            text-align: center;
-            margin-bottom: 20px;
-        }
+    .post-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    }
 
-        .post-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            justify-content: center;
-            overflow-y: auto;
-            max-height: 80vh;
-        }
+    .post-icon {
+        font-size: 1.5rem;
+        color: #ff6b6b;
+        background: #ffe1e1;
+        padding: 15px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 50px;
+        height: 50px;
+    }
 
-        .post-card {
-            width: 100%;
-            max-width: 600px;
-            padding: 20px;
-            border-radius: 12px;
-            background: #ffffff;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            flex-direction: column;
-            text-align: center;
-        }
+    .post-content {
+        flex: 1;
+    }
 
-        .post-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-        }
+    .post-content p {
+        font-size: 1.1rem;
+        color: #333;
+        margin: 0;
+        line-height: 1.6;
+    }
 
-        .post-icon {
-            font-size: 1.5rem;
-            color: #ff6b6b;
-            background: #ffe1e1;
-            padding: 15px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 50px;
-            height: 50px;
-        }
+    .view-more-btn {
+        background-color: #4CAF50;
+        color: white;
+        padding: 8px 12px;
+        border: none;
+        cursor: pointer;
+        border-radius: 5px;
+        margin-top: 10px;
+        font-size: 1rem;
+    }
 
-        .post-content {
-            flex: 1;
-        }
+    .view-more-btn:hover {
+        background-color: #45a049;
+    }
 
-        .post-content p {
-            font-size: 1.1rem;
-            color: #333;
-            margin: 0;
-            line-height: 1.6;
-        }
+    .qa-section {
+        margin-top: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
 
-        .view-more-btn {
-            background-color: #4CAF50;
-            color: white;
-            padding: 8px 12px;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-            margin-top: 10px;
-            font-size: 1rem;
-        }
+    .question-input {
+        padding: 8px;
+        width: 100%;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
 
-        .view-more-btn:hover {
-            background-color: #45a049;
-        }
-    </style>
+    .ask-btn {
+        background-color: #007BFF;
+        color: white;
+        padding: 6px 12px;
+        border: none;
+        cursor: pointer;
+        border-radius: 5px;
+        font-size: 1rem;
+    }
+
+    .ask-btn:hover {
+        background-color: #0056b3;
+    }
+
+    .ai-answer {
+        font-size: 1rem;
+        color: #333;
+        margin-top: 5px;
+        padding: 10px;
+        background: #f8f8f8;
+        border-radius: 5px;
+    }
+</style>
 
 <script>
-   document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function() {
     document.querySelectorAll(".view-more-btn").forEach(button => {
         button.addEventListener("click", function() {
             let insightText = this.getAttribute("data-insight");
-            let detailedPost = this.parentElement.querySelector(".detailed-post");
+            let postContent = this.parentElement;
+            let detailedPost = postContent.querySelector(".detailed-post");
+            let qaSection = postContent.querySelector(".qa-section");
 
             if (detailedPost.style.display === "block") {
                 detailedPost.style.display = "none";
+                qaSection.style.display = "none";
                 this.textContent = "View More";
                 return;
             }
@@ -116,12 +160,59 @@
                 .then(data => {
                     detailedPost.textContent = data.detailed_post;
                     detailedPost.style.display = "block";
+                    qaSection.style.display = "block";
                     this.textContent = "Show Less";
                 })
                 .catch(error => console.error("Error fetching extended insight:", error));
         });
     });
-});
 
+    document.addEventListener("click", function(event) {
+        if (event.target.classList.contains("ask-btn")) {
+            let postContent = event.target.closest(".post-content");
+            let questionInput = postContent.querySelector(".question-input");
+            let qaHistory = postContent.querySelector(".qa-history");
+            let insightText = postContent.querySelector(".post-data").textContent;
+            let question = questionInput.value.trim();
+
+            if (!question) {
+                alert("Please enter a question.");
+                return;
+            }
+
+            event.target.textContent = "Thinking...";
+            event.target.disabled = true;
+
+            let previousQA = "";
+            qaHistory.querySelectorAll(".ai-answer").forEach(ans => {
+                previousQA += ans.textContent + "\n";
+            });
+
+            fetch("/ai_posts/chat/", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ 
+                    question: question, 
+                    story: `${insightText}\n${previousQA}`
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                let aiAnswer = document.createElement("p");
+                aiAnswer.classList.add("ai-answer");
+                aiAnswer.textContent = `Q: ${question} \nA: ${data.response}`;
+                qaHistory.appendChild(aiAnswer);
+                questionInput.value = "";
+                event.target.textContent = "Get Answer";
+                event.target.disabled = false;
+            })
+            .catch(error => {
+                console.error("Error getting AI response:", error);
+                event.target.textContent = "Get Answer";
+                event.target.disabled = false;
+            });
+        }
+    });
+});
 </script>
 {% endblock %}

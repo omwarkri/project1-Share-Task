@@ -1,218 +1,711 @@
 {% extends "task/base.html" %}
 
 {% block content %}
-<h1>📢 Insights for You</h1>
+<div class="insights-container">
+    <header class="insights-header">
+        <h1><i class="fas fa-lightbulb"></i> AI Insights for You</h1>
+        <p class="subtitle">Discover personalized insights powered by AI</p>
+    </header>
 
-<div class="post-container">
-    {% for item in posts %}
-        <div class="post-card">
-            <div class="post-icon">
-                <i class="fas fa-lightbulb"></i>
-            </div>
-            <div class="post-content">
-                <p class="post-data">{{ item.post }}</p>
-                <p class="detailed-post" style="display: none;"></p>
-                
-                <button class="view-more-btn" data-insight="{{ item.post }}">View More</button>
-                
-                <div class="qa-section" style="display: none;">
-                    <input type="text" class="question-input" placeholder="Ask a question..." />
-                    <button class="ask-btn">Get Answer</button>
-                    <div class="qa-history"></div>
-                </div>
-            </div>
+    <div class="filter-controls">
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Search insights..." id="insight-search">
         </div>
-    {% endfor %}
+        <div class="sort-options">
+            <label for="sort-by">Sort by:</label>
+            <select id="sort-by">
+                <option value="recent">Most Recent</option>
+                <option value="relevant">Most Relevant</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="posts-wrapper">
+        <div class="post-container">
+            {% for item in posts %}
+                <div class="post-card">
+                    <div class="post-header">
+                        <div class="post-icon">
+                            <i class="fas fa-{{ item.icon|default:'lightbulb' }}"></i>
+                        </div>
+                        <div class="post-meta">
+                            <span class="post-category">{{ item.category|default:"General" }}</span>
+                            <span class="post-date">{{ item.date|default:"Today" }}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="post-content">
+                        <p class="post-summary">{{ item.post }}</p>
+                        <div class="detailed-post" style="display: none;"></div>
+                        
+                        <div class="post-actions">
+                            <button class="view-more-btn" data-insight="{{ item.post }}">
+                                <i class="fas fa-chevron-down"></i> Expand Insight
+                            </button>
+                            <button class="save-btn">
+                                <i class="far fa-bookmark"></i> Save
+                            </button>
+                        </div>
+                        
+                        <div class="qa-section" style="display: none;">
+                            <h3>Ask About This Insight</h3>
+                            <div class="question-input-container">
+                                <input type="text" class="question-input" placeholder="What would you like to know about this?" />
+                                <button class="ask-btn">
+                                    <i class="fas fa-paper-plane"></i> Ask AI
+                                </button>
+                            </div>
+                            <div class="qa-history"></div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="load-more-container">
+        <button class="load-more-btn">Load More Insights</button>
+    </div>
 </div>
 
 <style>
-    h1 {
-        font-size: 1.8rem;
-        color: #4a90e2;
-        text-align: center;
-        margin-bottom: 20px;
-    }
+:root {
+    --primary-color: #5a67d8;
+    --secondary-color: #4c51bf;
+    --accent-color: #667eea;
+    --light-accent: #a3bffa;
+    --success-color: #48bb78;
+    --warning-color: #ed8936;
+    --danger-color: #f56565;
+    --light-gray: #f7fafc;
+    --medium-gray: #e2e8f0;
+    --dark-gray: #718096;
+    --text-color: #2d3748;
+    --card-bg: #ffffff;
+    --card-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    --card-hover-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
 
+body {
+    background-color: #f8f9fa;
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.insights-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 1.5rem;
+    color: var(--text-color);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+}
+
+.insights-header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    flex-shrink: 0;
+}
+
+.insights-header h1 {
+    font-size: 2.2rem;
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    font-weight: 600;
+}
+
+.insights-header .subtitle {
+    font-size: 1rem;
+    color: var(--dark-gray);
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.5;
+}
+
+.filter-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding: 0.5rem 0;
+    flex-shrink: 0;
+}
+
+.search-box {
+    position: relative;
+    flex: 1;
+    min-width: 250px;
+    max-width: 400px;
+}
+
+.search-box i {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--dark-gray);
+    font-size: 0.9rem;
+}
+
+.search-box input {
+    width: 100%;
+    padding: 0.65rem 1rem 0.65rem 2.25rem;
+    border: 1px solid var(--medium-gray);
+    border-radius: 8px;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+    background-color: white;
+}
+
+.search-box input:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.sort-options {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.sort-options label {
+    font-size: 0.9rem;
+    color: var(--dark-gray);
+}
+
+.sort-options select {
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    border: 1px solid var(--medium-gray);
+    background-color: white;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.posts-wrapper {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 1rem;
+    padding: 0.5rem 0.5rem 1rem 0;
+}
+
+.post-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.25rem;
+    align-content: flex-start;
+}
+
+.post-card {
+    background: var(--card-bg);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--card-shadow);
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--medium-gray);
+    grid-column: span 1;
+}
+
+.post-card.expanded {
+    grid-column: span 2;
+    z-index: 10;
+    position: relative;
+}
+
+.post-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--card-hover-shadow);
+    border-color: var(--light-accent);
+}
+
+.post-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1rem 0;
+}
+
+.post-icon {
+    font-size: 1rem;
+    color: white;
+    background: linear-gradient(135deg, var(--accent-color), var(--primary-color));
+    padding: 10px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+}
+
+.post-meta {
+    display: flex;
+    flex-direction: column;
+}
+
+.post-category {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--primary-color);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.post-date {
+    font-size: 0.75rem;
+    color: var(--dark-gray);
+}
+
+.post-content {
+    padding: 1rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.post-summary {
+    font-size: 1rem;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+    color: var(--text-color);
+}
+
+.detailed-post {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--text-color);
+    margin-bottom: 1.25rem;
+    padding: 1rem;
+    background-color: var(--light-gray);
+    border-radius: 8px;
+    border-left: 3px solid var(--accent-color);
+}
+
+.post-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: auto;
+}
+
+.view-more-btn, .save-btn, .ask-btn, .load-more-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.65rem 1rem;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+    font-size: 0.9rem;
+}
+
+.view-more-btn {
+    background-color: var(--primary-color);
+    color: white;
+    flex: 1;
+}
+
+.view-more-btn:hover {
+    background-color: var(--secondary-color);
+}
+
+.save-btn {
+    background-color: white;
+    color: var(--dark-gray);
+    border: 1px solid var(--medium-gray);
+    padding: 0.65rem;
+}
+
+.save-btn:hover {
+    background-color: var(--light-gray);
+    color: var(--text-color);
+}
+
+.save-btn.saved {
+    color: var(--warning-color);
+    border-color: rgba(237, 137, 54, 0.2);
+}
+
+.qa-section {
+    margin-top: 1.25rem;
+    padding-top: 1.25rem;
+    border-top: 1px dashed var(--medium-gray);
+}
+
+.qa-section h3 {
+    font-size: 1rem;
+    margin-bottom: 0.75rem;
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+.question-input-container {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.question-input {
+    flex: 1;
+    padding: 0.65rem 1rem;
+    border: 1px solid var(--medium-gray);
+    border-radius: 8px;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+    background-color: white;
+}
+
+.question-input:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.ask-btn {
+    background-color: var(--success-color);
+    color: white;
+    white-space: nowrap;
+    padding: 0.65rem 1rem;
+}
+
+.ask-btn:hover {
+    background-color: #3d9b6b;
+}
+
+.ask-btn:disabled {
+    background-color: var(--medium-gray);
+    cursor: not-allowed;
+}
+
+.qa-history {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.ai-answer {
+    background-color: white;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    position: relative;
+    border: 1px solid var(--medium-gray);
+}
+
+.ai-answer::before {
+    content: "AI:";
+    font-weight: bold;
+    color: var(--primary-color);
+    margin-right: 0.5rem;
+}
+
+.load-more-container {
+    text-align: center;
+    margin-top: 0.5rem;
+    padding: 0.5rem 0;
+    flex-shrink: 0;
+}
+
+.load-more-btn {
+    background-color: white;
+    color: var(--primary-color);
+    border: 1px solid var(--primary-color);
+    padding: 0.75rem 1.5rem;
+    margin: 0 auto;
+}
+
+.load-more-btn:hover {
+    background-color: rgba(90, 103, 216, 0.05);
+}
+
+/* Custom scrollbar */
+.posts-wrapper::-webkit-scrollbar {
+    width: 8px;
+}
+
+.posts-wrapper::-webkit-scrollbar-track {
+    background: var(--light-gray);
+    border-radius: 4px;
+}
+
+.posts-wrapper::-webkit-scrollbar-thumb {
+    background: var(--medium-gray);
+    border-radius: 4px;
+}
+
+.posts-wrapper::-webkit-scrollbar-thumb:hover {
+    background: var(--dark-gray);
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+    .post-card.expanded {
+        grid-column: span 1;
+    }
+}
+
+@media (max-width: 768px) {
     .post-container {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 20px;
-        justify-content: center;
-        overflow-y: auto;
-        max-height: 80vh;
+        grid-template-columns: 1fr;
     }
-
-    .post-card {
-        width: 100%;
-        max-width: 600px;
-        padding: 20px;
-        border-radius: 12px;
-        background: #ffffff;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    
+    .filter-controls {
         flex-direction: column;
-        text-align: center;
+        align-items: stretch;
     }
-
-    .post-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    
+    .search-box {
+        max-width: 100%;
     }
-
-    .post-icon {
-        font-size: 1.5rem;
-        color: #ff6b6b;
-        background: #ffe1e1;
-        padding: 15px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 50px;
-        height: 50px;
+    
+    .insights-container {
+        padding: 1rem;
+        height: auto;
     }
-
-    .post-content {
-        flex: 1;
+    
+    .posts-wrapper {
+        overflow-y: visible;
     }
+}
 
-    .post-content p {
-        font-size: 1.1rem;
-        color: #333;
-        margin: 0;
-        line-height: 1.6;
+@media (max-width: 480px) {
+    .insights-header h1 {
+        font-size: 1.8rem;
     }
-
-    .view-more-btn {
-        background-color: #4CAF50;
-        color: white;
-        padding: 8px 12px;
-        border: none;
-        cursor: pointer;
-        border-radius: 5px;
-        margin-top: 10px;
-        font-size: 1rem;
-    }
-
-    .view-more-btn:hover {
-        background-color: #45a049;
-    }
-
-    .qa-section {
-        margin-top: 10px;
-        display: flex;
+    
+    .post-actions {
         flex-direction: column;
-        gap: 8px;
     }
-
-    .question-input {
-        padding: 8px;
+    
+    .view-more-btn, .save-btn {
         width: 100%;
-        border: 1px solid #ccc;
-        border-radius: 5px;
     }
-
+    
+    .question-input-container {
+        flex-direction: column;
+    }
+    
     .ask-btn {
-        background-color: #007BFF;
-        color: white;
-        padding: 6px 12px;
-        border: none;
-        cursor: pointer;
-        border-radius: 5px;
-        font-size: 1rem;
+        width: 100%;
     }
-
-    .ask-btn:hover {
-        background-color: #0056b3;
-    }
-
-    .ai-answer {
-        font-size: 1rem;
-        color: #333;
-        margin-top: 5px;
-        padding: 10px;
-        background: #f8f8f8;
-        border-radius: 5px;
-    }
+}
 </style>
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
+    // View more/less toggle functionality
     document.querySelectorAll(".view-more-btn").forEach(button => {
         button.addEventListener("click", function() {
-            let insightText = this.getAttribute("data-insight");
-            let postContent = this.parentElement;
-            let detailedPost = postContent.querySelector(".detailed-post");
-            let qaSection = postContent.querySelector(".qa-section");
-
+            const postCard = this.closest(".post-card");
+            const detailedPost = postCard.querySelector(".detailed-post");
+            const qaSection = postCard.querySelector(".qa-section");
+            const icon = this.querySelector("i");
+            
             if (detailedPost.style.display === "block") {
+                // Collapse the content
                 detailedPost.style.display = "none";
                 qaSection.style.display = "none";
-                this.textContent = "View More";
-                return;
+                this.innerHTML = '<i class="fas fa-chevron-down"></i> Expand Insight';
+                icon.className = "fas fa-chevron-down";
+            } else {
+                // Expand the content
+                const insightText = this.getAttribute("data-insight");
+                
+                // Show loading state
+                const originalText = this.innerHTML;
+                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+                this.disabled = true;
+                
+                fetch(`/ai_posts/extended?insight=${encodeURIComponent(insightText)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        detailedPost.innerHTML = data.detailed_post;
+                        detailedPost.style.display = "block";
+                        qaSection.style.display = "block";
+                        this.innerHTML = '<i class="fas fa-chevron-up"></i> Show Less';
+                        this.disabled = false;
+                        
+                        // Smooth scroll to show the expanded content
+                        detailedPost.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    })
+                    .catch(error => {
+                        console.error("Error fetching extended insight:", error);
+                        detailedPost.innerHTML = '<p class="error">Could not load additional details. Please try again.</p>';
+                        detailedPost.style.display = "block";
+                        this.innerHTML = originalText;
+                        this.disabled = false;
+                    });
             }
-
-            fetch(`/ai_posts/extended?insight=${encodeURIComponent(insightText)}`)
-                .then(response => response.json())
-                .then(data => {
-                    detailedPost.textContent = data.detailed_post;
-                    detailedPost.style.display = "block";
-                    qaSection.style.display = "block";
-                    this.textContent = "Show Less";
-                })
-                .catch(error => console.error("Error fetching extended insight:", error));
         });
     });
-
+    
+    // Save button functionality
+    document.querySelectorAll(".save-btn").forEach(button => {
+        button.addEventListener("click", function() {
+            this.classList.toggle("saved");
+            const isSaved = this.classList.contains("saved");
+            
+            if (isSaved) {
+                this.innerHTML = '<i class="fas fa-bookmark"></i> Saved';
+                // Here you would typically make an API call to save the insight
+            } else {
+                this.innerHTML = '<i class="far fa-bookmark"></i> Save';
+                // Here you would typically make an API call to unsave the insight
+            }
+        });
+    });
+    
+    // Ask AI functionality
     document.addEventListener("click", function(event) {
-        if (event.target.classList.contains("ask-btn")) {
-            let postContent = event.target.closest(".post-content");
-            let questionInput = postContent.querySelector(".question-input");
-            let qaHistory = postContent.querySelector(".qa-history");
-            let insightText = postContent.querySelector(".post-data").textContent;
-            let question = questionInput.value.trim();
-
+        if (event.target.classList.contains("ask-btn") || 
+            event.target.closest(".ask-btn")) {
+            const askBtn = event.target.classList.contains("ask-btn") ? 
+                event.target : event.target.closest(".ask-btn");
+                
+            const postCard = askBtn.closest(".post-card");
+            const questionInput = postCard.querySelector(".question-input");
+            const qaHistory = postCard.querySelector(".qa-history");
+            const insightText = postCard.querySelector(".post-summary").textContent;
+            const question = questionInput.value.trim();
+            
             if (!question) {
-                alert("Please enter a question.");
+                alert("Please enter a question before asking.");
                 return;
             }
-
-            event.target.textContent = "Thinking...";
-            event.target.disabled = true;
-
-            let previousQA = "";
-            qaHistory.querySelectorAll(".ai-answer").forEach(ans => {
-                previousQA += ans.textContent + "\n";
-            });
-
+            
+            // Disable button and show loading state
+            askBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Thinking...';
+            askBtn.disabled = true;
+            
+            // Add user question to history immediately
+            const userQuestionElement = document.createElement("div");
+            userQuestionElement.className = "ai-answer";
+            userQuestionElement.innerHTML = `<strong>You:</strong> ${question}`;
+            qaHistory.appendChild(userQuestionElement);
+            
+            // Collect context for the AI
+            let context = insightText;
+            const detailedPost = postCard.querySelector(".detailed-post");
+            if (detailedPost.style.display === "block") {
+                context += "\n\nAdditional details:\n" + detailedPost.textContent;
+            }
+            
+            // Get previous Q&A for context
+            const previousQA = Array.from(qaHistory.querySelectorAll(".ai-answer"))
+                .map(el => el.textContent)
+                .join("\n");
+            
             fetch("/ai_posts/chat/", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: { 
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": getCookie("csrftoken")
+                },
                 body: JSON.stringify({ 
-                    question: question, 
-                    story: `${insightText}\n${previousQA}`
+                    question: question,
+                    story: context,
+                    previous_qa: previousQA
                 })
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Network response was not ok");
+                }
+                return response.json();
+            })
             .then(data => {
-                let aiAnswer = document.createElement("p");
-                aiAnswer.classList.add("ai-answer");
-                aiAnswer.textContent = `Q: ${question} \nA: ${data.response}`;
-                qaHistory.appendChild(aiAnswer);
+                const aiAnswerElement = document.createElement("div");
+                aiAnswerElement.className = "ai-answer";
+                aiAnswerElement.textContent = data.response;
+                qaHistory.appendChild(aiAnswerElement);
+                
+                // Clear input and reset button
                 questionInput.value = "";
-                event.target.textContent = "Get Answer";
-                event.target.disabled = false;
+                askBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Ask AI';
+                askBtn.disabled = false;
+                
+                // Scroll to the new answer
+                aiAnswerElement.scrollIntoView({ behavior: 'smooth' });
             })
             .catch(error => {
                 console.error("Error getting AI response:", error);
-                event.target.textContent = "Get Answer";
-                event.target.disabled = false;
+                
+                const errorElement = document.createElement("div");
+                errorElement.className = "ai-answer error";
+                errorElement.textContent = "Sorry, there was an error getting a response. Please try again.";
+                qaHistory.appendChild(errorElement);
+                
+                askBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Ask AI';
+                askBtn.disabled = false;
             });
         }
     });
+    
+    // Search functionality
+    const searchInput = document.getElementById("insight-search");
+    if (searchInput) {
+        searchInput.addEventListener("input", function() {
+            const searchTerm = this.value.toLowerCase();
+            document.querySelectorAll(".post-card").forEach(card => {
+                const text = card.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    card.style.display = "flex";
+                } else {
+                    card.style.display = "none";
+                }
+            });
+        });
+    }
+    
+    // Load more button functionality
+    const loadMoreBtn = document.querySelector(".load-more-btn");
+    if (loadMoreBtn) {
+        loadMoreBtn.addEventListener("click", function() {
+            // This would typically make an API call to load more insights
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+            this.disabled = true;
+            
+            // Simulate loading delay
+            setTimeout(() => {
+                alert("In a real implementation, this would load more insights from the server.");
+                this.innerHTML = 'Load More Insights';
+                this.disabled = false;
+            }, 1500);
+        });
+    }
+    
+    // Helper function to get CSRF token
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
 });
 </script>
 {% endblock %}

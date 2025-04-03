@@ -1,0 +1,158 @@
+{% extends "task/base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2 class="meme-title">😂 AI-Generated Memes (So Funny You'll Forget to Breathe!)</h2>
+
+    <div class="meme-scroll-container">
+        <div class="meme-container">
+            {% for meme in memes %}
+                <div class="meme-box">
+                    <p class="meme-text">{{ meme.meme_text }}</p>
+                    <div class="meme-footer">
+                        <span class="meme-tag">#AI</span>
+                        <span class="meme-tag">#Meme</span>
+                        <span class="meme-tag">#{{ forloop.counter }}Funny</span>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="disclaimer">⚠️ Warning: Side effects may include uncontrollable laughter, snorting, and questioning reality</div>
+</div>
+
+<style>
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        font-family: 'Comic Sans MS', cursive, sans-serif;
+    }
+    
+    .meme-title {
+        text-align: center;
+        color: #ff00aa;
+        margin-bottom: 30px;
+        font-family: 'Comic Sans MS', cursive, sans-serif;
+        text-shadow: 3px 3px 0px #00ffff;
+        font-size: 2.5rem;
+        animation: rainbow 5s infinite;
+    }
+
+    .meme-scroll-container {
+        overflow-x: auto;
+        padding-bottom: 20px;
+        margin-bottom: 30px;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .meme-container {
+        display: inline-flex;
+        gap: 25px;
+        padding: 20px;
+    }
+
+    .meme-box {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 8px 8px 0px #ff00aa;
+        transition: all 0.3s ease;
+        border: 4px dashed #00ffff;
+        font-family: 'Impact', sans-serif;
+        position: relative;
+        min-width: 300px;
+        flex-shrink: 0;
+    }
+
+    .meme-box:hover {
+        transform: rotate(-2deg) scale(1.05);
+        box-shadow: 12px 12px 0px #00ffff;
+    }
+
+    .meme-text {
+        padding: 30px 20px;
+        margin: 0;
+        font-size: 28px;
+        line-height: 1.2;
+        text-align: center;
+        color: #333;
+        text-transform: uppercase;
+        text-shadow: 2px 2px 0px rgba(0,0,0,0.1);
+        background: linear-gradient(to bottom, #fff9c4, #ffeb3b);
+        min-height: 200px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        word-break: break-word;
+    }
+
+    .meme-footer {
+        padding: 15px;
+        background: linear-gradient(to right, #ff00aa, #00ffff);
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .meme-tag {
+        color: white;
+        font-size: 14px;
+        font-family: 'Comic Sans MS', cursive, sans-serif;
+        background: rgba(0,0,0,0.3);
+        padding: 3px 8px;
+        border-radius: 20px;
+    }
+
+    .disclaimer {
+        text-align: center;
+        font-size: 14px;
+        color: #666;
+        font-style: italic;
+        margin-top: 20px;
+        padding: 10px;
+        background: #f0f0f0;
+        border-radius: 5px;
+        border-left: 5px solid #ff00aa;
+    }
+
+    @keyframes rainbow {
+        0% { color: #ff00aa; }
+        20% { color: #00ffff; }
+        40% { color: #ff9900; }
+        60% { color: #aa00ff; }
+        80% { color: #00ffaa; }
+        100% { color: #ff00aa; }
+    }
+
+    @media (max-width: 768px) {
+        .meme-title {
+            font-size: 1.8rem;
+        }
+        
+        .meme-text {
+            font-size: 22px;
+            min-height: 150px;
+        }
+        
+        .meme-container {
+            padding: 10px;
+        }
+    }
+
+    /* Scrollbar styling */
+    .meme-scroll-container::-webkit-scrollbar {
+        height: 12px;
+    }
+
+    .meme-scroll-container::-webkit-scrollbar-track {
+        background: #f0f0f0;
+        border-radius: 10px;
+    }
+
+    .meme-scroll-container::-webkit-scrollbar-thumb {
+        background: linear-gradient(to right, #ff00aa, #00ffff);
+        border-radius: 10px;
+    }
+</style>
+{% endblock %}

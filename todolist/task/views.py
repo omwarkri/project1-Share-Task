@@ -2179,39 +2179,66 @@ def ai_chat(request):
     return JsonResponse({"error": "Invalid request"}, status=400)
 
 
+
+
+
 import json
 from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import login_required
 import google.generativeai as genai
 
-@csrf_exempt
-def ai_chat(request):
-    if request.method == "POST":
-        data = json.loads(request.body)
-        question = data.get("question")
-        story = data.get("story")
+@login_required
+def get_ai_memes(request):
+    """Generate meme captions based on user tasks."""
+    user = request.user
+    tasks = Task.objects.filter(user=user).order_by("-created_at")[:10]
+    task_titles = [task.title for task in tasks]
 
-        if not question or not story:
-            return JsonResponse({"error": "Missing question or story"}, status=400)
-
-        # Initialize Gemini model
-        model = genai.GenerativeModel("gemini-1.5-flash")
-
-        prompt = f"Based on this story: {story}, answer relate quetion as well other than story: {question}"
-
-        try:
-            response = model.generate_content(prompt)
-            
-            # Extract AI response safely
-            if response and response.candidates and response.candidates[0].content.parts:
-                answer = response.candidates[0].content.parts[0].text.strip()
-            else:
-                answer = "I couldn't generate a response. Please try again."
-
-        except Exception as e:
-            print("Error:", e)  # Log error for debugging
-            answer = "AI is currently unavailable. Please try again later."
-
-        return JsonResponse({"response": answer})
+    model = genai.GenerativeModel("gemini-1.5-flash")
+    prompt = f"""
+    User has recently planned or completed these tasks: {task_titles}.
     
-    return JsonResponse({"error": "Invalid request"}, status=400)
+    Generate **10 funny meme captions** based on these tasks. Captions should be:
+    - Witty and humorous
+    - Relatable to productivity, motivation, or daily struggles
+    - Short (1-2 lines max)
+
+    **Return ONLY a valid JSON array. No markdown. No explanations. Just JSON.**
+    Example:
+    [
+        {{"meme_text": "When you finish a task and realize there's more waiting..." }},
+        {{"meme_text": "That feeling when you check off a task but forget to save your progress..." }},
+        {{"meme_text": "When the deadline is tomorrow, and you haven't even started..." }}
+    ]
+    """
+
+    try:
+        response = model.generate_content(prompt)
+        ai_text = response.candidates[0].content.parts[0].text.strip()
+        print("Raw AI Response:", ai_text)  # Debugging
+
+        # Ensure AI returns only JSON (no markdown backticks)
+        if ai_text.startswith("```json"):
+            json_text = ai_text.split("```json")[1].strip("``` \n")
+        else:
+            json_text = ai_text  # Assume raw JSON
+
+        memes = json.loads(json_text)  # Convert JSON string to Python list
+    except (IndexError, json.JSONDecodeError, KeyError) as e:
+        print("JSON Parsing Error:", str(e))  # Debugging
+        memes = [{"meme_text": "AI response is not valid JSON format. Please try again."}]
+
+    return JsonResponse({"memes": memes})
+
+
+
+
+@login_required
+def ai_memes(request):
+    """Fetch AI-generated meme captions and display them in HTML."""
+    response = get_ai_memes(request)
+    memes_data = json.loads(response.content)  
+    memes = memes_data.get("memes", [])  # Extract AI-generated captions
+    print(memes)
+    return render(request, "memes/ai_memes.html", {"memes": memes})
+

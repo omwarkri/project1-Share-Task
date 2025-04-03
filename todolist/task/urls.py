@@ -46,5 +46,11 @@ urlpatterns = [
     path("ai_posts/extended/", get_extended_insight, name="extended_insight"),
 
     path("ai_posts/chat/", ai_chat, name="ai_chat"),
+
+
+    path("ai-stories/", ai_stories, name="ai_stories"),
+
+
+    path("ai-memes/", ai_memes, name="ai_memes"),
   
 ]

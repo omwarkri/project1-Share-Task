@@ -2242,3 +2242,68 @@ def ai_memes(request):
     print(memes)
     return render(request, "memes/ai_memes.html", {"memes": memes})
 
+
+
+import json
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+import google.generativeai as genai
+
+@login_required
+def get_ai_quotes(request):
+    """Generate motivational quotes based on user tasks."""
+    user = request.user
+    tasks = Task.objects.filter(user=user).order_by("-created_at")[:10]
+    task_titles = [task.title for task in tasks]
+
+    model = genai.GenerativeModel("gemini-1.5-flash")
+    prompt = f"""
+    User has recently planned or completed these tasks: {task_titles}.
+    
+    Generate **10 motivational quotes** based on these tasks. Quotes should be:
+    - Inspiring and uplifting
+    - Related to productivity, hard work, and success
+    - Short (1-2 sentences max)
+
+    **Return ONLY a valid JSON array. No markdown. No explanations. Just JSON.**
+    Example:
+    [
+        {{"quote_text": "Success is not final, failure is not fatal: it is the courage to continue that counts."}},
+        {{"quote_text": "Believe in yourself and all that you are. Know that there is something inside you greater than any obstacle."}},
+        {{"quote_text": "Great things never come from comfort zones."}}
+    ]
+    """
+
+    try:
+        response = model.generate_content(prompt)
+        ai_text = response.candidates[0].content.parts[0].text.strip()
+        print("Raw AI Response:", ai_text)  # Debugging
+
+        # Ensure AI returns only JSON (no markdown backticks)
+        if ai_text.startswith("```json"):
+            json_text = ai_text.split("```json")[1].strip("``` \n")
+        else:
+            json_text = ai_text  # Assume raw JSON
+
+        quotes = json.loads(json_text)  # Convert JSON string to Python list
+    except (IndexError, json.JSONDecodeError, KeyError) as e:
+        print("JSON Parsing Error:", str(e))  # Debugging
+        quotes = [{"quote_text": "AI response is not valid JSON format. Please try again."}]
+
+    return JsonResponse({"quotes": quotes})
+
+
+from django.shortcuts import render
+import json
+import google.generativeai as genai
+
+@login_required
+def ai_quotes(request):
+    """Fetch AI-generated motivational quotes and render them in HTML."""
+    response = get_ai_quotes(request)
+    quotes_data = json.loads(response.content)  # Convert JSONResponse to Python dict
+    quotes = quotes_data.get("quotes", [])
+
+    return render(request, "motivation/ai_quotes.html", {"quotes": quotes})
+
+

@@ -52,5 +52,8 @@ urlpatterns = [
 
 
     path("ai-memes/", ai_memes, name="ai_memes"),
+    path("ai-motivational-quotes/", ai_quotes, name="ai_motivational_quotes"),
+
+
   
 ]

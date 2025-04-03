@@ -1,0 +1,170 @@
+{% extends "task/base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2 class="page-title">✨ Motivational Quotes ✨</h2>
+    
+    <div class="quotes-scroll-container">
+        <div class="quotes-container">
+            {% for quote in quotes %}
+                <div class="quote-card">
+                    <div class="quote-content">
+                        <span class="quote-mark quote-start">“</span>
+                        <p class="quote-text">{{ quote.quote_text }}</p>
+                        <span class="quote-mark quote-end">”</span>
+                    </div>
+                    <div class="quote-footer">
+                        <span class="quote-category">Inspiration</span>
+                        <span class="quote-number">#{{ forloop.counter }}</span>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="empty-state">
+                    <img src="https://cdn-icons-png.flaticon.com/512/4076/4076478.png" alt="No quotes" class="empty-icon">
+                    <p class="empty-text">No quotes available right now. The universe is thinking of something great for you!</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --primary-color: #4a6bff;
+        --secondary-color: #ff7e5f;
+        --text-color: #333;
+        --light-bg: #f8f9fa;
+        --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    body {
+        overflow-y: auto; /* Ensure whole page can scroll */
+    }
+
+    .container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        min-height: 100vh; /* Ensure container takes at least full viewport height */
+    }
+
+    .page-title {
+        text-align: center;
+        color: var(--primary-color);
+        margin: 30px 0;
+        font-size: 2.5rem;
+        font-weight: 700;
+        text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .quotes-scroll-container {
+        max-height: 70vh; /* Limit height and enable scrolling */
+        overflow-y: auto; /* Enable vertical scrolling */
+        padding-right: 10px; /* Prevent scrollbar overlap */
+        margin: 40px 0;
+    }
+
+    .quotes-container {
+        display: flex;
+        flex-direction: column;
+        gap: 25px;
+        padding-bottom: 20px; /* Extra space at bottom */
+    }
+
+    .quote-card {
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        box-shadow: var(--shadow);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .quote-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .quote-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 5px;
+        height: 100%;
+        background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
+    }
+
+    .quote-content {
+        position: relative;
+        padding-left: 20px;
+    }
+
+    .quote-text {
+        font-size: 1.25rem;
+        line-height: 1.6;
+        color: var(--text-color);
+        margin: 0;
+        font-style: italic;
+        position: relative;
+    }
+
+    .quote-mark {
+        position: absolute;
+        font-size: 4rem;
+        color: rgba(74, 107, 255, 0.1);
+        font-family: Georgia, serif;
+    }
+
+    .quote-start {
+        top: -20px;
+        left: -15px;
+    }
+
+    .quote-end {
+        bottom: -40px;
+        right: -10px;
+    }
+
+    .quote-footer {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+        font-size: 0.9rem;
+    }
+
+    /* Custom scrollbar */
+    .quotes-scroll-container::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .quotes-scroll-container::-webkit-scrollbar-track {
+        background: var(--light-bg);
+        border-radius: 10px;
+    }
+
+    .quotes-scroll-container::-webkit-scrollbar-thumb {
+        background: linear-gradient(var(--primary-color), var(--secondary-color));
+        border-radius: 10px;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .quotes-scroll-container {
+            max-height: 65vh;
+        }
+        
+        .quote-card {
+            padding: 20px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .quotes-scroll-container {
+            max-height: 60vh;
+        }
+    }
+</style>
+{% endblock %}

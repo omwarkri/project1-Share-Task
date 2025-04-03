@@ -502,24 +502,27 @@
                     </button>
                 </li>
                 <li>
-                    <a id="feed-link" class="sidebar-link" href="{% url 'stories' %}" title="AI Stories">
-                        <i class="fas fa-book-open"></i> Insights
+                    <a id="memes-link" class="sidebar-link" href="{% url 'ai_memes' %}">
+                        <i class="fas fa-grin-squint-tears"></i> Memes
                     </a>
                 </li>
                 <li>
-                    <a id="feed-link" class="sidebar-link" href="{% url 'ai_memes' %}" title="AI Stories">
-                        <i class="fas fa-book-open"></i> Memes
+                    <a id="insights-link" class="sidebar-link" href="{% url 'stories' %}">
+                        <i class="fas fa-lightbulb"></i> Insights
+                    </a>
+                </li>
+                <li>
+                    <a id="motivation-link" class="sidebar-link" href="{% url 'ai_motivational_quotes' %}">
+                        <i class="fas fa-fire"></i> Motivation
                     </a>
                 </li>
                 <li>
                     <a id="feed-link" class="sidebar-link" href="{% url 'completed_tasks_feed' %}?filter_type=image">
-                        <i class="fas fa-rss"></i> Feed
+                        <i class="fas fa-newspaper"></i> Feed
                     </a>
                 </li>
             </ul>
-            <button class="add-task" class="sidebar-link" onclick="openAddTaskModal()">
-                <i class="fas fa-plus"></i> Add Task
-            </button>
+       
         </div>
         <div class="sidebar-footer">
             <div class="logout">

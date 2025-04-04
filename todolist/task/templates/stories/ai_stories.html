@@ -2,77 +2,76 @@
 
 {% block content %}
 <div class="insights-container">
-    <header class="insights-header">
-        <h1><i class="fas fa-lightbulb"></i> AI Insights for You</h1>
-        <p class="subtitle">Discover personalized insights powered by AI</p>
-    </header>
-
-    <div class="filter-controls">
-        <div class="search-box">
-            <i class="fas fa-search"></i>
-            <input type="text" placeholder="Search insights..." id="insight-search">
+    <div class="insight-container-wrapper">
+      
+    
+        <div class="filter-controls">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Search insights..." id="insight-search">
+            </div>
+            <div class="sort-options">
+                <label for="sort-by">Sort by:</label>
+                <select id="sort-by">
+                    <option value="recent">Most Recent</option>
+                    <option value="relevant">Most Relevant</option>
+                </select>
+            </div>
         </div>
-        <div class="sort-options">
-            <label for="sort-by">Sort by:</label>
-            <select id="sort-by">
-                <option value="recent">Most Recent</option>
-                <option value="relevant">Most Relevant</option>
-            </select>
-        </div>
-    </div>
-
-    <div class="posts-wrapper">
-        <div class="post-container">
-            {% for item in posts %}
-                <div class="post-card">
-                    <div class="post-header">
-                        <div class="post-icon">
-                            <i class="fas fa-{{ item.icon|default:'lightbulb' }}"></i>
-                        </div>
-                        <div class="post-meta">
-                            <span class="post-category">{{ item.category|default:"General" }}</span>
-                            <span class="post-date">{{ item.date|default:"Today" }}</span>
-                        </div>
-                    </div>
-                    
-                    <div class="post-content">
-                        <p class="post-summary">{{ item.post }}</p>
-                        <div class="detailed-post" style="display: none;"></div>
-                        
-                        <div class="post-actions">
-                            <button class="view-more-btn" data-insight="{{ item.post }}">
-                                <i class="fas fa-chevron-down"></i> Expand Insight
-                            </button>
-                            <button class="save-btn">
-                                <i class="far fa-bookmark"></i> Save
-                            </button>
+    
+        <div class="posts-wrapper">
+            <div class="post-container">
+                {% for item in posts %}
+                    <div class="post-card">
+                        <div class="post-header">
+                            <div class="post-icon">
+                                <i class="fas fa-{{ item.icon|default:'lightbulb' }}"></i>
+                            </div>
+                            <div class="post-meta">
+                                <span class="post-category">{{ item.category|default:"General" }}</span>
+                                <span class="post-date">{{ item.date|default:"Today" }}</span>
+                            </div>
                         </div>
                         
-                        <div class="qa-section" style="display: none;">
-                            <h3>Ask About This Insight</h3>
-                            <div class="question-input-container">
-                                <input type="text" class="question-input" placeholder="What would you like to know about this?" />
-                                <button class="ask-btn">
-                                    <i class="fas fa-paper-plane"></i> Ask AI
+                        <div class="post-content">
+                            <p class="post-summary">{{ item.post }}</p>
+                            <div class="detailed-post" style="display: none;"></div>
+                            
+                            <div class="post-actions">
+                                <button class="view-more-btn" data-insight="{{ item.post }}">
+                                    <i class="fas fa-chevron-down"></i> Expand Insight
+                                </button>
+                                <button class="save-btn">
+                                    <i class="far fa-bookmark"></i> Save
                                 </button>
                             </div>
-                            <div class="qa-history"></div>
+                            
+                            <div class="qa-section" style="display: none;">
+                                <h3>Ask About This Insight</h3>
+                                <div class="question-input-container">
+                                    <input type="text" class="question-input" placeholder="What would you like to know about this?" />
+                                    <button class="ask-btn">
+                                        <i class="fas fa-paper-plane"></i> Ask AI
+                                    </button>
+                                </div>
+                                <div class="qa-history"></div>
+                            </div>
                         </div>
                     </div>
-                </div>
-            {% endfor %}
+                {% endfor %}
+            </div>
         </div>
-    </div>
-
-    <div class="load-more-container">
-        <button class="load-more-btn">Load More Insights</button>
+    
+        <div class="load-more-container">
+            <button class="load-more-btn">Load More Insights</button>
+        </div>
     </div>
 </div>
 
 <style>
 :root {
-    --primary-color: #23cdab;
-    --secondary-color: #1abc9c;
+    --primary-color: #4a6bff;
+    --secondary-color: #ff7e5f;
     --accent-color: #14ae8f;
     --light-accent: #1abc9cc8;
     --success-color: #48bb78;
@@ -81,18 +80,21 @@
     --light-gray: #f7fafc;
     --medium-gray: #e2e8f0;
     --dark-gray: #718096;
-    --text-color: #2d3748;
-    --card-bg: #ffffff;
+    --text-color: #333;
+    --card-bg: #f8f9f;
     --card-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     --card-hover-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-body {
-    background-color: #f8f9fa;
-    margin: 0;
-    padding: 0;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-}
+:root {
+       
+       
+        
+        --light-bg: #f8f9fa;
+        --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+
 
 .insights-container {
     max-width: 1400px;
@@ -103,15 +105,32 @@ body {
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
-    margin-top: 80px;
-
+   
 }
+
+.insight-container-wrapper{
+    overflow: auto;
+    padding-right: 8px;
+}
+
+.insight-container-wrapper::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .insight-container-wrapper::-webkit-scrollbar-track {
+        background: var(--light-bg);
+        border-radius: 10px;
+    }
+
+    .insight-container-wrapper::-webkit-scrollbar-thumb {
+        background: linear-gradient(var(--primary-color), var(--secondary-color));
+        border-radius: 10px;
+    }
 
 .insights-header {
     text-align: center;
     margin-bottom: 1.5rem;
     flex-shrink: 0;
-   
 }
 
 .insights-header h1 {
@@ -201,6 +220,7 @@ body {
     overflow-y: auto;
     margin-bottom: 1rem;
     padding: 0.5rem 0.5rem 1rem 0;
+    -webkit-overflow-scrolling: touch;
 }
 
 .post-container {
@@ -466,7 +486,8 @@ body {
 
 @media (max-width: 768px) {
     .post-container {
-        grid-template-columns: 1fr;
+        display: flex;
+        flex-direction: column;
     }
     
     .filter-controls {
@@ -478,13 +499,12 @@ body {
         max-width: 100%;
     }
     
-    .insights-container {
-        padding: 1rem;
-        height: auto;
-    }
+   
     
-    .posts-wrapper {
-        overflow-y: visible;
+    
+    
+    body {
+        overflow-y: auto;
     }
 }
 
@@ -513,6 +533,11 @@ body {
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
+    // Helper function to detect mobile
+    function isMobile() {
+        return window.innerWidth <= 768;
+    }
+
     // View more/less toggle functionality
     document.querySelectorAll(".view-more-btn").forEach(button => {
         button.addEventListener("click", function() {
@@ -545,8 +570,10 @@ document.addEventListener("DOMContentLoaded", function() {
                         this.innerHTML = '<i class="fas fa-chevron-up"></i> Show Less';
                         this.disabled = false;
                         
-                        // Smooth scroll to show the expanded content
-                        detailedPost.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                        // Smooth scroll only on desktop
+                        if (!isMobile()) {
+                            detailedPost.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                        }
                     })
                     .catch(error => {
                         console.error("Error fetching extended insight:", error);
@@ -644,8 +671,12 @@ document.addEventListener("DOMContentLoaded", function() {
                 askBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Ask AI';
                 askBtn.disabled = false;
                 
-                // Scroll to the new answer
-                aiAnswerElement.scrollIntoView({ behavior: 'smooth' });
+                // Scroll to the new answer (only smooth on desktop)
+                if (!isMobile()) {
+                    aiAnswerElement.scrollIntoView({ behavior: 'smooth' });
+                } else {
+                    aiAnswerElement.scrollIntoView();
+                }
             })
             .catch(error => {
                 console.error("Error getting AI response:", error);

@@ -2096,13 +2096,6 @@ from .models import Task
 
 
 
-from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
-
-
-from django.http import JsonResponse
-from django.contrib.auth.decorators import login_required
-import google.generativeai as genai
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 import google.generativeai as genai
@@ -2115,40 +2108,59 @@ def get_extended_insight(request):
 
     model = genai.GenerativeModel("gemini-1.5-flash")
     
-    # Prompt to generate a motivational success story based on the insight
+    # Prompt designed to continue the existing insight naturally
     prompt = f"""
-    Expand on the following insight: '{insight_text}' in a **story-driven, motivational way**.  
-    - Start by elaborating on the insight, making it more vivid and engaging.  
-    - Then, smoothly transition into a **real-life success story** that embodies the insight.  
-    - The story should feel like a natural extension of the insight and should cover:  
-
-    1️⃣ **Background** – Who the person was, their struggles, and what made their journey difficult.  
-    2️⃣ **The Process** – How they applied the insight in their life (skills learned, mindset changes, persistence).  
-    3️⃣ **The Breakthrough** – The moment their efforts paid off (job offer, success, recognition, etc.).  
-    4️⃣ **Lessons for Others** – How this insight can help others in their own journey.  
-
-    The response should **flow naturally**, making the story feel like a continuation of the insight, rather than a separate addition.
+    You're expanding this insight to provide deeper value while maintaining its original voice:
+    
+    Original Insight: "{insight_text}"
+    
+    Continue this thought by:
+    1. First building on the original statement (1-2 sentences)
+    2. Then flowing into a relevant example that demonstrates it
+    3. Finally extracting practical lessons
+    
+    Structure your response to:
+    - Begin with "Building on this..." [continue the thought]
+    - Transition with "Consider how..." [introduce example]
+    - Conclude with "This shows us..." [practical takeaways]
+    
+    Keep the tone and style consistent with the original insight.
+    Length: Approximately 3-4 paragraphs (300-400 words)
     """
+    
+    generation_config = {
+        "temperature": 0.5,  # Balanced creativity/consistency
+        "max_output_tokens": 500
+    }
 
     try:
-        response = model.generate_content(prompt)
+        response = model.generate_content(
+            prompt,
+            generation_config=generation_config
+        )
 
-        # Extract AI response safely
         if response and response.candidates and response.candidates[0].content.parts:
-            success_story = response.candidates[0].content.parts[0].text.strip()
+            extension = response.candidates[0].content.parts[0].text.strip()
+            
+            # Create seamless transition
+            extended_insight = f"{insight_text}\n\n{extension}"
+            
+            # Remove any duplicate phrases
+            extended_insight = extended_insight.replace(
+                insight_text + insight_text, 
+                insight_text
+            )
         else:
-            raise ValueError("Unexpected AI response structure")
-
-        # Remove duplicate starting text (if AI starts with the same insight)
-        if success_story.startswith(insight_text):
-            success_story = success_story[len(insight_text):].strip()
+            extended_insight = insight_text  # Fallback to original
 
     except Exception as e:
-        print("Error:", e)  # Log error for debugging
-        success_story = "AI could not generate a relevant success story. Please try again."
+        print(f"Extension error: {str(e)}")
+        extended_insight = insight_text
 
-    return JsonResponse({"detailed_post": success_story})
-
+    return JsonResponse({
+        "detailed_post": extended_insight,
+        "seamless": True  # Frontend can use this for styling
+    })
 
 
 import openai
@@ -2156,27 +2168,47 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
 
-openai.api_key = "YOUR_OPENAI_API_KEY"
+
 
 @csrf_exempt
 def ai_chat(request):
     if request.method == "POST":
-        data = json.loads(request.body)
-        question = data.get("question")
-        story = data.get("story")
+        try:
+            data = json.loads(request.body)
+            question = data.get("question")
+            story = data.get("story")
+            previous_qa = data.get("previous_qa", "")
 
-        prompt = f"Based on this story: {story}, answer: {question}"
+            if not question or not story:
+                return JsonResponse({"error": "Missing question or story"}, status=400)
 
-        response = openai.ChatCompletion.create(
-            model="gpt-4",
-            messages=[{"role": "system", "content": "You are a helpful assistant."},
-                      {"role": "user", "content": prompt}]
-        )
+            # Create the prompt with context
+            prompt = f"""
+            Based on this context:
+            {story}
 
-        answer = response["choices"][0]["message"]["content"]
-        return JsonResponse({"response": answer})
+            {previous_qa}
+
+            Answer this question in a helpful, detailed way:
+            {question}
+            """
+
+            model = genai.GenerativeModel("gemini-1.5-flash")
+            response = model.generate_content(prompt)
+
+            # Safely extract the response
+            if response and response.candidates and response.candidates[0].content.parts:
+                answer = response.candidates[0].content.parts[0].text.strip()
+            else:
+                answer = "I couldn't generate a response. Please try again."
+
+            return JsonResponse({"response": answer})
+
+        except Exception as e:
+            print(f"Error in ai_chat: {str(e)}")
+            return JsonResponse({"error": "An error occurred while processing your request"}, status=500)
     
-    return JsonResponse({"error": "Invalid request"}, status=400)
+    return JsonResponse({"error": "Invalid request method"}, status=400)
 
 
 

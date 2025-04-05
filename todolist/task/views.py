@@ -2047,7 +2047,14 @@ def get_ai_posts(request):
     Generate **20 unique insights** based on these tasks. Each insight should be a complete post with a mix of and informative for user and encouraging motivating:
     - A short story 
     - Facts 
-    - A productivity tip 
+    - A productivity thought 
+    - Practical knowledge 
+    - Motivational elements 
+    - Actionable tips 
+    - Scientific/psychological facts 
+
+  
+
 
     ### Response Format:
     Return a **valid JSON array** inside markdown triple backticks like this:
@@ -2071,6 +2078,81 @@ def get_ai_posts(request):
         posts = [{"post": "AI response is not valid JSON format. Please try again."}]
 
     return JsonResponse({"posts": posts})
+
+
+# @login_required
+# def get_ai_posts(request):
+#     user = request.user
+#     tasks = Task.objects.filter(user=user).order_by("-created_at")[:10]
+#     task_titles = [task.title for task in tasks]
+
+#     model = genai.GenerativeModel("gemini-1.5-flash")
+    
+#     prompt = f"""
+#     Based on these recent tasks: {task_titles},
+#     generate 20 unique, informative posts that blend:
+#     - Practical knowledge (30%)
+#     - Motivational elements (20%)
+#     - Actionable tips (30%)
+#     - Scientific/psychological facts (20%)
+
+#     Each post should follow this structure:
+#     1. Hook: Engaging opening sentence
+#     2. Core Insight: Valuable information/fact
+#     3. Task Connection: Relate to user's tasks
+#     4. Actionable Tip: Specific advice
+#     5. Motivational Close: Encouraging ending
+
+#     Example Format (return as valid JSON):
+#     ```
+#     [
+#         {{
+#             "post": "Did you know? 15 minutes of planning saves 90 minutes of execution (Forbes). For your '{task_titles[0]}' task, try the 5-5-5 method: 5 mins planning, 5 mins organizing, 5 mins reviewing. Small investments in preparation yield massive productivity dividends!",
+#             "category": "productivity"
+#         }},
+#         {{
+#             "post": "The Zeigarnik Effect shows unfinished tasks stay on our minds. Your '{task_titles[1]}' is creating mental clutter. Here's the fix: Either complete it now, schedule it concretely, or delete it. Clarity brings peace of mind and focus!",
+#             "category": "psychology"
+#         }}
+#     ]
+#     ```
+
+#     Include diverse categories: productivity, psychology, health, time-management, etc.
+#     Ensure all facts are accurate and verifiable.
+#     """
+
+#     generation_config = {
+#         "temperature": 0.7,
+#         "max_output_tokens": 2000,
+#         "top_p": 0.9
+#     }
+
+#     try:
+#         response = model.generate_content(
+#             prompt,
+#             generation_config=generation_config
+#         )
+#         ai_text = response.candidates[0].content.parts[0].text.strip()
+        
+#         # Extract JSON from markdown code block
+#         json_str = ai_text.split("```")[1].strip()
+#         posts = json.loads(json_str)
+        
+#         # Add default category if missing and ensure proper formatting
+#         for post in posts:
+#             post['category'] = post.get('category', 'general')
+#             post['post'] = post['post'].replace('"', "'")  # Ensure consistent quotes
+            
+#     except Exception as e:
+#         print(f"AI Post Generation Error: {str(e)}")
+#         posts = [{
+#             "post": "Research shows writing down tasks increases completion by 42%. Keep using this app to harness that advantage!",
+#             "category": "productivity"
+#         }]
+    
+#     print(posts)
+
+#     return JsonResponse({"posts": posts})
 
 
 
@@ -2339,3 +2421,19 @@ def ai_quotes(request):
     return render(request, "motivation/ai_quotes.html", {"quotes": quotes})
 
 
+from django.http import JsonResponse
+from .models import Task
+from .tasks import generate_daily_schedule
+
+def get_schedule(request):
+    user = request.user
+    tasks = Task.objects.filter(user=user)
+
+    # Generate schedule
+    schedule = generate_daily_schedule(user, tasks)
+
+    return JsonResponse({
+        'status': 'success',
+        'message': 'Schedule generated successfully',
+        'schedule': schedule  # This assumes your function returns a dict/serializable data
+    })

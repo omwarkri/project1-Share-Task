@@ -100,6 +100,284 @@
             color: #1abc9c;
         }
 
+        /* Pomodoro Button Styles */
+.pomodoro-button {
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    color: #555;
+    padding: 8px;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.pomodoro-button:hover {
+    background-color: #f0f0f0;
+    color: #1abc9c;
+}
+
+/* Pomodoro Modal Styles */
+.pomodoro-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+    z-index: 5000;
+    
+}
+
+.pomodoro-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    position: relative;
+    background: rgba(255, 255, 255, 0.85);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.pomodoro-display {
+    font-size: 3.5rem;
+    font-weight: bold;
+    margin: 20px 0;
+    text-align: center;
+    font-family: monospace;
+}
+
+.pomodoro-controls {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.pomodoro-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.pomodoro-btn-start {
+    background-color: #1abc9c;
+    color: white;
+}
+
+.pomodoro-btn-pause {
+    background-color: #f39c12;
+    color: white;
+}
+
+.pomodoro-btn-reset {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.pomodoro-btn:hover {
+    opacity: 0.9;
+}
+
+.pomodoro-settings {
+    margin-top: 20px;
+}
+
+.pomodoro-settings div {
+    margin-bottom: 10px;
+}
+
+.pomodoro-settings label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.pomodoro-settings input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.pomodoro-status {
+    text-align: center;
+    font-style: italic;
+    color: #666;
+    margin-top: 10px;
+}
+
+/* Schedule Button Styles */
+.schedule-button {
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    color: #555;
+    padding: 8px;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.schedule-button:hover {
+    background-color: #f0f0f0;
+    color: #1abc9c;
+}
+
+/* Schedule Modal Styles */
+.schedule-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+    z-index: 5000;
+}
+
+.schedule-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    position: relative;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.schedule-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.schedule-title {
+    font-size: 1.5rem;
+    color: #333;
+}
+
+.schedule-list {
+    list-style: none;
+}
+
+.schedule-item {
+    padding: 15px;
+    margin-bottom: 10px;
+    background-color: rgba(255, 255, 255, 0.7);
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.schedule-item-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+}
+
+.schedule-item-time {
+    font-weight: bold;
+    color: #1abc9c;
+}
+
+.schedule-item-title {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.schedule-item-description {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.schedule-loading {
+    text-align: center;
+    padding: 20px;
+    color: #666;
+}
+
+.schedule-error {
+    text-align: center;
+    padding: 20px;
+    color: #e74c3c;
+}
+/* Schedule Content Styles */
+.schedule-paragraph {
+    white-space: pre-wrap;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    padding: 15px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+.schedule-section {
+    margin-bottom: 20px;
+}
+
+.schedule-section-title {
+    font-weight: bold;
+    color: #1abc9c;
+    margin-bottom: 10px;
+    font-size: 1.1rem;
+}
+
+.schedule-item {
+    margin-bottom: 8px;
+    position: relative;
+    padding-left: 20px;
+}
+
+.schedule-item:before {
+    content: "•";
+    position: absolute;
+    left: 0;
+    color: #1abc9c;
+}
+
+.schedule-time {
+    font-weight: bold;
+    color: #3498db;
+}
+
+.schedule-priority {
+    font-style: italic;
+    color: #e74c3c;
+    font-size: 0.9rem;
+}
+
+.schedule-note {
+    font-style: italic;
+    color: #666;
+    margin-top: 15px;
+    padding-top: 10px;
+    border-top: 1px dashed #ddd;
+}
+
+
         /* Sidebar Styles */
         .sidebar {
             width: 250px;
@@ -194,6 +472,9 @@
         .sidebar-footer {
             margin-top: 30px;
         }
+        
+
+        
 
         .accountbutton {
             width: 100%;
@@ -461,6 +742,12 @@
                 </div>
             </div>
             <div class="header-right">
+                <button class="schedule-button" onclick="openScheduleModal()" title="Daily Schedule">
+                    <i class="fas fa-calendar-day"></i>
+                </button>
+                <button class="pomodoro-button" onclick="openPomodoroModal()" title="Pomodoro Timer">
+                    <i class="fas fa-clock"></i>
+                </button>
                 {% if user.is_authenticated %}
                     <button class="view-chats-button" onclick="openChatModal()">💬 Chats</button>
                 {% else %}
@@ -573,6 +860,50 @@
             </div>
         </div>
     </div>
+
+    <!-- Pomodoro Modal -->
+<div id="pomodoroModal" class="pomodoro-modal">
+    <div class="pomodoro-content">
+        <span class="close-modal" onclick="closePomodoroModal()">&times;</span>
+        <h3 class="modal-header">
+            <i class="fas fa-clock"></i> Pomodoro Timer
+        </h3>
+        <div class="pomodoro-display">
+            <span id="pomodoro-minutes">25</span>:<span id="pomodoro-seconds">00</span>
+        </div>
+        <div class="pomodoro-controls">
+            <button id="pomodoro-start" class="pomodoro-btn pomodoro-btn-start">Start</button>
+            <button id="pomodoro-pause" class="pomodoro-btn pomodoro-btn-pause" disabled>Pause</button>
+            <button id="pomodoro-reset" class="pomodoro-btn pomodoro-btn-reset">Reset</button>
+        </div>
+        <div class="pomodoro-settings">
+            <div>
+                <label for="work-duration">Work Duration (minutes):</label>
+                <input type="number" id="work-duration" min="1" max="60" value="25">
+            </div>
+            <div>
+                <label for="break-duration">Break Duration (minutes):</label>
+                <input type="number" id="break-duration" min="1" max="30" value="5">
+            </div>
+        </div>
+        <div class="pomodoro-status" id="pomodoro-status">Ready to work</div>
+    </div>
+</div>
+
+<!-- Schedule Modal -->
+<div id="scheduleModal" class="schedule-modal">
+    <div class="schedule-content">
+        <span class="close-modal" onclick="closeScheduleModal()">&times;</span>
+        <div class="schedule-header">
+            <h3 class="schedule-title"><i class="fas fa-calendar-day"></i> Daily Schedule</h3>
+        </div>
+        <div id="scheduleContent">
+            <div class="schedule-loading">
+                <p>Loading your schedule...</p>
+            </div>
+        </div>
+    </div>
+</div>
 
     <script>
 
@@ -763,6 +1094,316 @@
                 });
         }
 
+
+// Pomodoro Timer Variables
+let pomodoroTimer;
+let isPomodoroRunning = false;
+let isWorkSession = true;
+let pomodoroTimeLeft = 25 * 60; // in seconds
+let pomodoroWorkDuration = 25;
+let pomodoroBreakDuration = 5;
+
+// DOM Elements
+const pomodoroMinutesDisplay = document.getElementById('pomodoro-minutes');
+const pomodoroSecondsDisplay = document.getElementById('pomodoro-seconds');
+const pomodoroStartButton = document.getElementById('pomodoro-start');
+const pomodoroPauseButton = document.getElementById('pomodoro-pause');
+const pomodoroResetButton = document.getElementById('pomodoro-reset');
+const pomodoroWorkDurationInput = document.getElementById('work-duration');
+const pomodoroBreakDurationInput = document.getElementById('break-duration');
+const pomodoroStatusDisplay = document.getElementById('pomodoro-status');
+const pomodoroModal = document.getElementById('pomodoroModal');
+
+// Load State from localStorage
+loadPomodoroState();
+
+// Initialize the timer display
+updatePomodoroDisplay();
+
+// Event Listeners
+pomodoroStartButton.addEventListener('click', startPomodoroTimer);
+pomodoroPauseButton.addEventListener('click', pausePomodoroTimer);
+pomodoroResetButton.addEventListener('click', resetPomodoroTimer);
+pomodoroWorkDurationInput.addEventListener('change', updatePomodoroSettings);
+pomodoroBreakDurationInput.addEventListener('change', updatePomodoroSettings);
+
+// Modal Functions
+function openPomodoroModal() {
+    pomodoroModal.style.display = 'flex';
+}
+function closePomodoroModal() {
+    pomodoroModal.style.display = 'none';
+}
+
+// Timer Functions
+function startPomodoroTimer() {
+    if (!isPomodoroRunning) {
+        isPomodoroRunning = true;
+        localStorage.setItem('pomodoroStartTimestamp', Date.now());
+        localStorage.setItem('isPomodoroRunning', 'true');
+        pomodoroTimer = setInterval(updatePomodoroTimer, 1000);
+        pomodoroStartButton.disabled = true;
+        pomodoroPauseButton.disabled = false;
+        pomodoroWorkDurationInput.disabled = true;
+        pomodoroBreakDurationInput.disabled = true;
+        pomodoroStatusDisplay.textContent = isWorkSession ? "Work session in progress" : "Break time!";
+    }
+}
+
+function pausePomodoroTimer() {
+    if (isPomodoroRunning) {
+        clearInterval(pomodoroTimer);
+        isPomodoroRunning = false;
+        localStorage.removeItem('pomodoroStartTimestamp');
+        localStorage.setItem('isPomodoroRunning', 'false');
+        pomodoroStartButton.disabled = false;
+        pomodoroPauseButton.disabled = true;
+        pomodoroStatusDisplay.textContent = isWorkSession ? "Work session paused" : "Break paused";
+        savePomodoroState();
+    }
+}
+
+function resetPomodoroTimer() {
+    clearInterval(pomodoroTimer);
+    isPomodoroRunning = false;
+    isWorkSession = true;
+    pomodoroTimeLeft = pomodoroWorkDuration * 60;
+    updatePomodoroDisplay();
+    pomodoroStartButton.disabled = false;
+    pomodoroPauseButton.disabled = true;
+    pomodoroWorkDurationInput.disabled = false;
+    pomodoroBreakDurationInput.disabled = false;
+    pomodoroStatusDisplay.textContent = "Ready to work";
+    localStorage.removeItem('pomodoroStartTimestamp');
+    localStorage.setItem('isPomodoroRunning', 'false');
+    savePomodoroState();
+}
+
+function updatePomodoroTimer() {
+    pomodoroTimeLeft--;
+    updatePomodoroDisplay();
+    savePomodoroState();
+
+    if (pomodoroTimeLeft <= 0) {
+        // Play a sound when session ends
+        const audio = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3');
+        audio.play();
+
+        isWorkSession = !isWorkSession;
+        pomodoroTimeLeft = (isWorkSession ? pomodoroWorkDuration : pomodoroBreakDuration) * 60;
+        pomodoroStatusDisplay.textContent = isWorkSession ? "Work session in progress" : "Break time!";
+        localStorage.setItem('pomodoroStartTimestamp', Date.now());
+        savePomodoroState();
+    }
+}
+
+function updatePomodoroDisplay() {
+    const minutes = Math.floor(pomodoroTimeLeft / 60);
+    const seconds = pomodoroTimeLeft % 60;
+    pomodoroMinutesDisplay.textContent = minutes.toString().padStart(2, '0');
+    pomodoroSecondsDisplay.textContent = seconds.toString().padStart(2, '0');
+}
+
+function updatePomodoroSettings() {
+    pomodoroWorkDuration = parseInt(pomodoroWorkDurationInput.value) || 25;
+    pomodoroBreakDuration = parseInt(pomodoroBreakDurationInput.value) || 5;
+
+    if (!isPomodoroRunning) {
+        pomodoroTimeLeft = pomodoroWorkDuration * 60;
+        updatePomodoroDisplay();
+    }
+
+    savePomodoroState();
+}
+
+function savePomodoroState() {
+    const state = {
+        pomodoroTimeLeft,
+        isWorkSession,
+        pomodoroWorkDuration,
+        pomodoroBreakDuration
+    };
+    localStorage.setItem('pomodoroState', JSON.stringify(state));
+}
+
+function loadPomodoroState() {
+    const savedState = JSON.parse(localStorage.getItem('pomodoroState'));
+    const startTimestamp = parseInt(localStorage.getItem('pomodoroStartTimestamp'));
+    const runningState = localStorage.getItem('isPomodoroRunning') === 'true';
+
+    if (savedState) {
+        pomodoroWorkDuration = savedState.pomodoroWorkDuration || 25;
+        pomodoroBreakDuration = savedState.pomodoroBreakDuration || 5;
+        isWorkSession = savedState.isWorkSession ?? true;
+
+        pomodoroWorkDurationInput.value = pomodoroWorkDuration;
+        pomodoroBreakDurationInput.value = pomodoroBreakDuration;
+
+        // Adjust time if timer was running
+        if (runningState && startTimestamp) {
+            const elapsed = Math.floor((Date.now() - startTimestamp) / 1000);
+            const adjustedTime = savedState.pomodoroTimeLeft - elapsed;
+
+            pomodoroTimeLeft = adjustedTime > 0 ? adjustedTime : 0;
+            isPomodoroRunning = true;
+            pomodoroTimer = setInterval(updatePomodoroTimer, 1000);
+            pomodoroStartButton.disabled = true;
+            pomodoroPauseButton.disabled = false;
+            pomodoroWorkDurationInput.disabled = true;
+            pomodoroBreakDurationInput.disabled = true;
+            pomodoroStatusDisplay.textContent = isWorkSession ? "Work session in progress" : "Break time!";
+        } else {
+            pomodoroTimeLeft = savedState.pomodoroTimeLeft || pomodoroWorkDuration * 60;
+        }
+    }
+}
+
+// Schedule Modal Functions
+function openScheduleModal() {
+    console.log("opening modal  ")
+    const scheduleModal = document.getElementById('scheduleModal');
+    const scheduleContent = document.getElementById('scheduleContent');
+    console.log(scheduleModal )
+    scheduleModal.style.display = 'flex';
+    scheduleContent.innerHTML = `
+        <div class="schedule-loading">
+            <p>Loading your schedule...</p>
+        </div>
+    `;
+    
+    // Fetch schedule data from API
+    fetchScheduleData();
+}
+
+function closeScheduleModal() {
+    const scheduleModal = document.getElementById('scheduleModal');
+    scheduleModal.style.display = 'none';
+}
+function fetchScheduleData() {
+    const scheduleContent = document.getElementById('scheduleContent');
+    
+    // Replace with your actual API endpoint
+    fetch('/api/daily-schedule/')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.schedule) {
+                renderScheduleText(data.schedule);
+            } else {
+                scheduleContent.innerHTML = `
+                    <div class="schedule-empty">
+                        <p>No schedule items for today.</p>
+                    </div>
+                `;
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching schedule:', error);
+            scheduleContent.innerHTML = `
+                <div class="schedule-error">
+                    <p>Failed to load schedule. Please try again later.</p>
+                </div>
+            `;
+        });
+}
+
+function renderScheduleText(scheduleText) {
+    const scheduleContent = document.getElementById('scheduleContent');
+    
+    // Create a container for the formatted schedule
+    const scheduleContainer = document.createElement('div');
+    scheduleContainer.className = 'schedule-paragraph';
+    
+    // Split the text into sections
+    const sections = scheduleText.split('\n\n**');
+    
+    sections.forEach((section, index) => {
+        // The first section won't have the ** prefix
+        const sectionText = index === 0 ? section : '**' + section;
+        const sectionDiv = document.createElement('div');
+        sectionDiv.className = 'schedule-section';
+        
+        // Check if this is a section header (contains **)
+        if (sectionText.startsWith('**') && sectionText.includes(':**')) {
+            const headerEnd = sectionText.indexOf(':**');
+            const header = sectionText.substring(2, headerEnd);
+            const content = sectionText.substring(headerEnd + 3).trim();
+            
+            // Add section header
+            const headerElement = document.createElement('div');
+            headerElement.className = 'schedule-section-title';
+            headerElement.textContent = header;
+            sectionDiv.appendChild(headerElement);
+            
+            // Process content lines
+            const lines = content.split('\n*');
+            lines.forEach(line => {
+                if (line.trim()) {
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'schedule-item';
+                    
+                    // Highlight times in the format "X:XX AM/PM - X:XX AM/PM"
+                    const formattedLine = line.replace(
+                        /(\d{1,2}:\d{2} [AP]M) - (\d{1,2}:\d{2} [AP]M)/g, 
+                        '<span class="schedule-time">$1 - $2</span>'
+                    );
+                    
+                    // Highlight priority notes
+                    const withPriority = formattedLine.replace(
+                        /\(([^)]+ priority)/g, 
+                        '(<span class="schedule-priority">$1</span>'
+                    );
+                    
+                    itemDiv.innerHTML = withPriority;
+                    sectionDiv.appendChild(itemDiv);
+                }
+            });
+        } else {
+            // This is a regular paragraph (like the intro or note)
+            const paragraph = document.createElement('p');
+            paragraph.textContent = sectionText;
+            if (sectionText.includes('Note:')) {
+                paragraph.className = 'schedule-note';
+            }
+            sectionDiv.appendChild(paragraph);
+        }
+        
+        scheduleContainer.appendChild(sectionDiv);
+    });
+    
+    scheduleContent.innerHTML = '';
+    scheduleContent.appendChild(scheduleContainer);
+}
+
+function formatTime(timeString) {
+    if (!timeString) return '';
+    const [hours, minutes] = timeString.split(':');
+    const hour = parseInt(hours);
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    const hour12 = hour % 12 || 12;
+    return `${hour12}:${minutes} ${ampm}`;
+}
+
+function getPriorityColor(priority) {
+    const priorityColors = {
+        'High': '#e74c3c',
+        'Medium': '#f39c12',
+        'Low': '#2ecc71'
+    };
+    return priorityColors[priority] || '#3498db';
+}
+
+// Close modal when clicking outside
+window.addEventListener('click', function(event) {
+    const scheduleModal = document.getElementById('scheduleModal');
+    if (event.target === scheduleModal) {
+        closeScheduleModal();
+    }
+});
 
     </script>
 </body>

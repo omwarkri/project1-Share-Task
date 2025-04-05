@@ -55,5 +55,8 @@ urlpatterns = [
     path("ai-motivational-quotes/", ai_quotes, name="ai_motivational_quotes"),
 
 
+    path("api/daily-schedule/", get_schedule, name="daily_schedule"),
+
+
   
 ]

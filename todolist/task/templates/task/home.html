@@ -306,6 +306,36 @@
         gap: 10px;
     }
 
+    /* Custom Loader Styles */
+#buttonLoader {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    margin-left: 8px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Button state during loading */
+.btn-loading {
+    position: relative;
+    padding-right: 40px;
+}
+
+.btn-loading .loader {
+    display: inline-block;
+}
+
+.btn-loading #buttonText {
+    margin-right: 5px;
+}
+
     /* Header Actions */
 .header-actions {
     display: flex;
@@ -2000,7 +2030,10 @@ input:checked + .slider:before {
                 <form id="interestGoalForm" style="display: none;">
                     {% csrf_token %}
                     <div id="formFields"></div> <!-- Form fields will be injected here -->
-                    <button type="button" class="btn btn-primary" onclick="submitInterestGoalForm()">Submit</button>
+                    <button type="button" class="btn btn-primary" onclick="submitInterestGoalForm()" id="submitButton">
+                        <span id="buttonText">Submit</span>
+                        <span id="buttonLoader" class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"></span>
+                    </button>
                 </form>
 
               
@@ -2745,10 +2778,17 @@ function closeAddTaskModal() {
 }
 
 
-// Function to submit updated form data
 function submitInterestGoalForm() {
     const interests = document.getElementById('interests').value;
     const goals = document.getElementById('goals').value;
+    const submitButton = document.getElementById('submitButton');
+    const buttonText = document.getElementById('buttonText');
+    const buttonLoader = document.getElementById('buttonLoader');
+
+    // Disable button and show loader
+    submitButton.disabled = true;
+    buttonText.textContent = 'Submitting';
+    buttonLoader.style.display = 'inline-block';
 
     fetch('/user/api/update-interests-goals/', {
         method: 'POST',
@@ -2768,6 +2808,12 @@ function submitInterestGoalForm() {
     })
     .catch(error => {
         console.error('Error submitting data:', error);
+    })
+    .finally(() => {
+        // Re-enable button and hide loader
+        submitButton.disabled = false;
+        buttonText.textContent = 'Submit';
+        buttonLoader.style.display = 'none';
     });
 }
 

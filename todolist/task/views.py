@@ -2423,7 +2423,7 @@ def ai_quotes(request):
 
 from django.http import JsonResponse
 from .models import Task
-from .tasks import generate_daily_schedule
+from user.views import generate_daily_schedule
 
 def get_schedule(request):
     user = request.user

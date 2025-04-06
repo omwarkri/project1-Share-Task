@@ -524,3 +524,43 @@ def update_user_interests_goals(request):
             return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
 
     return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=405)
+
+
+from google import generativeai
+generativeai.configure(api_key="AIzaSyDx3rr0MzUPaumvdII3WIffmtsZqAz7JIs")
+
+# Initialize the Gemini model
+model = generativeai.GenerativeModel('gemini-1.5-flash')
+
+from datetime import date
+from .models import DailySchedule
+
+def generate_daily_schedule(user, tasks):
+    today = date.today()
+    existing = DailySchedule.objects.filter(user=user, date=today).first()
+    if existing:
+        return existing.schedule
+    
+    if not tasks:
+        return "No tasks scheduled for today."
+
+    task_list = "\n".join([
+        f"- {task.title} (Due: {task.due_date.strftime('%I:%M %p') if task.due_date else 'No due time'})"
+        for task in tasks
+    ])
+
+    prompt = (
+        f"You are an AI task manager. The user has the following tasks today:\n\n"
+        f"{task_list}\n\n"
+        f"Generate an optimized, realistic schedule using this exact format:\n"
+        f"06:00 AM - 07:00 AM: [Task name]\n"
+        f"07:00 AM - 07:30 AM: [Next task or break]\n\n"
+        f"Use time intervals from morning to evening. Prioritize tasks with earlier due times, group similar tasks, and include breaks. "
+        f"Do NOT use markdown tables. Do NOT format with bullet points or bold text. Make it human-friendly and fluid."
+    )
+
+    # generate new schedule ...
+    new_schedule = model.generate_content(prompt).text.strip()
+
+    DailySchedule.objects.create(user=user, date=today, schedule=new_schedule)
+    return new_schedule

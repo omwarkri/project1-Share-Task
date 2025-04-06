@@ -67,6 +67,12 @@
             gap: 16px;
         }
 
+        .header-right{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
         .header-div {
             width: 100%;
             max-width: 1600px;
@@ -535,64 +541,110 @@
 /* Modal Styles */
     /* Modal Styles */
     .modal {
-        display: none; /* Hidden by default */
-        position: fixed;
-
-    
-        top: 0;
-      
+    display: none; /* Hidden by default */
+    position: fixed;
+    top: 0;
     left: 0;
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
     justify-content: center;
     align-items: center;
-        z-index: 5000; /* Ensure it's on top */
-    }
-
-   .modal .btn-primary,.modal button.btn-primary{
-        padding: 16px 8px;
-        border: 1px solid rgba(0, 0, 0, 0.608);
-        background-color: #242c30d2;
-        color: rgba(255, 255, 255, 0.718);
-    }
-
-
+    z-index: 5000; /* Ensure it's on top */
+}
 
 .modal-content {
     background-color: #fff;
-   
     border-radius: 12px;
-    width: 90%;
-    max-width: 500px;
+    width: 90%; /* Fallback for smaller screens */
+    max-width: 800px; /* Maximum width */
+    min-width: 500px; /* Minimum width */
+    height: auto; /* Flexible height */
+    max-height: 80vh; /* Maximum height */
+    min-height: 60vh; /* Minimum height */
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
     position: relative;
     animation: modalFadeIn 0.3s ease;
-    max-height: 90vh; /* Limit height to 90% of viewport height */
     overflow-y: auto; /* Enable scrolling if content overflows */
-    margin: auto; /* Center the modal content */
+    margin: 20px; /* Add some spacing from viewport edges */
+    display: flex;
+    flex-direction: column;
 }
 
-/* Modal Body */
+/* For larger screens - fixed dimensions */
+@media (min-width: 992px) {
+    .modal-content {
+        width: 800px; /* Fixed width */
+        height: 600px; /* Fixed height */
+    }
+}
+
+/* Modal Header */
+.modal-header {
+    padding: 20px;
+    border-bottom: 1px solid #e9ecef;
+    position: sticky;
+    top: 0;
+    background: white;
+    z-index: 1;
+}
+
+/* Modal Body - flexible content area */
 .modal-body {
-    padding: 24px;
+    padding: 20px;
     color: #555;
+    flex: 1; /* Takes remaining space */
+    overflow-y: auto; /* Scrollable content */
 }
 
-.btn-secondary {
-    background-color: #6c757d;
-    border: none;
-    border-radius: 5px;
-    padding: 10px 20px;
-    font-size: 14px;
-    font-weight: bold;
-    transition: background-color 0.3s ease;
-}
+/* Modal Footer */
 .modal-footer {
-    border-top: none;
-    
-    padding: 24px;
-    padding-top: 0;
+    padding: 20px;
+    border-top: 1px solid #e9ecef;
+    position: sticky;
+    bottom: 0;
+    background: white;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+/* Animation for Modal */
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Schedule Checkbox Styles */
+.schedule-item-container {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.schedule-checkbox {
+    margin-top: 3px;
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: #1abc9c;
+}
+
+.schedule-checkbox:checked + div {
+    text-decoration: line-through;
+    opacity: 0.7;
+}
+
+.schedule-checkbox:focus {
+    outline: 2px solid #1abc9c;
+    outline-offset: 2px;
 }
 
 
@@ -1310,71 +1362,91 @@ function fetchScheduleData() {
             `;
         });
 }
-
 function renderScheduleText(scheduleText) {
     const scheduleContent = document.getElementById('scheduleContent');
-    
-    // Create a container for the formatted schedule
+
     const scheduleContainer = document.createElement('div');
     scheduleContainer.className = 'schedule-paragraph';
-    
-    // Split the text into sections
-    const sections = scheduleText.split('\n\n**');
-    
-    sections.forEach((section, index) => {
-        // The first section won't have the ** prefix
-        const sectionText = index === 0 ? section : '**' + section;
-        const sectionDiv = document.createElement('div');
-        sectionDiv.className = 'schedule-section';
-        
-        // Check if this is a section header (contains **)
-        if (sectionText.startsWith('**') && sectionText.includes(':**')) {
-            const headerEnd = sectionText.indexOf(':**');
-            const header = sectionText.substring(2, headerEnd);
-            const content = sectionText.substring(headerEnd + 3).trim();
-            
-            // Add section header
-            const headerElement = document.createElement('div');
-            headerElement.className = 'schedule-section-title';
-            headerElement.textContent = header;
-            sectionDiv.appendChild(headerElement);
-            
-            // Process content lines
-            const lines = content.split('\n*');
-            lines.forEach(line => {
-                if (line.trim()) {
-                    const itemDiv = document.createElement('div');
-                    itemDiv.className = 'schedule-item';
-                    
-                    // Highlight times in the format "X:XX AM/PM - X:XX AM/PM"
-                    const formattedLine = line.replace(
-                        /(\d{1,2}:\d{2} [AP]M) - (\d{1,2}:\d{2} [AP]M)/g, 
-                        '<span class="schedule-time">$1 - $2</span>'
-                    );
-                    
-                    // Highlight priority notes
-                    const withPriority = formattedLine.replace(
-                        /\(([^)]+ priority)/g, 
-                        '(<span class="schedule-priority">$1</span>'
-                    );
-                    
-                    itemDiv.innerHTML = withPriority;
-                    sectionDiv.appendChild(itemDiv);
+
+    const lines = scheduleText.trim().split('\n');
+
+    lines.forEach((line) => {
+        if (line.trim()) {
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'schedule-item';
+
+            const checkboxContainer = document.createElement('div');
+            checkboxContainer.className = 'schedule-item-container';
+            checkboxContainer.style.display = 'flex';
+            checkboxContainer.style.alignItems = 'flex-start';
+            checkboxContainer.style.gap = '10px';
+
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.className = 'schedule-checkbox';
+            checkbox.style.marginTop = '3px';
+            checkbox.style.flexShrink = '0';
+
+            const label = document.createElement('div');
+
+            // If line starts with a time like "06:00 AM - 07:00 AM:"
+            const timeStartPattern = /^(\d{1,2}:\d{2} [AP]M - \d{1,2}:\d{2} [AP]M:)/;
+            const match = line.match(timeStartPattern);
+
+            let formattedLine = line;
+
+            if (match) {
+                formattedLine = line.replace(
+                    timeStartPattern,
+                    `<span class="schedule-time-block">${match[1]}</span>`
+                );
+                label.classList.add('schedule-box-line');
+            }
+
+            const withPriority = formattedLine.replace(
+                /\(([^)]+ priority)/gi,
+                '(<span class="schedule-priority">$1</span>'
+            );
+
+            label.innerHTML = withPriority;
+
+            checkboxContainer.appendChild(checkbox);
+            checkboxContainer.appendChild(label);
+            itemDiv.appendChild(checkboxContainer);
+            scheduleContainer.appendChild(itemDiv);
+
+            const taskId = 'task-' + btoa(line.trim()).substring(0, 12);
+
+            if (localStorage.getItem(`schedule-complete-${taskId}`)) {
+                checkbox.checked = true;
+                label.style.textDecoration = 'line-through';
+                label.style.opacity = '0.7';
+            }
+
+            checkbox.addEventListener('change', function () {
+                if (this.checked) {
+                    localStorage.setItem(`schedule-complete-${taskId}`, 'true');
+                    label.style.textDecoration = 'line-through';
+                    label.style.opacity = '0.7';
+                } else {
+                    localStorage.removeItem(`schedule-complete-${taskId}`);
+                    label.style.textDecoration = 'none';
+                    label.style.opacity = '1';
                 }
             });
-        } else {
-            // This is a regular paragraph (like the intro or note)
-            const paragraph = document.createElement('p');
-            paragraph.textContent = sectionText;
-            if (sectionText.includes('Note:')) {
-                paragraph.className = 'schedule-note';
-            }
-            sectionDiv.appendChild(paragraph);
         }
-        
-        scheduleContainer.appendChild(sectionDiv);
     });
-    
+
+    const noteMatch = scheduleText.match(/Note:(.+)$/s);
+    if (noteMatch) {
+        const noteDiv = document.createElement('div');
+        noteDiv.className = 'schedule-note';
+        noteDiv.style.marginTop = '20px';
+        noteDiv.style.fontStyle = 'italic';
+        noteDiv.textContent = 'Note:' + noteMatch[1].trim();
+        scheduleContainer.appendChild(noteDiv);
+    }
+
     scheduleContent.innerHTML = '';
     scheduleContent.appendChild(scheduleContainer);
 }

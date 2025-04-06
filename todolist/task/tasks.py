@@ -214,12 +214,15 @@ def generate_daily_schedule(user, tasks):
     ])
 
     prompt = (
-        f"You are an AI task manager. Arrange the user's daily tasks in an optimized schedule.\n\n"
-        f"Today's Tasks:\n{task_list}\n\n"
-        f"Create a structured, step-by-step **hourly** schedule for the day.\n"
-        f"Use a timeline format from morning to evening.\n"
-        f"Ensure high-priority tasks come first, breaks are included, and tasks are realistically scheduled."
+        f"You are an AI task manager. The user has the following tasks today:\n\n"
+        f"{task_list}\n\n"
+        f"Generate an optimized, realistic schedule using this exact format:\n"
+        f"06:00 AM - 07:00 AM: [Task name]\n"
+        f"07:00 AM - 07:30 AM: [Next task or break]\n\n"
+        f"Use time intervals from morning to evening. Prioritize tasks with earlier due times, group similar tasks, and include breaks. "
+        f"Do NOT use markdown tables. Do NOT format with bullet points or bold text. Make it human-friendly and fluid."
     )
+
 
     response = model.generate_content(prompt)
     ai_schedule = response.text

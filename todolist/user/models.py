@@ -99,3 +99,10 @@ class UserTaskAnalytics(models.Model):
 
     def __str__(self):
         return f"Analytics for {self.user.username}"
+
+
+
+class DailySchedule(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    date = models.DateField()
+    schedule = models.TextField()

@@ -26,9 +26,7 @@
             overflow: hidden; /* Prevent double scrollbars */
     
         }
-    .close-btn{
-        position: absolute;
-    }
+  
     .button-container {
         display: flex;
         justify-content: center; /* Center horizontally */
@@ -1548,6 +1546,8 @@ input:checked + .slider:before {
     transform: translate(-50%, -50%);
 }
 
+
+
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
@@ -1995,14 +1995,14 @@ input:checked + .slider:before {
 <div id="addTaskModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
-            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <span class="close-modal" onclick="AddTaskcloseModal()">&times;</span>
             <h2>Add Task</h2>
         </div>
         <div class="modal-body">
             <form method="POST" action="{% url 'add_task' %}">
                 {% csrf_token %}
                 {{ form.as_p }}
-                <button type="submit" class="submit-btn">Add Task</button>
+                <button type="submit" class="submit-btn btn btn-primary">Add Task</button>
             </form>
         </div>
     </div>
@@ -2680,7 +2680,12 @@ function closeChatModal() {
     }
 
     function closeModal(taskId) {
+        console.log("closing")
         document.getElementById(`shareTaskModal-${taskId}`).style.display = 'none';
+    }
+    function AddTaskcloseModal(taskId) {
+        console.log("closing")
+        document.getElementById(`addTaskModal`).style.display = 'none';
     }
 
 

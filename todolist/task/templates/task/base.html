@@ -553,6 +553,7 @@
     z-index: 5000; /* Ensure it's on top */
 }
 
+
 .modal-content {
     background-color: #fff;
     border-radius: 12px;
@@ -569,6 +570,20 @@
     margin: 20px; /* Add some spacing from viewport edges */
     display: flex;
     flex-direction: column;
+}
+.close-btn {
+    color: #aaa;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    line-height: 1;
+    margin-left: auto; /* Pushes it to the right */
+}
+
+.close-btn:hover,
+.close-btn:focus {
+    color: black;
+    text-decoration: none;
 }
 
 /* For larger screens - fixed dimensions */
@@ -587,6 +602,17 @@
     top: 0;
     background: white;
     z-index: 1;
+    position: relative;
+    display: flex;
+    
+
+}
+
+.close-modal{
+    position: absolute;
+    right: 10;
+    z-index: 5;
+
 }
 
 /* Modal Body - flexible content area */
@@ -669,6 +695,7 @@
     display: flex;
     flex-direction: column;
     align-items: start;
+    justify-content: center;
     gap:16px;
 
 }
@@ -687,6 +714,8 @@
             color: #666;
             transition: color 0.3s ease;
         }
+
+
 
         .close-modal:hover {
             color: #333;
@@ -914,12 +943,14 @@
     </div>
 
     <!-- Pomodoro Modal -->
-<div id="pomodoroModal" class="pomodoro-modal">
-    <div class="pomodoro-content">
-        <span class="close-modal" onclick="closePomodoroModal()">&times;</span>
-        <h3 class="modal-header">
-            <i class="fas fa-clock"></i> Pomodoro Timer
-        </h3>
+<div id="pomodoroModal" class="pomodoro-modal modal">
+    <div class="pomodoro-content  modal-content">
+      
+        <div class="modal-header" style="display: flex;">
+            <span class="close-modal" onclick="closePomodoroModal()">&times;</span>
+   
+            <h3>         <i class="fas fa-clock"></i> Pomodoro Timer</h3>
+        </div>
         <div class="pomodoro-display">
             <span id="pomodoro-minutes">25</span>:<span id="pomodoro-seconds">00</span>
         </div>

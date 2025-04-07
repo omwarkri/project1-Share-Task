@@ -445,6 +445,9 @@ class TaskDependency(models.Model):
         unique_together = ('task', 'dependent_on')  # Prevents duplicate dependencies
 
 
+        
+
+
 
 
 

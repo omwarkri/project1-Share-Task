@@ -58,5 +58,9 @@ urlpatterns = [
     path("api/daily-schedule/", get_schedule, name="daily_schedule"),
 
 
+    path('quiz/', quiz, name='quiz'),
+
+
+
   
 ]

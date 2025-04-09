@@ -1,0 +1,290 @@
+{% extends "task/base.html" %}
+
+{% block content %}
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>AI Quiz Generator</title>
+  <style>
+    .quiz-app-body {
+        font-family: 'Arial', sans-serif;
+        margin: 0;
+        padding: 15px;
+        background: linear-gradient(135deg, #f5f7fa 0%, #eef2f6 100%);
+        color: #4a5568;
+        line-height: 1.4;
+        max-width: 100%;
+        overflow-x: hidden;
+    }
+
+    .quiz-app-title {
+        color: #4299e1;
+        text-align: center;
+        margin: 15px 0 20px;
+        font-weight: 600;
+        font-size: 1.8em;
+    }
+
+    .quiz-subject-heading {
+        color: #4299e1;
+        margin-top: 20px;
+        font-weight: 500;
+        font-size: 1.4em;
+    }
+
+    .quiz-form {
+        margin: 15px 0;
+
+    }
+
+    .quiz-input-text {
+        width: 100%;
+        padding: 8px;
+        font-size: 15px;
+        margin: 8px 0 15px;
+        border: 1px solid #e2e8f0;
+        border-radius: 4px;
+        box-sizing: border-box;
+        background: linear-gradient(0deg, #ffffff 0%, #f8fafc 100%);
+    }
+
+    .quiz-container {
+      height: 100vh;
+      overflow: auto;
+      padding: 8px 32px;
+    }
+
+    .quiz-question-card {
+        margin-bottom: 15px;
+        padding: 15px;
+        background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .quiz-options-list {
+        margin: 8px 0 0 10px;
+    }
+
+    .quiz-option-label {
+        display: block;
+        padding: 8px 12px;
+        cursor: pointer;
+        border-radius: 4px;
+        transition: all 0.2s;
+    }
+
+    .quiz-option-label:hover {
+        background: linear-gradient(90deg, #ebf4ff 0%, #ffffff 100%);
+    }
+
+    .quiz-radio-input {
+        margin-right: 8px;
+    }
+
+    .quiz-primary-btn {
+        background: linear-gradient(135deg, #63b3ed 0%, #4299e1 100%);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        font-size: 15px;
+        border-radius: 6px;
+        cursor: pointer;
+        margin: 15px 0;
+        display: block;
+        box-shadow: 0 2px 4px rgba(66, 153, 225, 0.2);
+        transition: all 0.2s;
+        width: 100%;
+    }
+
+    .quiz-primary-btn:hover {
+        background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 6px rgba(66, 153, 225, 0.3);
+    }
+
+    .quiz-answer-correct {
+        color: #48bb78;
+        font-weight: bold;
+        background: linear-gradient(90deg, #f0fff4 0%, #ffffff 100%);
+        padding: 2px 6px;
+        border-radius: 4px;
+    }
+
+    .quiz-answer-wrong {
+        color: #f56565;
+        font-weight: bold;
+        background: linear-gradient(90deg, #fff5f5 0%, #ffffff 100%);
+        padding: 2px 6px;
+        border-radius: 4px;
+    }
+
+    .quiz-results-list {
+        padding: 0;
+        list-style: none;
+    }
+
+    .quiz-result-item {
+        margin-bottom: 15px;
+        padding: 15px;
+        background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .quiz-nav-link {
+        color: #4299e1;
+        text-decoration: none;
+        display: inline-block;
+        margin-top: 15px;
+    }
+
+    .quiz-nav-link:hover {
+        text-decoration: underline;
+    }
+
+    .quiz-score-display {
+        font-size: 1.2em;
+        margin: 20px 0;
+        color: #4a5568;
+        text-align: center;
+    }
+    
+    .quiz-form-label {
+        display: block;
+        margin: 5px 0;
+    }
+
+    .quiz-secondary-btn {
+        background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e0 100%);
+        color: #4a5568;
+        border: none;
+        padding: 8px 16px;
+        font-size: 14px;
+        border-radius: 6px;
+        cursor: pointer;
+        margin: 10px 0;
+        display: inline-block;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        transition: all 0.2s;
+    }
+    
+    .quiz-secondary-btn:hover {
+        background: linear-gradient(135deg, #cbd5e0 0%, #a0aec0 100%);
+        transform: translateY(-1px);
+    }
+    
+    .quiz-subject-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    #quiz-subject-form {
+        background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+        width: 50%;
+        border-radius: 8px;
+        padding: 15px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        margin-bottom: 20px;
+        {% if show_quiz or show_results %}display: none;{% endif %}
+    }
+
+    .quiz-actions-container {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+    }
+
+    .quiz-nav-btn {
+        padding: 10px 20px;
+        background: linear-gradient(135deg, #63b3ed 0%, #4299e1 100%);
+        color: white;
+        border-radius: 6px;
+        text-decoration: none;
+        box-shadow: 0 2px 4px rgba(66, 153, 225, 0.2);
+    }
+  </style>
+</head>
+<body class="quiz-app-body">
+
+  <div class="quiz-container">
+    <!-- Always show subject input at the top -->
+    <div id="quiz-subject-form">
+      <form method="post" class="quiz-form" style="display: flex; gap: 10px; align-items: center;">
+        {% csrf_token %}
+        <input type="hidden" name="form_type" value="change_subject">
+        <label class="quiz-form-label" style="margin: 0; font-weight: 500;">Enter Subject:</label>
+        <input type="text" name="subject" class="quiz-input-text" required 
+               style="flex: 1; padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 4px;"
+               value="{% if subject %}{{ subject }}{% endif %}">
+        <button type="submit" class="quiz-primary-btn"
+                style="width:20%; padding: 8px 16px; background: linear-gradient(135deg, #63b3ed 0%, #4299e1 100%); color: white; border: none; border-radius: 6px; cursor: pointer;">
+          {% if show_quiz or show_results %}Change Subject{% else %}Generate Quiz{% endif %}
+        </button>
+      </form>
+    </div>
+  
+    <button onclick="toggleSubjectForm()" class="quiz-secondary-btn" {% if not show_quiz and not show_results %}style="display: none;"{% endif %}>
+      Change Subject
+    </button>
+  
+    {% if show_quiz %}
+      <div class="quiz-subject-header">
+        <h2 class="quiz-subject-heading">Subject: {{ subject }}</h2>
+      </div>
+      <form method="post" class="quiz-form">
+        {% csrf_token %}
+        <input type="hidden" name="form_type" value="submit_quiz">
+        {% for q in questions %}
+          <div class="quiz-question-card">
+            <p><strong>{{ forloop.counter }}. {{ q.question }}</strong></p>
+            <div class="quiz-options-list">
+              {% for option in q.options %}
+                <label class="quiz-option-label">
+                  <input type="radio" class="quiz-radio-input" name="q{{ forloop.parentloop.counter0 }}" value="{{ option.0 }}" required>
+                  {{ option.1 }}
+                </label>
+              {% endfor %}
+            </div>
+          </div>
+        {% endfor %}
+        <button type="submit" class="quiz-primary-btn">Submit Quiz</button>
+      </form>
+    {% endif %}
+  
+    {% if show_results %}
+      <div class="quiz-subject-header">
+        <h2 class="quiz-subject-heading">Your Score: {{ score }} / {{ results|length }}</h2>
+      </div>
+      <ul class="quiz-results-list">
+        {% for r in results %}
+          <li class="quiz-result-item">
+            <strong>{{ r.question }}</strong><br>
+            Your Answer: <span class="{% if r.is_correct %}quiz-answer-correct{% else %}quiz-answer-wrong{% endif %}">{{ r.your_answer }}</span><br>
+            Correct Answer: {{ r.correct }}
+          </li>
+        {% endfor %}
+      </ul>
+      <div class="quiz-actions-container">
+        <a href="{% url 'quiz' %}" class="quiz-nav-btn">
+          Try Another Subject
+        </a>
+        <button onclick="toggleSubjectForm()" class="quiz-secondary-btn">
+          Keep Questions, Change Subject
+        </button>
+      </div>
+    {% endif %}
+  </div>
+  
+  <script>
+    function toggleSubjectForm() {
+      const form = document.getElementById('quiz-subject-form');
+      form.style.display = form.style.display === 'none' ? 'block' : 'none';
+    }
+  </script>
+  </body>
+  </html>
+  
+  {% endblock %}

@@ -803,6 +803,48 @@ def toggle_subtask(request, subtask_id):
     subtask.save()
     return JsonResponse({"id": subtask.id, "completed": subtask.completed})
 
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import get_object_or_404
+
+import json
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import get_object_or_404
+from .models import SubTask  # make sure SubTask is imported
+
+@csrf_exempt
+def edit_subtask(request, subtask_id):
+    subtask = get_object_or_404(SubTask, id=subtask_id)
+    
+    if request.method == 'PUT':
+        try:
+            data = json.loads(request.body)
+            new_title = data.get('title')
+            if new_title:
+                subtask.title = new_title
+                subtask.save()
+                return JsonResponse({'success': True, 'id': subtask.id, 'title': subtask.title})
+            else:
+                return JsonResponse({'success': False, 'error': 'Title is required'}, status=400)
+        except json.JSONDecodeError:
+            return JsonResponse({'success': False, 'error': 'Invalid JSON'}, status=400)
+
+    return JsonResponse({'success': False, 'error': 'Invalid request method'}, status=400)
+
+
+
+
+@csrf_exempt
+def delete_subtask(request, subtask_id):
+    subtask = get_object_or_404(SubTask, id=subtask_id)
+    if request.method == 'DELETE':
+        subtask.delete()
+        return JsonResponse({'success': True, 'deleted_id': subtask_id})
+    return JsonResponse({'success': False, 'error': 'Invalid request method'}, status=400)
+
+
+
 
 from django.shortcuts import render
 
@@ -2446,8 +2488,7 @@ def get_schedule(request):
 from django.shortcuts import render, redirect
 import google.generativeai as genai
 
-# Configure your Gemini model
-genai.configure(api_key="YOUR_GEMINI_API_KEY")
+
 model = genai.GenerativeModel("gemini-1.5-flash")
 
 

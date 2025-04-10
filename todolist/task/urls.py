@@ -17,6 +17,8 @@ urlpatterns = [
     path("api/tasks/<int:task_id>/subtasks/", get_subtasks),
     path("api/tasks/<int:task_id>/subtasks/add/", add_subtask),
     path("api/subtasks/<int:subtask_id>/toggle/", toggle_subtask),
+    path('api/subtasks/<int:subtask_id>/update/', edit_subtask, name='edit_subtask'),
+    path('api/subtasks/<int:subtask_id>/delete/', delete_subtask, name='delete_subtask'),
 
 
     path('teams/', teams_list, name='teams_list'),  # Show all teams
@@ -59,8 +61,5 @@ urlpatterns = [
 
 
     path('quiz/', quiz, name='quiz'),
-
-
-
   
 ]

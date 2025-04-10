@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Subtasks</title>
   <style>
-    /* General Styles */
     body {
       font-family: 'Arial', sans-serif;
       background: linear-gradient(135deg, #f5f7fa, #e6e9ef);
@@ -26,13 +25,6 @@
       padding: 30px;
     }
 
-    .custom-subtask-title {
-      color: #2c3e50;
-      font-size: 28px;
-      margin-bottom: 20px;
-      font-weight: 600;
-    }
-
     .custom-subtask-heading {
       color: #34495e;
       font-size: 22px;
@@ -40,7 +32,6 @@
       font-weight: 500;
     }
 
-    /* Subtask List */
     .custom-subtask-list {
       list-style-type: none;
       padding: 0;
@@ -56,6 +47,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 10px;
       transition: all 0.3s ease;
     }
 
@@ -64,12 +56,11 @@
       box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
     }
 
-    .custom-completed {
+    .custom-completed .custom-subtask-text {
       text-decoration: line-through;
       color: #95a5a6;
     }
 
-    /* Toggle Button */
     .custom-toggle-button {
       background: none;
       border: 2px solid #1abc9c;
@@ -95,7 +86,6 @@
       font-size: 14px;
     }
 
-    /* Loading Animation for Toggle Button */
     .custom-toggle-button.loading::before {
       content: "";
       width: 16px;
@@ -111,23 +101,35 @@
       100% { transform: rotate(360deg); }
     }
 
-    /* Subtask Text */
     .custom-subtask-text {
       flex: 1;
-      margin: 0 16px;
+      margin: 0 10px;
       font-size: 16px;
       color: #333;
     }
 
-    /* Add Subtask Form */
+    .subtask-actions button {
+      background: none;
+      border: none;
+      color: #3498db;
+      cursor: pointer;
+      font-size: 14px;
+      margin-left: 5px;
+    }
+
+    .subtask-actions button:hover {
+      text-decoration: underline;
+    }
+
     .custom-subtask-form {
       display: flex;
+      flex-wrap: wrap;
       gap: 12px;
       margin-top: 24px;
     }
 
     .custom-subtask-form input {
-      flex: 1;
+      flex: 1 1 auto;
       padding: 12px;
       border: 2px solid #ddd;
       border-radius: 12px;
@@ -146,11 +148,12 @@
       color: white;
       border: none;
       border-radius: 12px;
-      padding: 12px 24px;
+      padding: 12px 20px;
       font-size: 16px;
       font-weight: 500;
       cursor: pointer;
       transition: all 0.3s ease;
+      flex: 0 0 auto;
     }
 
     .custom-subtask-form button.loading {
@@ -158,13 +161,6 @@
       cursor: not-allowed;
     }
 
-    .custom-subtask-form button:hover:not(.loading) {
-      background: linear-gradient(135deg, #16a085, #1abc9c);
-      transform: translateY(-2px);
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    }
-
-    /* Empty State */
     .custom-empty-state {
       text-align: center;
       color: #95a5a6;
@@ -172,29 +168,17 @@
       margin-top: 20px;
     }
 
-    /* Responsive Design */
     @media (max-width: 600px) {
       .custom-subtask-container {
         padding: 20px;
-      }
-
-      .custom-subtask-title {
-        font-size: 24px;
-      }
-
-      .custom-subtask-heading {
-        font-size: 20px;
       }
 
       .custom-subtask-form {
         flex-direction: column;
       }
 
+      .custom-subtask-form button,
       .custom-subtask-form input {
-        width: 100%;
-      }
-
-      .custom-subtask-form button {
         width: 100%;
       }
     }
@@ -202,20 +186,17 @@
 </head>
 <body>
   <div class="custom-subtask-container">
-   
     <h3 class="custom-subtask-heading">Subtasks</h3>
 
-    <!-- Subtask List -->
     <ul class="custom-subtask-list" id="subtask-list"></ul>
     <p id="empty-message" class="custom-empty-state" style="display: none;">No subtasks yet.</p>
 
-    <!-- Add Subtask Form -->
     <div class="custom-subtask-form">
       <input type="text" id="new-subtask" placeholder="Add a new subtask">
       <button id="add-button" onclick="addSubtask()">Add</button>
+      <button id="suggest-button" onclick="suggestSubtasks()">AI Suggestions</button>
     </div>
 
-    <!-- CSRF Token (Hidden) -->
     <input type="hidden" id="csrf-token" value="{{ csrf_token }}">
   </div>
 
@@ -223,7 +204,6 @@
     const taskId = {{ task.id }};
     const csrfToken = document.getElementById("csrf-token").value;
 
-    // Fetch and display subtasks
     async function fetchSubtasks() {
       const response = await fetch(`/api/tasks/${taskId}/subtasks/`);
       const subtasks = await response.json();
@@ -239,20 +219,22 @@
           li.className = `custom-subtask-item ${subtask.completed ? "custom-completed" : ""}`;
           li.innerHTML = `
             <div class="custom-toggle-button ${subtask.completed ? "custom-completed" : ""}" onclick="toggleSubtask(${subtask.id})"></div>
-            <p class="custom-subtask-text">${subtask.title}</p>
+            <p class="custom-subtask-text" id="text-${subtask.id}">${subtask.title}</p>
+            <div class="subtask-actions">
+              <button onclick="editSubtask(${subtask.id}, '${subtask.title.replace(/'/g, "\\'")}')">Edit</button>
+              <button onclick="deleteSubtask(${subtask.id})">Delete</button>
+            </div>
           `;
           subtaskList.appendChild(li);
         });
       }
     }
 
-    // Add a new subtask
     async function addSubtask() {
       const addButton = document.getElementById("add-button");
-      const title = document.getElementById("new-subtask").value;
+      const title = document.getElementById("new-subtask").value.trim();
       if (!title) return alert("Subtask title is required!");
 
-      // Disable button and show loading state
       addButton.textContent = "Adding...";
       addButton.classList.add("loading");
 
@@ -272,15 +254,13 @@
         alert("Error adding subtask!");
       }
 
-      // Re-enable button
       addButton.textContent = "Add";
       addButton.classList.remove("loading");
     }
 
-    // Toggle subtask completion
     async function toggleSubtask(subtaskId) {
-      const toggleButton = document.querySelector(`.custom-toggle-button[onclick="toggleSubtask(${subtaskId})"]`);
-      toggleButton.classList.add("loading");
+      const button = document.querySelector(`.custom-toggle-button[onclick="toggleSubtask(${subtaskId})"]`);
+      button.classList.add("loading");
 
       const response = await fetch(`/api/subtasks/${subtaskId}/toggle/`, {
         method: "POST",
@@ -293,10 +273,81 @@
         alert("Error toggling subtask!");
       }
 
-      toggleButton.classList.remove("loading");
+      button.classList.remove("loading");
     }
 
-    // Load subtasks on page load
+    async function deleteSubtask(subtaskId) {
+      const confirmed = confirm("Are you sure you want to delete this subtask?");
+      if (!confirmed) return;
+
+      const response = await fetch(`/api/subtasks/${subtaskId}/delete/`, {
+        method: "DELETE",
+        headers: { "X-CSRFToken": csrfToken }
+      });
+
+      if (response.ok) {
+        fetchSubtasks();
+      } else {
+        alert("Error deleting subtask!");
+      }
+    }
+
+    function editSubtask(id, currentTitle) {
+      const textEl = document.getElementById(`text-${id}`);
+      const newTitle = prompt("Edit subtask title:", currentTitle);
+      if (newTitle && newTitle.trim() !== "" && newTitle !== currentTitle) {
+        updateSubtask(id, newTitle);
+      }
+    }
+
+    async function updateSubtask(id, title) {
+      const response = await fetch(`/api/subtasks/${id}/update/`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": csrfToken
+        },
+        body: JSON.stringify({ title })
+      });
+
+      if (response.ok) {
+        fetchSubtasks();
+      } else {
+        alert("Error updating subtask!");
+      }
+    }
+
+    async function suggestSubtasks() {
+      const suggestButton = document.getElementById("suggest-button");
+      suggestButton.textContent = "Suggesting...";
+      suggestButton.classList.add("loading");
+
+      try {
+        const response = await fetch(`/api/tasks/${taskId}/subtasks/ai_suggestions/`, {
+          method: "GET",
+          headers: { "X-CSRFToken": csrfToken }
+        });
+
+        const suggestions = await response.json();
+        for (let suggestion of suggestions) {
+          await fetch(`/api/tasks/${taskId}/subtasks/add/`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-CSRFToken": csrfToken
+            },
+            body: JSON.stringify({ title: suggestion })
+          });
+        }
+        fetchSubtasks();
+      } catch (err) {
+        alert("Failed to fetch suggestions.");
+      }
+
+      suggestButton.textContent = "AI Suggestions";
+      suggestButton.classList.remove("loading");
+    }
+
     fetchSubtasks();
   </script>
 </body>

@@ -132,3 +132,42 @@ def chat_ai_view(request, task_id):
         return JsonResponse(messages_list, safe=False)
 
     return JsonResponse({'status': 'error', 'message': 'Invalid request method'})
+
+
+
+
+import google.generativeai as genai
+from django.conf import settings
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_GET
+from task.models import Task
+import re
+genai.configure(api_key="AIzaSyDx3rr0MzUPaumvdII3WIffmtsZqAz7JIs")
+
+@require_GET
+@csrf_exempt
+def ai_subtask_suggestions(request, task_id):
+    try:
+        task = Task.objects.get(pk=task_id)
+    except Task.DoesNotExist:
+        return JsonResponse({"error": "Task not found"}, status=404)
+
+    model = genai.GenerativeModel('gemini-1.5-flash')
+
+    prompt = f"Generate 4 helpful subtasks for the main task: \"{task.title}\". Keep them short and actionable."
+    
+    response = model.generate_content(prompt)
+
+    # Parse response safely (you can adjust this based on the format Gemini returns)
+    text = response.text.strip()
+    suggestions = []
+
+    for line in text.splitlines():
+        # Clean line: remove bullets, asterisks, and sequence numbers like "1.", "1)", etc.
+        clean_line = re.sub(r"^\s*(?:[-•*]|\d+[.)])\s*", "", line)  # remove bullets or numbering
+        clean_line = clean_line.replace("**", "").strip()  # remove bold markers
+        if clean_line:
+            suggestions.append(clean_line)
+
+    return JsonResponse(suggestions, safe=False)

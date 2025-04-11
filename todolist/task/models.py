@@ -321,55 +321,62 @@ class PartnerFeedback(models.Model):
     class Meta:
         ordering = ['-created_at']  # Orders feedbacks by creation date (newest first)
 
+from cloudinary.uploader import upload
+from cloudinary.models import CloudinaryField
+
 class TaskCompletionDetails(models.Model):
     task = models.OneToOneField(
         Task, 
         on_delete=models.CASCADE, 
         related_name='completion_details'
-    )  # Links completion details to a single task
+    )
     completion_details = models.TextField()
-    completion_files = models.JSONField(default=list)  # Stores file URLs as a JSON list
-    uploaded_file = models.FileField(
-        upload_to='completion_files/', 
-        blank=True, 
-        null=True
-    )  # For videos or general files
-    uploaded_image = models.ImageField(
-        upload_to='completion_images/', 
-        blank=True, 
-        null=True
-    )  # For images
+    completion_files = models.JSONField(default=list)
+    uploaded_image = CloudinaryField('image', blank=True, null=True)
+    uploaded_file = CloudinaryField('file', blank=True, null=True)
     partner_feedback = models.OneToOneField(
         PartnerFeedback, 
         on_delete=models.SET_NULL, 
         null=True, 
         blank=True, 
         related_name='completion_details'
-    )  # Links feedback to completion details
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"Completion Details for Task {self.task.id}"
 
     def has_details(self):
-        """Check if completion details are provided."""
         return bool(self.completion_details)
 
     def has_files(self):
-        """Check if completion files are provided."""
         return bool(self.completion_files)
 
     def has_uploaded_file(self):
-        """Check if an uploaded file (e.g., video) is provided."""
         return bool(self.uploaded_file)
 
     def has_uploaded_image(self):
-        """Check if an uploaded image is provided."""
         return bool(self.uploaded_image)
 
     def has_partner_feedback(self):
-        """Check if partner feedback is provided."""
         return bool(self.partner_feedback)
+
+    def save(self, *args, **kwargs):
+        if hasattr(self, '_image_file'):
+            uploaded_image = upload(
+                self._image_file,
+                folder=f'share-task-media/task_completions/{self.task.id}/images'
+            )
+            self.uploaded_image = uploaded_image['public_id']
+
+        if hasattr(self, '_file_file'):
+            uploaded_file = upload(
+                self._file_file,
+                folder=f'share-task-media/task_completions/{self.task.id}/files'
+            )
+            self.uploaded_file = uploaded_file['public_id']
+
+        super().save(*args, **kwargs)
 
 
 

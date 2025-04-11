@@ -60,8 +60,27 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+
+     'cloudinary',
+    'cloudinary_storage',
 ]
 
+
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': 'ddw1upvx3',
+    'API_KEY': '935838691454949',
+    'API_SECRET': '2ZR0CSz_KyiZUN96SEmtB9Zwp7U',
+}
+
+import cloudinary
+
+cloudinary.config( 
+  cloud_name = 'ddw1upvx3', 
+  api_key = '935838691454949', 
+  api_secret = '2ZR0CSz_KyiZUN96SEmtB9Zwp7U'
+)
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 
 

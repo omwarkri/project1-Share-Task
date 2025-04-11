@@ -945,15 +945,16 @@ def complete_task(request, task_id):
             uploaded_image = request.FILES.get('uploaded_image')
             uploaded_file = request.FILES.get('uploaded_file')
 
-            completion = TaskCompletionDetails.objects.create(
-                task=task,
-                completion_details=completion_details,
-                uploaded_image=uploaded_image,
-                uploaded_file=uploaded_file
-            )
+            completion = TaskCompletionDetails(
+            task=task,
+            completion_details=completion_details
+        )
 
-            task.status = 'completed'
-            task.save()
+        # Temporarily attach uploaded files to trigger Cloudinary uploads in the save() method
+            completion._image_file = uploaded_image  # Should be from request.FILES.get(...)
+            # completion._file_file = uploaded_file    # Should be from request.FILES.get(...)
+
+            completion.save()
 
             # Save partner feedback if provided
             partner_feedback = None

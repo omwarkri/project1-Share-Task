@@ -2506,13 +2506,17 @@ def parse_mcqs(text):
             'correct': correct.lower()
         })
     return questions
-
-
 def quiz(request):
-    if request.method == "POST" and "subject" in request.POST:
-        subject = request.POST["subject"]
-        prompt = f"""
-Generate 50 multiple-choice questions on the subject: "{subject}".
+    if request.method == "POST":
+        if "subject" in request.POST:
+            # Quiz generation request
+            subject = request.POST["subject"]
+            level = request.POST.get("level", "beginner")  # default to beginner
+            question_count = int(request.POST.get("question_count", 10))  # default to 10
+
+            prompt = f"""
+Generate {question_count} multiple-choice questions on the subject: "{subject}".
+Difficulty level: {level.capitalize()}.
 
 Use this exact format:
 
@@ -2525,50 +2529,60 @@ d) Option D
 
 **Correct Answer: b)**
 
-Repeat the format for all 5 questions.
+Repeat the format for all {question_count} questions.
 """
-        response = model.generate_content(prompt)
-        text = response.candidates[0].content.parts[0].text.strip()
 
-        questions = parse_mcqs(text)
+            response = model.generate_content(prompt)
+            text = response.candidates[0].content.parts[0].text.strip()
+            questions = parse_mcqs(text)
 
-        request.session["quiz"] = questions
-        request.session["subject"] = subject
+            request.session["quiz"] = questions
+            request.session["subject"] = subject
+            request.session["level"] = level
+            request.session["question_count"] = question_count
 
-        return render(request, "quiz/ai_quiz.html", {
-            "questions": questions,
-            "subject": subject,
-            "show_quiz": True,
-            "show_results": False
-        })
-
-    elif request.method == "POST" and "q0" in request.POST:
-        questions = request.session.get("quiz", [])
-        subject = request.session.get("subject", "Unknown")
-
-        score = 0
-        results = []
-
-        for i, q in enumerate(questions):
-            selected = request.POST.get(f"q{i}")
-            is_correct = selected == q["correct"]
-            if is_correct:
-                score += 1
-            results.append({
-                "question": q["question"],
-                "your_answer": dict(q["options"]).get(selected, ""),
-                "correct": dict(q["options"]).get(q["correct"], ""),
-                "is_correct": is_correct
+            return render(request, "quiz/ai_quiz.html", {
+                "questions": questions,
+                "subject": subject,
+                "level": level,
+                "question_count": question_count,
+                "show_quiz": True,
+                "show_results": False
             })
 
-        return render(request, "quiz/ai_quiz.html", {
-            "score": score,
-            "results": results,
-            "subject": subject,
-            "show_quiz": False,
-            "show_results": True
-        })
+        elif any(key.startswith("q") for key in request.POST):
+            # Quiz submission request
+            questions = request.session.get("quiz", [])
+            subject = request.session.get("subject", "Unknown")
+            level = request.session.get("level", "Unknown")
+            question_count = request.session.get("question_count", len(questions))
 
+            score = 0
+            results = []
+
+            for i, q in enumerate(questions):
+                selected = request.POST.get(f"q{i}")
+                is_correct = selected == q["correct"]
+                if is_correct:
+                    score += 1
+                results.append({
+                    "question": q["question"],
+                    "your_answer": dict(q["options"]).get(selected, ""),
+                    "correct": dict(q["options"]).get(q["correct"], ""),
+                    "is_correct": is_correct
+                })
+
+            return render(request, "quiz/ai_quiz.html", {
+                "score": score,
+                "results": results,
+                "subject": subject,
+                "level": level,
+                "question_count": question_count,
+                "show_quiz": False,
+                "show_results": True
+            })
+
+    # Default (GET or invalid POST)
     return render(request, "quiz/ai_quiz.html", {
         "show_quiz": False,
         "show_results": False

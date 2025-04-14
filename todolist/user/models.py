@@ -8,10 +8,13 @@ from django.contrib.auth.models import AbstractUser, Group, Permission
 
 from django.db import models
 from django.contrib.auth.models import AbstractUser, Group, Permission
+
 from cloudinary.models import CloudinaryField
+
+
 class CustomUser(AbstractUser):
     phone_number = models.CharField(max_length=15, blank=True, null=True)
-    profile_picture = CloudinaryField('image', folder='profile_pictures', blank=True, null=True)
+    profile_picture = CloudinaryField('image', blank=True, null=True)
     tasks = models.ManyToManyField('task.Task', related_name='users', blank=True)
     score = models.IntegerField(default=0)
     followers = models.ManyToManyField('self', symmetrical=False, related_name='following', blank=True)
@@ -23,7 +26,7 @@ class CustomUser(AbstractUser):
         Group,
         related_name='customuser_set',  # Custom related name
         blank=True
-    ) 
+    )
     user_permissions = models.ManyToManyField(
         Permission,
         related_name='customuser_set',  # Custom related name
@@ -31,9 +34,9 @@ class CustomUser(AbstractUser):
     )
 
     def __str__(self):
-        return self.username or f"User-{self.id}"
+        return str(self.username)
 
-    
+
     def follow(self, user):
         """Follow another user."""
         self.following.add(user)
@@ -52,7 +55,8 @@ class CustomUser(AbstractUser):
 
     def get_following_count(self):
         """Get the number of users the current user is following."""
-        return self.following.count()   
+        return self.following.count()
+
 
 # Activity Log Model (for tracking user activities)
 class UserActivity(models.Model):
@@ -66,15 +70,17 @@ class UserActivity(models.Model):
     def __str__(self):
         return f"{self.user.username} - {self.activity_date} - {self.activity_type}"
 
+
 # Badge Model
 class Badge(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField()
-    icon = models.ImageField(upload_to='badge_icons/', blank=True, null=True)
+    icon = CloudinaryField('image', folder='badges', blank=True, null=True)
     min_score = models.IntegerField(default=0)
 
     def __str__(self):
-        return self.name
+        return self.name  # ⚠️ if name is None, this causes TypeError
+
 
 # UserBadge Model for linking Users and Badges (Through Model for Many-to-Many)
 class UserBadge(models.Model):

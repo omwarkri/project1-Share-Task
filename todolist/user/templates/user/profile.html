@@ -9,383 +9,244 @@
     <title>User Profile</title>
     {% load custom_filters %}
     <style>
-        /* Reset default margins and padding */
-        
-
-        /* General Styles */
-        h1, h2 {
-            color: #1abc9c;
-          
-            font-weight: 600;
+        /* Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        h1 {
-            font-size: 2.5em;
+        /* Vibrant Color Palette */
+        :root {
+            --primary: #1abc9c;
+            --primary-dark: #16a085;
+            --secondary: #3498db;
+            --accent: #f1c40f;
+            --danger: #e74c3c;
+            --success: #2ecc71;
+            --text: #2c3e50;
+            --light-bg: #f8f9fa;
+            --card-bg: #ffffff;
         }
 
-        h2 {
-            font-size: 1.8em;
+        /* Animations */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
         }
 
-        p {
-            font-size: 1.1em;
-            color: #555;
-            margin: 5px 0;
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
+            100% { transform: translateY(0px); }
+        }
+
+        @keyframes glow {
+            0% { box-shadow: 0 0 5px rgba(26, 188, 156, 0.5); }
+            50% { box-shadow: 0 0 20px rgba(26, 188, 156, 0.8); }
+            100% { box-shadow: 0 0 5px rgba(26, 188, 156, 0.5); }
         }
 
         /* Profile Main Container */
         .profile-main {
-            height: 100vh; /* Full viewport height */
-            overflow-y: auto; /* Enable vertical scrolling */
-            background-color: #fff; /* Optional: Add a background color */
-            box-sizing: border-box; /* Include padding in height calculation */
-            
-            
-        }
-
-        .profile-main h3{
-            color: rgba(0, 26, 23, 0.76);
-        }
-
-        /* Custom Scrollbar Styles */
-        .profile-main::-webkit-scrollbar {
-            width: 10px; /* Width of the scrollbar */
-        }
-
-        .profile-main::-webkit-scrollbar-track {
-            background: #f1f1f1; /* Color of the track */
-            border-radius: 10px; /* Rounded corners for the track */
-        }
-
-        .profile-main::-webkit-scrollbar-thumb {
-            background: #1abc9c; /* Color of the scrollbar thumb */
-            border-radius: 10px; /* Rounded corners for the thumb */
-            border: 2px solid #f1f1f1; /* Border around the thumb */
-        }
-
-        .profile-main::-webkit-scrollbar-thumb:hover {
-            background: #16a085; /* Color of the thumb on hover */
-        }
-
-        .left-section::-webkit-scrollbar,
-        .right-section::-webkit-scrollbar {
-            width: 8px; /* Width of the scrollbar */
-        }
-
-        .left-section::-webkit-scrollbar-track,
-        .right-section::-webkit-scrollbar-track {
-            background: #f1f1f1; /* Color of the track */
-            border-radius: 10px; /* Rounded corners for the track */
-        }
-
-        .left-section::-webkit-scrollbar-thumb,
-        .right-section::-webkit-scrollbar-thumb {
-            background: #134f43c1; /* Color of the scrollbar thumb */
-            border-radius: 10px; /* Rounded corners for the thumb */
-            border: 2px solid #f1f1f1; /* Border around the thumb */
-        }
-
-        .left-section::-webkit-scrollbar-thumb:hover,
-        .right-section::-webkit-scrollbar-thumb:hover {
-            background: #134f43c1;
+            height: 100vh;
+            overflow-y: auto;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
+            padding: 20px;
         }
 
         /* Flex Container */
         .flex-container {
             display: flex;
-            gap: 8px; /* Space between left and right sections */
-            height: 100%; /* Take full height of the parent */
+            gap: 20px;
+            height: 100%;
         }
 
         /* Left Section */
         .left-section {
-    flex: 1;
-    max-width: 400px;
-    overflow-y: auto;
-    display: flex
-;
-    align-items: start;
-    justify-content: center;
-}
+            flex: 1;
+            max-width: 400px;
+            overflow-y: auto;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+        }
 
         /* Right Section */
         .right-section {
-            flex: 2; /* Take up 2 parts of the available space */
-            overflow-y: auto; /* Enable scrolling if content overflows */
+            flex: 2;
+            overflow-y: auto;
+            padding: 20px;
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
         }
 
-        /* Right Section Styles */
-.right-section {
-    flex: 2; /* Take up 2 parts of the available space */
-    overflow-y: auto; /* Enable scrolling if content overflows */
-    padding: 20px; /* Add padding for better spacing */
-    background-color: #ffffff97; /* White background for contrast */
-    border-radius: 12px; /* Rounded corners */
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-    margin-left: 20px; /* Space between left and right sections */
-}
-
-/* Card Styles in Right Section */
-.right-section .card {
-    background: #ffffff;
-    padding: 0px;
-    /* border-radius: 12px; */
-    /* box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); */
-    /* margin-bottom: 20px; */
-    width: 100%;
-    text-align: left;
-}
-.card {
-    background: white;
-    padding: 30px;
-    border-radius: 12px;
-    margin-bottom: 20px;
-    width: 100%;
-    text-align: center;
-}
-
-
-.bio{
-    display: flex;
-    gap:8px;
-    align-items: center;
-}
-
-/* Analytics Button */
-.right-section .analytics-button {
-    background-color: #3498db; /* Blue color */
-    color: white;
-    border: none;
-    padding: 12px 24px;
-    border-radius: 8px;
-    font-size: 1em;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-    margin-bottom: 20px; /* Space below the button */
-    width: 100%; /* Full width */
-}
-
-.right-section .analytics-button:hover {
-    background-color: #2980b9; /* Darker blue on hover */
-    transform: translateY(-2px); /* Slight lift effect */
-}
-
-/* Calendar Styles */
-.right-section .calendar {
-    display: grid;
-    grid-template-rows: repeat(10, 15px); /* Smaller rows for mobile */
-    gap: 5px; /* Space between days */
-    margin-top: 20px;
-    background-color: #f8f9fa; /* Light background */
-  
-    border-radius: 10px;
-  
-}
-
-.right-section .calendar-header {
-    grid-column: 1 / -1; /* Span across all columns */
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 0.9em;
-    color: #555;
-    margin-bottom: 10px;
-    font-weight: 500;
-}
-
-.right-section .calendar-header span {
-    margin: 0 5px;
-}
-
-.right-section .day {
-    width: 20px;
-    height: 15px;
-    background-color: #e0e0e0; /* Default color */
-    border-radius: 3px;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-}
-
-.right-section .day:hover {
-    transform: scale(1.2); /* Slight zoom on hover */
-    opacity: 0.8; /* Slight transparency */
-}
-
-/* Color Classes for Calendar */
-.right-section .green { background-color: #1abc9c; } /* Light green */
-.right-section .dark-green { background-color: #16a085; } /* Dark green */
-.right-section .yellow { background-color: #FFEB3B; } /* Yellow */
-
-/* Rating and Reviews Section */
-.right-section .rating-reviews {
-    margin-top: 30px;
-}
-
-.right-section .rating-reviews h2 {
-    font-size: 1.8em;
-    margin-bottom: 20px;
-    color: #1abc9c; /* Accent color */
-}
-
-.right-section .review-card {
-    background: #ffffff;
-    border-radius: 10px;
-    
-    padding: 20px;
-    margin-bottom: 15px;
-    text-align: left;
-}
-
-.right-section .review-card p {
-    margin: 5px 0;
-    color: #555;
-}
-
-.right-section .review-card .rating {
-    font-weight: bold;
-    color: #FFD700; /* Gold color for ratings */
-}
-
-.right-section .review-card .comment {
-    font-style: italic;
-    margin-top: 10px;
-}
-
-.right-section .review-card .timestamp {
-    font-size: 0.9em;
-    color: #888;
-}
-
-/* Report Form Styles */
-.right-section #reportForm {
-    margin-bottom: 20px;
-}
-
-.right-section #reportForm label {
-    display: block;
-    font-weight: 600;
-    margin-bottom: 8px;
-    color: #1abc9c; /* Accent color */
-}
-
-.right-section #reportForm .form-select {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ffffff72;
-    border-radius: 8px;
-    font-size: 1em;
-    color: #555;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-.right-section #reportForm .form-select:focus {
-    border-color: #1abc9c;
-    box-shadow: 0 0 8px rgba(26, 188, 156, 0.3);
-    outline: none;
-}
-
-.right-section #reportForm .btn {
-    padding: 10px 20px;
-    border-radius: 8px;
-    font-size: 1em;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-    margin-right: 10px; /* Space between buttons */
-}
-
-.right-section #reportForm .btn-primary {
-    background-color: #1abc9c; /* Accent color */
-    color: white;
-    border: none;
-}
-
-.right-section #reportForm .btn-primary:hover {
-    background-color: #16a085; /* Darker accent color */
-    transform: translateY(-2px);
-}
-
-.right-section #reportForm .btn-danger {
-    background-color: #e74c3c; /* Red color */
-    color: white;
-    border: none;
-}
-
-.right-section #reportForm .btn-danger:hover {
-    background-color: #c0392b; /* Darker red */
-    transform: translateY(-2px);
-}
-
         /* Card Styles */
-     
+        .card {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
 
-        /* Profile Picture Styles */
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+        }
+
+        /* Profile Picture */
         .profile-picture-container {
             margin: 20px 0;
+            position: relative;
         }
 
         .profile-picture {
-            width: 70px;
-            height: 70px;
+            width: 120px;
+            height: 120px;
             border-radius: 50%;
             object-fit: cover;
-            border: 2px solid #1abc9c;
-            transition: transform 0.3s ease;
+            border: 4px solid var(--primary);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(26, 188, 156, 0.3);
         }
 
         .profile-picture:hover {
             transform: scale(1.05);
+            border-color: var(--accent);
+            animation: pulse 2s infinite;
         }
 
-        /* User Score */
-        .user-score {
-            font-size: 1.2em;
-            color: #1abc9c;
-            margin-top: -8px;
-
-        }
-
-        .name-badge{
+        /* Level Indicator */
+        .level-indicator {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: var(--accent);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
+            font-weight: bold;
+            border: 2px solid white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Score Display */
+        .user-score {
+            font-size: 1.5em;
+            color: var(--primary);
+            margin: 10px 0;
+            font-weight: bold;
+            position: relative;
+        }
+
+        .user-score::after {
+            content: '';
+            display: block;
+            width: 50px;
+            height: 3px;
+            background: var(--primary);
+            margin: 5px auto;
+            border-radius: 3px;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            margin: 20px 0;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+            color: var(--text);
+        }
+
+        .progress-bar {
+            height: 10px;
+            background: #e0e0e0;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+            border-radius: 5px;
+            transition: width 1s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(
+                90deg,
+                rgba(255, 255, 255, 0.1) 0%,
+                rgba(255, 255, 255, 0.4) 50%,
+                rgba(255, 255, 255, 0.1) 100%
+            );
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
         }
 
         /* Badges Section */
         .badges-section {
-            margin: 20px 0;
+            margin: 30px 0;
         }
 
-        .badges-section h3 {
-            font-size: 1.5em;
-            color: #1abc9c;
-            margin-bottom: 10px;
-        }
-
-        .badges {
+        .badges-container {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            gap: 10px;
-            margin: 20px 0;
+            gap: 15px;
+            margin-top: 20px;
         }
 
         .badge {
+            width: 60px;
+            height: 60px;
             border-radius: 50%;
-            width: 50px;
-            height: 50px;
             display: flex;
-            justify-content: center;
             align-items: center;
-            background-color: #1abc9c;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: white;
-            font-size: 1.2em;
-            font-weight: bold;
-            transition: transform 0.3s ease;
+            font-size: 1.5em;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .badge.locked {
+            background: #e0e0e0;
+            filter: grayscale(100%);
         }
 
         .badge:hover {
-            transform: scale(1.1);
+            transform: translateY(-5px) scale(1.1);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
         }
 
         .badge img {
@@ -395,538 +256,472 @@
             object-fit: cover;
         }
 
-        /* Edit Button Styles */
+        .badge-tooltip {
+            position: absolute;
+            bottom: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--text);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.8em;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        .badge:hover .badge-tooltip {
+            opacity: 1;
+        }
+
+        /* Streak Counter */
+        .streak-counter {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .streak-icon {
+            font-size: 1.8em;
+            margin-right: 10px;
+            animation: pulse 1.5s infinite;
+        }
+
+        .streak-count {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        /* Buttons */
+        .edit-button, .logout-button {
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px 5px;
+            border: none;
+            width: 100%;
+        }
+
         .edit-button {
-    background-color: #1abc9c;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 1em;
-    font-weight: 500;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-    /* margin-top: 20px; */
-}
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            box-shadow: 0 4px 15px rgba(26, 188, 156, 0.3);
+        }
 
         .edit-button:hover {
-            background-color: #16a085;
-            transform: translateY(-2px);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(26, 188, 156, 0.4);
         }
 
-        .edit-button:active {
-            transform: translateY(0);
-        }
-
-        /* Analytics Button */
-.analytics-button {
-    background-color: #3498db;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 1em;
-    font-weight: 500;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-    margin-top: 20px;
-}
-
-.analytics-button:hover {
-    background-color: #2980b9;
-    transform: translateY(-2px);
-}
-
-
-/* Toggle Buttons */
-.toggle-buttons {
-    display: flex;
-    gap: 10px; /* Space between buttons */
-    margin-bottom: 20px; /* Space below buttons */
-}
-
-.toggle-button {
-    background-color: #f8f9fa; /* Light background */
-    color: #555; /* Dark text */
-    border: 1px solid #ddd; /* Light border */
-    padding: 10px 20px;
-    border-radius: 8px;
-    font-size: 1em;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-}
-
-.toggle-button.active {
-    background-color: #1abc9c; /* Accent color */
-    color: white; /* White text */
-    border: none;
-}
-
-.toggle-button:hover {
-    background-color: #16a085; /* Darker accent color */
-    color: white; /* White text */
-    transform: translateY(-2px); /* Slight lift effect */
-}
-
-/* Analytics Section Styles */
-.analytics-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 32px;
-    margin-bottom: 32px;
-    margin-top: 32px;
-}
-
-.analytics-card {
-    background: #ffffff;
-    border: 0.6px solid rgba(171, 171, 171, 0.501);
-    border-radius: 12px;
-    padding: 16px;
-    text-align: center;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.analytics-card:hover {
-    transform: translateY(-2px);
- 
-}
-
-.analytics-icon {
-    font-size: 2em;
-    color: #1abc9c;
-    margin-bottom: 10px;
-}
-
-.analytics-content h3 {
-    font-size: 1.2em;
-
-    margin-bottom: 10px;
-}
-
-.analytics-content p {
-    font-size: 1.5em;
-    color: #1abc9c;
-    font-weight: bold;
-}
-
-/* Progress Bar Styles */
-.progress-section {
-    margin-top: 30px;
-    display: flex;
-    flex-direction: column;
-    gap:16px
-}
-
-.progress-bar {
-    width: 100%;
-    height: 10px;
-    background-color: #e0e0e0;
-    border-radius: 5px;
-    overflow: hidden;
-}
-
-.progress-fill {
-    height: 100%;
-    background-color: #073a30d2;
-    transition: width 0.5s ease;
-}
-
-.progress-section p {
-    font-size: 1em;
-    color: #928f8fcf;
-    margin-top: 8px;
-}
-
-/* Chart Section Styles */
-.chart-section {
-    margin-top: 30px;
-}
-
-.chart-section h3 {
-    font-size: 1.5em;
-    color: #1abc9c;
-    margin-bottom: 20px;
-}
-
-#taskCategoriesChart {
-    max-width: 100%;
-    height: auto;
-}
-/* Modal Styles */
-.modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.modal-content {
-    background: white;
-
-    border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    text-align: center;
-    width: 400px;
-    position: relative;
-}
-
-.close {
-    position: absolute;
-    top: 10px;
-    right: 20px;
-    font-size: 24px;
-    cursor: pointer;
-}
-
-
-        /* Logout Button */
         .logout-button {
-            background-color: #e74c3c;
+            background: linear-gradient(135deg, var(--danger), #c0392b);
             color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1em;
-            font-weight: 500;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-            margin-top: 20px;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
         }
 
         .logout-button:hover {
-            background-color: #c0392b;
-            transform: translateY(-2px);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(231, 76, 60, 0.4);
         }
 
-        .logout-button:active {
-            transform: translateY(0);
+        /* Toggle Buttons */
+        .toggle-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
         }
+
+        .toggle-button {
+            flex: 1;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            background: #e0e0e0;
+            color: var(--text);
+        }
+
+        .toggle-button.active {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            box-shadow: 0 4px 15px rgba(26, 188, 156, 0.3);
+        }
+
+        .toggle-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Activity Calendar */
         .calendar {
             display: grid;
-            grid-template-rows: repeat(10, 15px); /* Arrange days vertically */
-            grid-auto-flow: column; /* Flow days into columns */
-            gap: 3px;
-            margin-top: 20px;
-            background-color: #fff;
+            grid-template-rows: repeat(7, 15px);
+            grid-auto-flow: column;
+            gap: 4px;
+            margin: 20px 0;
             padding: 20px;
+            background: white;
             border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-            overflow-y: scroll;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            overflow-x: auto;
         }
 
         .calendar-header {
             grid-column: 1 / -1;
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            font-size: 0.9em;
-            color: #555;
+            font-weight: 600;
+            color: var(--text);
             margin-bottom: 10px;
-            font-weight: 500;
-        }
-
-        .calendar-header span {
-            margin: 0 5px;
         }
 
         .day {
             width: 15px;
             height: 15px;
-            background-color: #e0e0e0;
             border-radius: 3px;
-            transition: background-color 0.3s ease, transform 0.2s ease;
+            background: #e0e0e0;
+            transition: all 0.3s ease;
+            cursor: pointer;
         }
 
         .day:hover {
             transform: scale(1.2);
-            opacity: 0.8;
         }
 
-        .day {
-            width: 12px;
-            height: 12px;
-            background-color: #e0e0e0;
-            border-radius: 3px;
-            transition: background-color 0.3s ease, transform 0.2s ease;
+        .day.today {
+            border: 2px solid var(--accent);
+            box-shadow: 0 0 0 2px white inset;
         }
 
-        .day:hover {
-            transform: scale(1.2);
-            opacity: 0.8;
+        .day.green { background: var(--primary); }
+        .day.dark-green { background: var(--primary-dark); }
+        .day.yellow { background: var(--accent); }
+
+        /* Analytics Cards */
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
         }
 
-        /* Color Classes */
-        .green { background-color: #1abc9c; }
-        .dark-green { background-color: #16a085; }
-        .yellow { background-color: #FFEB3B; }
-
-        /* Rating and Reviews Section */
-        .rating-reviews {
-            margin-top: 30px;
-        }
-
-        .rating-reviews h2 {
-            font-size: 1.8em;
-            margin-bottom: 20px;
-        }
-
-        .review-card {
-            background: #ffffff;
+        .analytics-card {
+            background: white;
             border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             padding: 20px;
-            margin-bottom: 15px;
-            text-align: left;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
         }
 
-        .review-card p {
-            margin: 5px 0;
-            color: #555;
+        .analytics-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
         }
 
-        .review-card .rating {
+        .analytics-icon {
+            font-size: 2.5em;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .analytics-card h3 {
+            font-size: 1.1em;
+            color: var(--text);
+            margin-bottom: 10px;
+        }
+
+        .analytics-card p {
+            font-size: 1.8em;
             font-weight: bold;
-            color: #FFD700;
+            color: var(--primary);
         }
 
-        .review-card .comment {
-            font-style: italic;
-            margin-top: 10px;
-        }
-
-        .review-card .timestamp {
-            font-size: 0.9em;
-            color: #888;
-        }
-
-      
-
-        /* Modal Header */
-        .modal-header {
-            background-color: #ffffff84;
-            position: relative;
-         
-        }
-
-        .modal-header h2 {
-            margin: 0;
-            font-size: 1.5em;
-            color: #1abc9c;
-        }
-
-        /* Close Button */
-        .close-button {
-            background: none;
-            border: none;
-            font-size: 1.5em;
-            cursor: pointer;
-            color: #555;
-            transition: color 0.3s ease;
-        }
-
-        .close-button:hover {
-            color: #1abc9c;
-        }
-
-        /* Form Group Styles */
-        #reportForm{
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            width: 40%;
-        }
-        .form-group {
-            margin-bottom: 20px;
-            text-align: left;
-        }
-
-        .form-group label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: #1abc9c;
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 1em;
-            color: #555;
-            transition: border-color 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .form-input:focus {
-            border-color: #1abc9c;
-            box-shadow: 0 0 8px rgba(26, 188, 156, 0.3);
-            outline: none;
-        }
-
-        /* Submit Button */
-        .submit-button {
-            background-color: #1abc9c;
+        /* Daily Challenge */
+        .daily-challenge {
+            background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
             color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            font-size: 1em;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-            width: 100%;
-            margin-top: 20px;
+            position: relative;
+            overflow: hidden;
         }
 
-        .submit-button:hover {
-            background-color: #16a085;
-            transform: translateY(-2px);
-        }
-
-        .submit-button:active {
-            transform: translateY(0);
-        }
-
-        .close-button{
+        .daily-challenge::before {
+            content: '';
             position: absolute;
-            right:10px;
-            top:10px;
-
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+            animation: rotate 15s linear infinite;
         }
 
-        /* Animation for Modal */
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .challenge-title {
+            font-size: 1.3em;
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        .challenge-description {
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .challenge-reward {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .reward-badge {
+            width: 40px;
+            height: 40px;
+            background: var(--accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .reward-points {
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .challenge-button {
+            background: white;
+            color: var(--primary);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            margin-top: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .challenge-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Achievement Popup */
+        .achievement-popup {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            z-index: 1000;
+            transform: translateX(120%);
+            transition: transform 0.5s ease;
+        }
+
+        .achievement-popup.show {
+            transform: translateX(0);
+        }
+
+        .achievement-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 1.5em;
+            color: white;
+        }
+
+        .achievement-text h4 {
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        .achievement-text p {
+            color: var(--text);
+            font-size: 0.9em;
         }
 
         /* Responsive Design */
         @media (max-width: 768px) {
             .flex-container {
-                flex-direction: column; /* Stack sections vertically on smaller screens */
+                flex-direction: column;
             }
 
-            .profile-main{
-                padding: 16px;
-                padding-top: 8px;
-            }
-            .logout-button{
-                margin: 0;
-            }
             .left-section, .right-section {
-                max-width: 100%; /* Full width on smaller screens */
-                overflow: visible;
-                padding: 0;
-                margin: 0;
-                box-shadow: none;
-            }
-            .card{
-                padding: 8px;
+                max-width: 100%;
             }
 
-            /* Adjust calendar for mobile */
-            .calendar {
-                grid-template-rows: repeat(10, 12px); /* Smaller rows for mobile */
-                gap: 2px; /* Reduce gap between days */
-                padding: 10px; /* Reduce padding */
-            }
-            .day {
-                width: 10px; /* Smaller day size */
-                height: 8px; /* Smaller day size */
+            .card {
+                padding: 20px;
             }
 
-        
-
-            .calendar-header {
-                font-size: 0.8em; /* Smaller font size for header */
+            .analytics-grid {
+                grid-template-columns: 1fr 1fr;
             }
 
-            .calendar-header span {
-                margin: 0 2px; /* Reduce margin between month names */
+            .profile-picture {
+                width: 100px;
+                height: 100px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .analytics-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .toggle-buttons {
+                flex-direction: column;
             }
         }
     </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 
+<body>
 <div class="profile-main">
+    <!-- Achievement Popup (hidden by default) -->
+    <div class="achievement-popup" id="achievementPopup">
+        <div class="achievement-icon">
+            <i class="fas fa-trophy"></i>
+        </div>
+        <div class="achievement-text">
+            <h4>New Achievement Unlocked!</h4>
+            <p>You've earned the "Task Master" badge</p>
+        </div>
+    </div>
+
     <div class="flex-container">
         <!-- Left Section: Profile Details -->
         <div class="left-section">
             <div class="card">
-                <div class="bio">
-                    <div class="profile-picture-container">
-                        {% if user.profile_picture %}
-                            <img src="{{ user.profile_picture.url }}" alt="Profile Picture">
-                        {% else %}
-                            <img class="profile-picture" src="https://res.cloudinary.com/ddw1upvx3/image/upload/v1744618924/download_pwgfmv.png" alt="Default Profile Picture">
-                        {% endif %}
-                    </div>
-
-                   <div>
-                    <div class="name-badge">
-                        <h1>{{ user.username }}!</h1>
-        .
-        <div class="badge" title="{{ user_badges.last.badge.name }}">
-            <img class="badge_icon" src="http://127.0.0.1:8000/media/{{ user_badges.last.badge.icon }}" alt="{{ user_badges.last.badge.name }}">
-        </div>
-                    </div>
-                    <p class="user-score">Score: {{ user.score }}</p>
-                   </div>
+                <div class="profile-picture-container">
+                    {% if user.profile_picture %}
+                        <img class="profile-picture" src="{{ user.profile_picture.url }}" alt="{{ user.username }}'s Profile Picture">
+                    {% else %}
+                        <img class="profile-picture" src="https://res.cloudinary.com/ddw1upvx3/image/upload/v1744618924/download_pwgfmv.png" alt="Default Profile Picture">
+                    {% endif %}
+                    <div class="level-indicator" title="Your Level">5</div>
                 </div>
-               
+
+                <h1>{{ user.username }}</h1>
+                <p class="user-score">{{ user.score }} XP</p>
+
+                <!-- Progress to next level -->
+                
+                <div class="progress-container">
+                    <div class="progress-label">
+                        <span>Level {{ level }}</span>
+                        <span>{{ user.score }} XP / {{ xp_required }} XP</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: {{ progress|floatformat:0 }}%;"></div>
+                    </div>
+                </div>
+                
+
+
+
+                <!-- Current Badge -->
+                <div class="badges-section">
+                    <h3>Current Badge</h3>
+                    <div class="badges-container">
+                        <div class="badge" title="{{ user_badges.last.badge.name }}">
+                            <img src="{{ user_badges.last.badge.icon.url}}" alt="{{ user_badges.last.badge.name }}">
+                            <div class="badge-tooltip">{{ user_badges.last.badge.name }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Streak Counter -->
+                <div class="streak-counter">
+                    <div class="streak-icon">
+                        <i class="fas fa-fire"></i>
+                    </div>
+                    <div class="streak-count">
+                        7 day streak
+                    </div>
+                </div>
 
                 <!-- Edit Button -->
-                <button class="edit-button" onclick="openProfileEditModal()">Edit Profile</button>
-
-            
+                <button class="edit-button" onclick="openProfileEditModal()">
+                    <i class="fas fa-edit"></i> Edit Profile
+                </button>
 
                 <!-- Logout Button -->
                 <form method="post" action="{% url 'logout' %}" style="display: inline;">
                     {% csrf_token %}
-                    <button class="logout-button" type="submit">Logout</button>
+                    <button class="logout-button" type="submit">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
                 </form>
             </div>
         </div>
 
-        <!-- Right Section: Activity and Reviews -->
+        <!-- Right Section: Activity and Analytics -->
         <div class="right-section">
             <!-- Toggle Buttons -->
             <div class="toggle-buttons">
-                <button id="analyticsButton" class="toggle-button active" onclick="showAnalytics()">Analytics</button>
-                <button id="activityButton" class="toggle-button " onclick="showActivity()">Activity</button>
-                
+                <button id="analyticsButton" class="toggle-button active" onclick="showAnalytics()">
+                    <i class="fas fa-chart-line"></i> Analytics
+                </button>
+                <button id="activityButton" class="toggle-button" onclick="showActivity()">
+                    <i class="fas fa-calendar-alt"></i> Activity
+                </button>
+                <button id="achievementsButton" class="toggle-button" onclick="showAchievements()">
+                    <i class="fas fa-trophy"></i> Achievements
+                </button>
             </div>
-        
+
+            <!-- Daily Challenge -->
+            <div class="daily-challenge">
+                <h3 class="challenge-title">Today's Challenge</h3>
+                <p class="challenge-description">Complete 3 tasks before 6 PM to earn bonus XP!</p>
+                <div class="challenge-reward">
+                    <div class="reward-badge">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div class="reward-points">+50 XP</div>
+                </div>
+                <button class="challenge-button">Accept Challenge</button>
+            </div>
+
             <!-- Activity Section -->
             <div id="activitySection" class="card">
-                <!-- Report Form -->
-                <form id="reportForm">
-                    <label for="reportType">Select Report Type:</label>
-                    <select id="reportType" class="form-select">
-                        <option value="daily">Daily Report</option>
-                        <option value="weekly">Weekly Report</option>
-                        <option value="monthly">Monthly Report</option>
-                    </select>
-                    <br>
-                    <button type="button" id="downloadCsv" class="btn btn-primary">Download CSV</button>
-                    <button type="button" id="downloadPdf" class="btn btn-danger">Download PDF</button>
-                </form>
-        
-                <!-- Activity Calendar -->
-                <h2>Your Activity Calendar</h2>
+                <h2><i class="fas fa-calendar-alt"></i> Activity Calendar</h2>
                 <div class="calendar-header">
                     <span>{{ previous_month|date:"F Y" }}</span>
                     <span>{{ current_month|date:"F Y" }}</span>
@@ -940,115 +735,133 @@
                                 dark-green
                             {% elif color_map|get_item:date == 'yellow' %}
                                 yellow
-                            {% endif %}" 
+                            {% endif %}
+                            {% if date == today %}today{% endif %}" 
                             title="{{ date }}">
                         </div>
                     {% endfor %}
                 </div>
-        
-                <!-- Rating and Reviews -->
-                <h2>Your Ratings and Reviews</h2>
+
+                <h2><i class="fas fa-comments"></i> Recent Feedback</h2>
                 {% if feedbacks %}
                     {% for feedback in feedbacks %}
                         <div class="review-card">
-                            <p class="rating">Rating: {{ feedback.rating }}/5</p>
-                            <p class="comment">Comment: {{ feedback.comment }}</p>
-                            <p class="timestamp">Date: {{ feedback.created_at|date:"F j, Y" }}</p>
+                            <div class="rating-stars">
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= feedback.rating %}
+                                        <i class="fas fa-star" style="color: #FFD700;"></i>
+                                    {% else %}
+                                        <i class="far fa-star" style="color: #FFD700;"></i>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                            <p class="comment">"{{ feedback.comment }}"</p>
+                            <p class="timestamp">{{ feedback.created_at|date:"F j, Y" }}</p>
                         </div>
                     {% endfor %}
                 {% else %}
-                    <p>No ratings or reviews yet.</p>
+                    <p>No feedback yet. Complete tasks to receive feedback!</p>
                 {% endif %}
             </div>
-        
+
             <!-- Analytics Section -->
-           <!-- Analytics Section -->
-<div id="analyticsSection" class="card" style="display: none;">
-    <h2>User Analytics</h2>
-    <div class="analytics-grid">
-        <!-- Total Tasks Card -->
-        <div class="analytics-card">
-            <div class="analytics-icon">
-                <i class="fas fa-tasks"></i>
-            </div>
-            <div class="analytics-content">
-                <h3>Total Tasks</h3>
-                <p id="totalTasks">-</p>
-            </div>
-        </div>
+            <div id="analyticsSection" class="card">
+                <h2><i class="fas fa-chart-pie"></i> Your Productivity Analytics</h2>
+                
+                <div class="analytics-grid">
+                    <!-- Total Tasks Card -->
+                    <div class="analytics-card">
+                        <div class="analytics-icon">
+                            <i class="fas fa-tasks"></i>
+                        </div>
+                        <div class="analytics-content">
+                            <h3>Total Tasks</h3>
+                            <p id="totalTasks">-</p>
+                        </div>
+                    </div>
 
-        <!-- Completed Tasks Card -->
-        <div class="analytics-card">
-            <div class="analytics-icon">
-                <i class="fas fa-check-circle"></i>
-            </div>
-            <div class="analytics-content">
-                <h3>Completed Tasks</h3>
-                <p id="completedTasks">-</p>
-            </div>
-        </div>
+                    <!-- Completed Tasks Card -->
+                    <div class="analytics-card">
+                        <div class="analytics-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="analytics-content">
+                            <h3>Completed</h3>
+                            <p id="completedTasks">-</p>
+                        </div>
+                    </div>
 
-        <!-- Overdue Tasks Card -->
-        <div class="analytics-card">
-            <div class="analytics-icon">
-                <i class="fas fa-exclamation-circle"></i>
-            </div>
-            <div class="analytics-content">
-                <h3>Overdue Tasks</h3>
-                <p id="overdueTasks">-</p>
-            </div>
-        </div>
+                    <!-- Overdue Tasks Card -->
+                    <div class="analytics-card">
+                        <div class="analytics-icon">
+                            <i class="fas fa-exclamation-circle"></i>
+                        </div>
+                        <div class="analytics-content">
+                            <h3>Overdue</h3>
+                            <p id="overdueTasks">-</p>
+                        </div>
+                    </div>
 
-        <!-- Average Completion Time Card -->
-        <div class="analytics-card">
-            <div class="analytics-icon">
-                <i class="fas fa-clock"></i>
-            </div>
-            <div class="analytics-content">
-                <h3>Avg. Completion Time</h3>
-                <p id="averageTime">-</p>
-            </div>
-        </div>
+                    <!-- Average Time Card -->
+                    <div class="analytics-card">
+                        <div class="analytics-icon">
+                            <i class="fas fa-stopwatch"></i>
+                        </div>
+                        <div class="analytics-content">
+                            <h3>Avg. Time</h3>
+                            <p id="averageTime">-</p>
+                        </div>
+                    </div>
+                </div>
 
-        <!-- Most Common Category Card -->
-        <div class="analytics-card">
-            <div class="analytics-icon">
-                <i class="fas fa-star"></i>
-            </div>
-            <div class="analytics-content">
-                <h3>Most Common Category</h3>
-                <p id="commonCategory">-</p>
-            </div>
-        </div>
+                <!-- Progress Bars -->
+                <h3><i class="fas fa-chart-bar"></i> Completion Rate</h3>
+                <div class="progress-container">
+                    <div class="progress-label">
+                        <span>Completion Rate</span>
+                        <span id="completedPercentage">0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="completedProgress" style="width: 0%;"></div>
+                    </div>
+                </div>
 
-        <!-- Last Updated Card -->
-        <div class="analytics-card">
-            <div class="analytics-icon">
-                <i class="fas fa-calendar-alt"></i>
+                <!-- Task Categories Chart -->
+                <!-- <h3><i class="fas fa-chart-pie"></i> Task Categories</h3>
+                <canvas id="taskCategoriesChart" height="200"></canvas> -->
             </div>
-            <div class="analytics-content">
-                <h3>Last Updated</h3>
-                <p id="lastUpdated">-</p>
+
+            <!-- Achievements Section -->
+            <div id="achievementsSection" class="card" style="display: none;">
+                <h2><i class="fas fa-trophy"></i> Your Achievements</h2>
+                
+                <div class="badges-section">
+                    <h3>Unlocked Badges</h3>
+                    <div class="badges-container">
+                        {% for badge in user_badges %}
+                            <div class="badge">
+                                <img src="http://127.0.0.1:8000/media/{{ badge.badge.icon }}" alt="{{ badge.badge.name }}">
+                                <div class="badge-tooltip">{{ badge.badge.name }}</div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="badges-section">
+                    <h3>Next Badges to Earn</h3>
+                    <div class="badges-container">
+                        {% for badge in locked_badges %}
+                            <div class="badge locked">
+                                <i class="fas fa-lock"></i>
+                                <div class="badge-tooltip">{{ badge.name }} ({{ badge.requirement }})</div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Progress Bars for Task Completion -->
-    <div class="progress-section">
-        <h3>Task Completion Progress</h3>
-        <div class="progress-bar">
-            <div class="progress-fill" id="completedProgress" style="width: 0%;"></div>
-        </div>
-        <p><span id="completedPercentage">0%</span> of tasks completed</p>
-    </div>
-
-    <!-- Task Categories Pie Chart -->
-    <div class="chart-section">
-        <h3>Task Categories</h3>
-        <canvas id="taskCategoriesChart"></canvas>
-    </div>
-</div>
-        </div>
     <!-- Modal for Profile Update -->
     <div id="editModal" class="modal" style="display: none;">
         <div class="modal-content">
@@ -1067,7 +880,7 @@
                     <input type="email" id="email" name="email" value="{{ user.email }}" class="form-input">
                 </div>
                 <div class="form-group">
-                    <label for="profile_picture">Profile Picture Update:</label>
+                    <label for="profile_picture">Profile Picture:</label>
                     <input type="file" id="profile_picture" name="profile_picture" class="form-input">
                 </div>
                 <button type="submit" class="submit-button">Update Profile</button>
@@ -1076,108 +889,173 @@
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-       function openProfileEditModal() {
-            document.getElementById('editModal').style.display = 'flex';
-        }
-
-        function closeProfileEditModal() {
-            document.getElementById('editModal').style.display = 'none';
-        }
-// Function to fetch and update analytics data
-function fetchUserAnalytics() {
-    fetch('/user/api/user-analytics/')
-        .then(response => response.json())
-        .then(data => {
-            if (data.error) {
-                alert("Error: " + data.error);
-                return;
-            }
-
-            // Update analytics cards
-            document.getElementById("totalTasks").innerText = data.total_tasks;
-            document.getElementById("completedTasks").innerText = data.completed_tasks;
-            document.getElementById("overdueTasks").innerText = data.overdue_tasks;
-            const averageTime = Math.round(data.average_completion_time);
-            document.getElementById("averageTime").innerText = averageTime + " hour";
-            document.getElementById("commonCategory").innerText = data.most_common_category || "N/A";
-            document.getElementById("lastUpdated").innerText = data.last_updated;
-
-            // Update progress bar
-            const completedPercentage = (data.completed_tasks / data.total_tasks) * 100;
-            document.getElementById("completedProgress").style.width = completedPercentage + "%";
-            document.getElementById("completedPercentage").innerText = Math.round(completedPercentage) + "%";
-
-            // Update pie chart (using Chart.js)
-            updateTaskCategoriesChart(data.task_categories);
-        })
-        .catch(error => console.error("Error fetching analytics:", error));
-}
-
-// Function to update the task categories pie chart
-function updateTaskCategoriesChart(categories) {
-    const ctx = document.getElementById('taskCategoriesChart').getContext('2d');
-    if (window.taskCategoriesChart) {
-        window.taskCategoriesChart.destroy(); // Destroy existing chart instance
+    // Function to show achievement popup
+    function showAchievementPopup() {
+        const popup = document.getElementById('achievementPopup');
+        popup.classList.add('show');
+        
+        // Hide after 5 seconds
+        setTimeout(() => {
+            popup.classList.remove('show');
+        }, 5000);
     }
 
-    window.taskCategoriesChart = new Chart(ctx, {
-        type: 'pie',
-        data: {
-            labels: Object.keys(categories),
-            datasets: [{
-                data: Object.values(categories),
-                backgroundColor: [
-                    '#1abc9c', '#3498db', '#9b59b6', '#e74c3c', '#f1c40f', '#2ecc71'
-                ],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'bottom'
+    // Function to fetch and update analytics data
+    function fetchUserAnalytics() {
+        fetch('/user/api/user-analytics/')
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    console.error("Error:", data.error);
+                    return;
                 }
-            }
-        }
-    });
-}
 
-// Function to show the Analytics section
-function showAnalytics() {
-    document.getElementById('activitySection').style.display = 'none';
-    document.getElementById('analyticsSection').style.display = 'block';
+                // Update analytics cards
+                document.getElementById("totalTasks").innerText = data.total_tasks;
+                document.getElementById("completedTasks").innerText = data.completed_tasks;
+                document.getElementById("overdueTasks").innerText = data.overdue_tasks;
+                
+                const averageTime = Math.round(data.average_completion_time);
+                document.getElementById("averageTime").innerText = averageTime > 0 ? 
+                    averageTime + " hrs" : "N/A";
 
-    // Update button states
-    document.getElementById('analyticsButton').classList.add('active');
-    document.getElementById('activityButton').classList.remove('active');
+                // Update progress bar
+                const completedPercentage = data.total_tasks > 0 ? 
+                    (data.completed_tasks / data.total_tasks) * 100 : 0;
+                
+                document.getElementById("completedProgress").style.width = completedPercentage + "%";
+                document.getElementById("completedPercentage").innerText = Math.round(completedPercentage) + "%";
 
-    // Fetch analytics data
-    fetchUserAnalytics();
-}
-
-// Function to show the Activity section
-function showActivity() {
-    document.getElementById('activitySection').style.display = 'block';
-    document.getElementById('analyticsSection').style.display = 'none';
-
-    // Update button states
-    document.getElementById('activityButton').classList.add('active');
-    document.getElementById('analyticsButton').classList.remove('active');
-}
-
-// Initialize with Analytics section visible
-window.onload = function() {
-    const calendar = document.querySelector('.calendar');
-    if (calendar) {
-        calendar.scrollLeft = calendar.scrollWidth; // Scroll to the end (right)
+                // Update task categories chart
+                updateTaskCategoriesChart(data.task_categories);
+            })
+            .catch(error => console.error("Error fetching analytics:", error));
     }
 
-    // Show Analytics section by default
-    showAnalytics();
-};
-</script>
+    // Function to update the task categories pie chart
+    function updateTaskCategoriesChart(categories) {
+        const ctx = document.getElementById('taskCategoriesChart').getContext('2d');
+        
+        // Destroy previous chart if it exists
+        if (window.taskCategoriesChart) {
+            window.taskCategoriesChart.destroy();
+        }
 
+        // Create new chart
+        window.taskCategoriesChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: Object.keys(categories),
+                datasets: [{
+                    data: Object.values(categories),
+                    backgroundColor: [
+                        '#1abc9c', '#3498db', '#9b59b6', '#e74c3c', 
+                        '#f1c40f', '#2ecc71', '#e67e22', '#34495e'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 20,
+                            usePointStyle: true,
+                            pointStyle: 'circle'
+                        }
+                    }
+                },
+                cutout: '60%'
+            }
+        });
+    }
+
+    // Function to show sections
+    function showSection(sectionToShow) {
+        // Hide all sections
+        document.getElementById('activitySection').style.display = 'none';
+        document.getElementById('analyticsSection').style.display = 'none';
+        document.getElementById('achievementsSection').style.display = 'none';
+        
+        // Deactivate all buttons
+        document.getElementById('activityButton').classList.remove('active');
+        document.getElementById('analyticsButton').classList.remove('active');
+        document.getElementById('achievementsButton').classList.remove('active');
+        
+        // Show selected section and activate its button
+        document.getElementById(sectionToShow + 'Section').style.display = 'block';
+        document.getElementById(sectionToShow + 'Button').classList.add('active');
+        
+        // If showing analytics, fetch fresh data
+        if (sectionToShow === 'analytics') {
+            fetchUserAnalytics();
+        }
+    }
+
+    // Section toggle functions
+    function showActivity() { showSection('activity'); }
+    function showAnalytics() { showSection('analytics'); }
+    function showAchievements() { showSection('achievements'); }
+
+    // Modal functions
+    function openProfileEditModal() {
+        document.getElementById('editModal').style.display = 'flex';
+    }
+
+    function closeProfileEditModal() {
+        document.getElementById('editModal').style.display = 'none';
+    }
+
+    // Initialize page
+    window.onload = function() {
+        // Scroll calendar to current day
+        const calendar = document.querySelector('.calendar');
+        if (calendar) {
+            calendar.scrollLeft = calendar.scrollWidth;
+        }
+
+        // Show analytics by default
+        showAnalytics();
+
+        // Show a random achievement popup (demo purposes)
+        setTimeout(showAchievementPopup, 2000);
+
+        // Add hover effects to all badges
+        const badges = document.querySelectorAll('.badge');
+        badges.forEach(badge => {
+            badge.addEventListener('mouseenter', () => {
+                const tooltip = badge.querySelector('.badge-tooltip');
+                if (tooltip) {
+                    tooltip.style.opacity = '1';
+                }
+            });
+            badge.addEventListener('mouseleave', () => {
+                const tooltip = badge.querySelector('.badge-tooltip');
+                if (tooltip) {
+                    tooltip.style.opacity = '0';
+                }
+            });
+        });
+
+        // Daily challenge button
+        const challengeButton = document.querySelector('.challenge-button');
+        if (challengeButton) {
+            challengeButton.addEventListener('click', function() {
+                this.textContent = 'Challenge Accepted!';
+                this.style.background = 'var(--success)';
+                this.style.color = 'white';
+                
+                // Show achievement popup
+                setTimeout(showAchievementPopup, 1000);
+            });
+        }
+    };
+</script>
+</body>
+</html>
 {% endblock %}

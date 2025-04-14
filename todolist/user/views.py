@@ -211,11 +211,16 @@ def profile_view(request):
 
         user_badges=user.user_badges.all()
         # Accessing the badges
-        print(user.profile_picture  )
+        level = user_badges.count()
+        next_level_xp = (level + 1) * 50
+        progress = (user.score / next_level_xp) * 100
 
         # Prepare context for the template
         context = {
             'user': user,
+            'level': level,
+            'progress': progress,
+            'xp_required': next_level_xp,
             'user_badges':user_badges,
             'dates': dates,
             'color_map': color_map,
@@ -224,6 +229,7 @@ def profile_view(request):
             'feedbacks': feedbacks,
         }
 
+       
         return render(request, 'user/profile.html', context)
 
 

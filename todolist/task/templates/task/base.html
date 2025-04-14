@@ -598,12 +598,14 @@
 .modal-header {
     padding: 20px;
     border-bottom: 1px solid #e9ecef;
-    position: sticky;
+    position: relative;
     top: 0;
     background: white;
     z-index: 1;
     position: relative;
     display: flex;
+    width: 100%;
+    justify-content: space-between;
     
 
 }
@@ -876,7 +878,7 @@
                 </li>
                 <li>
                     <a id="insights-link" class="sidebar-link" href="{% url 'quiz' %}">
-                        <i className="fas fa-question-circle"></i> Quiz
+                        <i class="fas fa-question"></i> Quiz
                     </a>
                 </li>
                 <li>

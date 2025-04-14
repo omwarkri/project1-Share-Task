@@ -61,18 +61,18 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
 
-     'cloudinary',
+    'cloudinary',
     'cloudinary_storage',
 ]
-
-
-CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': 'ddw1upvx3',
-    'API_KEY': '935838691454949',
-    'API_SECRET': '2ZR0CSz_KyiZUN96SEmtB9Zwp7U',
-}
-
 import cloudinary
+
+# CLOUDINARY_STORAGE = {
+#     'CLOUD_NAME': 'ddw1upvx3',
+#     'API_KEY': '935838691454949',
+#     'API_SECRET': '2ZR0CSz_KyiZUN96SEmtB9Zwp7U',
+# }
+
+
 
 cloudinary.config( 
   cloud_name = 'ddw1upvx3', 

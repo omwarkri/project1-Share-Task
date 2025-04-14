@@ -869,9 +869,9 @@
                 <div class="bio">
                     <div class="profile-picture-container">
                         {% if user.profile_picture %}
-                            <img class="profile-picture" src="{{ user.profile_picture.url }}" alt="{{ user.username }}'s Profile Picture">
+                            <img src="{{ user.profile_picture.url }}" alt="Profile Picture">
                         {% else %}
-                            <img class="profile-picture" src="https://via.placeholder.com/150" alt="Default Profile Picture">
+                            <img class="profile-picture" src="https://res.cloudinary.com/ddw1upvx3/image/upload/v1744618924/download_pwgfmv.png" alt="Default Profile Picture">
                         {% endif %}
                     </div>
 

@@ -8,9 +8,10 @@ from django.contrib.auth.models import AbstractUser, Group, Permission
 
 from django.db import models
 from django.contrib.auth.models import AbstractUser, Group, Permission
+from cloudinary.models import CloudinaryField
 class CustomUser(AbstractUser):
     phone_number = models.CharField(max_length=15, blank=True, null=True)
-    profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
+    profile_picture = CloudinaryField('image', folder='profile_pictures', blank=True, null=True)
     tasks = models.ManyToManyField('task.Task', related_name='users', blank=True)
     score = models.IntegerField(default=0)
     followers = models.ManyToManyField('self', symmetrical=False, related_name='following', blank=True)
@@ -30,7 +31,8 @@ class CustomUser(AbstractUser):
     )
 
     def __str__(self):
-        return self.username
+        return self.username or f"User-{self.id}"
+
     
     def follow(self, user):
         """Follow another user."""

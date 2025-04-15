@@ -155,7 +155,7 @@ def ai_subtask_suggestions(request, task_id):
 
     model = genai.GenerativeModel('gemini-1.5-flash')
 
-    prompt = f"Generate 4 helpful subtasks for the main task: \"{task.title}\". Keep them short and actionable."
+    prompt = f"Generate 10 helpful subtasks for the main task: \"{task.title}\". Keep them short and actionable."
     
     response = model.generate_content(prompt)
 

@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Chat with Task Procedure</title>
+  <style>
+    /* General Styles */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f0f4f8;
+      color: #333;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .container {
+      display: grid;
+      grid-template-columns: 2fr 3fr;
+      max-width: 80%;
+      width: 100%;
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      height: 90vh;
+      animation: fadeIn 0.5s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Left Section (Task Procedure) */
+    .left-section {
+      background: #e8f6f3;
+      color: #333;
+      display: flex;
+      overflow: hidden;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 100%;
+      width: 100%;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .procedureSection {
+      flex: 1;
+      position: relative;
+      max-height: 100%;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      padding:10px;
+    }
+
+    #procedure-content {
+      overflow-y: auto;
+      max-height: calc(100% - 40px);
+      padding: 10px;
+      box-sizing: border-box;
+    }
+
+    .left-section h3 {
+      font-size: 18px;
+      margin-bottom: 8px;
+    }
+
+    .left-section p {
+      font-size: 12px;
+      color: #555;
+      line-height: 1.5;
+    }
+
+    h2.title{
+        font-size: 18px;
+        color: rgba(255, 255, 255, 0.677); /* Dark text for task title */
+        white-space: nowrap;
+        overflow-y: hidden;
+        overflow-x: scroll;
+        background-color: #122436e9;
+        padding: 8px;
+        max-width: 93%;
+    }
+
+    /* Right Section (Chat Box) */
+    .right-section {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background: #ffffff;
+      overflow: hidden;
+      height: 100%;
+      transition: all 0.3s ease;
+      position:relative;
+    }
+
+    /* Maximized State for Chat Section */
+    .right-section.maximized {
+      height: 100vh;
+      width: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1000;
+      background: #ffffff;
+    }
+
+    .right-section.maximized .chat-box {
+      height: calc(100% - 100px); /* Adjust for header and input form */
+    }
+
+    .right-section.maximized + .left-section {
+      display: none;
+    }
+
+    @keyframes slideUp {
+      from {
+        transform: translateY(20px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    input[type="text"] {
+      flex: 1;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 12px;
+      outline: none;
+      transition: border-color 0.3s ease;
+    }
+
+    input[type="text"]:focus {
+      border-color: #64b5f6;
+    }
+
+    button {
+      padding: 8px 16px;
+      background: #64b5f6;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background: #42a5f5;
+    }
+
+    /* Maximize Button */
+    .maximize-button {
+      background: #4141410e;
+      z-index: 500;
+      color: rgb(28, 34, 35);
+      border: none;
+      border-radius: 8px;
+      padding: 4px 8px;
+      position:absolute;
+      right:0;
+      top:2;
+      width: 32px;
+      height: 32px;
+      font-size: 18px;
+      cursor: pointer;
+      margin-left: 10px;
+      transition: background 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .maximize-button:hover {
+      background: #4141411d;
+    }
+
+    /* Maximized State */
+    .left-section.maximized {
+      height: 100vh;
+      width: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1000;
+      background: #dceefb;
+    }
+
+    .left-section.maximized .procedureSection {
+      height: calc(100% - 40px);
+    }
+
+    .left-section.maximized #procedure-content {
+      max-height: calc(100% - 60px);
+    }
+
+    /* Hide right section when left is maximized */
+    .left-section.maximized + .right-section {
+      display: none;
+    }
+
+    .add-button {
+      background: #1abc9c;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 36px; /* Smaller button size for mobile */
+      height: 36px; /* Smaller button size for mobile */
+      font-size: 20px; /* Smaller font size for mobile */
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.3s ease, transform 0.3s ease;
+    }
+
+    .add-button:hover {
+      background: #02ddb1e0;
+      transform: scale(1.1);
+    }
+
+    #noteFormContainer {
+      display: none;
+      background: #ffffff;
+      padding: 8px; /* Reduced padding for mobile */
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      margin-top: 15px; /* Reduced margin for mobile */
+      overflow: hidden;
+      height: 100%;
+      position: relative;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    #subTaskFormCOntainer {
+      display: none;
+      background: #ffffff;
+      padding: 15px; /* Reduced padding for mobile */
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    
+      overflow: scroll;
+      height: 100%;
+      position: relative;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    #noteFormContainer.show,
+    #subTaskFormCOntainer.show {
+      display: block;
+    }
+
+    .add-options {
+      position: fixed;
+      left: 10px; /* Adjusted position for mobile */
+      top: 10px; /* Adjusted position for mobile */
+      display: inline-block;
+      z-index: 1000;
+    }
+
+    .options-dropdown {
+
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      display: none;
+      z-index: 10;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    .options-dropdown button {
+      display: block;
+      width: 100%;
+      padding: 8px 16px; /* Reduced padding for mobile */
+      text-align: left;
+      background: none;
+      border: none;
+      color: #333;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .options-dropdown button:hover {
+      background: #f0f8f7;
+    }
+
+    .show {
+      display: block;
+    }
+
+    .hide {
+      display: none;
+    }
+
+    /* Media Queries for Mobile Devices */
+    @media (max-width: 600px) {
+      .container {
+        grid-template-columns: 1fr;
+        height: 98vh;
+        max-width: 100%;
+      }
+
+      .left-section {
+        height: 35vh;
+      }
+
+      .right-section {
+        height: 65vh;
+        padding-bottom: 20px;
+      }
+
+      .procedureSection,
+      .chat-box {
+        padding: 10px;
+      }
+
+      .left-section h3 {
+        font-size: 16px;
+      }
+
+      .left-section p {
+        font-size: 10px;
+      }
+
+      .chat-header {
+        font-size: 18px;
+        padding: 10px;
+      }
+
+      .chat-message {
+        font-size: 12px;
+        padding: 6px 10px;
+        margin-bottom: 16px;
+      }
+
+      .message-send{
+        margin-bottom: 40px;
+      }
+
+      input[type="text"] {
+        font-size: 10px;
+      }
+
+      button {
+        font-size: 10px;
+      }
+
+      .maximize-button {
+        width: 32px;
+        height: 32px;
+        font-size: 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <div class="add-options">
+      <button class="add-button" onclick="toggleOptions()">+</button>
+      <div class="options-dropdown" id="optionsDropdown">
+        <button onclick="addNotes()">Add Notes</button>
+        <button onclick="addSubTask()">Add Sub Task</button>
+        <button onclick="viewProcedure()">View Procedure</button>
+      </div>
+    </div>
+    <!-- Left Section (Procedure Info) -->
+    <div class="left-section">
+      <h2 class="title">Task: {{ task.title }}</h2>
+      <button class="maximize-button" onclick="toggleMaximize(document.querySelector('.left-section'), document.querySelector('.right-section'), this)">+</button>
+      
+      <div class="procedureSection">
+        {% include 'task_procedure.html' %}
+      </div>
+      <!-- Container for the form -->
+      <div id="noteFormContainer">
+        {% include 'notes_section.html' %}
+      </div>
+      <div id="subTaskFormCOntainer">
+        {% include 'sub_task.html' %}
+      </div>
+    </div>
+
+    <!-- Right Section (Chat Box) -->
+    <div class="right-section">
+      <button class="maximize-button" onclick="toggleMaximize(document.querySelector('.right-section'), document.querySelector('.left-section'), this)">
+        +
+      </button>
+      {% include 'ai_chat.html' %}
+    </div>
+    
+  </div>
+
+  <script>
+    // Function to replace **text** with <strong>text</strong>
+    function formatBoldText(element) {
+      element.innerHTML = element.innerHTML.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    }
+  
+    // Function to add line breaks after periods, excluding specific cases
+    function addLineBreaksAfterPeriods(element) {
+      element.innerHTML = element.innerHTML.replace(/(\d+\. )/g, '<br>$1');
+      element.innerHTML = element.innerHTML.replace(/(?<!\d|\.\S)\. /g, '.<br>');
+    }
+  
+    // Function to format headings and structure content
+    function formatProcedureContent(element) {
+      element.innerHTML = element.innerHTML.replace(
+        /Phase \d+:.*?(?=<br>|$)/g,
+        (match) => `<strong>${match}</strong>`
+      );
+      element.innerHTML = element.innerHTML.replace(
+        /(\d+\. .*?(?=<br>|$))/g,
+        (match) => `<br>${match}`
+      );
+    }
+  
+    // Apply to procedure content
+    const procedureContent = document.getElementById('procedure-content');
+    if (procedureContent) {
+      formatBoldText(procedureContent);
+      addLineBreaksAfterPeriods(procedureContent);
+      formatProcedureContent(procedureContent);
+    }
+  
+    // Apply to all chat messages
+    const messageContents = document.querySelectorAll('.message-content');
+    messageContents.forEach(message => {
+      formatBoldText(message);
+      addLineBreaksAfterPeriods(message);
+    });
+  
+    // Toggle options dropdown
+    function toggleOptions() {
+      const dropdown = document.getElementById('optionsDropdown');
+      dropdown.classList.toggle('show');
+    }
+  
+    // Close dropdown if clicked outside
+    window.onclick = function(event) {
+      if (!event.target.matches('.add-button')) {
+        const dropdowns = document.getElementsByClassName('options-dropdown');
+        for (let dropdown of dropdowns) {
+          if (dropdown.classList.contains('show')) {
+            dropdown.classList.remove('show');
+          }
+        }
+      }
+    };
+  
+    // Show the form and disable the procedure section
+    function addNotes() {
+      const noteFormContainer = document.getElementById('noteFormContainer');
+      const subTaskFormContainer = document.getElementById('subTaskFormCOntainer');
+      const leftSection = document.querySelector('.procedureSection');
+  
+      noteFormContainer.classList.add('show');
+      subTaskFormContainer.classList.remove('show');
+      leftSection.classList.add('hide');
+    }
+  
+    // Show the sub-task form and disable the procedure section
+    function addSubTask() {
+      const noteFormContainer = document.getElementById('noteFormContainer');
+      const subTaskFormContainer = document.getElementById('subTaskFormCOntainer');
+      const leftSection = document.querySelector('.procedureSection');
+  
+      subTaskFormContainer.classList.add('show');
+      noteFormContainer.classList.remove('show');
+      leftSection.classList.add('hide');
+    }
+  
+    // Show the procedure view
+    function viewProcedure() {
+      console.log("view Procedure");
+  
+      const noteFormContainer = document.getElementById('noteFormContainer');
+      const subTaskFormContainer = document.getElementById('subTaskFormCOntainer');
+      const procedureSection = document.querySelector('.procedureSection');
+  
+      noteFormContainer.classList.add('hide');
+      noteFormContainer.classList.remove('show');
+      subTaskFormContainer.classList.add('hide');
+      subTaskFormContainer.classList.remove('show');
+      procedureSection.classList.remove('hide');
+    }
+  
+    // Close any form and re-enable the procedure section
+    function closeForm() {
+      const noteFormContainer = document.getElementById('noteFormContainer');
+      const subTaskFormContainer = document.getElementById('subTaskFormCOntainer');
+      const leftSection = document.querySelector('.procedureSection');
+  
+      noteFormContainer.classList.remove('show');
+      subTaskFormContainer.classList.remove('show');
+      leftSection.classList.remove('hide');
+    }
+  
+    // Toggle maximize for left section
+    function toggleMaximize(sectionToMaximize, sectionToHide, button) {
+      console.log("maximizing");
+      sectionToMaximize.classList.toggle('maximized');
+      sectionToHide.classList.toggle('hidden');
+      button.textContent = sectionToMaximize.classList.contains('maximized') ? '-' : '+';
+    }
+  </script>
+  
+</body>
+</html>  

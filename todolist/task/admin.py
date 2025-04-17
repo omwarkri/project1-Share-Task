@@ -23,10 +23,23 @@ class TeamAdmin(admin.ModelAdmin):
 # Register Task model
 @admin.register(Task)
 class TaskAdmin(admin.ModelAdmin):
-    list_display = ('title', 'user', 'status', 'priority', 'due_date', 'created_at',"reminder_sent","assigned_to")
-    list_filter = ('status', 'priority', 'created_at')
+    list_display = (
+        'title',
+        'user',
+        'status',
+        'priority',
+        'due_date',
+        'created_at',
+        'reminder_sent',
+        'assigned_to',
+    )
+    list_filter = ('status', 'priority', 'created_at','user')
     search_fields = ('title', 'description')
-    filter_horizontal = ('allowed_users',)  # For easier management of ManyToManyField
+    filter_horizontal = ('allowed_users',)
+
+    # Add ordering support
+    ordering = ('-created_at',)  # default ordering in admin panel
+    sortable_by = ('created_at', 'due_date', 'priority', 'last_visited_at')  # allow these to be sorted
 
 # Register PartnerFeedback model
 @admin.register(PartnerFeedback)

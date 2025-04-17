@@ -262,6 +262,8 @@ def home(request):
     order = request.GET.get('order', 'desc')  # Default: Descending order
     search_query = request.GET.get('q', None)  # Search query for tasks
     UserInterestGoalForms=UserInterestGoalForm()
+
+    
    
     tasks = Task.objects.filter(
         Q(user=request.user) | Q(assigned_to=request.user)
@@ -292,14 +294,18 @@ def home(request):
     }
 
     # Validate sorting field
-    if sort_by not in sorting_fields:
-        sort_by = 'created_at'  # Default to sorting by creation date if invalid
+    if sort_by in sorting_fields:
+        sort_field = sorting_fields[sort_by]
+        order_prefix = '-' if order == 'desc' else ''
+        tasks = tasks.order_by(f'{order_prefix}{sort_field}')
+    else:
+        tasks = tasks.order_by('-last_visited_at', '-created_at')
 
-    # Determine the sorting order
-    sort_by = f"-{sorting_fields[sort_by]}" if order == 'desc' else sorting_fields[sort_by]
+    # Determine the sorting order\\
 
-    # Apply sorting to the tasks
-    tasks = tasks.order_by(sort_by)
+    if sort_by=="created_at":
+        tasks = tasks.order_by('-last_visited_at')
+   
 
     # Add suggested users to each task
     tasks_with_suggestions = []
@@ -337,6 +343,39 @@ def home(request):
     }
 
     return render(request, 'task/home.html', context)
+
+
+from django.http import JsonResponse
+from django.utils import timezone
+from .models import Task
+from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import csrf_protect  # Protects against CSRF attacks
+
+import json
+
+@require_POST
+@csrf_protect
+def mark_task_visited(request):
+    try:
+        data = json.loads(request.body)
+        task_id = data.get('task_id')
+        print("Received task_id:", task_id)
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+
+    if not task_id:
+        return JsonResponse({'status': 'error', 'message': 'Task ID is required'}, status=400)
+
+    try:
+        task = Task.objects.get(id=task_id)
+        task.last_visited_at = timezone.now()
+        task.save()
+        return JsonResponse({'status': 'success', 'message': 'Task marked as visited'})
+    except Task.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'Task not found'}, status=404)
+
+
+
 
 
 

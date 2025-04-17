@@ -1278,6 +1278,7 @@ function updatePomodoroTimer() {
         // Play a sound when session ends
         const audio = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3');
         audio.play();
+        incrementPomodoroCount() 
 
         isWorkSession = !isWorkSession;
         pomodoroTimeLeft = (isWorkSession ? pomodoroWorkDuration : pomodoroBreakDuration) * 60;
@@ -1347,6 +1348,35 @@ function loadPomodoroState() {
         }
     }
 }
+
+  // Increment Pomodoro count on completion
+  function incrementPomodoroCount() {
+            fetch('/user/increment-pomodoro/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCSRFToken()  // CSRF Token for security
+                },
+                body: JSON.stringify({})
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    console.log("Pomodoro incremented. Current count:", data.count);
+                } else {
+                    console.error("Failed to increment:", data.message);
+                }
+            })
+            .catch(err => console.error("Error:", err));
+        }
+
+        function getCSRFToken() {
+            const name = 'csrftoken';
+            const cookieValue = document.cookie
+                .split('; ')
+                .find(row => row.startsWith(name + '='));
+            return cookieValue ? decodeURIComponent(cookieValue.split('=')[1]) : '';
+        }
 
 // Schedule Modal Functions
 function openScheduleModal() {

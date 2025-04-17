@@ -204,6 +204,8 @@ class Task(models.Model):
     )
     is_daily = models.BooleanField(default=False)  # New field to mark daily tasks
     vector = models.JSONField(null=True, blank=True)  # Store embedding directly
+    last_visited_at = models.DateTimeField(null=True, blank=True)
+
 
     def __str__(self):
         return self.title
@@ -260,7 +262,8 @@ class Task(models.Model):
     
     
     class Meta:
-        ordering = ['-created_at']
+        ordering = ['-last_visited_at', '-created_at']
+
 
     
 from django.db import models

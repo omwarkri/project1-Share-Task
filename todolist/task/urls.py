@@ -1,10 +1,11 @@
 
 from django.contrib import admin
 from django.urls import path,include
-from .views import search_tasks,update_task_dependencies,get_task_dependencies,add_task_note,generate_ai_procedure
+from .views import search_tasks,update_task_dependencies,get_task_dependencies,add_task_note,generate_ai_procedure, mark_task_visited 
 from .views import *
 from .views import team_leaderboard
 urlpatterns = [
+    path('mark-task-visited/', mark_task_visited, name='mark_task_visited'),
 
      
 

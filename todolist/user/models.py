@@ -33,8 +33,7 @@ class CustomUser(AbstractUser):
         blank=True
     )
 
-    def __str__(self):
-        return str(self.username)
+    pomodoro_count = models.IntegerField(default=0)  # New field to track Pomodoro
 
 
     def follow(self, user):
@@ -56,6 +55,12 @@ class CustomUser(AbstractUser):
     def get_following_count(self):
         """Get the number of users the current user is following."""
         return self.following.count()
+       
+    def increment_pomodoro_count(self):
+        """Increment the pomodoro count and save the user"""
+        self.pomodoro_count += 1
+        self.save()
+
 
 
 # Activity Log Model (for tracking user activities)

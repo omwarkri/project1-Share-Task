@@ -57,6 +57,21 @@
             padding: 20px;
         }
 
+        .pomodoro-counter {
+    background-color: #f8f9fa;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-left: 10px;
+}
+
+.pomodoro-counter i {
+    color: #1abc9c;
+}
+
         /* Flex Container */
         .flex-container {
             display: flex;
@@ -650,6 +665,10 @@
                     <div class="progress-bar">
                         <div class="progress-fill" style="width: {{ progress|floatformat:0 }}%;"></div>
                     </div>
+                </div>
+
+                <div class="pomodoro-counter">
+                    <i class="fas fa-clock"></i> Pomodoros: {{ user.pomodoro_count }}
                 </div>
                 
 

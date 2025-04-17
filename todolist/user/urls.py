@@ -21,4 +21,5 @@ urlpatterns = [
     path('api/login/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'), 
     path('api/protected/', ProtectedView.as_view(), name='protected_view'),
     path('api/update-interests-goals/', update_user_interests_goals, name='update_interests_goals'), 
+    path('increment-pomodoro/', views.increment_pomodoro_count, name='increment_pomodoro'),
 ]

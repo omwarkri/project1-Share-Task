@@ -570,3 +570,18 @@ def generate_daily_schedule(user, tasks):
 
     DailySchedule.objects.create(user=user, date=today, schedule=new_schedule)
     return new_schedule
+
+
+
+from django.views.decorators.http import require_POST
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+
+@require_POST
+@login_required
+def increment_pomodoro_count(request):
+    try:
+        request.user.increment_pomodoro_count()
+        return JsonResponse({'status': 'success', 'count': request.user.pomodoro_count})
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)

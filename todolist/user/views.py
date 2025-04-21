@@ -585,3 +585,82 @@ def increment_pomodoro_count(request):
         return JsonResponse({'status': 'success', 'count': request.user.pomodoro_count})
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+
+
+
+# utils.py or management/commands/generate_daily_challenges.py
+
+import random
+from datetime import date
+from .models import ChallengeTemplate, DailyChallenge
+
+
+
+
+from django.http import JsonResponse
+from .models import DailyChallenge, UserChallenge
+from django.utils import timezone
+
+
+def generate_daily_challenges(num_challenges=1):
+    today = date.today()
+    if DailyChallenge.objects.filter(date=today).exists():
+        return  # Already generated today
+
+    all_templates = list(ChallengeTemplate.objects.all())
+
+    # Avoid crash if not enough templates
+    if len(all_templates) < num_challenges:
+        num_challenges = len(all_templates)
+
+    if num_challenges == 0:
+        return
+
+    selected = random.sample(all_templates, num_challenges)
+    for template in selected:
+        DailyChallenge.objects.create(template=template)
+
+
+
+def get_daily_challenges(request):
+    today = timezone.now().date()
+
+    # Trigger generation
+    generate_daily_challenges()
+
+    challenge = DailyChallenge.objects.filter(date=today).first()
+    if not challenge:
+        return JsonResponse({'challenge': None})
+
+    user_chal = None
+    if request.user.is_authenticated:
+        user_chal = UserChallenge.objects.filter(user=request.user, daily_challenge=challenge).first()
+
+    data = {
+        'title': challenge.template.title,
+        'description': challenge.template.description,
+        'target': challenge.template.target,
+        'reward': challenge.template.xp_reward,
+        'accepted': user_chal.accepted if user_chal else False,
+        'completed': user_chal.completed if user_chal else False,
+        'progress': user_chal.progress if user_chal else 0,
+    }
+
+    return JsonResponse({'challenge': data})
+
+
+
+
+def update_progress(user, challenge_type, amount=1):
+    today = date.today()
+    challenges = DailyChallenge.objects.filter(date=today, template__challenge_type=challenge_type)
+
+    for chal in challenges:
+        user_chal, _ = UserChallenge.objects.get_or_create(user=user, daily_challenge=chal)
+        if not user_chal.accepted:
+            continue
+        user_chal.progress += amount
+        if user_chal.progress >= chal.template.target:
+            user_chal.completed = True
+        user_chal.save()
+

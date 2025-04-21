@@ -267,8 +267,21 @@
       animation: fadeIn 0.3s ease-in-out;
     }
 
+    #microTaskFormCOntainer {
+      display: none;
+      background: #ffffff;
+      padding: 15px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      overflow: scroll;
+      height: 100%;
+      position: relative;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
     #noteFormContainer.show,
-    #subTaskFormCOntainer.show {
+    #subTaskFormCOntainer.show,
+    #microTaskFormCOntainer.show {
       display: block;
     }
 
@@ -384,6 +397,7 @@
       <div class="options-dropdown" id="optionsDropdown">
         <button onclick="addNotes()">Add Notes</button>
         <button onclick="addSubTask()">Add Sub Task</button>
+        <button onclick="addMicroTask()">Add Microtask</button>
         <button onclick="viewProcedure()">View Procedure</button>
       </div>
     </div>
@@ -401,6 +415,9 @@
       </div>
       <div id="subTaskFormCOntainer">
         {% include 'sub_task.html' %}
+      </div>
+      <div id="microTaskFormCOntainer">
+        {% include 'micro_task.html' %}
       </div>
     </div>
 
@@ -475,10 +492,12 @@
     function addNotes() {
       const noteFormContainer = document.getElementById('noteFormContainer');
       const subTaskFormContainer = document.getElementById('subTaskFormCOntainer');
+      const microTaskFormContainer = document.getElementById('microTaskFormCOntainer');
       const leftSection = document.querySelector('.procedureSection');
   
       noteFormContainer.classList.add('show');
       subTaskFormContainer.classList.remove('show');
+      microTaskFormContainer.classList.remove('show');
       leftSection.classList.add('hide');
     }
   
@@ -486,25 +505,38 @@
     function addSubTask() {
       const noteFormContainer = document.getElementById('noteFormContainer');
       const subTaskFormContainer = document.getElementById('subTaskFormCOntainer');
+      const microTaskFormContainer = document.getElementById('microTaskFormCOntainer');
       const leftSection = document.querySelector('.procedureSection');
   
       subTaskFormContainer.classList.add('show');
       noteFormContainer.classList.remove('show');
+      microTaskFormContainer.classList.remove('show');
+      leftSection.classList.add('hide');
+    }
+  
+    // Show the micro-task form and disable the procedure section
+    function addMicroTask() {
+      const noteFormContainer = document.getElementById('noteFormContainer');
+      const subTaskFormContainer = document.getElementById('subTaskFormCOntainer');
+      const microTaskFormContainer = document.getElementById('microTaskFormCOntainer');
+      const leftSection = document.querySelector('.procedureSection');
+  
+      microTaskFormContainer.classList.add('show');
+      noteFormContainer.classList.remove('show');
+      subTaskFormContainer.classList.remove('show');
       leftSection.classList.add('hide');
     }
   
     // Show the procedure view
     function viewProcedure() {
-      console.log("view Procedure");
-  
       const noteFormContainer = document.getElementById('noteFormContainer');
       const subTaskFormContainer = document.getElementById('subTaskFormCOntainer');
+      const microTaskFormContainer = document.getElementById('microTaskFormCOntainer');
       const procedureSection = document.querySelector('.procedureSection');
   
-      noteFormContainer.classList.add('hide');
       noteFormContainer.classList.remove('show');
-      subTaskFormContainer.classList.add('hide');
       subTaskFormContainer.classList.remove('show');
+      microTaskFormContainer.classList.remove('show');
       procedureSection.classList.remove('hide');
     }
   
@@ -512,16 +544,17 @@
     function closeForm() {
       const noteFormContainer = document.getElementById('noteFormContainer');
       const subTaskFormContainer = document.getElementById('subTaskFormCOntainer');
+      const microTaskFormContainer = document.getElementById('microTaskFormCOntainer');
       const leftSection = document.querySelector('.procedureSection');
   
       noteFormContainer.classList.remove('show');
       subTaskFormContainer.classList.remove('show');
+      microTaskFormContainer.classList.remove('show');
       leftSection.classList.remove('hide');
     }
   
     // Toggle maximize for left section
     function toggleMaximize(sectionToMaximize, sectionToHide, button) {
-      console.log("maximizing");
       sectionToMaximize.classList.toggle('maximized');
       sectionToHide.classList.toggle('hidden');
       button.textContent = sectionToMaximize.classList.contains('maximized') ? '-' : '+';
@@ -529,4 +562,4 @@
   </script>
   
 </body>
-</html>  
+</html>

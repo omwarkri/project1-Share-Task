@@ -726,17 +726,11 @@
             </div>
 
             <!-- Daily Challenge -->
-            <div class="daily-challenge">
-                <h3 class="challenge-title">Today's Challenge</h3>
-                <p class="challenge-description">Complete 3 tasks before 6 PM to earn bonus XP!</p>
-                <div class="challenge-reward">
-                    <div class="reward-badge">
-                        <i class="fas fa-star"></i>
-                    </div>
-                    <div class="reward-points">+50 XP</div>
-                </div>
-                <button class="challenge-button">Accept Challenge</button>
-            </div>
+            <!-- Replace the existing daily challenge div with this -->
+<div class="daily-challenge" id="daily-challenge-container">
+    <h3 class="challenge-title">Loading challenge...</h3>
+</div>
+            
 
             <!-- Activity Section -->
             <div id="activitySection" class="card">
@@ -921,6 +915,99 @@
         }, 5000);
     }
 
+// Function to fetch and display daily challenge
+function fetchDailyChallenge() {
+    fetch('/user/api/daily-challenges/')  // Update this endpoint to match your Django URL
+        .then(response => {
+            if (!response.ok) throw new Error('Failed to fetch challenge');
+            return response.json();
+        })
+        .then(data => {
+            const container = document.getElementById('daily-challenge-container');
+            
+            if (data.error || !data.challenge) {
+                container.innerHTML = `
+                    <h3 class="challenge-title">No challenge available today</h3>
+                    <p class="challenge-description">Check back tomorrow for a new challenge!</p>
+                `;
+                return;
+            }
+
+            const challenge = data.challenge;
+            container.innerHTML = `
+                <h3 class="challenge-title">${challenge.title}</h3>
+                <p class="challenge-description">${challenge.description}</p>
+                <div class="challenge-reward">
+                    <div class="reward-badge">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div class="reward-points">+${challenge.reward} XP</div>
+                </div>
+                <button class="challenge-button" id="challenge-accept-btn" 
+                        ${challenge.accepted ? 'disabled' : ''}
+                        onclick="${challenge.accepted ? '' : 'acceptChallenge()'}">
+                    ${challenge.accepted ? 'Challenge Accepted!' : 'Accept Challenge'}
+                </button>
+                ${challenge.progress ? `<div class="challenge-progress">Progress: ${challenge.progress}</div>` : ''}
+            `;
+
+            if (!challenge.accepted) {
+                document.getElementById('challenge-accept-btn').addEventListener('click', acceptChallenge);
+            }
+        })
+        .catch(error => {
+            console.error('Error loading daily challenge:', error);
+            document.getElementById('daily-challenge-container').innerHTML = `
+                <p>Error loading challenge. Please try again later.</p>
+            `;
+        });
+}
+
+// Function to accept the challenge
+function acceptChallenge() {
+    console.log("accept challenge")
+    const btn = document.getElementById('challenge-accept-btn');
+    btn.disabled = true;
+    
+    fetch('/api/accept-challenge/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+        },
+        credentials: 'same-origin'
+    })
+    .then(response => {
+        if (!response.ok) throw new Error('Failed to accept challenge');
+        btn.textContent = 'Challenge Accepted!';
+        // Optionally show a success message
+    })
+    .catch(error => {
+        console.error('Error accepting challenge:', error);
+        btn.disabled = false;
+        alert('Failed to accept challenge. Please try again.');
+    });
+}
+
+fetchDailyChallenge()
+
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
     // Function to fetch and update analytics data
     function fetchUserAnalytics() {
         fetch('/user/api/user-analytics/')
@@ -1074,6 +1161,8 @@
             });
         }
     };
+
+    
 </script>
 </body>
 </html>

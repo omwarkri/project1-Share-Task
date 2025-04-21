@@ -62,5 +62,9 @@ urlpatterns = [
 
 
     path('quiz/', quiz, name='quiz'),
+
+    path('tasks/<int:task_id>/make-active/', make_task_active, name='make_task_active'),
+    path('tasks/<int:task_id>/toggle-pinned/', toggle_task_pinned, name='toggle_task_pinned'),
+
   
 ]

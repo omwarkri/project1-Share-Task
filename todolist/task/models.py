@@ -206,6 +206,9 @@ class Task(models.Model):
     vector = models.JSONField(null=True, blank=True)  # Store embedding directly
     last_visited_at = models.DateTimeField(null=True, blank=True)
 
+    is_active = models.BooleanField(default=False)  # Only one can be True per user
+    is_pinned = models.BooleanField(default=False)  # Multiple can be True per user
+
 
     def __str__(self):
         return self.title
@@ -239,15 +242,19 @@ class Task(models.Model):
     def save(self, *args, **kwargs):
         previous_status = None
         if self.pk:
-            previous_status = Task.objects.get(pk=self.pk).status  # Get previous status before saving
+            previous_status = Task.objects.get(pk=self.pk).status
 
-        super().save(*args, **kwargs)  # Save the task
+        # Ensure only one active task per user
+        if self.is_active:
+            Task.objects.filter(user=self.user, is_active=True).exclude(pk=self.pk).update(is_active=False)
+
+        super().save(*args, **kwargs)
 
         # If task status changed to completed, update scores
         if previous_status != 'completed' and self.status == 'completed':
-
             if self.assigned_to and self.team:
-                TeamScoreboard.update_or_create_score(self.assigned_to, self.team, points=10)  # Update team score
+                TeamScoreboard.update_or_create_score(self.assigned_to, self.team, points=10)
+
 
     def get_all_likes(self):
         """
@@ -262,7 +269,8 @@ class Task(models.Model):
     
     
     class Meta:
-        ordering = ['-last_visited_at', '-created_at']
+        ordering = ['-is_active', '-is_pinned', '-created_at']
+
 
 
     

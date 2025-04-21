@@ -3,6 +3,7 @@ from . import views
 from .views import UserRegistrationView, CustomTokenObtainPairView, ProtectedView, get_user_analytics,download_task_report, download_task_report_pdf
 from .views import *
 
+
 urlpatterns = [
    
     path('login/', views.login_view, name='login'),
@@ -22,4 +23,6 @@ urlpatterns = [
     path('api/protected/', ProtectedView.as_view(), name='protected_view'),
     path('api/update-interests-goals/', update_user_interests_goals, name='update_interests_goals'), 
     path('increment-pomodoro/', views.increment_pomodoro_count, name='increment_pomodoro'),
+    path('api/daily-challenges/', views.get_daily_challenges, name='daily-challenges'),
+   
 ]

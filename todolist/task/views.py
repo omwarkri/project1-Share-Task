@@ -249,7 +249,11 @@ from concurrent.futures import ThreadPoolExecutor
 from .models import Task
 from .forms import TaskForm, TaskDependenciesForm
 from user.forms import UserInterestGoalForm
+    # Determine the sorting order\\
 
+from django.db.models import F
+from django.db.models.functions import Coalesce
+from django.db.models import ExpressionWrapper, DateTimeField
 
 
 @login_required
@@ -294,17 +298,25 @@ def home(request):
     }
 
     # Validate sorting field
-    if sort_by in sorting_fields:
-        sort_field = sorting_fields[sort_by]
-        order_prefix = '-' if order == 'desc' else ''
-        tasks = tasks.order_by(f'{order_prefix}{sort_field}')
-    else:
-        tasks = tasks.order_by('-last_visited_at', '-created_at')
+    # if sort_by in sorting_fields:
+    #     sort_field = sorting_fields[sort_by]
+    #     order_prefix = '-' if order == 'desc' else ''
+    #     tasks = tasks.order_by(f'{order_prefix}{sort_field}')
 
-    # Determine the sorting order\\
 
-    if sort_by=="created_at":
-        tasks = tasks.order_by('-last_visited_at')
+
+
+    # Custom default ordering: active → pinned → created_at
+    if sort_by == "created_at":
+        tasks = tasks.order_by('-is_active', '-is_pinned', '-created_at')
+    elif sort_by == "last_visited":
+        tasks = tasks.order_by(
+            '-is_active',
+            '-is_pinned',
+            F('last_visited_at').desc(nulls_last=True)
+        )
+
+
    
 
     # Add suggested users to each task
@@ -2626,3 +2638,22 @@ Repeat the format for all {question_count} questions.
         "show_quiz": False,
         "show_results": False
     })
+
+
+from django.views.decorators.http import require_POST
+from django.http import JsonResponse
+from .models import Task
+
+@require_POST
+def make_task_active(request, task_id):
+    Task.objects.filter(user=request.user, is_active=True).update(is_active=False)
+    Task.objects.filter(pk=task_id, user=request.user).update(is_active=True)
+    return JsonResponse({'status': 'success'})
+
+@require_POST
+def toggle_task_pinned(request, task_id):
+    task = Task.objects.get(pk=task_id, user=request.user)
+    task.is_pinned = not task.is_pinned
+    task.save()
+    return JsonResponse({'status': 'success'})
+

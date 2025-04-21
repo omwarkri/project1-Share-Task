@@ -865,6 +865,7 @@ input:checked + .slider:before {
         overflow: hidden;
         display: flex;
         flex-direction: column;
+        position: relative;
     }
     
     .task-card:hover {
@@ -876,7 +877,126 @@ input:checked + .slider:before {
         justify-content: space-between;
         align-items: center;
         margin-bottom: 10px;
+       
     }
+
+    
+    .saturn-animation-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none; /* So it doesn't interfere with clicks */
+}
+
+.planet {
+  width: 12px;
+  height: 12px;
+  background-color: #28a745;
+  border-radius: 50%;
+  z-index: 5;
+  box-shadow: 0 0 6px rgba(40, 167, 69, 0.8);
+}
+
+/* General ring styles */
+.ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 2px solid rgba(40, 167, 69, 0.4);
+  z-index: 1;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+/* Individual rings with different sizes and speeds */
+.ring1 {
+  width: 30px;
+  height: 30px;
+  animation: rotate-ring1 3s linear infinite;
+}
+
+.ring2 {
+  width: 36px;
+  height: 36px;
+  animation: rotate-ring2 5s linear infinite reverse;
+}
+
+.ring3 {
+  width: 42px;
+  height: 42px;
+  animation: rotate-ring3 7s linear infinite;
+}
+
+/* Animations */
+@keyframes rotate-ring1 {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes rotate-ring2 {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes rotate-ring3 {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+
+.pinned-task-ring {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.pinned-dot {
+  width: 10px;
+  height: 10px;
+  background-color: gold;
+  border-radius: 50%;
+  box-shadow: 0 0 6px rgba(255, 215, 0, 0.8);
+  position: relative;
+  z-index: 2;
+}
+
+.yellow-ring {
+  width: 18px;
+  height: 18px;
+  border: 2px solid yellow;
+  border-radius: 50%;
+  position: absolute;
+  z-index: 1;
+  animation: pulse-ring 1.5s infinite;
+}
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+}
+
+
+
+
+
     
     .task-title {
     font-size: 18px;
@@ -1548,6 +1668,25 @@ input:checked + .slider:before {
 
 
 
+/* Animation */
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7);
+    }
+    70% {
+        transform: scale(1.4);
+        box-shadow: 0 0 0 10px rgba(40, 167, 69, 0);
+    }
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(40, 167, 69, 0);
+    }
+}
+
+
+
+
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
@@ -1902,14 +2041,17 @@ input:checked + .slider:before {
                     </div>
             
                     <!-- Filter Dropdown -->
-                    <div class="dropdown">
-                        <button class="filter-button" title="Filters">⚙️</button>
-                        <div class="dropdown-content">
-                            <button onclick="filterDailyTasks()" title="Daily Tasks">📅 Daily Tasks</button>
-                            <button onclick="showAssignedTasks()" title="My Assigned Tasks">👤 My Assigned Tasks</button>
-                            <button onclick="openFilterModal()" title="Advanced Filters">⚙️ Advanced Filters</button>
-                        </div>
-                    </div>
+                    <!-- Filter Dropdown -->
+            <div class="dropdown">
+                <button class="filter-button" title="Filters">⚙️</button>
+                <div class="dropdown-content">
+                    <button onclick="filterDailyTasks()" title="Daily Tasks">📅 Daily Tasks</button>
+                    <button onclick="showAssignedTasks()" title="My Assigned Tasks">👤 My Assigned Tasks</button>
+                    <button onclick="sortByLastVisited()" title="Sort by Last Visited">🕒 Last Visited</button>
+                    <button onclick="openFilterModal()" title="Advanced Filters">⚙️ Advanced Filters</button>
+                </div>
+            </div>
+
             
                     <!-- Date Filter -->
                     <div class="date-filter-container">
@@ -1936,14 +2078,15 @@ input:checked + .slider:before {
         <!-- Task List -->
         <div class="task-grid">
             {% for task_data in tasks_with_suggestions %}
-                <div class="task-card task-item" 
+                <div id="task-container"  class="task-card task-item" 
                 data-task-id="{{ task_data.task.id }}"
                 data-status="{{ task_data.task.status }}" 
                 data-priority="{{ task_data.task.priority }}" 
                 data-assigned-to="{% if task_data.task.assigned_to %}{{ task_data.task.assigned_to.id }}{% endif %}"
                 data-is-daily="{{ task_data.task.is_daily }}"
                 data-due-datetime="{{ task_data.task.due_date|date:'Y-m-d H:i' }}"
-                data-private="{{ task_data.task.shareable  }}"> <!-- Add this line -->
+                data-private="{{ task_data.task.shareable  }}" 
+                data-last-visited="{% if task_data.task.last_visited_at %}{{ task_data.task.last_visited_at|date:'c' }}{% endif %}">
                     <div class="task-header">
                         <strong class="task-title">📌 {{ task_data.task.title }}</strong>
                         <span class="task-priority {{ task_data.task.priority }}">
@@ -1954,6 +2097,25 @@ input:checked + .slider:before {
                             {{ task_data.task.get_priority_display }}
                             
                         </span>
+                        {% if task_data.task.is_active %}
+                        <!-- Animated orbit for active task -->
+                        <div class="saturn-animation-badge">
+                          <div class="planet"></div>
+                          <div class="ring ring1"></div>
+                          <div class="ring ring2"></div>
+                          <div class="ring ring3"></div>
+                        </div>
+                      {% elif task_data.task.is_pinned %}
+                        <!-- Glowing golden dot for pinned task -->
+                        <div class="pinned-task-ring">
+                            <div class="pinned-dot"></div>
+                            <div class="yellow-ring"></div>
+                          </div>
+                      {% endif %}
+                      
+
+
+
                     </div>
                     <div class="task-body">
                         <p><strong>📊 Status:</strong> {{ task_data.task.get_status_display }}</p>
@@ -1973,6 +2135,14 @@ input:checked + .slider:before {
                             <span class="badge badge-warning">⏰ Approaching Due</span>
 
                             {% endif %}
+
+                            <button class="task-action" onclick="makeTaskActive({{ task_data.task.id }})">
+                                {% if task_data.task.is_active %}🌟 Active{% else %}⭐ Make Active{% endif %}
+                            </button>
+                        
+                            <button class="task-action" onclick="togglePinned({{ task_data.task.id }})">
+                                {% if task_data.task.is_pinned %}📌 Unpin{% else %}📍 Pin{% endif %}
+                            </button>
                         </div>
                        
                     </div>
@@ -1980,6 +2150,8 @@ input:checked + .slider:before {
                         <button class="task-action" onclick="openViewDependencyModal({{ task_data.task.id }})">🔗 Dependencies</button>
                         <button class="task-action" onclick="openModal({{ task_data.task.id }})">✔️ Complete</button>
                         <a href="{% url 'task_detail' task_data.task.id %}" class="task-action">📄 Details</a>
+
+                        
                     </div>
                 </div>
             {% empty %}
@@ -2256,39 +2428,73 @@ input:checked + .slider:before {
 
 <script>
 
+
+function getCSRFToken() {
+    return document.querySelector('[name=csrfmiddlewaretoken]').value;
+}
+
+
+
+function makeTaskActive(taskId) {
+    fetch(`/tasks/${taskId}/make-active/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCSRFToken(),
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.status === 'success') {
+            location.reload();  // Refresh to reflect active task change
+        }
+    });
+}
+
+function togglePinned(taskId) {
+    fetch(`/tasks/${taskId}/toggle-pinned/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCSRFToken(),
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.status === 'success') {
+            location.reload();  // Refresh to reflect pin toggle
+        }
+    });
+}
     
 /// Add this to your JavaScript section
 document.addEventListener("DOMContentLoaded", function() {
     // Track task visits when clicking on task cards
-
-    
     document.querySelectorAll('.task-card').forEach(taskCard => {
         taskCard.addEventListener('click', function(e) {
-            console.log()
-            // Don't trigger for buttons inside the card
-            if (e.target.tagName === 'BUTTON' || e.target.tagName === 'A' || e.target.closest('button') || e.target.closest('a')) {
-                return;
-            }
-
+            // Get the task ID first
             const taskId = this.getAttribute('data-task-id');
             if (!taskId) return;
 
-            // Send visit data to server
-            trackTaskVisit(taskId);
+            // Don't trigger for buttons or links inside the card
+            if (e.target.tagName === 'BUTTON' || e.target.tagName === 'A' || e.target.closest('button') || e.target.closest('a')) {
+                // Run background function for tracking task visit
+                trackTaskVisit(taskId);
+            }
         });
     });
 
     // Function to track task visits
     function trackTaskVisit(taskId) {
-         console.log(taskId)
+        console.log("Tracking visit for task ID:", taskId);
+
         fetch('/mark-task-visited/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRFToken': getCSRFToken()
             },
-           
-            body: JSON.stringify({task_id: taskId})
+            body: JSON.stringify({ task_id: taskId })
         })
         .then(response => response.json())
         .then(data => {
@@ -2309,6 +2515,7 @@ document.addEventListener("DOMContentLoaded", function() {
         return document.querySelector('[name=csrfmiddlewaretoken]').value;
     }
 });
+
     function showAssignedTasks() {
     const taskItems = document.querySelectorAll('.task-item');
     const currentUserId = {{ request.user.id }}; // Pass the current user's ID from Django
@@ -2946,6 +3153,30 @@ function toggleInterestGoalForm() {
 //         });
 //     });
 // }
+
+
+function sortByLastVisited() {
+    console.log("hoo")
+    const taskContainer = document.querySelector('.task-grid');
+    const tasks = Array.from(taskContainer.querySelectorAll('.task-item')); // ✅ scoped correctly
+
+    tasks.sort((a, b) => {
+        const aVal = a.getAttribute('data-last-visited');
+        const bVal = b.getAttribute('data-last-visited');
+
+        if (!aVal && !bVal) return 0;
+        if (!aVal) return 1;
+        if (!bVal) return -1;
+
+        return new Date(bVal) - new Date(aVal);
+    });
+
+    tasks.forEach(task => taskContainer.appendChild(task)); // ✅ safe now
+
+}
+
+
+
 function submitTask() {
     const csrfToken = document.querySelector("[name=csrfmiddlewaretoken]").value;
 

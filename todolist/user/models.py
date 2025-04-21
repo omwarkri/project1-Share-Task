@@ -119,3 +119,46 @@ class DailySchedule(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     date = models.DateField()
     schedule = models.TextField()
+
+
+
+
+# models.py
+
+from django.db import models
+from datetime import date
+
+class ChallengeTemplate(models.Model):
+    CHALLENGE_TYPE_CHOICES = [
+        ('pomodoro', 'Pomodoro'),
+        ('tasks', 'Tasks'),
+        # ('early_bird', 'Early Bird'),
+        # ('focus', 'Focus Time'),
+    ]
+
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+    challenge_type = models.CharField(max_length=20, choices=CHALLENGE_TYPE_CHOICES)
+    target = models.IntegerField()
+    xp_reward = models.IntegerField(default=50)
+
+    def __str__(self):
+        return self.title
+
+class DailyChallenge(models.Model):
+    template = models.ForeignKey(ChallengeTemplate, on_delete=models.CASCADE)
+    date = models.DateField(default=date.today)
+
+    def __str__(self):
+        return f"{self.template.title} - {self.date}"
+
+class UserChallenge(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    daily_challenge = models.ForeignKey(DailyChallenge, on_delete=models.CASCADE)
+    accepted = models.BooleanField(default=False)
+    completed = models.BooleanField(default=False)
+    progress = models.IntegerField(default=0)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.daily_challenge.template.title}"
+

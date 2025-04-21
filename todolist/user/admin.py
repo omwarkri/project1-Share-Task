@@ -30,3 +30,30 @@ admin.site.register(CustomUser, CustomUserAdmin)
 admin.site.register(UserActivity, UserActivityAdmin)
 admin.site.register(Badge, BadgeAdmin)
 admin.site.register(UserBadge, UserBadgeAdmin)
+
+
+# admin.py
+
+from django.contrib import admin
+from .models import ChallengeTemplate, DailyChallenge, UserChallenge
+
+@admin.register(ChallengeTemplate)
+class ChallengeTemplateAdmin(admin.ModelAdmin):
+    list_display = ('title', 'challenge_type', 'target', 'xp_reward')
+    list_filter = ('challenge_type',)
+    search_fields = ('title', 'description')
+
+
+@admin.register(DailyChallenge)
+class DailyChallengeAdmin(admin.ModelAdmin):
+    list_display = ('template', 'date')
+    list_filter = ('date',)
+    search_fields = ('template__title',)
+
+
+@admin.register(UserChallenge)
+class UserChallengeAdmin(admin.ModelAdmin):
+    list_display = ('user', 'daily_challenge', 'accepted', 'completed', 'progress')
+    list_filter = ('accepted', 'completed')
+    search_fields = ('user__username', 'daily_challenge__template__title')
+

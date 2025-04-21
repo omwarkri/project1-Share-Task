@@ -923,9 +923,7 @@
         {% endblock %}
     </main>
 
-    <footer>
-        &copy; {{ year }} {{ app_name }}. All rights reserved.
-    </footer>
+
 
     <!-- Chat Modal -->
     <div id="chatModal" class="modal" style="display: none;">
@@ -1330,25 +1328,45 @@ function loadPomodoroState() {
         pomodoroWorkDurationInput.value = pomodoroWorkDuration;
         pomodoroBreakDurationInput.value = pomodoroBreakDuration;
 
-        // Adjust time if timer was running
+        // Only restore running timer if it was active AND within reasonable time
         if (runningState && startTimestamp) {
             const elapsed = Math.floor((Date.now() - startTimestamp) / 1000);
-            const adjustedTime = savedState.pomodoroTimeLeft - elapsed;
-
-            pomodoroTimeLeft = adjustedTime > 0 ? adjustedTime : 0;
-            isPomodoroRunning = true;
-            pomodoroTimer = setInterval(updatePomodoroTimer, 1000);
-            pomodoroStartButton.disabled = true;
-            pomodoroPauseButton.disabled = false;
-            pomodoroWorkDurationInput.disabled = true;
-            pomodoroBreakDurationInput.disabled = true;
-            pomodoroStatusDisplay.textContent = isWorkSession ? "Work session in progress" : "Break time!";
+            const sessionDuration = (isWorkSession ? pomodoroWorkDuration : pomodoroBreakDuration) * 60;
+            
+            // Only restore if less than 5 minutes have passed since last update
+            if (elapsed < 300) { // 300 seconds = 5 minutes
+                const adjustedTime = savedState.pomodoroTimeLeft - elapsed;
+                pomodoroTimeLeft = adjustedTime > 0 ? adjustedTime : 0;
+                
+                // If time is up, switch session
+                if (pomodoroTimeLeft <= 0) {
+                    isWorkSession = !isWorkSession;
+                    pomodoroTimeLeft = (isWorkSession ? pomodoroWorkDuration : pomodoroBreakDuration) * 60;
+                }
+                
+                isPomodoroRunning = true;
+                pomodoroTimer = setInterval(updatePomodoroTimer, 1000);
+                pomodoroStartButton.disabled = true;
+                pomodoroPauseButton.disabled = false;
+                pomodoroWorkDurationInput.disabled = true;
+                pomodoroBreakDurationInput.disabled = true;
+                pomodoroStatusDisplay.textContent = isWorkSession ? "Work session in progress" : "Break time!";
+            } else {
+                // If too much time has passed, reset to default
+                resetPomodoroTimer();
+            }
         } else {
             pomodoroTimeLeft = savedState.pomodoroTimeLeft || pomodoroWorkDuration * 60;
+            updatePomodoroDisplay();
         }
+    } else {
+        // No saved state - initialize with defaults
+        pomodoroWorkDuration = 25;
+        pomodoroBreakDuration = 5;
+        pomodoroTimeLeft = pomodoroWorkDuration * 60;
+        updatePomodoroDisplay();
     }
 }
-
   // Increment Pomodoro count on completion
   function incrementPomodoroCount() {
             fetch('/user/increment-pomodoro/', {

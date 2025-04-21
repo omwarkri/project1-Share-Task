@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Microtasks</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(135deg, #f5f7fa, #e6e9ef);
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .custom-microtask-container {
+      max-width: 600px;
+      width: 100%;
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+      padding: 30px;
+    }
+
+    .custom-microtask-heading {
+      color: #34495e;
+      font-size: 22px;
+      margin-bottom: 20px;
+      font-weight: 500;
+    }
+
+    .custom-microtask-list {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .custom-microtask-item {
+      background: #ffffff;
+      margin-bottom: 12px;
+      padding: 16px;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      transition: all 0.3s ease;
+    }
+
+    .custom-microtask-item:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .custom-completed .custom-microtask-text {
+      text-decoration: line-through;
+      color: #95a5a6;
+    }
+
+    .custom-toggle-button {
+      background: none;
+      border: 2px solid #1abc9c;
+      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .custom-toggle-button.custom-completed {
+      background: #1abc9c;
+      border-color: #1abc9c;
+    }
+
+    .custom-toggle-button.custom-completed::before {
+      content: "✓";
+      color: white;
+      font-size: 14px;
+    }
+
+    .custom-microtask-text {
+      flex: 1;
+      margin: 0 10px;
+      font-size: 16px;
+      color: #333;
+    }
+
+    .microtask-actions button {
+      background: none;
+      border: none;
+      color: #3498db;
+      cursor: pointer;
+      font-size: 14px;
+      margin-left: 5px;
+    }
+
+    .microtask-actions button:hover {
+      text-decoration: underline;
+    }
+
+    .custom-microtask-form {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .custom-microtask-form input {
+      flex: 1 1 auto;
+      padding: 12px;
+      border: 2px solid #ddd;
+      border-radius: 12px;
+      font-size: 16px;
+      outline: none;
+      transition: border-color 0.3s ease;
+    }
+
+    .custom-microtask-form input:focus {
+      border-color: #1abc9c;
+      box-shadow: 0 0 8px rgba(26, 188, 156, 0.3);
+    }
+
+    .custom-microtask-form button {
+      background: linear-gradient(135deg, #1abc9c, #16a085);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 12px 20px;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      flex: 0 0 auto;
+    }
+
+    .custom-microtask-form button:disabled {
+      background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+      cursor: not-allowed;
+    }
+
+    .custom-empty-state {
+      text-align: center;
+      color: #95a5a6;
+      font-size: 16px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="custom-microtask-container">
+    <h3 class="custom-microtask-heading">Microtasks</h3>
+    <ul class="custom-microtask-list" id="microtask-list"></ul>
+    <p id="empty-message" class="custom-empty-state" style="display: none;">No microtasks yet.</p>
+
+    <div class="custom-microtask-form">
+      <input type="text" id="new-microtask" placeholder="Add a new microtask">
+      <button id="add-microtask-btn">Add</button>
+      <button id="suggest-microtasks-btn">AI Suggestions</button>
+    </div>
+
+    <input type="hidden" id="csrf-token" value="{{ csrf_token }}">
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const taskId = {{ task.id }};
+      const csrfToken = document.getElementById("csrf-token").value;
+      const suggestBtn = document.getElementById('suggest-microtasks-btn');
+      
+      // Event listeners
+      document.getElementById('add-microtask-btn').addEventListener('click', addMicrotask);
+      suggestBtn.addEventListener('click', suggestMicrotasks);
+      document.getElementById('new-microtask').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') addMicrotask();
+      });
+
+      // Fetch microtasks on load
+      fetchMicrotasks();
+
+      async function fetchMicrotasks() {
+        try {
+          const response = await fetch(`/api/tasks/${taskId}/microtasks/`);
+          if (!response.ok) throw new Error('Failed to fetch microtasks');
+          
+          const microtasks = await response.json();
+          const list = document.getElementById("microtask-list");
+          list.innerHTML = "";
+
+          if (microtasks.length === 0) {
+            document.getElementById("empty-message").style.display = "block";
+          } else {
+            document.getElementById("empty-message").style.display = "none";
+            microtasks.forEach(task => {
+              const li = document.createElement("li");
+              li.className = `custom-microtask-item ${task.completed ? "custom-completed" : ""}`;
+              li.innerHTML = `
+                <button class="custom-toggle-button ${task.completed ? "custom-completed" : ""}" 
+                        onclick="toggleMicrotask(${task.id})"></button>
+                <p class="custom-microtask-text" id="text-${task.id}">${escapeHtml(task.title)}</p>
+                <div class="microtask-actions">
+                  <button onclick="editMicrotask(${task.id}, '${escapeHtml(task.title).replace(/'/g, "\\'")}')">Edit</button>
+                  <button onclick="deleteMicrotask(${task.id})">Delete</button>
+                </div>
+              `;
+              list.appendChild(li);
+            });
+          }
+        } catch (error) {
+          console.error("Error fetching microtasks:", error);
+          alert("Error loading microtasks. Please try again.");
+        }
+      }
+
+      async function addMicrotask() {
+        const input = document.getElementById("new-microtask");
+        const title = input.value.trim();
+        if (!title) return alert("Microtask title is required!");
+
+        try {
+          const response = await fetch(`/api/tasks/${taskId}/microtasks/add/`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-CSRFToken": csrfToken
+            },
+            body: JSON.stringify({ title })
+          });
+
+          if (!response.ok) throw new Error('Failed to add microtask');
+          
+          input.value = "";
+          await fetchMicrotasks();
+        } catch (error) {
+          console.error("Error adding microtask:", error);
+          alert("Error adding microtask. Please try again.");
+        }
+      }
+
+      async function toggleMicrotask(id) {
+        try {
+          const response = await fetch(`/api/microtasks/${id}/toggle/`, {
+            method: "POST",
+            headers: { "X-CSRFToken": csrfToken }
+          });
+
+          if (!response.ok) throw new Error('Failed to toggle microtask');
+          
+          await fetchMicrotasks();
+        } catch (error) {
+          console.error("Error toggling microtask:", error);
+          alert("Error toggling microtask. Please try again.");
+        }
+      }
+
+      async function deleteMicrotask(id) {
+        const confirmed = confirm("Are you sure you want to delete this microtask?");
+        if (!confirmed) return;
+
+        try {
+          const response = await fetch(`/api/microtasks/${id}/delete/`, {
+            method: "DELETE",
+            headers: { "X-CSRFToken": csrfToken }
+          });
+
+          if (!response.ok) throw new Error('Failed to delete microtask');
+          
+          await fetchMicrotasks();
+        } catch (error) {
+          console.error("Error deleting microtask:", error);
+          alert("Error deleting microtask. Please try again.");
+        }
+      }
+
+      function editMicrotask(id, currentTitle) {
+        const newTitle = prompt("Edit microtask title:", currentTitle);
+        if (newTitle && newTitle.trim() !== "" && newTitle !== currentTitle) {
+          updateMicrotask(id, newTitle);
+        }
+      }
+
+      async function updateMicrotask(id, title) {
+        try {
+          const response = await fetch(`/api/microtasks/${id}/update/`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              "X-CSRFToken": csrfToken
+            },
+            body: JSON.stringify({ title })
+          });
+
+          if (!response.ok) throw new Error('Failed to update microtask');
+          
+          await fetchMicrotasks();
+        } catch (error) {
+          console.error("Error updating microtask:", error);
+          alert("Error updating microtask. Please try again.");
+        }
+      }
+
+      async function suggestMicrotasks() {
+        const originalText = suggestBtn.textContent;
+        
+        try {
+          // Change button text and disable it
+          suggestBtn.textContent = 'Suggesting...';
+          suggestBtn.disabled = true;
+          
+          const response = await fetch(`/api/tasks/${taskId}/microtasks/ai_suggestions/`, {
+            method: "GET",
+            headers: { "X-CSRFToken": csrfToken }
+          });
+
+          if (!response.ok) throw new Error("Failed to get suggestions");
+
+          const suggestions = await response.json();
+          console.log(suggestions.generated_microtasks); // Optional: log for debug
+
+          // Re-fetch microtasks from DB and update UI
+          await fetchMicrotasks();
+        } catch (error) {
+          console.error("Error getting suggestions:", error);
+          alert("Error getting AI suggestions. Please try again.");
+        } finally {
+          // Restore button state
+          suggestBtn.textContent = originalText;
+          suggestBtn.disabled = false;
+        }
+      }
+
+      function escapeHtml(unsafe) {
+        return unsafe
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#039;");
+      }
+
+      // Make functions available globally
+      window.toggleMicrotask = toggleMicrotask;
+      window.deleteMicrotask = deleteMicrotask;
+      window.editMicrotask = editMicrotask;
+    });
+  </script>
+</body>
+</html>

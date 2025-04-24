@@ -158,7 +158,32 @@ class UserChallenge(models.Model):
     accepted = models.BooleanField(default=False)
     completed = models.BooleanField(default=False)
     progress = models.IntegerField(default=0)
+    completed_at = models.DateTimeField(null=True, blank=True)  # Optional: track when
 
     def __str__(self):
         return f"{self.user.username} - {self.daily_challenge.template.title}"
+    
+
+
+from django.utils import timezone
+
+def update_challenge_progress(user, increment=1):
+    today = timezone.now().date()
+    try:
+        challenge = DailyChallenge.objects.get(date=today)
+        user_chal = UserChallenge.objects.get(user=user, daily_challenge=challenge)
+    except (DailyChallenge.DoesNotExist, UserChallenge.DoesNotExist):
+        return
+
+    user_chal.progress += increment
+
+    if user_chal.progress >= challenge.template.target and not user_chal.completed:
+        user_chal.completed = True
+        user_chal.completed_at = timezone.now()
+        # 🎉 Award XP here
+        user.profile.xp += challenge.template.xp_reward
+        user.profile.save()
+
+    user_chal.save()
+
 

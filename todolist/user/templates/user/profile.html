@@ -944,15 +944,16 @@ function fetchDailyChallenge() {
                     <div class="reward-points">+${challenge.reward} XP</div>
                 </div>
                 <button class="challenge-button" id="challenge-accept-btn" 
-                        ${challenge.accepted ? 'disabled' : ''}
-                        onclick="${challenge.accepted ? '' : 'acceptChallenge()'}">
+                    ${challenge.accepted ? 'disabled' : ''}>
                     ${challenge.accepted ? 'Challenge Accepted!' : 'Accept Challenge'}
                 </button>
                 ${challenge.progress ? `<div class="challenge-progress">Progress: ${challenge.progress}</div>` : ''}
             `;
 
+            // Only add event listener if not yet accepted
             if (!challenge.accepted) {
-                document.getElementById('challenge-accept-btn').addEventListener('click', acceptChallenge);
+                document.getElementById('challenge-accept-btn')
+                    .addEventListener('click', acceptChallenge);
             }
         })
         .catch(error => {
@@ -966,10 +967,11 @@ function fetchDailyChallenge() {
 // Function to accept the challenge
 function acceptChallenge() {
     console.log("accept challenge")
+    const csrfToken = '{{ csrf_token }}';  // If using Django template rendering
     const btn = document.getElementById('challenge-accept-btn');
     btn.disabled = true;
     
-    fetch('/api/accept-challenge/', {
+    fetch('/user/api/accept-challenge/', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

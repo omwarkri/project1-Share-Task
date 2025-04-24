@@ -1,0 +1,71 @@
+<div class="sidebar" id="sidebar">
+    <div>
+        <div class="sidebar-toggle-div">
+            <button class="sidebar-toggle" onclick="toggleSidebar()" aria-label="Close Sidebar">X</button>
+        </div>
+        <a class="sidebar-header" href="{% url 'home' %}" style="text-decoration: none;">
+            <img class="site-logo" src="https://res.cloudinary.com/ddw1upvx3/image/upload/v1741984458/share-task-media/symbols/ufsei0znhklvfkovekjm.png" alt="Site Logo">
+            <h2>Share Task</h2>
+        </a>
+        <ul class="sidebar-menu">
+            <li>
+                <a id="all-tasks-link" class="sidebar-link" href="{% url 'home' %}">
+                    <i class="fas fa-tasks"></i> All Tasks
+                </a>
+            </li>
+            <li>
+                <a class="sidebar-link" id="leaderboard-link" href="{% url 'leaderboard' %}">
+                    <i class="fas fa-trophy"></i> Leaderboard
+                </a>
+            </li>
+            <li>
+                <button id="teams-link" class="sidebar-link" href="#" onclick="checkAuthentication()">
+                    <i class="fas fa-users"></i> My Teams
+                </button>
+            </li>
+            <li>
+                <a id="insights-link" class="sidebar-link" href="{% url 'stories' %}">
+                    <i class="fas fa-lightbulb"></i> Insights
+                </a>
+            </li>
+            <li>
+                <a id="insights-link" class="sidebar-link" href="{% url 'quiz' %}">
+                    <i class="fas fa-question"></i> Quiz
+                </a>
+            </li>
+            <li>
+                <a id="memes-link" class="sidebar-link" href="{% url 'ai_memes' %}">
+                    <i class="fas fa-grin-squint-tears"></i> Memes
+                </a>
+            </li>
+          
+            <li>
+                <a id="motivation-link" class="sidebar-link" href="{% url 'ai_motivational_quotes' %}">
+                    <i class="fas fa-fire"></i> Motivation
+                </a>
+            </li>
+            <li>
+                <a id="feed-link" class="sidebar-link" href="{% url 'completed_tasks_feed' %}?filter_type=image">
+                    <i class="fas fa-newspaper"></i> Feed
+                </a>
+            </li>
+        </ul>
+   
+    </div>
+    <div class="sidebar-footer">
+        <div class="logout">
+            {% if user.is_authenticated %}
+                <form method="post" action="{% url 'logout' %}" style="display: inline;">
+                    {% csrf_token %}
+                    <button class="accountbutton" type="submit">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </form>
+            {% else %}
+                <a class="accountbutton" href="{% url 'login' %}">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</div>

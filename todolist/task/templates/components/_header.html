@@ -1,0 +1,200 @@
+<header>
+    <div class="header-div">
+        <div class="header-left">
+            <button class="sidebar-toggle" onclick="toggleSidebar()" aria-label="Toggle Sidebar">☰</button>
+            <a class="sidebar-header" href="{% url 'home' %}" style="text-decoration: none;">
+                <img class="header-site-logo" src="https://res.cloudinary.com/ddw1upvx3/image/upload/v1741984458/share-task-media/symbols/ufsei0znhklvfkovekjm.png" alt="Site Logo">
+            </a>
+            <div class="welcome-message">
+                <span>
+                    {% if user.is_authenticated %}
+                        Welcome, <a href="{% url 'profile' %}">{{ user.username }}</a>!
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+        <div class="header-right">
+            <button class="schedule-button" onclick="openScheduleModal()" title="Daily Schedule">
+                <i class="fas fa-calendar-day"></i>
+            </button>
+            <button class="pomodoro-button" onclick="openPomodoroModal()" title="Pomodoro Timer">
+                <i class="fas fa-clock"></i>
+            </button>
+            {% if user.is_authenticated %}
+                <button class="view-chats-button" onclick="openChatModal()">💬 Chats</button>
+            {% else %}
+                <a href="{% url 'login' %}" class="view-chats-button">Login</a>
+                <a href="{% url 'register' %}" class="view-chats-button">Signup</a>
+            {% endif %}
+        </div>
+    </div>
+</header>
+
+<script>
+// Schedule Modal Functions
+function openScheduleModal() {
+    console.log("opening modal  ")
+    const scheduleModal = document.getElementById('scheduleModal');
+    const scheduleContent = document.getElementById('scheduleContent');
+    console.log(scheduleModal )
+    scheduleModal.style.display = 'flex';
+    scheduleContent.innerHTML = `
+        <div class="schedule-loading">
+            <p>Loading your schedule...</p>
+        </div>
+    `;
+    
+    // Fetch schedule data from API
+    fetchScheduleData();
+}
+
+function closeScheduleModal() {
+    const scheduleModal = document.getElementById('scheduleModal');
+    scheduleModal.style.display = 'none';
+}
+function fetchScheduleData() {
+    const scheduleContent = document.getElementById('scheduleContent');
+    
+    // Replace with your actual API endpoint
+    fetch('/api/daily-schedule/')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.schedule) {
+                renderScheduleText(data.schedule);
+            } else {
+                scheduleContent.innerHTML = `
+                    <div class="schedule-empty">
+                        <p>No schedule items for today.</p>
+                    </div>
+                `;
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching schedule:', error);
+            scheduleContent.innerHTML = `
+                <div class="schedule-error">
+                    <p>Failed to load schedule. Please try again later.</p>
+                </div>
+            `;
+        });
+}
+function renderScheduleText(scheduleText) {
+    const scheduleContent = document.getElementById('scheduleContent');
+
+    const scheduleContainer = document.createElement('div');
+    scheduleContainer.className = 'schedule-paragraph';
+
+    const lines = scheduleText.trim().split('\n');
+
+    lines.forEach((line) => {
+        if (line.trim()) {
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'schedule-item';
+
+            const checkboxContainer = document.createElement('div');
+            checkboxContainer.className = 'schedule-item-container';
+            checkboxContainer.style.display = 'flex';
+            checkboxContainer.style.alignItems = 'flex-start';
+            checkboxContainer.style.gap = '10px';
+
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.className = 'schedule-checkbox';
+            checkbox.style.marginTop = '3px';
+            checkbox.style.flexShrink = '0';
+
+            const label = document.createElement('div');
+
+            // If line starts with a time like "06:00 AM - 07:00 AM:"
+            const timeStartPattern = /^(\d{1,2}:\d{2} [AP]M - \d{1,2}:\d{2} [AP]M:)/;
+            const match = line.match(timeStartPattern);
+
+            let formattedLine = line;
+
+            if (match) {
+                formattedLine = line.replace(
+                    timeStartPattern,
+                    `<span class="schedule-time-block">${match[1]}</span>`
+                );
+                label.classList.add('schedule-box-line');
+            }
+
+            const withPriority = formattedLine.replace(
+                /\(([^)]+ priority)/gi,
+                '(<span class="schedule-priority">$1</span>'
+            );
+
+            label.innerHTML = withPriority;
+
+            checkboxContainer.appendChild(checkbox);
+            checkboxContainer.appendChild(label);
+            itemDiv.appendChild(checkboxContainer);
+            scheduleContainer.appendChild(itemDiv);
+
+            const taskId = 'task-' + btoa(line.trim()).substring(0, 12);
+
+            if (localStorage.getItem(`schedule-complete-${taskId}`)) {
+                checkbox.checked = true;
+                label.style.textDecoration = 'line-through';
+                label.style.opacity = '0.7';
+            }
+
+            checkbox.addEventListener('change', function () {
+                if (this.checked) {
+                    localStorage.setItem(`schedule-complete-${taskId}`, 'true');
+                    label.style.textDecoration = 'line-through';
+                    label.style.opacity = '0.7';
+                } else {
+                    localStorage.removeItem(`schedule-complete-${taskId}`);
+                    label.style.textDecoration = 'none';
+                    label.style.opacity = '1';
+                }
+            });
+        }
+    });
+
+    const noteMatch = scheduleText.match(/Note:(.+)$/s);
+    if (noteMatch) {
+        const noteDiv = document.createElement('div');
+        noteDiv.className = 'schedule-note';
+        noteDiv.style.marginTop = '20px';
+        noteDiv.style.fontStyle = 'italic';
+        noteDiv.textContent = 'Note:' + noteMatch[1].trim();
+        scheduleContainer.appendChild(noteDiv);
+    }
+
+    scheduleContent.innerHTML = '';
+    scheduleContent.appendChild(scheduleContainer);
+}
+
+function formatTime(timeString) {
+    if (!timeString) return '';
+    const [hours, minutes] = timeString.split(':');
+    const hour = parseInt(hours);
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    const hour12 = hour % 12 || 12;
+    return `${hour12}:${minutes} ${ampm}`;
+}
+
+function getPriorityColor(priority) {
+    const priorityColors = {
+        'High': '#e74c3c',
+        'Medium': '#f39c12',
+        'Low': '#2ecc71'
+    };
+    return priorityColors[priority] || '#3498db';
+}
+
+// Close modal when clicking outside
+window.addEventListener('click', function(event) {
+    const scheduleModal = document.getElementById('scheduleModal');
+    if (event.target === scheduleModal) {
+        closeScheduleModal();
+    }
+});
+</script>

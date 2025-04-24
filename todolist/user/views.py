@@ -664,3 +664,77 @@ def update_progress(user, challenge_type, amount=1):
             user_chal.completed = True
         user_chal.save()
 
+
+
+# views.py
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+from django.contrib.auth.decorators import login_required
+from django.utils import timezone
+
+from .models import DailyChallenge, UserChallenge
+
+@require_POST
+@login_required
+def accept_challenge(request):
+    today = timezone.now().date()
+    user = request.user
+
+    try:
+        challenge = DailyChallenge.objects.get(date=today)
+    except DailyChallenge.DoesNotExist:
+        return JsonResponse({'error': 'No challenge for today'}, status=404)
+
+    user_chal, created = UserChallenge.objects.get_or_create(
+        user=user,
+        daily_challenge=challenge,
+        defaults={'accepted': True, 'progress': 0, 'completed': False}
+    )
+
+    if not created and not user_chal.accepted:
+        user_chal.accepted = True
+        user_chal.save()
+
+    return JsonResponse({'success': True, 'message': 'Challenge accepted!'})
+
+
+
+
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+from .models import UserChallenge
+import json
+from django.utils import timezone
+
+@csrf_exempt
+def update_challenge_progress(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Invalid request'}, status=400)
+
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'Unauthorized'}, status=401)
+
+    data = json.loads(request.body)
+    action_type = data.get('type')  # "task" or "pomodoro"
+
+    today = timezone.now().date()
+    user_challenge = UserChallenge.objects.filter(user=request.user, daily_challenge__date=today).first()
+
+    if not user_challenge:
+        return JsonResponse({'error': 'No active challenge'}, status=404)
+
+    template_type = user_challenge.daily_challenge.template.challenge_type  # for example: 'task' or 'pomodoro'
+
+    if action_type != template_type:
+        return JsonResponse({'message': 'Action does not match today\'s challenge'}, status=200)
+
+    # Update progress
+    user_challenge.progress += 1
+    if user_challenge.progress >= user_challenge.daily_challenge.template.target:
+        user_challenge.completed = True
+        # Add reward XP here if needed
+
+    user_challenge.save()
+
+    return JsonResponse({'success': True})
+

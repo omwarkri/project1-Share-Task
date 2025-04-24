@@ -2339,12 +2339,12 @@ input:checked + .slider:before {
 {% for task_data in tasks_with_suggestions %}
 <div id="shareTaskModal-{{ task_data.task.id }}" class="modal" style="display: none;">
     <div class="modal-content">
-        <span class="close-modal" onclick="closeModal({{ task_data.task.id }})">&times;</span>
+        <span class="close-modal" onclick="closeModalShareTaskModal({{ task_data.task.id }})">&times;</span>
         <div class="modal-header">
             <h3>📤 Share Your Task Completion</h3>
         <p>Would you like to share how you completed this task?</p>
         </div>
-        <form class="modal-body" method="post" enctype="multipart/form-data" action="{% url 'complete_task' task_data.task.id %}">
+        <form class="modal-body" method="post" enctype="multipart/form-data" action="{% url 'complete_task' task_data.task.id %}"  onsubmit="completeChallenge('task')" enctype="multipart/form-data">
             {% csrf_token %}
             <label for="completion_details">📝 How did you complete the task?</label>
             <textarea name="completion_details" id="completion_details" rows="4"></textarea>
@@ -2940,7 +2940,7 @@ function closeChatModal() {
         document.getElementById(`shareTaskModal-${taskId}`).style.display = 'flex';
     }
 
-    function closeModal(taskId) {
+    function closeModalShareTaskModal(taskId) {
         console.log("closing")
         document.getElementById(`shareTaskModal-${taskId}`).style.display = 'none';
     }
@@ -3227,6 +3227,36 @@ function resetFields() {
 
     // Initially show all tasks
     filterTasks('all', 'all');
+
+
+function completeChallenge(type) {
+    fetch('/user/api/complete-challenge/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken  // Make sure csrfToken is correctly defined and accessible
+        },
+        body: JSON.stringify({
+            type: type  // You can pass 'task' or 'pomodoro' as the type here
+        }),
+        credentials: 'same-origin'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'completed') {
+            alert('Task completed!');
+        } else if (data.status === 'updated') {
+            alert('Pomodoro progress updated!');
+        } else {
+            alert('Error completing challenge.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('There was an issue with completing the challenge.');
+    });
+}
+
 
 </script>
 

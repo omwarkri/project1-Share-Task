@@ -972,6 +972,14 @@ def log_activity_and_update_scores(task, user, completion=None, partner_feedback
         task.task_partner.score += 5  # Example: 5 points for helping
         task.task_partner.save()
 
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+import threading
+
+from .models import Task, TaskCompletionDetails, PartnerFeedback
+
+
 @login_required
 def complete_task(request, task_id):
     task = get_object_or_404(Task, id=task_id)
@@ -991,19 +999,22 @@ def complete_task(request, task_id):
                 messages.success(request, 'Task marked as completed without sharing completion details.')
                 return redirect('task_detail', task_id=task.id)
 
-            # Save completion details
+            # Get form data
             completion_details = request.POST.get('completion_details')
             uploaded_image = request.FILES.get('uploaded_image')
             uploaded_file = request.FILES.get('uploaded_file')
 
+            # Create completion instance
             completion = TaskCompletionDetails(
-            task=task,
-            completion_details=completion_details
-        )
+                task=task,
+                completion_details=completion_details
+            )
 
-        # Temporarily attach uploaded files to trigger Cloudinary uploads in the save() method
-            completion._image_file = uploaded_image  # Should be from request.FILES.get(...)
-            # completion._file_file = uploaded_file    # Should be from request.FILES.get(...)
+            # Attach only existing files to avoid Cloudinary errors
+            if uploaded_image:
+                completion._image_file = uploaded_image
+            if uploaded_file:
+                completion._file_file = uploaded_file
 
             completion.save()
 
@@ -1011,6 +1022,7 @@ def complete_task(request, task_id):
             partner_feedback = None
             partner_rating = request.POST.get('partner_rating')
             partner_comment = request.POST.get('partner_comment')
+
             if partner_rating and partner_comment and task.task_partner:
                 partner_feedback = PartnerFeedback.objects.create(
                     task=task,
@@ -1032,6 +1044,7 @@ def complete_task(request, task_id):
             messages.error(request, "Cannot complete this task as some dependencies are not yet completed.")
 
     return render(request, 'task/task_detail.html', {'task': task})
+
 
 
 

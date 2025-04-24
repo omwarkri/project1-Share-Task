@@ -24,5 +24,7 @@ urlpatterns = [
     path('api/update-interests-goals/', update_user_interests_goals, name='update_interests_goals'), 
     path('increment-pomodoro/', views.increment_pomodoro_count, name='increment_pomodoro'),
     path('api/daily-challenges/', views.get_daily_challenges, name='daily-challenges'),
+    path('api/accept-challenge/', views.accept_challenge, name='accept-challenge'),
+    path('api/update-challenge-progress/', views.update_challenge_progress, name='update_challenge_progress'),
    
 ]

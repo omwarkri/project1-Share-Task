@@ -6,12 +6,7 @@
 
 <style>
 
-    body {
-        background-color: #f8f9fa; /* Light background */
-        color: #333; /* Dark text for contrast */
-    
-     
-    }
+ 
     
     /* Button styling */
     /* Button styling */
@@ -867,9 +862,56 @@ input:checked + .slider:before {
         flex-direction: column;
         position: relative;
     }
+
+    .task-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, #1abc9c, #3498db);
+}
     
     .task-card:hover {
         transform: translateY(-5px);
+    }
+
+     /* Special Effects for Completed Tasks */
+     .task-card.completed {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .task-card.completed::after {
+        content: "✓";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 5rem;
+        color: rgba(46, 204, 113, 0);
+        
+        opacity: 0.1;
+        z-index: 1;
+    }
+  
+
+    /* Priority Indicators Animation */
+    .high-priority-indicator {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 8px;
+        height: 8px;
+        background-color: #e74c3c;
+        border-radius: 50%;
+        animation: blink 1.5s infinite;
+    }
+
+    @keyframes blink {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.3; }
     }
     
     .task-header {
@@ -1705,6 +1747,7 @@ input:checked + .slider:before {
                 height: calc(100vh - 100px); /* Adjust height for mobile header */
                 padding-bottom: 80px; /* Add padding for floating button */
             }
+            
 
             .getSuggestionButton{
                 margin-right: 56px;

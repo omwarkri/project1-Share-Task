@@ -778,14 +778,7 @@
     transition: transform 0.6s ease-in-out; /* Smooth scaling effect */
 }
 
-#loading-spinner.show .spinner {
-    transform: scale(1); /* Scale up to normal size */
-}
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
 
         /* Responsive Fixes */
         @media (max-width: 768px) {
@@ -811,12 +804,9 @@
 <body class="base-main-body">
     {% include 'components/_header.html' %}
     {% include 'components/_loading_spinner.html' %}
-
-
     <!-- Sidebar -->
     {% include 'components/_sidebar.html' %}
     
-
     <main class="main">
         {% block content %}
         {% endblock %}
@@ -824,142 +814,26 @@
 
 
 
-    <!-- Chat Modal -->
-    <div id="chatModal" class="modal" style="display: none;">
-        <div class="modal-content">
-            <span class="close-modal" onclick="closeChatModal()">&times;</span>
-            <h3 class="modal-header">💬 All Chats</h3>
-            <div class="chat-list modal-body">
-                <p>Loading chats...</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Teams Modal -->
-    <div id="teamsModal" class="modal" style="display: none;">
-        <div class="modal-content">
-            <span class="close-modal" onclick="closeTeamsModal()">&times;</span>
-            <h3 class="modal-header">👥 My Teams</h3>
-            <div class="teams-list">
-                <p>Loading teams...</p>
-            </div>
-        </div>
-    </div>
+   
 
 
 
-<!-- Schedule Modal -->
-<div id="scheduleModal" class="schedule-modal">
-    <div class="schedule-content">
-        <span class="close-modal" onclick="closeScheduleModal()">&times;</span>
-        <div class="schedule-header">
-            <h3 class="schedule-title"><i class="fas fa-calendar-day"></i> Daily Schedule</h3>
-        </div>
-        <div id="scheduleContent">
-            <div class="schedule-loading">
-                <p>Loading your schedule...</p>
-            </div>
-        </div>
-    </div>
-</div>
+
 
   <!-- All Modals -->
 
+  {% include 'components/_modals.html' %}
   {% include 'components/_pomodoro_modal.html' %}
 
 
-    <script>
+<script>
+    function toggleSidebar() {
+        const sidebar = document.getElementById("sidebar");
+        sidebar.classList.toggle("show");
+    }
 
-    function checkAuthentication() {
-            {% if user.is_authenticated %}
-                openTeamsModal(); // Open the teams modal for authenticated users
-            {% else %}
-                window.location.href = "{% url 'login' %}"; // Redirect to login page for unauthenticated users
-            {% endif %}
-        }
-        function toggleSidebar() {
-            const sidebar = document.getElementById("sidebar");
-            sidebar.classList.toggle("show");
-        }
+       
 
-        function openChatModal() {
-            const chatModal = document.getElementById('chatModal');
-            chatModal.style.display = 'flex';
-
-            // Fetch chats from the backend
-            fetch('/fetch-all-chats/')
-                .then(response => response.json())
-                .then(data => {
-                    const chatList = document.querySelector('.chat-list');
-                    chatList.innerHTML = '';
-
-                    if (data.chats && data.chats.length > 0) {
-                        data.chats.forEach(chat => {
-                            const chatItem = document.createElement('div');
-                            chatItem.classList.add('chat-item');
-
-                            if (chat.task_id) {
-                                chatItem.innerHTML = `
-                                    <a href="/chat/${chat.task_id}/?receiver_id=${chat.user.id}">
-                                        <strong>${chat.user.username} ${chat.task_id}</strong>: ${chat.last_message}
-                                        <small class="chat-time">${chat.timestamp}</small>
-                                    </a>
-                                `;
-                            }
-
-                            chatList.appendChild(chatItem);
-                        });
-                    } else {
-                        chatList.innerHTML = '<p>No chats available.</p>';
-                    }
-                })
-                .catch(error => {
-                    console.error("Error fetching chats:", error);
-                    document.querySelector('.chat-list').innerHTML = '<p>Error loading chats.</p>';
-                });
-        }
-
-        function closeChatModal() {
-            const chatModal = document.getElementById('chatModal');
-            chatModal.style.display = 'none';
-        }
-
-        function openTeamsModal() {
-            const teamsModal = document.getElementById('teamsModal');
-            teamsModal.style.display = 'flex';
-
-            // Fetch teams from the backend
-            fetch('/teams/')
-                .then(response => response.json())
-                .then(data => {
-                    const teamsList = document.querySelector('.teams-list');
-                    teamsList.innerHTML = '';
-
-                    if (data.teams && data.teams.length > 0) {
-                        data.teams.forEach(team => {
-                            const teamItem = document.createElement('div');
-                            teamItem.classList.add('team-item');
-                            teamItem.innerHTML = `
-                                <a href="/teams/${team.id}/ ">
-                                    <strong>${team.name}</strong>: ${team.description}
-                                </a>
-                            `;
-                            teamsList.appendChild(teamItem);
-                        });
-                    } else {
-                        teamsList.innerHTML = '<p>No teams available.</p>';
-                    }
-                })
-                .catch(error => {
-                    console.error("Error fetching teams:", error);
-                    document.querySelector('.teams-list').innerHTML = '<p>Error loading teams.</p>';
-                });
-        }
-
-        function closeTeamsModal() {
-            const teamsModal = document.getElementById('teamsModal');
-            teamsModal.style.display = 'none';
-        }
 
         document.addEventListener('DOMContentLoaded', () => {
             const currentPath = window.location.pathname;
@@ -999,48 +873,6 @@
     });
 
 
-    function showLoadingSpinner() {
-            document.getElementById('loading-spinner').style.display = 'flex';
-            const spinner = document.getElementById('loading-spinner');
-            spinner.classList.add('show');
-            const sidebar = document.getElementById("sidebar");
-    sidebar.classList.remove("show"); // Remove the 'show' class to hide the sidebar
-            
-        }
-
-        // Function to hide the loading spinner
-        function hideLoadingSpinner() {
-            document.getElementById('loading-spinner').style.display = 'none';
-            const spinner = document.getElementById('loading-spinner');
-    spinner.classList.remove('show'); // Remove the 'show' class
-
-        }
-
-        window.addEventListener("pageshow", function(event) {
-    const spinner = document.getElementById('loading-spinner');
-    if (spinner) {
-        spinner.style.display = 'none'; // Hide the spinner
-        spinner.classList.remove('show'); // Ensure class is removed
-    }
-
-    const sidebar = document.getElementById("sidebar");
-    if (sidebar) {
-        sidebar.classList.remove("show"); // Hide the sidebar if it's open
-    }
-});
-
-        // Show spinner when a link is clicked (for page transitions)
-        document.addEventListener('DOMContentLoaded', function () {
-            const links = document.querySelectorAll('a');
-            links.forEach(link => {
-                link.addEventListener('click', showLoadingSpinner);
-            });
-        });
-
-        // Hide spinner when the page is fully loaded
-        window.addEventListener('load', function () {
-            setTimeout(hideLoadingSpinner, 500); // Hide after 500ms delay
-        });
 
         // Optional: Show spinner during AJAX requests
         function fetchData(url) {

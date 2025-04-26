@@ -165,25 +165,5 @@ class UserChallenge(models.Model):
     
 
 
-from django.utils import timezone
-
-def update_challenge_progress(user, increment=1):
-    today = timezone.now().date()
-    try:
-        challenge = DailyChallenge.objects.get(date=today)
-        user_chal = UserChallenge.objects.get(user=user, daily_challenge=challenge)
-    except (DailyChallenge.DoesNotExist, UserChallenge.DoesNotExist):
-        return
-
-    user_chal.progress += increment
-
-    if user_chal.progress >= challenge.template.target and not user_chal.completed:
-        user_chal.completed = True
-        user_chal.completed_at = timezone.now()
-        # 🎉 Award XP here
-        user.profile.xp += challenge.template.xp_reward
-        user.profile.save()
-
-    user_chal.save()
 
 

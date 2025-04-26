@@ -1,0 +1,120 @@
+ <!-- Chat Modal -->
+ <div id="chatModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeChatModal()">&times;</span>
+        <h3 class="modal-header">💬 All Chats</h3>
+        <div class="chat-list modal-body">
+            <p>Loading chats...</p>
+        </div>
+    </div>
+</div>
+
+<!-- Teams Modal -->
+<div id="teamsModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeTeamsModal()">&times;</span>
+        <h3 class="modal-header">👥 My Teams</h3>
+        <div class="teams-list">
+            <p>Loading teams...</p>
+        </div>
+    </div>
+</div>
+
+<!-- Schedule Modal -->
+<div id="scheduleModal" class="schedule-modal">
+    <div class="schedule-content">
+        <span class="close-modal" onclick="closeScheduleModal()">&times;</span>
+        <div class="schedule-header">
+            <h3 class="schedule-title"><i class="fas fa-calendar-day"></i> Daily Schedule</h3>
+        </div>
+        <div id="scheduleContent">
+            <div class="schedule-loading">
+                <p>Loading your schedule...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+
+function openChatModal() {
+            const chatModal = document.getElementById('chatModal');
+            chatModal.style.display = 'flex';
+
+            // Fetch chats from the backend
+            fetch('/fetch-all-chats/')
+                .then(response => response.json())
+                .then(data => {
+                    const chatList = document.querySelector('.chat-list');
+                    chatList.innerHTML = '';
+
+                    if (data.chats && data.chats.length > 0) {
+                        data.chats.forEach(chat => {
+                            const chatItem = document.createElement('div');
+                            chatItem.classList.add('chat-item');
+
+                            if (chat.task_id) {
+                                chatItem.innerHTML = `
+                                    <a href="/chat/${chat.task_id}/?receiver_id=${chat.user.id}">
+                                        <strong>${chat.user.username} ${chat.task_id}</strong>: ${chat.last_message}
+                                        <small class="chat-time">${chat.timestamp}</small>
+                                    </a>
+                                `;
+                            }
+
+                            chatList.appendChild(chatItem);
+                        });
+                    } else {
+                        chatList.innerHTML = '<p>No chats available.</p>';
+                    }
+                })
+                .catch(error => {
+                    console.error("Error fetching chats:", error);
+                    document.querySelector('.chat-list').innerHTML = '<p>Error loading chats.</p>';
+                });
+        }
+
+        function closeChatModal() {
+            const chatModal = document.getElementById('chatModal');
+            chatModal.style.display = 'none';
+        }
+
+
+        function openTeamsModal() {
+            const teamsModal = document.getElementById('teamsModal');
+            teamsModal.style.display = 'flex';
+
+            // Fetch teams from the backend
+            fetch('/teams/')
+                .then(response => response.json())
+                .then(data => {
+                    const teamsList = document.querySelector('.teams-list');
+                    teamsList.innerHTML = '';
+
+                    if (data.teams && data.teams.length > 0) {
+                        data.teams.forEach(team => {
+                            const teamItem = document.createElement('div');
+                            teamItem.classList.add('team-item');
+                            teamItem.innerHTML = `
+                                <a href="/teams/${team.id}/ ">
+                                    <strong>${team.name}</strong>: ${team.description}
+                                </a>
+                            `;
+                            teamsList.appendChild(teamItem);
+                        });
+                    } else {
+                        teamsList.innerHTML = '<p>No teams available.</p>';
+                    }
+                })
+                .catch(error => {
+                    console.error("Error fetching teams:", error);
+                    document.querySelector('.teams-list').innerHTML = '<p>Error loading teams.</p>';
+                });
+        }
+
+        function closeTeamsModal() {
+            const teamsModal = document.getElementById('teamsModal');
+            teamsModal.style.display = 'none';
+        }
+</script>

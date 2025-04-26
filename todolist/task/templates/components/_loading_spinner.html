@@ -11,3 +11,50 @@
 <div id="loading-spinner">
     <div class="spinner"></div>
 </div>
+
+
+<script>
+    
+    function showLoadingSpinner() {
+            document.getElementById('loading-spinner').style.display = 'flex';
+            const spinner = document.getElementById('loading-spinner');
+            spinner.classList.add('show');
+            const sidebar = document.getElementById("sidebar");
+    sidebar.classList.remove("show"); // Remove the 'show' class to hide the sidebar
+            
+        }
+
+        // Function to hide the loading spinner
+        function hideLoadingSpinner() {
+            document.getElementById('loading-spinner').style.display = 'none';
+            const spinner = document.getElementById('loading-spinner');
+    spinner.classList.remove('show'); // Remove the 'show' class
+
+        }
+
+        window.addEventListener("pageshow", function(event) {
+    const spinner = document.getElementById('loading-spinner');
+    if (spinner) {
+        spinner.style.display = 'none'; // Hide the spinner
+        spinner.classList.remove('show'); // Ensure class is removed
+    }
+
+    const sidebar = document.getElementById("sidebar");
+    if (sidebar) {
+        sidebar.classList.remove("show"); // Hide the sidebar if it's open
+    }
+});
+
+        // Show spinner when a link is clicked (for page transitions)
+        document.addEventListener('DOMContentLoaded', function () {
+            const links = document.querySelectorAll('a');
+            links.forEach(link => {
+                link.addEventListener('click', showLoadingSpinner);
+            });
+        });
+
+        // Hide spinner when the page is fully loaded
+        window.addEventListener('load', function () {
+            setTimeout(hideLoadingSpinner, 500); // Hide after 500ms delay
+        });
+</script>

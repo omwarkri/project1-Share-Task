@@ -30,8 +30,154 @@
     </div>
 </div>
 
+<style>
+/* Pomodoro Timer Styles */
+.pomodoro-modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.4);
+    align-items: center;
+    justify-content: center;
+}
+
+.pomodoro-content {
+    background-color: #fefefe;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 90%;
+    max-width: 400px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.pomodoro-display {
+    font-size: 4rem;
+    text-align: center;
+    margin: 20px 0;
+    font-family: monospace;
+    color: #333;
+}
+
+.pomodoro-controls {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.pomodoro-btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.2s;
+}
+
+.pomodoro-btn-start {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.pomodoro-btn-pause {
+    background-color: #f39c12;
+    color: white;
+}
+
+.pomodoro-btn-reset {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.pomodoro-btn:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+.pomodoro-settings {
+    margin-bottom: 15px;
+}
+
+.pomodoro-settings div {
+    margin-bottom: 10px;
+}
+
+.pomodoro-settings label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.pomodoro-settings input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.pomodoro-status {
+    text-align: center;
+    font-weight: bold;
+    margin-top: 10px;
+    padding: 8px;
+    border-radius: 4px;
+    background-color: #f8f9fa;
+}
+
+/* Break Activity Styles */
+.break-activity {
+    margin-top: 15px;
+    padding: 15px;
+    background-color: #e8f4fc;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: bold;
+    border-left: 4px solid #3498db;
+    animation: fadeIn 0.5s ease-in;
+}
+
+.break-activity-title {
+    color: #3498db;
+    margin-bottom: 8px;
+    font-size: 1.1em;
+}
+
+.break-activity-suggestion {
+    font-weight: normal;
+    color: #333;
+    font-size: 0.95em;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+    .pomodoro-display {
+        font-size: 3rem;
+    }
+    
+    .pomodoro-controls {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .pomodoro-btn {
+        width: 100%;
+        margin-bottom: 8px;
+    }
+}
+</style>
+
 <script>
-// Pomodoro Timer Variables
 // Pomodoro Timer Variables
 let pomodoroTimer;
 let isPomodoroRunning = false;
@@ -51,6 +197,25 @@ const pomodoroBreakDurationInput = document.getElementById('break-duration');
 const pomodoroStatusDisplay = document.getElementById('pomodoro-status');
 const pomodoroModal = document.getElementById('pomodoroModal');
 
+// Break Activity Suggestions
+const breakActivities = [
+    "Take a short walk around your space",
+    "Do 5 minutes of light stretching or yoga",
+    "Practice deep breathing: Inhale for 4s, hold for 4s, exhale for 6s",
+    "Get a glass of water and stay hydrated",
+    "Look away from screens and focus on distant objects for 1 minute",
+    "Listen to your favorite calming song",
+    "Do a quick 3-minute meditation",
+    "Tidy up your workspace for a fresh start",
+    "Have a healthy snack like nuts or fruit",
+    "Do some quick doodling or creative activity",
+    "Massage your hands, neck, and shoulders",
+    "Stand up and do 10 squats or leg stretches",
+    "Write down three things you're grateful for",
+    "Step outside for fresh air if possible",
+    "Do eye exercises: look up/down/left/right"
+];
+
 // Load State from localStorage
 loadPomodoroState();
 
@@ -67,9 +232,12 @@ pomodoroBreakDurationInput.addEventListener('change', updatePomodoroSettings);
 // Modal Functions
 function openPomodoroModal() {
     pomodoroModal.style.display = 'flex';
+    document.body.style.overflow = 'hidden'; // Prevent scrolling
 }
+
 function closePomodoroModal() {
     pomodoroModal.style.display = 'none';
+    document.body.style.overflow = ''; // Re-enable scrolling
 }
 
 // Timer Functions
@@ -83,7 +251,7 @@ function startPomodoroTimer() {
         pomodoroPauseButton.disabled = false;
         pomodoroWorkDurationInput.disabled = true;
         pomodoroBreakDurationInput.disabled = true;
-        pomodoroStatusDisplay.textContent = isWorkSession ? "Work session in progress" : "Break time!";
+        updateSessionStatus();
     }
 }
 
@@ -113,6 +281,7 @@ function resetPomodoroTimer() {
     pomodoroStatusDisplay.textContent = "Ready to work";
     localStorage.removeItem('pomodoroStartTimestamp');
     localStorage.setItem('isPomodoroRunning', 'false');
+    removeBreakActivityDisplay();
     savePomodoroState();
 }
 
@@ -123,13 +292,27 @@ function updatePomodoroTimer() {
 
     if (pomodoroTimeLeft <= 0) {
         // Play a sound when session ends
-        const audio = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3');
-        audio.play();
-        incrementPomodoroCount() 
+        playSessionEndSound();
+        
+        // Increment pomodoro count if work session completed
+        if (!isWorkSession) {
+            incrementPomodoroCount();
+        }
 
+        // Switch session type
         isWorkSession = !isWorkSession;
         pomodoroTimeLeft = (isWorkSession ? pomodoroWorkDuration : pomodoroBreakDuration) * 60;
-        pomodoroStatusDisplay.textContent = isWorkSession ? "Work session in progress" : "Break time!";
+        
+        // Update UI for new session
+        updateSessionStatus();
+        
+        // Show modal and activity if starting break
+        if (!isWorkSession) {
+            showBreakModalAndActivity();
+        } else {
+            removeBreakActivityDisplay();
+        }
+        
         localStorage.setItem('pomodoroStartTimestamp', Date.now());
         savePomodoroState();
     }
@@ -199,7 +382,12 @@ function loadPomodoroState() {
                 pomodoroPauseButton.disabled = false;
                 pomodoroWorkDurationInput.disabled = true;
                 pomodoroBreakDurationInput.disabled = true;
-                pomodoroStatusDisplay.textContent = isWorkSession ? "Work session in progress" : "Break time!";
+                updateSessionStatus();
+                
+                // Show break activity if in break session
+                if (!isWorkSession) {
+                    showBreakActivity();
+                }
             } else {
                 // If too much time has passed, reset to default
                 resetPomodoroTimer();
@@ -216,46 +404,106 @@ function loadPomodoroState() {
         updatePomodoroDisplay();
     }
 }
-  // Increment Pomodoro count on completion
-  function incrementPomodoroCount() {
-            fetch('/user/increment-pomodoro/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': getCSRFToken()  // CSRF Token for security
-                },
-                body: JSON.stringify({})
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    completeChallenge('pomodoro');
-                    console.log("Pomodoro incremented. Current count:", data.count);
-                } else {
-                    console.error("Failed to increment:", data.message);
-                }
-            })
-            .catch(err => console.error("Error:", err));
-        }
 
-        function getCSRFToken() {
-            const name = 'csrftoken';
-            const cookieValue = document.cookie
-                .split('; ')
-                .find(row => row.startsWith(name + '='));
-            return cookieValue ? decodeURIComponent(cookieValue.split('=')[1]) : '';
+function playSessionEndSound() {
+    const audio = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3');
+    audio.play().catch(e => console.log("Audio playback prevented:", e));
+}
+
+function updateSessionStatus() {
+    pomodoroStatusDisplay.textContent = isWorkSession ? "Work session in progress" : "Break time!";
+    document.title = isWorkSession ? 
+        `(${formatTime(pomodoroTimeLeft)}) Work Time - Pomodoro Timer` : 
+        `(${formatTime(pomodoroTimeLeft)}) Break Time - Pomodoro Timer`;
+}
+
+function formatTime(seconds) {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+}
+
+function showBreakModalAndActivity() {
+    // Show the modal if it's hidden
+    if (pomodoroModal.style.display === 'none' || !pomodoroModal.style.display) {
+        openPomodoroModal();
+    }
+    
+    // Show break activity suggestion
+    showBreakActivity();
+}
+
+function showBreakActivity() {
+    // Only show activity during break sessions
+    if (!isWorkSession) {
+        // Get a random activity
+        const randomActivity = breakActivities[Math.floor(Math.random() * breakActivities.length)];
+        
+        // Create or update the activity display
+        let activityElement = document.getElementById('break-activity');
+        if (!activityElement) {
+            activityElement = document.createElement('div');
+            activityElement.id = 'break-activity';
+            activityElement.className = 'break-activity';
+            
+            // Insert after the status display
+            pomodoroStatusDisplay.insertAdjacentElement('afterend', activityElement);
         }
+        
+        activityElement.innerHTML = `
+            <div class="break-activity-title">⏳ Break Activity Suggestion</div>
+            <div class="break-activity-suggestion">${randomActivity}</div>
+        `;
+    }
+}
+
+function removeBreakActivityDisplay() {
+    const activityElement = document.getElementById('break-activity');
+    if (activityElement) {
+        activityElement.remove();
+    }
+}
+
+// Increment Pomodoro count on work session completion
+function incrementPomodoroCount() {
+    fetch('/user/increment-pomodoro/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCSRFToken()
+        },
+        body: JSON.stringify({})
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            completeChallenge('pomodoro');
+            console.log("Pomodoro incremented. Current count:", data.count);
+        } else {
+            console.error("Failed to increment:", data.message);
+        }
+    })
+    .catch(err => console.error("Error:", err));
+}
+
+function getCSRFToken() {
+    const name = 'csrftoken';
+    const cookieValue = document.cookie
+        .split('; ')
+        .find(row => row.startsWith(name + '='));
+    return cookieValue ? decodeURIComponent(cookieValue.split('=')[1]) : '';
+}
 
 function completeChallenge(type) {
     fetch('/user/api/update-challenge-progress/', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRFToken': csrfToken  // make sure csrfToken is defined
+            'X-CSRFToken': getCSRFToken()
         },
         credentials: 'same-origin',
         body: JSON.stringify({
-            type: type  // either 'task' or 'pomodoro'
+            type: type
         })
     })
     .then(response => {
@@ -264,17 +512,55 @@ function completeChallenge(type) {
     })
     .then(data => {
         if (data.status === 'completed') {
-            alert('🎉 Challenge Completed! XP awarded.');
+            showNotification('🎉 Challenge Completed! XP awarded.');
         } else if (data.status === 'updated') {
-            alert('✅ Progress updated!');
-        } else {
-            alert('⚠️ Nothing to update.');
+            console.log('Progress updated');
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('Something went wrong. Try again.');
     });
 }
 
+function showNotification(message) {
+    // Create notification element if it doesn't exist
+    let notification = document.getElementById('pomodoro-notification');
+    if (!notification) {
+        notification = document.createElement('div');
+        notification.id = 'pomodoro-notification';
+        notification.style.position = 'fixed';
+        notification.style.bottom = '20px';
+        notification.style.right = '20px';
+        notification.style.padding = '15px';
+        notification.style.backgroundColor = '#4CAF50';
+        notification.style.color = 'white';
+        notification.style.borderRadius = '4px';
+        notification.style.boxShadow = '0 2px 10px rgba(0,0,0,0.2)';
+        notification.style.zIndex = '10000';
+        notification.style.animation = 'fadeIn 0.3s';
+        document.body.appendChild(notification);
+        
+        // Auto-remove after 5 seconds
+        setTimeout(() => {
+            notification.style.animation = 'fadeOut 0.3s';
+            setTimeout(() => notification.remove(), 300);
+        }, 5000);
+    }
+    
+    notification.textContent = message;
+}
+
+// Close modal when clicking outside of it
+window.addEventListener('click', (event) => {
+    if (event.target === pomodoroModal) {
+        closePomodoroModal();
+    }
+});
+
+// Close modal with Escape key
+document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && pomodoroModal.style.display === 'flex') {
+        closePomodoroModal();
+    }
+});
 </script>

@@ -31,6 +31,16 @@
 </header>
 
 <script>
+
+function checkAuthentication() {
+            {% if user.is_authenticated %}
+                openTeamsModal(); // Open the teams modal for authenticated users
+            {% else %}
+                window.location.href = "{% url 'login' %}"; // Redirect to login page for unauthenticated users
+            {% endif %}
+}
+
+
 // Schedule Modal Functions
 function openScheduleModal() {
     console.log("opening modal  ")

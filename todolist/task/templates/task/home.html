@@ -1709,6 +1709,41 @@ input:checked + .slider:before {
 }
 
 
+#dailyTaskModal{
+    display: flex;
+}
+
+/* Add to your existing CSS */
+#dailyTaskModal .modal-content {
+    max-width: 500px;
+    background-color: #f8f9fa;
+    border-radius: 12px;
+    padding: 20px;
+}
+
+#dailyTaskModal .modal-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+#dailyTaskModal .modal-footer {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+#dailyTaskModal .loader {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #1abc9c;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin: 20px auto;
+}
+
+
 
 /* Animation */
 @keyframes pulse {
@@ -1732,6 +1767,49 @@ input:checked + .slider:before {
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+}
+
+
+/* Add to your existing CSS */
+.subtasks-container {
+    margin-top: 20px;
+    border-top: 1px solid #eee;
+    padding-top: 15px;
+}
+
+.subtasks-list {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0 0 0;
+}
+
+.subtask-item {
+    padding: 8px 0;
+    border-bottom: 1px solid #f0f0f0;
+    display: flex;
+    align-items: center;
+}
+
+.subtask-item label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    width: 100%;
+}
+
+.subtask-item input[type="checkbox"] {
+    margin-right: 10px;
+}
+
+.subtask-item.completed span {
+    text-decoration: line-through;
+    color: #888;
+}
+
+.subtask-item small {
+    margin-left: auto;
+    color: #666;
+    font-size: 0.8em;
 }
 
     
@@ -2276,8 +2354,21 @@ input:checked + .slider:before {
 
 
 
-
-
+<!-- Add this modal near your other modals in the template -->
+<div id="dailyTaskModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeActiveTaskModal()">&times;</span>
+        <div class="modal-body" id="dailyTaskContent">
+            <!-- Active task content will be loaded here -->
+            <div class="loader"></div>
+        </div>
+        <div class="modal-footer">
+            <button class="task-action" onclick="completeActiveTask()">✔️ Complete</button>
+            <button class="task-action" onclick="closeActiveTaskModal()">⏱️ Later</button>
+            <button class="task-action" onclick="location.href='/task-detail/' + document.getElementById('activeTaskId').value">📄 Details</button>
+        </div>
+    </div>
+</div>
  
 
 
@@ -2470,6 +2561,106 @@ input:checked + .slider:before {
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
 
 <script>
+function loadActiveTask() {
+    const dailyTaskContent = document.getElementById('dailyTaskContent');
+    dailyTaskContent.innerHTML = '<div class="loader"></div>';
+    
+    fetch('/tasks/get-active-task/', {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.task) {
+            let subtasksHtml = '';
+            if (data.task.subtasks && data.task.subtasks.length > 0) {
+                subtasksHtml = `
+                    <div class="subtasks-container">
+                        <h5>📋 Subtasks/Microtasks</h5>
+                        <ul class="subtasks-list">
+                            ${data.task.subtasks.map(subtask => `
+                                <li class="subtask-item ${subtask.is_completed ? 'completed' : ''}">
+                                    <label>
+                                        <input type="checkbox" 
+                                               ${subtask.is_completed ? 'checked' : ''}
+                                               onchange="toggleSubtaskCompletion(${subtask.id}, this)">
+                                        <span>${subtask.title}</span>
+                                        ${subtask.due_date ? `<small>(${new Date(subtask.due_date).toLocaleDateString()})</small>` : ''}
+                                    </label>
+                                </li>
+                            `).join('')}
+                        </ul>
+                    </div>
+                `;
+            }
+
+            dailyTaskContent.innerHTML = `
+                <div class="active-task-header">
+                    <h4>🌟 Your Active Task</h4>
+                    <p>This is your currently active task:</p>
+                </div>
+                <div class="active-task-content">
+                    <h3>${data.task.title}</h3>
+                    <p>${data.task.description || 'No description provided.'}</p>
+                    <div class="task-meta">
+                        <span class="priority-badge ${data.task.priority}">
+                            Priority: ${data.task.get_priority_display}
+                        </span>
+                        <span class="due-date">
+                            Due: ${new Date(data.task.due_date).toLocaleString()}
+                        </span>
+                    </div>
+                    ${subtasksHtml}
+                    <input type="hidden" id="activeTaskId" value="${data.task.id}">
+                </div>
+            `;
+        } else {
+            dailyTaskContent.innerHTML = `
+                <div class="no-active-task">
+                    <p>You don't have any active tasks right now.</p>
+                    <button class="task-action" onclick="closeActiveTaskModal()">Close</button>
+                </div>
+            `;
+        }
+    })
+    .catch(error => {
+        dailyTaskContent.innerHTML = '<p>Error loading active task.</p>';
+        console.error('Error:', error);
+    });
+}
+
+function toggleSubtaskCompletion(subtaskId, checkbox) {
+    const isCompleted = checkbox.checked;
+    
+    fetch(`/tasks/toggle-subtask/${subtaskId}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCSRFToken(),
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ is_completed: isCompleted })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status !== 'success') {
+            checkbox.checked = !isCompleted; // Revert if failed
+            alert('Error updating subtask: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        checkbox.checked = !isCompleted; // Revert on error
+        alert('There was an error updating the subtask.');
+    });
+}
+
+
+// Call this when the page loads
+document.addEventListener('DOMContentLoaded', function() {
+    loadActiveTask()
+});
 
 
 function getCSRFToken() {

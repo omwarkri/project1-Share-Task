@@ -2668,5 +2668,46 @@ def toggle_task_pinned(request, task_id):
     task = Task.objects.get(pk=task_id, user=request.user)
     task.is_pinned = not task.is_pinned
     task.save()
+
     return JsonResponse({'status': 'success'})
 
+
+
+
+
+
+# views.py
+def get_active_task(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'Not authenticated'}, status=401)
+    
+    # Get the currently active task with its subtasks
+    active_task = Task.objects.filter(
+        user=request.user,
+        is_active=True
+    ).prefetch_related('subtasks').first()
+    
+    if active_task:
+        subtasks = []
+        for subtask in active_task.subtasks.all():
+            subtasks.append({
+                'id': subtask.id,
+                'title': subtask.title,
+              
+                'is_completed': subtask.completed,
+               
+            })
+        
+        return JsonResponse({
+            'task': {
+                'id': active_task.id,
+                'title': active_task.title,
+                'description': active_task.description,
+                'priority': active_task.priority,
+                'get_priority_display': active_task.get_priority_display(),
+                'due_date': active_task.due_date.strftime('%Y-%m-%d %H:%M'),
+                'subtasks': subtasks
+            }
+        })
+    
+    return JsonResponse({'message': 'No active task'})

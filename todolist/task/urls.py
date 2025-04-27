@@ -66,5 +66,12 @@ urlpatterns = [
     path('tasks/<int:task_id>/make-active/', make_task_active, name='make_task_active'),
     path('tasks/<int:task_id>/toggle-pinned/', toggle_task_pinned, name='toggle_task_pinned'),
 
+
+
+    path('tasks/get-active-task/', get_active_task, name='get_active_task'),
+
+
+    
+
   
 ]

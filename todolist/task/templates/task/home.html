@@ -1787,6 +1787,7 @@ input:checked + .slider:before {
     padding: 8px 0;
     border-bottom: 1px solid #f0f0f0;
     display: flex;
+    flex-direction: column;
     align-items: center;
 }
 
@@ -2358,17 +2359,21 @@ input:checked + .slider:before {
 <div id="dailyTaskModal" class="modal">
     <div class="modal-content">
         <span class="close-modal" onclick="closeActiveTaskModal()">&times;</span>
+
         <div class="modal-body" id="dailyTaskContent">
-            <!-- Active task content will be loaded here -->
             <div class="loader"></div>
         </div>
+
         <div class="modal-footer">
             <button class="task-action" onclick="completeActiveTask()">✔️ Complete</button>
             <button class="task-action" onclick="closeActiveTaskModal()">⏱️ Later</button>
-            <button class="task-action" onclick="location.href='/task-detail/' + document.getElementById('activeTaskId').value">📄 Details</button>
+            <button class="task-action" onclick="location.href='/task/' + document.getElementById('activeTaskId').value">
+                📄 Details
+            </button>
         </div>
     </div>
 </div>
+
  
 
 
@@ -2564,7 +2569,7 @@ input:checked + .slider:before {
 function loadActiveTask() {
     const dailyTaskContent = document.getElementById('dailyTaskContent');
     dailyTaskContent.innerHTML = '<div class="loader"></div>';
-    
+
     fetch('/tasks/get-active-task/', {
         method: 'GET',
         headers: {
@@ -2573,29 +2578,65 @@ function loadActiveTask() {
     })
     .then(response => response.json())
     .then(data => {
-        if (data.task) {
-            let subtasksHtml = '';
-            if (data.task.subtasks && data.task.subtasks.length > 0) {
-                subtasksHtml = `
-                    <div class="subtasks-container">
-                        <h5>📋 Subtasks/Microtasks</h5>
-                        <ul class="subtasks-list">
-                            ${data.task.subtasks.map(subtask => `
-                                <li class="subtask-item ${subtask.is_completed ? 'completed' : ''}">
-                                    <label>
-                                        <input type="checkbox" 
-                                               ${subtask.is_completed ? 'checked' : ''}
-                                               onchange="toggleSubtaskCompletion(${subtask.id}, this)">
-                                        <span>${subtask.title}</span>
-                                        ${subtask.due_date ? `<small>(${new Date(subtask.due_date).toLocaleDateString()})</small>` : ''}
-                                    </label>
-                                </li>
-                            `).join('')}
-                        </ul>
-                    </div>
-                `;
-            }
+    if (data.task) {
+        let subtasksHtml = '';
 
+        if (data.task.subtasks && data.task.subtasks.length > 0) {
+    subtasksHtml = `
+        <div class="subtasks-container">
+            <h5>📋 Subtasks / Microtasks</h5>
+            <ul class="subtasks-list">
+                ${data.task.subtasks.map(subtask => `
+                    <li class="subtask-item ${subtask.is_completed ? 'completed' : ''}">
+                        <label>
+                            <input type="checkbox" 
+                                   ${subtask.is_completed ? 'checked' : ''}
+                                   onchange="toggleSubtaskCompletion(${subtask.id}, this)">
+                            <span>${subtask.title}</span>
+                        </label>
+
+                        <ul class="microtasks-list">
+                            ${
+                                (subtask.microtasks && subtask.microtasks.length > 0)
+                                ? subtask.microtasks.map(microtask => `
+                                    <li class="microtask-item ${microtask.is_completed ? 'completed' : ''}">
+                                        <label>
+                                            <input type="checkbox"
+                                                   ${microtask.is_completed ? 'checked' : ''}
+                                                   onchange="toggleMicrotaskCompletion(${microtask.id}, this)">
+                                            <span>${microtask.title}</span>
+                                        </label>
+                                    </li>
+                                `).join('')
+                                : `
+                                    <li class="no-microtasks">
+                                        <p>No microtasks yet. 🤖</p>
+                                        <button class="task-action" onclick="generateAIMicrotasks(${subtask.id})">
+                                            Generate Microtasks
+                                        </button>
+                                    </li>
+                                `
+                            }
+                        </ul>
+
+                    </li>
+                `).join('')}
+            </ul>
+        </div>
+    `;
+}
+else {
+            // No subtasks, show "Generate AI Subtasks" button
+            subtasksHtml = `
+                <div class="no-subtasks">
+                    <p>No subtasks yet. 🤖</p>
+                    <button class="task-action" onclick="generateAISubtasks(${data.task.id})">🤖 Generate AI Subtasks</button>
+                </div>
+            `;
+        }
+
+
+            // ✅ Now finally update the full modal content correctly
             dailyTaskContent.innerHTML = `
                 <div class="active-task-header">
                     <h4>🌟 Your Active Task</h4>
@@ -2631,10 +2672,64 @@ function loadActiveTask() {
     });
 }
 
+
+
+function generateAISubtasks(taskId) {
+    // Show loading state if you want
+    document.getElementById('dailyTaskContent').innerHTML = '<p>Generating subtasks using AI...</p>';
+
+    fetch(`/api/tasks/${taskId}/subtasks/ai_suggestions/`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCSRFToken(),  // Only if needed for Django or similar
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data) {
+            // Reload the task modal content or refresh the page
+            loadActiveTask(taskId);  // <- You should have a function like this that reloads the task modal
+        } else {
+            alert('Failed to generate subtasks.');
+        }
+    })
+    .catch(error => {
+        console.error('Error generating subtasks:', error);
+        alert('Something went wrong.');
+    });
+}
+function generateAIMicrotasks(subtaskId) {
+    // Show loading message inside dailyTaskContent while generating
+    document.getElementById('dailyTaskContent').innerHTML = '<p>Generating microtasks using AI...</p>';
+
+    fetch(`/api/tasks/${subtaskId}/microtasks/ai_suggestions/`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCSRFToken(),  // Include CSRF if your backend needs it
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data) {
+            // After microtasks are generated, reload the active task view
+            loadActiveTask();  
+        } else {
+            alert('Failed to generate microtasks.');
+        }
+    })
+    .catch(error => {
+        console.error('Error generating microtasks:', error);
+        alert('Something went wrong.');
+    });
+}
+
+
 function toggleSubtaskCompletion(subtaskId, checkbox) {
     const isCompleted = checkbox.checked;
     
-    fetch(`/tasks/toggle-subtask/${subtaskId}/`, {
+    fetch(`/api/subtasks/${subtaskId}/toggle/`, {
         method: 'POST',
         headers: {
             'X-CSRFToken': getCSRFToken(),
@@ -2653,6 +2748,32 @@ function toggleSubtaskCompletion(subtaskId, checkbox) {
         console.error('Error:', error);
         checkbox.checked = !isCompleted; // Revert on error
         alert('There was an error updating the subtask.');
+    });
+}
+
+
+function toggleMicrotaskCompletion(microtaskId, checkbox) {
+    const isCompleted = checkbox.checked;
+    
+    fetch(`/api/microtasks/${microtaskId}/toggle/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCSRFToken(),
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ is_completed: isCompleted })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status !== 'success') {
+            checkbox.checked = !isCompleted; // Revert if failed
+            alert('Error updating microtask: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        checkbox.checked = !isCompleted; // Revert on error
+        alert('There was an error updating the microtask.');
     });
 }
 
@@ -3490,7 +3611,18 @@ function completeChallenge(type) {
         alert('There was an issue with completing the challenge.');
     });
 }
+function closeActiveTaskModal() {
+    var modal = document.getElementById('dailyTaskModal');
+    modal.style.display = "none";
+}
 
+// Optional: Close modal if user clicks outside the modal content
+window.onclick = function(event) {
+    var modal = document.getElementById('dailyTaskModal');
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+}
 
 </script>
 

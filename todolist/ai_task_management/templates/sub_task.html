@@ -329,16 +329,6 @@
         });
 
         const suggestions = await response.json();
-        for (let suggestion of suggestions) {
-          await fetch(`/api/tasks/${taskId}/subtasks/add/`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "X-CSRFToken": csrfToken
-            },
-            body: JSON.stringify({ title: suggestion })
-          });
-        }
         fetchSubtasks();
       } catch (err) {
         alert("Failed to fetch suggestions.");

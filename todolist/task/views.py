@@ -849,10 +849,24 @@ def get_task_details(request, task_id):
 
 @csrf_exempt
 def toggle_subtask(request, subtask_id):
-    subtask = SubTask.objects.get(id=subtask_id)
-    subtask.completed = not subtask.completed
-    subtask.save()
-    return JsonResponse({"id": subtask.id, "completed": subtask.completed})
+    try:
+        subtask = SubTask.objects.get(id=subtask_id)
+        # Toggle the subtask
+        subtask.completed = not subtask.completed
+        subtask.save()
+
+        # Toggle all related microtasks
+        microtasks = subtask.microtask_set.all()  # assuming MicroTask has ForeignKey to SubTask
+        microtasks.update(completed=subtask.completed)
+
+        return JsonResponse({
+            "status": "success",
+            "id": subtask.id,
+            "completed": subtask.completed,
+            "updated_microtasks": list(microtasks.values_list('id', flat=True)),
+        })
+    except SubTask.DoesNotExist:
+        return JsonResponse({"status": "error", "message": "Subtask not found"}, status=404)
 
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -2681,21 +2695,27 @@ def get_active_task(request):
     if not request.user.is_authenticated:
         return JsonResponse({'error': 'Not authenticated'}, status=401)
     
-    # Get the currently active task with its subtasks
     active_task = Task.objects.filter(
         user=request.user,
         is_active=True
-    ).prefetch_related('subtasks').first()
+    ).prefetch_related('subtasks__microtasks').first()
     
     if active_task:
         subtasks = []
         for subtask in active_task.subtasks.all():
+            microtasks = []
+            for microtask in subtask.microtasks.all():  # ✅ Only microtasks under each subtask
+                microtasks.append({
+                    'id': microtask.id,
+                    'title': microtask.title,
+                    'is_completed': microtask.completed,
+                })
+            
             subtasks.append({
                 'id': subtask.id,
                 'title': subtask.title,
-              
                 'is_completed': subtask.completed,
-               
+                'microtasks': microtasks,  # ✅ microtasks under subtask
             })
         
         return JsonResponse({
@@ -2706,8 +2726,10 @@ def get_active_task(request):
                 'priority': active_task.priority,
                 'get_priority_display': active_task.get_priority_display(),
                 'due_date': active_task.due_date.strftime('%Y-%m-%d %H:%M'),
-                'subtasks': subtasks
+                'subtasks': subtasks,  # ✅ no direct_microtasks
             }
         })
     
     return JsonResponse({'message': 'No active task'})
+
+

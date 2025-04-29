@@ -302,3 +302,51 @@ def generate_microtasks_for_each_subtask(request, task_id):  # Changed parameter
             'status': 'error',
             'message': str(e)
         }, status=500)
+    
+
+
+    from django.http import JsonResponse
+
+from django.http import JsonResponse
+from .models import Microtask  # Adjust if your model import path differs
+import google.generativeai as generativeai
+
+generativeai.configure(api_key="AIzaSyDx3rr0MzUPaumvdII3WIffmtsZqAz7JIs")
+model = generativeai.GenerativeModel('gemini-1.5-flash')
+
+def get_microtask_instructions(request, microtask_id):
+    try:
+        microtask = Microtask.objects.select_related('subtask', 'task').get(id=microtask_id)
+        task_title = microtask.task.title
+        subtask_title = microtask.subtask.title
+        microtask_title = microtask.title
+
+        prompt = f"""
+        I am working on a task titled: "{task_title}".
+        One of its subtasks is: "{subtask_title}".
+        I need to complete the following microtask: "{microtask_title}".
+
+        Please provide a clear, step-by-step list of instructions (3 to 7 steps) that would help someone execute this microtask effectively.
+        Each step should be practical and actionable. Do not return anything other than the steps.
+        """
+
+        response = model.generate_content(prompt)
+        raw_text = response.text.strip()
+
+        instructions = [
+            line.strip("- ").strip()
+            for line in raw_text.split("\n")
+            if line.strip()
+        ]
+
+        return JsonResponse({'instructions': instructions})
+
+    except Microtask.DoesNotExist:
+        return JsonResponse({
+            'error': 'Microtask not found.'
+        }, status=404)
+    except Exception as e:
+        return JsonResponse({
+            'error': str(e)
+        }, status=500)
+

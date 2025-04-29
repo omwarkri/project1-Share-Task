@@ -1278,6 +1278,7 @@ input:checked + .slider:before {
         display: flex;
         gap: 10px;
         margin-top: 10px;
+        overflow-y: auto;
     
     }
     
@@ -1813,6 +1814,20 @@ input:checked + .slider:before {
     font-size: 0.8em;
 }
 
+.cross-lines-background {
+    background-image: 
+        repeating-linear-gradient(125deg, #f6ffffb4 0, #d3f8ee 1px, transparent 2px, transparent 7px);
+    background-color: #ffffff;
+    background-size: cover;
+}
+
+.microtask-item{
+    display: flex;
+    
+}
+.microtask-item label{
+    width: 10px;
+}
     
     /* Mobile Responsiveness */
     @media (max-width: 768px) {
@@ -2200,7 +2215,7 @@ input:checked + .slider:before {
         <!-- Task List -->
         <div class="task-grid">
             {% for task_data in tasks_with_suggestions %}
-                <div id="task-container"  class="task-card task-item" 
+                <div id="task-container"  class="task-card task-item cross-lines-background" 
                 data-task-id="{{ task_data.task.id }}"
                 data-status="{{ task_data.task.status }}" 
                 data-priority="{{ task_data.task.priority }}" 
@@ -2258,20 +2273,23 @@ input:checked + .slider:before {
 
                             {% endif %}
 
-                            <button class="task-action" onclick="makeTaskActive({{ task_data.task.id }})">
-                                {% if task_data.task.is_active %}🌟 Active{% else %}⭐ Make Active{% endif %}
-                            </button>
                         
-                            <button class="task-action" onclick="togglePinned({{ task_data.task.id }})">
-                                {% if task_data.task.is_pinned %}📌 Unpin{% else %}📍 Pin{% endif %}
-                            </button>
                         </div>
                        
                     </div>
                     <div class="task-footer">
-                        <button class="task-action" onclick="openViewDependencyModal({{ task_data.task.id }})">🔗 Dependencies</button>
+                        
                         <button class="task-action" onclick="openModal({{ task_data.task.id }})">✔️ Complete</button>
                         <a href="{% url 'task_detail' task_data.task.id %}" class="task-action">📄 Details</a>
+                        <button class="task-action" onclick="makeTaskActive({{ task_data.task.id }})">
+                            {% if task_data.task.is_active %}🌟 Active{% else %}⭐ Make Active{% endif %}
+                        </button>
+                        
+                    
+                        <button class="task-action" onclick="togglePinned({{ task_data.task.id }})">
+                            {% if task_data.task.is_pinned %}📌 Unpin{% else %}📍 Pin{% endif %}
+                        </button>
+                        <button class="task-action" onclick="openViewDependencyModal({{ task_data.task.id }})">🔗 Dependencies</button> 
 
                         
                     </div>
@@ -2562,6 +2580,18 @@ input:checked + .slider:before {
     </div>
 </div>
 
+<div id="instructionModal" class="modal" style="display:none;">
+
+    <div class="modal-content">
+        <div class="modal-header">
+            <span class="close-modal" onclick="closeInstructionModal()">&times;</span>
+        <h2>📋 AI Instructions</h2>
+        </div>
+        
+        <div id="instructionContent">Loading...</div>
+    </div>
+</div>
+
 
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
 
@@ -2596,28 +2626,31 @@ function loadActiveTask() {
                         </label>
 
                         <ul class="microtasks-list">
-                            ${
-                                (subtask.microtasks && subtask.microtasks.length > 0)
-                                ? subtask.microtasks.map(microtask => `
-                                    <li class="microtask-item ${microtask.is_completed ? 'completed' : ''}">
-                                        <label>
-                                            <input type="checkbox"
-                                                   ${microtask.is_completed ? 'checked' : ''}
-                                                   onchange="toggleMicrotaskCompletion(${microtask.id}, this)">
-                                            <span>${microtask.title}</span>
-                                        </label>
-                                    </li>
-                                `).join('')
-                                : `
-                                    <li class="no-microtasks">
-                                        <p>No microtasks yet. 🤖</p>
-                                        <button class="task-action" onclick="generateAIMicrotasks(${subtask.id})">
-                                            Generate Microtasks
-                                        </button>
-                                    </li>
-                                `
-                            }
-                        </ul>
+    ${
+        (subtask.microtasks && subtask.microtasks.length > 0)
+        ? subtask.microtasks.map(microtask => `
+            <li class="microtask-item ${microtask.is_completed ? 'completed' : ''}">
+                <label >
+                    <input type="checkbox"
+                           ${microtask.is_completed ? 'checked' : ''}
+                           onchange="toggleMicrotaskCompletion(${microtask.id}, this)"
+                           onclick="event.stopPropagation();"> <!-- Prevent modal on checkbox click -->
+                    
+                </label>
+                <span onclick="openInstructionModal(${microtask.id})">${microtask.title}</span>
+            </li>
+        `).join('')
+        : `
+            <li class="no-microtasks">
+                <p>No microtasks yet. 🤖</p>
+                <button class="task-action" onclick="generateAIMicrotasks(${subtask.id})">
+                    Generate Microtasks
+                </button>
+            </li>
+        `
+    }
+</ul>
+
 
                     </li>
                 `).join('')}
@@ -2749,7 +2782,7 @@ function toggleSubtaskCompletion(subtaskId, checkbox) {
         checkbox.checked = !isCompleted; // Revert on error
         alert('There was an error updating the subtask.');
     });
-}
+} 
 
 
 function toggleMicrotaskCompletion(microtaskId, checkbox) {
@@ -2776,6 +2809,31 @@ function toggleMicrotaskCompletion(microtaskId, checkbox) {
         alert('There was an error updating the microtask.');
     });
 }
+
+function openInstructionModal(microtaskId) {
+    const modal = document.getElementById('instructionModal');
+    const content = document.getElementById('instructionContent');
+    
+    modal.style.display = 'flex';
+    content.innerHTML = 'Loading...';
+
+    fetch(`/microtask/${microtaskId}/instructions/`)
+        .then(response => response.json())
+        .then(data => {
+            content.innerHTML = `<ul>${
+                data.instructions.map(instr => `<li>🧠 ${instr}</li>`).join('')
+            }</ul>`;
+        })
+        .catch(err => {
+            content.innerHTML = 'Failed to load instructions.';
+            console.error(err);
+        });
+}
+
+function closeInstructionModal() {
+    document.getElementById('instructionModal').style.display = 'none';
+}
+
 
 
 // Call this when the page loads

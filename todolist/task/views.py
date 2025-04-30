@@ -367,24 +367,57 @@ import json
 
 @require_POST
 @csrf_protect
+@login_required
 def mark_task_visited(request):
     try:
         data = json.loads(request.body)
-        task_id = data.get('task_id')
-        print("Received task_id:", task_id)
+        
     except json.JSONDecodeError:
-        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+        return JsonResponse({'error': 'Invalid JSON'}, status=400)
+    task_id = data.get('task_id')
+    print("Received task_id:", task_id)
 
     if not task_id:
-        return JsonResponse({'status': 'error', 'message': 'Task ID is required'}, status=400)
+        return JsonResponse({'message': 'No active task'})  # 🔄 Matches get_active_task's empty response
 
     try:
-        task = Task.objects.get(id=task_id)
+        task = Task.objects.prefetch_related('subtasks__microtasks').get(id=task_id, user=request.user)
         task.last_visited_at = timezone.now()
         task.save()
-        return JsonResponse({'status': 'success', 'message': 'Task marked as visited'})
+
+        subtasks = []
+        for subtask in task.subtasks.all():
+            microtasks = []
+            for microtask in subtask.microtasks.all():
+                microtasks.append({
+                    'id': microtask.id,
+                    'title': microtask.title,
+                    'is_completed': microtask.completed,
+                })
+            subtasks.append({
+                'id': subtask.id,
+                'title': subtask.title,
+                'is_completed': subtask.completed,
+                'microtasks': microtasks,
+            })
+
+        return JsonResponse({
+            'status': 'success',
+            'message': 'Task marked as visited',
+            'task': {
+                'id': task.id,
+                'title': task.title,
+                'description': task.description,
+                'priority': task.priority,
+                'get_priority_display': task.get_priority_display(),
+                'due_date': task.due_date.strftime('%Y-%m-%d %H:%M'),
+                'subtasks': subtasks,
+            }
+        })
+
     except Task.DoesNotExist:
-        return JsonResponse({'status': 'error', 'message': 'Task not found'}, status=404)
+        return JsonResponse({'message': 'No active task'}, status=404)
+
 
 
 

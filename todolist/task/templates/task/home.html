@@ -922,78 +922,80 @@ input:checked + .slider:before {
        
     }
 
-    
     .saturn-animation-badge {
   position: absolute;
-  top: 10px;
-  right: 10px;
-  width: 40px;
-  height: 40px;
+  top: 5px;
+  right: 5px;
+  width: 60px;
+  height: 60px;
   display: flex;
   align-items: center;
   justify-content: center;
-  pointer-events: none; /* So it doesn't interfere with clicks */
+  pointer-events: none;
+  z-index: 2;
 }
 
 .planet {
-  width: 12px;
-  height: 12px;
+  width: 14px;
+  height: 14px;
   background-color: #28a745;
   border-radius: 50%;
   z-index: 5;
   box-shadow: 0 0 6px rgba(40, 167, 69, 0.8);
 }
 
-/* General ring styles */
+/* Base style for all rings */
 .ring {
   position: absolute;
   border-radius: 50%;
-  border: 2px solid rgba(40, 167, 69, 0.4);
+  border: 1px solid rgba(17, 61, 27, 0.2); /* smooth, soft ring */
   z-index: 1;
   animation-timing-function: linear;
   animation-iteration-count: infinite;
+  box-shadow: 0 0 4px rgba(40, 167, 69, 0.3); /* soft glow */
 }
 
-/* Individual rings with different sizes and speeds */
+/* Slightly offset each ring outward */
 .ring1 {
   width: 30px;
   height: 30px;
-  animation: rotate-ring1 3s linear infinite;
+  animation: rotate-ring1 4s linear infinite;
 }
 
 .ring2 {
-  width: 36px;
-  height: 36px;
-  animation: rotate-ring2 5s linear infinite reverse;
+  width: 38px;
+  height: 38px;
+  animation: rotate-ring2 6s linear infinite reverse;
 }
 
 .ring3 {
-  width: 42px;
-  height: 42px;
-  animation: rotate-ring3 7s linear infinite;
+  width: 46px;
+  height: 46px;
+  animation: rotate-ring3 8s linear infinite;
 }
 
-/* Animations */
 @keyframes rotate-ring1 {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg);  }
 }
 
 @keyframes rotate-ring2 {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+    0% { transform: rotate(0deg); transform: scale(1);}
+  50% { transform: rotate(360deg); transform: scale(1.2);}
+  100% { transform: rotate(360deg); transform: scale(1);}
 }
 
 @keyframes rotate-ring3 {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  0% { transform: rotate(0deg); transform: scale(1);}
+  50% { transform: rotate(360deg); transform: scale(1.2);}
+  100% { transform: rotate(360deg); transform: scale(1);}
 }
 
 
 .pinned-task-ring {
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: 12px;
+  right: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1013,7 +1015,7 @@ input:checked + .slider:before {
 .yellow-ring {
   width: 18px;
   height: 18px;
-  border: 2px solid yellow;
+  border: 2px solid rgb(44, 44, 26);
   border-radius: 50%;
   position: absolute;
   z-index: 1;
@@ -1076,8 +1078,9 @@ input:checked + .slider:before {
         font-size: 12px;
         font-weight: bold;
         white-space: nowrap;
-        background-color: #f8f9fa; /* Light background for priority */
+        background-color: transparent 
         color: #555; /* Darker text */
+        z-index: 10;
     }
     
     .task-body {
@@ -1824,9 +1827,11 @@ input:checked + .slider:before {
 .microtask-item{
     display: flex;
     
+    
 }
 .microtask-item label{
     width: 10px;
+    margin-right: 4px   ;
 }
     
     /* Mobile Responsiveness */
@@ -1971,7 +1976,7 @@ input:checked + .slider:before {
     
     
         .header {
-            
+            margin-top: 16px;
             align-items: flex-start;
             margin-bottom: 0;
            
@@ -2238,15 +2243,15 @@ input:checked + .slider:before {
                         <!-- Animated orbit for active task -->
                         <div class="saturn-animation-badge">
                           <div class="planet"></div>
-                          <div class="ring ring1"></div>
+                        
                           <div class="ring ring2"></div>
-                          <div class="ring ring3"></div>
+                      
                         </div>
                       {% elif task_data.task.is_pinned %}
                         <!-- Glowing golden dot for pinned task -->
                         <div class="pinned-task-ring">
                             <div class="pinned-dot"></div>
-                            <div class="yellow-ring"></div>
+                        
                           </div>
                       {% endif %}
                       
@@ -2391,6 +2396,26 @@ input:checked + .slider:before {
         </div>
     </div>
 </div>
+
+
+<div id="detailTaskModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeDetailTaskModal()">&times;</span>
+
+        <div class="modal-body" id="detailTaskContent">
+            <div class="loader">Loading...</div>
+        </div>
+
+        <div class="modal-footer">  
+            <button class="task-action" onclick="completeActiveTask()">✔️ Complete</button>
+            <button class="task-action" onclick="closeDetailTaskModal()">⏱️ Later</button>
+            <button class="task-action" onclick="viewTaskDetails()">
+                📄 Details
+            </button>
+        </div>
+    </div>
+</div>
+
 
  
 
@@ -2707,6 +2732,8 @@ else {
 
 
 
+
+
 function generateAISubtasks(taskId) {
     // Show loading state if you want
     document.getElementById('dailyTaskContent').innerHTML = '<p>Generating subtasks using AI...</p>';
@@ -2798,7 +2825,7 @@ function toggleMicrotaskCompletion(microtaskId, checkbox) {
     })
     .then(response => response.json())
     .then(data => {
-        if (data.status !== 'success') {
+        if (data.status !== 'ok') {
             checkbox.checked = !isCompleted; // Revert if failed
             alert('Error updating microtask: ' + data.message);
         }
@@ -2879,6 +2906,12 @@ function togglePinned(taskId) {
         }
     });
 }
+
+
+function closeDetailTaskModal() {
+    document.getElementById('detailTaskModal').style.display = 'none';
+}
+
     
 /// Add this to your JavaScript section
 document.addEventListener("DOMContentLoaded", function() {
@@ -2888,6 +2921,8 @@ document.addEventListener("DOMContentLoaded", function() {
             // Get the task ID first
             const taskId = this.getAttribute('data-task-id');
             if (!taskId) return;
+            trackTaskVisit(taskId);
+            
 
             // Don't trigger for buttons or links inside the card
             if (e.target.tagName === 'BUTTON' || e.target.tagName === 'A' || e.target.closest('button') || e.target.closest('a')) {
@@ -2900,6 +2935,9 @@ document.addEventListener("DOMContentLoaded", function() {
     // Function to track task visits
     function trackTaskVisit(taskId) {
         console.log("Tracking visit for task ID:", taskId);
+        const detailTaskContent = document.getElementById('detailTaskContent');
+        document.getElementById('detailTaskModal').style.display = 'flex';
+        detailTaskContent.innerHTML = '<div class="loader"></div>';
 
         fetch('/mark-task-visited/', {
             method: 'POST',
@@ -2911,8 +2949,11 @@ document.addEventListener("DOMContentLoaded", function() {
         })
         .then(response => response.json())
         .then(data => {
-            if (data.status === 'success') {
-                // Move the visited task to the top of the grid
+            if (data.status === 'success' && data.task) {
+                // Render the modal using the unified structure
+                renderActiveTaskModal(data.task);
+
+                // Optionally move the visited task to top
                 const taskElement = document.querySelector(`.task-card[data-task-id="${taskId}"]`);
                 if (taskElement) {
                     const taskGrid = document.querySelector('.task-grid');
@@ -2923,11 +2964,94 @@ document.addEventListener("DOMContentLoaded", function() {
         .catch(error => console.error('Error tracking visit:', error));
     }
 
+
     // Helper function to get CSRF token
     function getCSRFToken() {
         return document.querySelector('[name=csrfmiddlewaretoken]').value;
     }
 });
+
+function renderActiveTaskModal(task) {
+
+    const detailTaskContent = document.getElementById('detailTaskContent');
+    let subtasksHtml = '';
+
+    if (task.subtasks && task.subtasks.length > 0) {
+        subtasksHtml = `
+            <div class="subtasks-container">
+                <h5>📋 Subtasks / Microtasks</h5>
+                <ul class="subtasks-list">
+                    ${task.subtasks.map(subtask => `
+                        <li class="subtask-item ${subtask.is_completed ? 'completed' : ''}">
+                            <label>
+                                <input type="checkbox" 
+                                       ${subtask.is_completed ? 'checked' : ''}
+                                       onchange="toggleSubtaskCompletion(${subtask.id}, this)">
+                                <span>${subtask.title}</span>
+                            </label>
+                            <ul class="microtasks-list">
+                                ${
+                                    (subtask.microtasks && subtask.microtasks.length > 0)
+                                    ? subtask.microtasks.map(microtask => `
+                                        <li class="microtask-item ${microtask.is_completed ? 'completed' : ''}">
+                                            <label>
+                                                <input type="checkbox"
+                                                       ${microtask.is_completed ? 'checked' : ''}
+                                                       onchange="toggleMicrotaskCompletion(${microtask.id}, this)"
+                                                       onclick="event.stopPropagation();">
+                                            </label>
+                                            <span onclick="openInstructionModal(${microtask.id})">${microtask.title}</span>
+                                        </li>
+                                    `).join('')
+                                    : `
+                                        <li class="no-microtasks">
+                                            <p>No microtasks yet. 🤖</p>
+                                            <button class="task-action" onclick="generateAIMicrotasks(${subtask.id})">
+                                                Generate Microtasks
+                                            </button>
+                                        </li>
+                                    `
+                                }
+                            </ul>
+                        </li>
+                    `).join('')}
+                </ul>
+            </div>
+        `;
+    } else {
+        subtasksHtml = `
+            <div class="no-subtasks">
+                <p>No subtasks yet. 🤖</p>
+                <button class="task-action" onclick="generateAISubtasks(${task.id})">🤖 Generate AI Subtasks</button>
+            </div>
+        `;
+    }
+
+    detailTaskContent.innerHTML = `
+        <div class="active-task-header">
+            <h4>🌟 Your Active Task</h4>
+            <p>This is your currently active task:</p>
+        </div>
+        <div class="active-task-content">
+            <h3>${task.title}</h3>
+            <p>${task.description || 'No description provided.'}</p>
+            <div class="task-meta">
+                <span class="priority-badge ${task.priority}">
+                    Priority: ${task.get_priority_display}
+                </span>
+                <span class="due-date">
+                    Due: ${new Date(task.due_date).toLocaleString()}
+                </span>
+            </div>
+            ${subtasksHtml}
+            <input type="hidden" id="activeTaskId" value="${task.id}">
+        </div>
+    `;
+
+    // ✅ Show the modal
+    
+    }
+
 
     function showAssignedTasks() {
     const taskItems = document.querySelectorAll('.task-item');

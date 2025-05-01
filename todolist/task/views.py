@@ -889,7 +889,7 @@ def toggle_subtask(request, subtask_id):
         subtask.save()
 
         # Toggle all related microtasks
-        microtasks = subtask.microtask_set.all()  # assuming MicroTask has ForeignKey to SubTask
+        microtasks = subtask.microtasks.all()  # assuming MicroTask has ForeignKey to SubTask
         microtasks.update(completed=subtask.completed)
 
         return JsonResponse({

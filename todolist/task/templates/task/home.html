@@ -826,18 +826,213 @@ input:checked + .slider:before {
 .submit-button:hover {
     background-color: #16a085;
 }
+ /* Add these styles to your CSS section */
+ .active-task-container {
+        background-color: #f8f9fa;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 15px;
+        margin: 10px auto;
+        width: 95%;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        margin-top: 40px;
+    }
 
-/* Animation for Modal */
-@keyframes fadeIn {
+    .active-task-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .active-task-header h3 {
+        margin: 0;
+        font-size: 18px;
+        color: #2c3e50;
+    }
+
+    .progress-container {
+        height: 10px;
+        background-color: #e9ecef;
+        border-radius: 5px;
+        margin-top: 10px;
+        overflow: hidden;
+    }
+
+    .progress-bar {
+        height: 100%;
+        background-color: #1abc9c;
+        transition: width 0.3s ease;
+    }
+
+    #active-task-details {
+        margin-bottom: 10px;
+    }
+
+    #active-task-details h4 {
+        margin: 5px 0;
+        font-size: 16px;
+    }
+
+    #active-task-details p {
+        margin: 3px 0;
+        font-size: 14px;
+        color: #555;
+    }
+
+    /* Entry Animation */
+.animate-entry {
+    animation: fadeSlideIn 1s ease forwards;
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+@keyframes fadeSlideIn {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Glow/Pulse for Header */
+.pulse-highlight {
+    animation: pulseGlow 2.5s infinite ease-in-out;
+}
+
+@keyframes pulseGlow {
+    0% {
+        box-shadow: 0 0 0px rgba(255, 215, 0, 0.4);
+    }
+    50% {
+        box-shadow: 0 0 12px rgba(255, 215, 0, 0.7);
+    }
+    100% {
+        box-shadow: 0 0 0px rgba(255, 215, 0, 0.4);
+    }
+}
+
+/* Stylish Card */
+.card-style {
+    background: linear-gradient(135deg, #fdfbfb, #ebedee);
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Progress Bar */
+/* 🔷 Background with diagonal cross lines */
+.cross-lines-background {
+    background-image: repeating-linear-gradient(125deg, #f0fffa 0, #d3f8ee 1px, transparent 2px, transparent 7px);
+    background-color: #ffffff;
+    background-size: cover;
+    padding: 20px;
+    border-radius: 18px;
+}
+
+/* 🌟 Entry Animation */
+.animate-entry {
+    animation: fadeSlideIn 1s ease forwards;
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+@keyframes fadeSlideIn {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 💡 Header Glow Pulse */
+.pulse-highlight {
+    animation: pulseGlow 2.5s infinite ease-in-out;
+    padding: 10px;
+    border-radius: 12px;
+}
+
+@keyframes pulseGlow {
+    0% {
+        box-shadow: 0 0 0px rgba(0, 255, 170, 0.4);
+    }
+    50% {
+        box-shadow: 0 0 12px rgba(0, 255, 170, 0.7);
+    }
+    100% {
+        box-shadow: 0 0 0px rgba(0, 255, 170, 0.4);
+    }
+}
+
+/* 📋 Stylish Card */
+.card-style {
+    background: linear-gradient(135deg, #f0fffc, #dff3f0);
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: #f2f5f9;
+    margin: 0;
+    padding: 20px;
+}
+
+/* 🍏 iOS-style background with diagonal lines */
+.ios-background {
+    background-image: repeating-linear-gradient(125deg, #ffffff 0px, #f0fdf9 1px, transparent 2px, transparent 8px);
+    border-radius: 24px;
+    padding: 20px;
+    transition: all 0.3s ease-in-out;
+}
+
+/* 🧊 Glassmorphism effect */
+.ios-glass {
+    backdrop-filter: blur(8px);
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 16px;
+    padding: 12px 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+/* 🪟 Card with soft light and rounded edges */
+.ios-card {
+    background: linear-gradient(145deg, #ffffff, #f0f0f0);
+    border-radius: 20px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04);
+    padding: 20px;
+}
+
+/* 📊 Smooth progress bar */
+.progress-container {
+    background-color: #e5f8f4;
+    border-radius: 20px;
+    height: 10px;
+    margin-top: 14px;
+    overflow: hidden;
+}
+
+.ios-progress {
+    background: linear-gradient(90deg, #00c6ab, #4fd1c5);
+    height: 100%;
+    transition: width 0.4s ease-in-out;
+}
+
+/* ✨ iOS animation feel */
+#active-task-container {
+    animation: fadeSlideIn 0.7s ease-out;
+}
+
+@keyframes fadeSlideIn {
     from {
         opacity: 0;
-        transform: translateY(-20px);
+        transform: translateY(20px);
     }
     to {
         opacity: 1;
         transform: translateY(0);
     }
 }
+
+
     
     
         /* Task Grid */
@@ -2147,6 +2342,22 @@ input:checked + .slider:before {
         </div>
     </div>
 
+    <div id="active-task-container" class="active-task-container ios-background">
+        <div class="active-task-header ios-glass">
+            <h3>🌟 Active Task</h3>
+        </div>
+        <div class="active-task-content ios-card">
+            <div id="active-task-details">
+                <!-- Content will be loaded dynamically -->
+                <p>No active task currently</p>
+            </div>
+            <div class="progress-container">
+                <div id="active-task-progress" class="progress-bar ios-progress" style="width: 0%"></div>
+            </div>
+        </div>
+    </div>
+    
+
     <!-- Main Content -->
     <div class="main-content">
         <!-- Header -->
@@ -2623,110 +2834,118 @@ input:checked + .slider:before {
 <script>
 function loadActiveTask() {
     const dailyTaskContent = document.getElementById('dailyTaskContent');
+    const activeTaskContainer = document.getElementById('active-task-details');
+
     dailyTaskContent.innerHTML = '<div class="loader"></div>';
 
     fetch('/tasks/get-active-task/', {
         method: 'GET',
-        headers: {
-            'Accept': 'application/json',
-        },
+        headers: { 'Accept': 'application/json' },
     })
     .then(response => response.json())
     .then(data => {
-    if (data.task) {
-        let subtasksHtml = '';
-
-        if (data.task.subtasks && data.task.subtasks.length > 0) {
-    subtasksHtml = `
-        <div class="subtasks-container">
-            <h5>📋 Subtasks / Microtasks</h5>
-            <ul class="subtasks-list">
-                ${data.task.subtasks.map(subtask => `
-                    <li class="subtask-item ${subtask.is_completed ? 'completed' : ''}">
-                        <label>
-                            <input type="checkbox" 
-                                   ${subtask.is_completed ? 'checked' : ''}
-                                   onchange="toggleSubtaskCompletion(${subtask.id}, this)">
-                            <span>${subtask.title}</span>
-                        </label>
-
-                        <ul class="microtasks-list">
-    ${
-        (subtask.microtasks && subtask.microtasks.length > 0)
-        ? subtask.microtasks.map(microtask => `
-            <li class="microtask-item ${microtask.is_completed ? 'completed' : ''}">
-                <label >
-                    <input type="checkbox"
-                           ${microtask.is_completed ? 'checked' : ''}
-                           onchange="toggleMicrotaskCompletion(${microtask.id}, this)"
-                           onclick="event.stopPropagation();"> <!-- Prevent modal on checkbox click -->
-                    
-                </label>
-                <span onclick="openInstructionModal(${microtask.id})">${microtask.title}</span>
-            </li>
-        `).join('')
-        : `
-            <li class="no-microtasks">
-                <p>No microtasks yet. 🤖</p>
-                <button class="task-action" onclick="generateAIMicrotasks(${subtask.id})">
-                    Generate Microtasks
-                </button>
-            </li>
-        `
-    }
-</ul>
-
-
-                    </li>
-                `).join('')}
-            </ul>
-        </div>
-    `;
-}
-else {
-            // No subtasks, show "Generate AI Subtasks" button
-            subtasksHtml = `
-                <div class="no-subtasks">
-                    <p>No subtasks yet. 🤖</p>
-                    <button class="task-action" onclick="generateAISubtasks(${data.task.id})">🤖 Generate AI Subtasks</button>
-                </div>
-            `;
-        }
-
-
-            // ✅ Now finally update the full modal content correctly
-            dailyTaskContent.innerHTML = `
-                <div class="active-task-header">
-                    <h4>🌟 Your Active Task</h4>
-                    <p>This is your currently active task:</p>
-                </div>
-                <div class="active-task-content">
-                    <h3>${data.task.title}</h3>
-                    <p>${data.task.description || 'No description provided.'}</p>
-                    <div class="task-meta">
-                        <span class="priority-badge ${data.task.priority}">
-                            Priority: ${data.task.get_priority_display}
-                        </span>
-                        <span class="due-date">
-                            Due: ${new Date(data.task.due_date).toLocaleString()}
-                        </span>
-                    </div>
-                    ${subtasksHtml}
-                    <input type="hidden" id="activeTaskId" value="${data.task.id}">
-                </div>
-            `;
-        } else {
+        if (!data.task) {
             dailyTaskContent.innerHTML = `
                 <div class="no-active-task">
                     <p>You don't have any active tasks right now.</p>
                     <button class="task-action" onclick="closeActiveTaskModal()">Close</button>
                 </div>
             `;
+            activeTaskContainer.innerHTML = '<p>No active task currently</p>';
+            document.getElementById('active-task-progress').style.width = '0%';
+            return;
         }
+
+        const task = data.task;
+        let subtasksHtml = '';
+
+        if (task.subtasks && task.subtasks.length > 0) {
+            subtasksHtml = `
+                <div class="subtasks-container">
+                    <h5>📋 Subtasks / Microtasks</h5>
+                    <ul class="subtasks-list">
+                        ${task.subtasks.map(subtask => `
+                            <li class="subtask-item ${subtask.is_completed ? 'completed' : ''}">
+                                <label>
+                                    <input type="checkbox" 
+                                           ${subtask.is_completed ? 'checked' : ''}
+                                           onchange="toggleSubtaskCompletion(${subtask.id}, this)">
+                                    <span>${subtask.title}</span>
+                                </label>
+                                <ul class="microtasks-list">
+                                    ${
+                                        (subtask.microtasks && subtask.microtasks.length > 0)
+                                            ? subtask.microtasks.map(microtask => `
+                                                <li class="microtask-item ${microtask.is_completed ? 'completed' : ''}">
+                                                    <label>
+                                                        <input type="checkbox"
+                                                               ${microtask.is_completed ? 'checked' : ''}
+                                                               onchange="toggleMicrotaskCompletion(${microtask.id}, this)"
+                                                               onclick="event.stopPropagation();">
+                                                    </label>
+                                                    <span onclick="openInstructionModal(${microtask.id})">${microtask.title}</span>
+                                                </li>
+                                            `).join('')
+                                            : `
+                                                <li class="no-microtasks">
+                                                    <p>No microtasks yet. 🤖</p>
+                                                    <button class="task-action" onclick="generateAIMicrotasks(${subtask.id})">
+                                                        Generate Microtasks
+                                                    </button>
+                                                </li>
+                                            `
+                                    }
+                                </ul>
+                            </li>
+                        `).join('')}
+                    </ul>
+                </div>
+            `;
+        } else {
+            subtasksHtml = `
+                <div class="no-subtasks">
+                    <p>No subtasks yet. 🤖</p>
+                    <button class="task-action" onclick="generateAISubtasks(${task.id})">🤖 Generate AI Subtasks</button>
+                </div>
+            `;
+        }
+
+        // Progress bar logic
+        const totalSubtasks = task.subtasks ? task.subtasks.length : 0;
+        const completedSubtasks = task.subtasks ? task.subtasks.filter(sub => sub.is_completed).length : 0;
+        const progress = totalSubtasks > 0 ? (completedSubtasks / totalSubtasks) * 100 : 0;
+
+        activeTaskContainer.innerHTML = `
+            <h4>${task.title}</h4>
+            <p>${task.description || 'No description'}</p>
+            <small>${completedSubtasks}/${totalSubtasks} subtasks completed</small>
+        `;
+        document.getElementById('active-task-progress').style.width = `${progress}%`;
+
+        dailyTaskContent.innerHTML = `
+            <div class="active-task-header">
+                <h4>🌟 Your Active Task</h4>
+                <p>This is your currently active task:</p>
+            </div>
+            <div class="active-task-content">
+                <h3>${task.title}</h3>
+                <p>${task.description || 'No description provided.'}</p>
+                <div class="task-meta">
+                    <span class="priority-badge ${task.priority}">
+                        Priority: ${task.get_priority_display}
+                    </span>
+                    <span class="due-date">
+                        Due: ${new Date(task.due_date).toLocaleString()}
+                    </span>
+                </div>
+                ${subtasksHtml}
+                <input type="hidden" id="activeTaskId" value="${task.id}">
+            </div>
+        `;
     })
     .catch(error => {
-        dailyTaskContent.innerHTML = '<p>Error loading active task.</p>';
         console.error('Error:', error);
+        dailyTaskContent.innerHTML = '<p>Error loading active task.</p>';
     });
 }
 

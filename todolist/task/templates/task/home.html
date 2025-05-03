@@ -838,6 +838,22 @@ input:checked + .slider:before {
         margin-top: 40px;
     }
 
+    .active-task-container::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 100%;
+        background: radial-gradient(circle, rgba(50, 134, 155, 0.1) 0%, rgba(255,255,255,0) 70%);
+        animation: rotate 15s linear infinite;
+    }
+
+    @keyframes rotate {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
     .active-task-header {
         display: flex;
         justify-content: space-between;
@@ -886,6 +902,101 @@ input:checked + .slider:before {
     opacity: 0;
     transform: translateY(20px);
 }
+
+.subtasks-container {
+    background: #f9f9f9;
+    border-radius: 12px;
+    padding: 16px;
+    margin-top: 20px;
+    width: 100%;
+}
+
+.subtasks-container h5 {
+    font-size: 18px;
+    margin-bottom: 12px;
+    color: #333;
+}
+
+.subtasks-list,
+.microtasks-list {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+    width: 100%;
+}
+
+.subtask-item,
+.microtask-item {
+    margin-bottom: 10px;
+    padding: 10px 12px;
+    background: #ffffff;
+    border-radius: 8px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.subtask-item:hover,
+.microtask-item:hover {
+    background: #f0f8ff;
+}
+
+.subtask-item.completed > label > span,
+.microtask-item.completed > span {
+    text-decoration: line-through;
+    color: #888;
+}
+
+label {
+    display: flex;
+    align-items: center;
+    font-size: 15px;
+    width: 100%;
+    cursor: pointer;
+    gap: 12px; /* adds space between checkbox and title */
+    width: 100%;
+}
+
+input[type="checkbox"] {
+    transform: scale(1.2);
+    cursor: pointer;
+    margin: 0;
+    
+}
+
+span {
+    flex-grow: 1;
+    word-break: break-word;
+    padding-left: 2px; /* optional slight padding for extra separation */
+    margin-left: 8px;
+}
+
+
+.no-subtasks,
+.no-microtasks {
+    padding: 12px;
+    text-align: center;
+    color: #777;
+    background: #ffffff;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+.task-action {
+    background-color: #4f46e5;
+    color: white;
+    padding: 8px 14px;
+    font-size: 14px;
+    margin-top: 8px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.task-action:hover {
+    background-color: #4338ca;
+}
+
 
 @keyframes fadeSlideIn {
     to {
@@ -973,7 +1084,7 @@ body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     background-color: #f2f5f9;
     margin: 0;
-    padding: 20px;
+   
 }
 
 /* 🍏 iOS-style background with diagonal lines */
@@ -3140,23 +3251,29 @@ document.addEventListener("DOMContentLoaded", function() {
             // Get the task ID first
             const taskId = this.getAttribute('data-task-id');
             if (!taskId) return;
-            trackTaskVisit(taskId);
+            
             
 
             // Don't trigger for buttons or links inside the card
             if (e.target.tagName === 'BUTTON' || e.target.tagName === 'A' || e.target.closest('button') || e.target.closest('a')) {
+            console.log("button")
                 // Run background function for tracking task visit
-                trackTaskVisit(taskId);
+                trackTaskVisit(taskId,false);
+            }else{
+                trackTaskVisit(taskId,true);
             }
         });
     });
 
     // Function to track task visits
-    function trackTaskVisit(taskId) {
-        console.log("Tracking visit for task ID:", taskId);
-        const detailTaskContent = document.getElementById('detailTaskContent');
-        document.getElementById('detailTaskModal').style.display = 'flex';
-        detailTaskContent.innerHTML = '<div class="loader"></div>';
+    function trackTaskVisit(taskId,isopnen) {
+        if (isopnen===true){
+            console.log("Tracking visit for task ID:", taskId);
+            const detailTaskContent = document.getElementById('detailTaskContent');
+            document.getElementById('detailTaskModal').style.display = 'flex';
+            detailTaskContent.innerHTML = '<div class="loader"></div>';
+
+        }
 
         fetch('/mark-task-visited/', {
             method: 'POST',

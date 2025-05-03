@@ -1,0 +1,22 @@
+<div id="viewTaskDependencies" style="display: none;">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeViewDependencyModal()">&times;</span>
+        <h3>🔗 Task Dependencies</h3>
+        
+        <div id="loader" class="loader" style="display: none;"></div>
+
+        <div class="task-dependencies">
+            <h4>📌 Current Dependencies</h4>
+            <ul id="dependency-list" class="dependency-list">
+                <li class="no-dependencies">No dependencies set for this task.</li>
+            </ul>
+        </div>
+
+        <form method="POST" id="update-dependencies-form" class="dependency-form">
+            {% csrf_token %}
+            <h4>🔄 Update Dependencies</h4>
+            <select id="dependency-select" name="dependencies" multiple class="dependency-select"></select>
+            <button type="submit" class="submit-button">🔄 Update Dependencies</button>
+        </form>
+    </div>
+</div>

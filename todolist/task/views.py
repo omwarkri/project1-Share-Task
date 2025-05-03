@@ -377,8 +377,7 @@ def mark_task_visited(request):
     task_id = data.get('task_id')
     print("Received task_id:", task_id)
 
-    if not task_id:
-        return JsonResponse({'message': 'No active task'})  # 🔄 Matches get_active_task's empty response
+
 
     try:
         task = Task.objects.prefetch_related('subtasks__microtasks').get(id=task_id, user=request.user)
@@ -2703,12 +2702,39 @@ Repeat the format for all {question_count} questions.
 from django.views.decorators.http import require_POST
 from django.http import JsonResponse
 from .models import Task
+from django.db import transaction
+
+from django.views.decorators.http import require_POST
+from django.http import JsonResponse
+from django.db import transaction
+from django.views.decorators.http import require_POST
+from django.http import JsonResponse
+from django.db import transaction
 
 @require_POST
 def make_task_active(request, task_id):
-    Task.objects.filter(user=request.user, is_active=True).update(is_active=False)
-    Task.objects.filter(pk=task_id, user=request.user).update(is_active=True)
-    return JsonResponse({'status': 'success'})
+    try:
+        print(f"Request User: {request.user}")
+        task = Task.objects.filter(pk=task_id, user=request.user).first()
+
+        if not task:
+            print("Task not found or not owned by user.")
+            return JsonResponse({'status': 'failed', 'error': 'Task not found or unauthorized'}, status=400)
+
+        with transaction.atomic():
+            Task.objects.filter(user=request.user, is_active=True).update(is_active=False)
+            task.is_active = True
+            task.save()
+
+        print(f"Activated task {task_id} for user {request.user}")
+        return JsonResponse({'status': 'success'})
+
+    except Exception as e:
+        print("Error in make_task_active:", str(e))
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+
+
 
 @require_POST
 def toggle_task_pinned(request, task_id):
@@ -2724,33 +2750,41 @@ def toggle_task_pinned(request, task_id):
 
 
 # views.py
+from django.http import JsonResponse
+from .models import Task  # assuming it's imported
+
+from django.http import JsonResponse
+from .models import Task  # assuming it's imported
+
 def get_active_task(request):
     if not request.user.is_authenticated:
         return JsonResponse({'error': 'Not authenticated'}, status=401)
-    
+
     active_task = Task.objects.filter(
         user=request.user,
         is_active=True
     ).prefetch_related('subtasks__microtasks').first()
-    
+
     if active_task:
+        print(f"[DEBUG] Active task ID: {active_task.id} for user {request.user}")
+
         subtasks = []
         for subtask in active_task.subtasks.all():
             microtasks = []
-            for microtask in subtask.microtasks.all():  # ✅ Only microtasks under each subtask
+            for microtask in subtask.microtasks.all():
                 microtasks.append({
                     'id': microtask.id,
                     'title': microtask.title,
                     'is_completed': microtask.completed,
                 })
-            
+
             subtasks.append({
                 'id': subtask.id,
                 'title': subtask.title,
                 'is_completed': subtask.completed,
-                'microtasks': microtasks,  # ✅ microtasks under subtask
+                'microtasks': microtasks,
             })
-        
+
         return JsonResponse({
             'task': {
                 'id': active_task.id,
@@ -2758,11 +2792,13 @@ def get_active_task(request):
                 'description': active_task.description,
                 'priority': active_task.priority,
                 'get_priority_display': active_task.get_priority_display(),
-                'due_date': active_task.due_date.strftime('%Y-%m-%d %H:%M'),
-                'subtasks': subtasks,  # ✅ no direct_microtasks
+                'due_date': active_task.due_date.strftime('%Y-%m-%d %H:%M') if active_task.due_date else None,
+                'subtasks': subtasks,
             }
         })
-    
-    return JsonResponse({'message': 'No active task'})
+
+    print(f"[DEBUG] No active task found for user {request.user}")
+    return JsonResponse({'task': None})
+
 
 

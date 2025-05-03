@@ -1,0 +1,7 @@
+<div class="task-grid">
+    {% for task_data in tasks_with_suggestions %}
+        {% include 'task/components/task_card.html' %}
+    {% empty %}
+        <p>No tasks found.</p>
+    {% endfor %}
+</div>

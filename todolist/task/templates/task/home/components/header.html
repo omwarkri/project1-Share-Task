@@ -1,0 +1,47 @@
+<div class="header">
+    <h1>📋 All Tasks</h1>
+    
+    <div class="mobile-bottom-bar">
+        <button class="floating-add-task-button wave" onclick="openAddTaskModal()">
+            <span class="plus-icon">➕</span>
+        </button>
+    </div>
+    
+    <button type="button" class="btn btn-primary getSuggestionButton" onclick="fetchAndDisplaySuggestions()">
+        Get Task Suggestions
+    </button>
+    
+    <div class="header-actions">
+        <button class="mobile-toggle-button" onclick="toggleHeaderActions()" title="Toggle Menu">⚙️</button>
+        
+        <div id="header-actions-container" class="header-actions-container">
+            <div class="search-container">
+                <input type="text" id="search-bar" class="search-bar" placeholder="🔍 Search tasks..." oninput="searchTasks()" title="Search tasks" />
+            </div>
+            
+            <div class="dropdown">
+                <button class="filter-button" title="Filters">⚙️</button>
+                <div class="dropdown-content">
+                    <button onclick="filterDailyTasks()" title="Daily Tasks">📅 Daily Tasks</button>
+                    <button onclick="showAssignedTasks()" title="My Assigned Tasks">👤 My Assigned Tasks</button>
+                    <button onclick="sortByLastVisited()" title="Sort by Last Visited">🕒 Last Visited</button>
+                    <button onclick="openFilterModal()" title="Advanced Filters">⚙️ Advanced Filters</button>
+                </div>
+            </div>
+            
+            <div class="date-filter-container">
+                <input type="text" id="date-filter" class="search-bar" placeholder="📅 Filter by date..." title="Filter by date" />
+            </div>
+            
+            <div class="private-task-toggle" title="Show Private Tasks">
+                <label class="switch">
+                    <input type="checkbox" id="is-private-task" onchange="filterTasks()">
+                    <span class="slider"></span>
+                </label>
+                <span>🔒</span>
+            </div>
+            
+            <button id="clear-filter-button" class="clear-filter-button" onclick="displayAllTasks()" title="Clear Filters">🗑️</button>
+        </div>
+    </div>
+</div>

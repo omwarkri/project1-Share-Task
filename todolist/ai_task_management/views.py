@@ -238,17 +238,25 @@ from task.models import Task, SubTask
 from google import generativeai
 from django.http import JsonResponse
 
+from google import generativeai
+from django.http import JsonResponse
+from .models import Task, Microtask  # Ensure these are imported
+from google import generativeai
+from django.http import JsonResponse
+from .models import Task, Microtask  # Ensure these are imported
+
 # Configure the generative AI model
 generativeai.configure(api_key="AIzaSyDx3rr0MzUPaumvdII3WIffmtsZqAz7JIs")
 model = generativeai.GenerativeModel('gemini-1.5-flash')
 
-def generate_microtasks_for_each_subtask(request, task_id):  # Changed parameter structure
+
+def generate_microtasks_for_each_subtask(request, task_id):
     """
     Generate microtasks for each subtask of a given task using AI
     """
     try:
         task = Task.objects.prefetch_related('subtasks').get(id=task_id)
-        subtasks = task.subtasks.all()  # Changed from subtask_set to subtasks
+        subtasks = task.subtasks.all()
 
         all_microtasks = {}
 
@@ -271,12 +279,11 @@ def generate_microtasks_for_each_subtask(request, task_id):  # Changed parameter
                     if line.strip()
                 ]
 
-                # Create microtasks and store them
                 created_microtasks = []
                 for title in microtask_list:
                     microtask = Microtask.objects.create(
-                        task=task, 
-                        subtask=subtask, 
+                        task=task,
+                        subtask=subtask,
                         title=title
                     )
                     created_microtasks.append(title)
@@ -297,15 +304,15 @@ def generate_microtasks_for_each_subtask(request, task_id):  # Changed parameter
             'status': 'error',
             'message': f'Task with id {task_id} does not exist'
         }, status=404)
+
     except Exception as e:
         return JsonResponse({
             'status': 'error',
             'message': str(e)
-        }, status=500)
-    
+        })  # ✅ Corrected the closing of JsonResponse here
 
 
-    from django.http import JsonResponse
+from django.http import JsonResponse
 
 from django.http import JsonResponse
 from .models import Microtask  # Adjust if your model import path differs

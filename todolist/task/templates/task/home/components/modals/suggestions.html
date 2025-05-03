@@ -1,0 +1,29 @@
+<div class="modal fade" id="taskSuggestionsModal" tabindex="-1" aria-labelledby="taskSuggestionsModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content" id="modalContent">
+            <div class="modal-header">
+                <button class="" id="editInterestGoalsTitle" style="cursor: pointer;" onclick="toggleInterestGoalForm()">
+                    Edit Interests and Goals
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <form id="interestGoalForm" style="display: none;">
+                    {% csrf_token %}
+                    <div id="formFields"></div>
+                    <button type="button" class="btn btn-primary" onclick="submitInterestGoalForm()" id="submitButton">
+                        <span id="buttonText">Submit</span>
+                        <span id="buttonLoader" class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"></span>
+                    </button>
+                </form>
+
+                <h2 class="modal-title">Task Suggestions</h2>
+                <div id="loader" style="display: none; text-align: center;">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+                <ul id="suggestionsList"></ul>
+            </div>
+
+            <div class="modal-footer

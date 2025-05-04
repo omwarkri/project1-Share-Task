@@ -1,0 +1,136 @@
+<style>
+    /* Button styling */
+    .shutter-button {
+        background-color: #16a085; /* Green background */
+        color: white; /* White text */
+        padding: 8px 16px; /* Padding */
+        border: none; /* Remove border */
+        cursor: pointer; /* Pointer cursor on hover */
+        font-size: 16px; /* Font size */
+        border-radius: 5px; /* Rounded corners */
+        display: flex;
+        align-items: center; /* Center the icon and text vertically */
+        gap: 8px; /* Space between icon and text */
+        position: absolute;
+        top:20;
+        left:50%;
+        margin-top: 1px;
+        transform: translateX(-50%); /* Adjust for exact centering */
+        transition: top 0.5s ease-out; /* Smooth transition for movement */
+        z-index:700;
+    
+    }
+    
+    .shutter-button:hover {
+        background-color: #00a483; /* Darker green on hover */
+    }
+    
+    /* Shutter container styling */
+    .shutter-container {
+        height: 0; /* Start with zero height */
+        overflow: hidden; /* Hide overflow content */
+        transition: height 0.5s ease-out; /* Smooth transition */
+        background-color: #2c3e50; /* Light background */
+        color: white;
+        border: 1px solid #ddd; /* Border */
+        border-radius: 5px; /* Rounded corners */
+        padding: 0 15px; /* Padding */
+        margin: 0 auto; /* Center the container */
+        width:  100%; /* Set a width for the container */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    
+    
+    /* Class to expand the shutter */
+    .shutter-container.expanded {
+        height: 200px; /* Set a specific height */
+        padding: 15px; /* Add padding when expanded */
+    }
+    
+    .shutter-container.expanded .container{
+        overflow-y: auto; /* Enable vertical scrolling */
+        height:100%;
+        width:80%;
+    }
+    
+    .shutter-container.expanded .container {
+        overflow-y: auto; /* Enable vertical scrolling */
+        height: 100%; /* Take full height of the parent */
+        width: 80%; /* Set width to 80% of the parent */
+        padding-right: 10px; /* Add padding to prevent content from overlapping the scrollbar */
+    }
+    
+    /* Custom Scrollbar Styles */
+    .shutter-container.expanded .container::-webkit-scrollbar {
+        width: 8px; /* Reduce scrollbar width */
+    }
+    
+    .shutter-container.expanded .container::-webkit-scrollbar-track {
+        background: #f1f1f1; /* Light gray track */
+        border-radius: 4px; /* Rounded corners */
+    }
+    
+    .shutter-container.expanded .container::-webkit-scrollbar-thumb {
+        background: #888; /* Dark gray thumb */
+        border-radius: 4px; /* Rounded corners */
+    }
+    
+    .shutter-container.expanded .container::-webkit-scrollbar-thumb:hover {
+        background: #555; /* Darker gray on hover */
+    }
+    
+</style>
+<button id="toggle-shutter-button" class="shutter-button">▼</button>
+
+<div id="shutter-container" class="shutter-container">
+    <div class="container">
+        <h2>⏰ Overdue Tasks</h2>
+        <ul>
+            {% for task_data in tasks_with_suggestions %}
+                {% if task_data.is_overdue %}
+                <li>
+                    📌 {{ task_data.task.title }} - Due: {{ task_data.task.due_date }}
+                </li>
+                {% endif %}
+            {% endfor %}
+        </ul>  
+        <h2>🔔 Tasks Due Soon</h2>
+        <ul>
+            {% for task_data in tasks_with_suggestions %}
+                {% if task_data.is_approaching and not task_data.is_overdue %}
+                <li>
+                    📌 {{ task_data.task.title }} - Due: {{ task_data.task.due_date }}
+                </li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+
+<script>
+    
+
+    const toggleButton = document.getElementById('toggle-shutter-button');
+        const shutterContainer = document.getElementById('shutter-container');
+
+        // Add a click event listener to the button
+        toggleButton.addEventListener('click', function () {
+            // Toggle the 'expanded' class on the container
+            console.log("opening")
+            shutterContainer.classList.toggle('expanded');
+
+            // Change the button text and arrow based on the container's state
+            if (shutterContainer.classList.contains('expanded')) {
+                toggleButton.innerHTML = '▲';
+                toggleButton.style.top = '10'; /* Move the button up */
+                shutterContent.scrollTo({ top: 0, behavior: 'smooth' }); // Smooth scroll to top
+            } else {
+                toggleButton.innerHTML = '▼';
+                toggleButton.style.top = '10    '; /* Move the button back to the top */
+            }
+        });
+</script>

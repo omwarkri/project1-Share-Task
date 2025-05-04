@@ -28,88 +28,6 @@
         margin-bottom: 10px; /* Space below the button */
     }
     
-    /* Button styling */
-    .shutter-button {
-        background-color: #16a085; /* Green background */
-        color: white; /* White text */
-        padding: 8px 16px; /* Padding */
-        border: none; /* Remove border */
-        cursor: pointer; /* Pointer cursor on hover */
-        font-size: 16px; /* Font size */
-        border-radius: 5px; /* Rounded corners */
-        display: flex;
-        align-items: center; /* Center the icon and text vertically */
-        gap: 8px; /* Space between icon and text */
-        position: absolute;
-        top:20;
-        left:50%;
-        margin-top: 1px;
-        transform: translateX(-50%); /* Adjust for exact centering */
-        transition: top 0.5s ease-out; /* Smooth transition for movement */
-        z-index:700;
-    
-    }
-    
-    .shutter-button:hover {
-        background-color: #00a483; /* Darker green on hover */
-    }
-    
-    /* Shutter container styling */
-    .shutter-container {
-        height: 0; /* Start with zero height */
-        overflow: hidden; /* Hide overflow content */
-        transition: height 0.5s ease-out; /* Smooth transition */
-        background-color: #2c3e50; /* Light background */
-        color: white;
-        border: 1px solid #ddd; /* Border */
-        border-radius: 5px; /* Rounded corners */
-        padding: 0 15px; /* Padding */
-        margin: 0 auto; /* Center the container */
-        width:  100%; /* Set a width for the container */
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    
-    
-    
-    /* Class to expand the shutter */
-    .shutter-container.expanded {
-        height: 200px; /* Set a specific height */
-        padding: 15px; /* Add padding when expanded */
-    }
-    
-    .shutter-container.expanded .container{
-        overflow-y: auto; /* Enable vertical scrolling */
-        height:100%;
-        width:80%;
-    }
-    
-    .shutter-container.expanded .container {
-        overflow-y: auto; /* Enable vertical scrolling */
-        height: 100%; /* Take full height of the parent */
-        width: 80%; /* Set width to 80% of the parent */
-        padding-right: 10px; /* Add padding to prevent content from overlapping the scrollbar */
-    }
-    
-    /* Custom Scrollbar Styles */
-    .shutter-container.expanded .container::-webkit-scrollbar {
-        width: 8px; /* Reduce scrollbar width */
-    }
-    
-    .shutter-container.expanded .container::-webkit-scrollbar-track {
-        background: #f1f1f1; /* Light gray track */
-        border-radius: 4px; /* Rounded corners */
-    }
-    
-    .shutter-container.expanded .container::-webkit-scrollbar-thumb {
-        background: #888; /* Dark gray thumb */
-        border-radius: 4px; /* Rounded corners */
-    }
-    
-    .shutter-container.expanded .container::-webkit-scrollbar-thumb:hover {
-        background: #555; /* Darker gray on hover */
-    }
     
     a.suggested-users-button img{
         height: 30px;
@@ -827,74 +745,7 @@ input:checked + .slider:before {
     background-color: #16a085;
 }
  /* Add these styles to your CSS section */
- .active-task-container {
-        background-color: #f8f9fa;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        padding: 15px;
-        margin: 10px auto;
-        width: 95%;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        margin-top: 40px;
-    }
 
-    .active-task-container::before {
-        content: '';
-        position: absolute;
-        top: -50%;
-        left: -50%;
-        width: 200%;
-        height: 100%;
-        background: radial-gradient(circle, rgba(50, 134, 155, 0.1) 0%, rgba(255,255,255,0) 70%);
-        animation: rotate 15s linear infinite;
-    }
-
-    @keyframes rotate {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-
-    .active-task-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 10px;
-    }
-
-    .active-task-header h3 {
-        margin: 0;
-        font-size: 18px;
-        color: #2c3e50;
-    }
-
-    .progress-container {
-        height: 10px;
-        background-color: #e9ecef;
-        border-radius: 5px;
-        margin-top: 10px;
-        overflow: hidden;
-    }
-
-    .progress-bar {
-        height: 100%;
-        background-color: #1abc9c;
-        transition: width 0.3s ease;
-    }
-
-    #active-task-details {
-        margin-bottom: 10px;
-    }
-
-    #active-task-details h4 {
-        margin: 5px 0;
-        font-size: 16px;
-    }
-
-    #active-task-details p {
-        margin: 3px 0;
-        font-size: 14px;
-        color: #555;
-    }
 
     /* Entry Animation */
 .animate-entry {
@@ -2425,207 +2276,26 @@ body {
     </style>
 <div class="dashboard-container">
     <!-- Button to toggle the shutter -->
-    <button id="toggle-shutter-button" class="shutter-button">▼</button>
+
+    {% include 'task/home/components/shutter.html' %}
+    {% include 'task/home/components/active_task.html' %}
+    
 
     <!-- Container for the "Tasks Due Soon" list -->
-    <div id="shutter-container" class="shutter-container">
-        <div class="container">
-            <h2>⏰ Overdue Tasks</h2>
-            <ul>
-                {% for task_data in tasks_with_suggestions %}
-                    {% if task_data.is_overdue %}
-                    <li>
-                        📌 {{ task_data.task.title }} - Due: {{ task_data.task.due_date }}
-                    </li>
-                    {% endif %}
-                {% endfor %}
-            </ul>  
-            <h2>🔔 Tasks Due Soon</h2>
-            <ul>
-                {% for task_data in tasks_with_suggestions %}
-                    {% if task_data.is_approaching and not task_data.is_overdue %}
-                    <li>
-                        📌 {{ task_data.task.title }} - Due: {{ task_data.task.due_date }}
-                    </li>
-                    {% endif %}
-                {% endfor %}
-            </ul>
-        </div>
-    </div>
 
-    <div id="active-task-container" class="active-task-container ios-background">
-        <div class="active-task-header ios-glass">
-            <h3>🌟 Active Task</h3>
-        </div>
-        <div class="active-task-content ios-card">
-            <div id="active-task-details">
-                <!-- Content will be loaded dynamically -->
-                <p>No active task currently</p>
-            </div>
-            <div class="progress-container">
-                <div id="active-task-progress" class="progress-bar ios-progress" style="width: 0%"></div>
-            </div>
-        </div>
-    </div>
+ 
     
 
     <!-- Main Content -->
     <div class="main-content">
         <!-- Header -->
-        <div class="header">
-            <h1>📋 All Tasks</h1>
-            
-
+       
              
-            <!-- Floating Add Task Button -->
-            <div class="mobile-bottom-bar">
-                <button class="floating-add-task-button wave" onclick="openAddTaskModal()">
-                    <span class="plus-icon">➕</span>
-                </button>
-            </div>
-            <button type="button" class="btn btn-primary getSuggestionButton"  onclick="fetchAndDisplaySuggestions()">
-                Get Task Suggestions
-            </button>
-            <div class="header-actions">
-                <!-- Toggle Button for Mobile View -->
-                <button class="mobile-toggle-button" onclick="toggleHeaderActions()" title="Toggle Menu"> ⚙️</button>
-
-               <!-- Modal -->
-
-
-<!-- Button with onclick -->
-
-
-            
-                <!-- Header Actions Container -->
-                <div id="header-actions-container" class="header-actions-container">
-                    <!-- Search Bar -->
-                    <div class="search-container">
-                        <input type="text" id="search-bar" class="search-bar" placeholder="🔍 Search tasks..." oninput="searchTasks()" title="Search tasks" />
-                    </div>
-            
-                    <!-- Filter Dropdown -->
-                    <!-- Filter Dropdown -->
-            <div class="dropdown">
-                <button class="filter-button" title="Filters">⚙️</button>
-                <div class="dropdown-content">
-                    <button onclick="filterDailyTasks()" title="Daily Tasks">📅 Daily Tasks</button>
-                    <button onclick="showAssignedTasks()" title="My Assigned Tasks">👤 My Assigned Tasks</button>
-                    <button onclick="sortByLastVisited()" title="Sort by Last Visited">🕒 Last Visited</button>
-                    <button onclick="openFilterModal()" title="Advanced Filters">⚙️ Advanced Filters</button>
-                </div>
-            </div>
-
-            
-                    <!-- Date Filter -->
-                    <div class="date-filter-container">
-                        <input type="text" id="date-filter" class="search-bar" placeholder="📅 Filter by date..." title="Filter by date" />
-                    </div>
-            
-                    <!-- Private Task Toggle -->
-                    <div class="private-task-toggle" title="Show Private Tasks">
-                        <label class="switch">
-                            <input type="checkbox" id="is-private-task" onchange="filterTasks()">
-                            <span class="slider"></span>
-                        </label>
-                        <span>🔒</span>
-                    </div>
-            
-                    <!-- Clear Filters Button -->
-                    <button id="clear-filter-button" class="clear-filter-button" onclick="displayAllTasks()" title="Clear Filters">🗑️</button>
-                </div>
-            </div>
-             
-        </div>
-
+        {% include 'task/home/components/header.html' %}
+        {% include 'task/home/components/task_grid.html' %}
 
         <!-- Task List -->
-        <div class="task-grid">
-            {% for task_data in tasks_with_suggestions %}
-                <div id="task-container"  class="task-card task-item cross-lines-background" 
-                data-task-id="{{ task_data.task.id }}"
-                data-status="{{ task_data.task.status }}" 
-                data-priority="{{ task_data.task.priority }}" 
-                data-assigned-to="{% if task_data.task.assigned_to %}{{ task_data.task.assigned_to.id }}{% endif %}"
-                data-is-daily="{{ task_data.task.is_daily }}"
-                data-due-datetime="{{ task_data.task.due_date|date:'Y-m-d H:i' }}"
-                data-private="{{ task_data.task.shareable  }}" 
-                data-last-visited="{% if task_data.task.last_visited_at %}{{ task_data.task.last_visited_at|date:'c' }}{% endif %}">
-                    <div class="task-header">
-                        <strong class="task-title">📌 {{ task_data.task.title }}</strong>
-                        <span class="task-priority {{ task_data.task.priority }}">
-                            {% if task_data.task.priority == 'high' %}🚨
-                            {% elif task_data.task.priority == 'medium' %}⚠️
-                            {% else %}✅
-                            {% endif %}
-                            {{ task_data.task.get_priority_display }}
-                            
-                        </span>
-                        {% if task_data.task.is_active %}
-                        <!-- Animated orbit for active task -->
-                        <div class="saturn-animation-badge">
-                          <div class="planet"></div>
-                        
-                          <div class="ring ring2"></div>
-                      
-                        </div>
-                      {% elif task_data.task.is_pinned %}
-                        <!-- Glowing golden dot for pinned task -->
-                        <div class="pinned-task-ring">
-                            <div class="pinned-dot"></div>
-                        
-                          </div>
-                      {% endif %}
-                      
-
-
-
-                    </div>
-                    <div class="task-body">
-                        <p><strong>📊 Status:</strong> {{ task_data.task.get_status_display }}</p>
-                        <p><strong>📅 Due Date:</strong> {{ task_data.task.due_date|date:"F j, Y, g:i a" }}</p>
-                        {% if task_data.task.team %}
-            <p><strong>👤 Team:</strong>
-                <a href="{% url 'view_team_tasks' task_data.task.team.id %}">{{ task_data.task.team.name }}</a>
-            </p>
-        {% endif %}
-			
-                        <div class="task-mid-buttons">
-                            <a href="{% url 'ai_task_management' task_data.task.id %}" class="suggested-users-button">🤖</a>
-                            <a href="{% url 'suggested_users' task_data.task.id %}" class="suggested-users-button">👥</a>
-                            {% if task_data.task.is_overdue %}
-                            <span class="badge badge-danger">⏳ Overdue</span>
-                            {% elif task_data.task.is_approaching_due_date %}
-                            <span class="badge badge-warning">⏰ Approaching Due</span>
-
-                            {% endif %}
-
-                        
-                        </div>
-                       
-                    </div>
-                    <div class="task-footer">
-                        
-                        <button class="task-action" onclick="openModal({{ task_data.task.id }})">✔️ Complete</button>
-                        <a href="{% url 'task_detail' task_data.task.id %}" class="task-action">📄 Details</a>
-                        <button class="task-action" onclick="makeTaskActive({{ task_data.task.id }})">
-                            {% if task_data.task.is_active %}🌟 Active{% else %}⭐ Make Active{% endif %}
-                        </button>
-                        
-                    
-                        <button class="task-action" onclick="togglePinned({{ task_data.task.id }})">
-                            {% if task_data.task.is_pinned %}📌 Unpin{% else %}📍 Pin{% endif %}
-                        </button>
-                        <button class="task-action" onclick="openViewDependencyModal({{ task_data.task.id }})">🔗 Dependencies</button> 
-
-                        
-                    </div>
-                </div>
-            {% empty %}
-                <p>No tasks found.</p>
-            {% endfor %}
-        </div>
-                    
+       
            
 
 <!-- Modals -->
@@ -2751,64 +2421,7 @@ body {
 </script>
 
 
-<!-- Filter Modal -->
-<div id="filterModal" class="modal">
-    <div class="modal-content">
-        <span class="close-modal" onclick="closeFilterModal()">&times;</span>
-        <h3>⚙️ Filters</h3>
 
-        <!-- Tabs for Filters -->
-        <div class="filter-tabs">
-            <button class="tab-button active" onclick="openFilterTab('status')">📊 Status</button>
-            <button class="tab-button" onclick="openFilterTab('priority')">🚦 Priority</button>
-            <button class="tab-button" onclick="openFilterTab('sort')">🔀 Sort By</button>
-        </div>
-
-        <!-- Status Filters -->
-        <div id="status-filters" class="filter-tab-content active">
-            <h4>Filter by Status:</h4>
-            <div class="filter-buttons">
-                <button onclick="filterTasks('all', 'all')" class="modern-button">🌐 All</button>
-                <button onclick="filterTasks('pending', 'all')" class="modern-button">⏳ Pending</button>
-                <button onclick="filterTasks('in_progress', 'all')" class="modern-button">🚧 In Progress</button>
-                <button onclick="filterTasks('completed', 'all')" class="modern-button">✅ Completed</button>
-                <button onclick="filterTasks('archived', 'all')" class="modern-button">🗄️ Archived</button>
-            </div>
-        </div>
-
-        <!-- Priority Filters -->
-        <div id="priority-filters" class="filter-tab-content">
-            <h4>Filter by Priority:</h4>
-            <div class="filter-buttons">
-                <button onclick="filterTasks('all', 'all')" class="modern-button">🌐 All</button>
-                <button onclick="filterTasks('all', 'low')" class="modern-button">✅ Low</button>
-                <button onclick="filterTasks('all', 'medium')" class="modern-button">⚠️ Medium</button>
-                <button onclick="filterTasks('all', 'high')" class="modern-button">🚨 High</button>
-                <button onclick="filterTasks('all', 'critical')" class="modern-button">🔥 Critical</button>
-            </div>
-        </div>
-
-        <!-- Sort Filters -->
-        <div id="sort-filters" class="filter-tab-content">
-            <h4>Sort By:</h4>
-            <div class="filter-options">
-                <select id="sort-by" class="modern-select" onchange="applySorting()">
-                    <option value="title">📝 Title</option>
-                    <option value="due_date">📅 Due Date</option>
-                    <option value="priority">🚦 Priority</option>
-                    <option value="status">📊 Status</option>
-                </select>
-                <select id="sort-order" class="modern-select" onchange="applySorting()">
-                    <option value="asc">⬆️ Ascending</option>
-                    <option value="desc">⬇️ Descending</option>
-                </select>
-            </div>
-        </div>
-
-        <!-- Apply Filters Button -->
-        <button class="apply-filters-button" onclick="applyFilters()">Apply Filters</button>
-    </div>
-</div>
 
 <!-- View Task Dependencies Modal -->
 <div id="viewTaskDependencies" style="display: none;">
@@ -3389,111 +3002,9 @@ function renderActiveTaskModal(task) {
     }
 
 
-    function showAssignedTasks() {
-    const taskItems = document.querySelectorAll('.task-item');
-    const currentUserId = {{ request.user.id }}; // Pass the current user's ID from Django
+   
 
-    taskItems.forEach(task => {
-        const assignedTo = task.getAttribute('data-assigned-to');
-        if (assignedTo && assignedTo === currentUserId.toString()) {
-            task.style.display = 'block'; // Show tasks assigned to the current user
-        } else {
-            task.style.display = 'none'; // Hide other tasks
-        }
-    });
-}
-     function displayAllTasks() {
-    const taskItems = document.querySelectorAll('.task-item');
-    document.getElementById('is-private-task').checked=false
-    const clearFiltersButton = document.getElementById('clear-filters-button');
-    const dateFilterInput = flatpickr("#date-filter", {
-        enableTime: false,
-        dateFormat: "Y-m-d",
-        onChange: function (selectedDates, dateStr) {
-            filterTasks(); // Trigger filtering when the date changes
-        }
-    });
-
-    taskItems.forEach(task => {
-        dateFilterInput.clear();
-        task.style.display = 'block'; // Show all tasks
-    });
-}
-
-    // Function to filter tasks by date
-
-    function openFilterTab(tabName) {
-    const tabContents = document.querySelectorAll('.filter-tab-content');
-    const tabButtons = document.querySelectorAll('.tab-button');
-
-    tabContents.forEach(content => content.classList.remove('active'));
-    tabButtons.forEach(button => button.classList.remove('active'));
-
-    document.getElementById(`${tabName}-filters`).classList.add('active');
-    document.querySelector(`[onclick="openFilterTab('${tabName}')"]`).classList.add('active');
-}
-
-function toggleHeaderActions() {
-    const container = document.getElementById("header-actions-container");
-    container.classList.toggle("active");
-}
-
-document.addEventListener('DOMContentLoaded', function () {
-    const privateTaskToggle = document.getElementById('is-private-task');
-    console.log(privateTaskToggle)
-    if (privateTaskToggle) {
-        privateTaskToggle.addEventListener('change', function () {
-            filterTasks(); // Trigger filtering when the toggle changes
-        });
-    } else {
-        console.error('Private task toggle element not found.');
-    }
-});
-
-
-function filterTasks(statusFilter = 'all', priorityFilter = 'all') {
-    const dateFilterInput = document.getElementById("date-filter");
-    const selectedDate = dateFilterInput ? dateFilterInput.value.trim() : '';
-    const privateSwitch = document.getElementById('is-private-task'); // Get private task toggle
-    console.log(privateSwitch.checked)
-    if (!privateSwitch) {
-        console.error("Private task switch element not found!");
-        return;
-    }
-
-    const showPrivate = privateSwitch.checked; // Get toggle state
-    const taskItems = document.querySelectorAll('.task-item');
-
-    taskItems.forEach(task => {
-        const taskStatus = task.getAttribute('data-status'); // Get task status
-        const taskPriority = task.getAttribute('data-priority'); // Get task priority
-        const taskDueDateTime = task.getAttribute('data-due-datetime'); // Get due date
-        console.log(task.getAttribute('data-private'))
-        const isPrivate = task.getAttribute('data-private') === 'False'; // Check if task is private
-
-        // Match filters
-        const matchesStatus = (statusFilter === 'all' || taskStatus === statusFilter);
-        const matchesPriority = (priorityFilter === 'all' || taskPriority === priorityFilter);
-        const matchesDate = (selectedDate === '' || taskDueDateTime.startsWith(selectedDate));
-        let matchesPrivacy=NaN
-        if (showPrivate && isPrivate ){
-            matchesPrivacy=true
-
-        }
-        if (!showPrivate){
-            matchesPrivacy=true
-        }
-        if (matchesStatus && matchesPriority && matchesDate && matchesPrivacy) {
-            task.style.display = 'block'; // Show the task
-        } else {
-            task.style.display = 'none'; // Hide the task
-        }
-    });
-}
-
-    
-
-
+  
 
 
 
@@ -3503,45 +3014,9 @@ function filterTasks(statusFilter = 'all', priorityFilter = 'all') {
 
 
 
-// Initialize Flatpickr for date filtering (without time)
-flatpickr("#date-filter", {
-    enableTime: false, // Disable time selection
-    dateFormat: "Y-m-d", // Format to match only the date portion
-    onChange: function(selectedDates, dateStr) {
-        // document.getElementById("due-date").value = dateStr;
-        let dueDateField = document.querySelector("[name='due_date']");
-        console.log(dueDateField)
-        if (dueDateField) {
-            console.log(dateStr)
-            dueDateField.value = dateStr + " 12:00"; 
-        }
-
-
-        filterTasks(); // Filter tasks by the selected date
-    }
-});
 
 
 
-        const toggleButton = document.getElementById('toggle-shutter-button');
-        const shutterContainer = document.getElementById('shutter-container');
-
-        // Add a click event listener to the button
-        toggleButton.addEventListener('click', function () {
-            // Toggle the 'expanded' class on the container
-            console.log("opening")
-            shutterContainer.classList.toggle('expanded');
-
-            // Change the button text and arrow based on the container's state
-            if (shutterContainer.classList.contains('expanded')) {
-                toggleButton.innerHTML = '▲';
-                toggleButton.style.top = '10'; /* Move the button up */
-                shutterContent.scrollTo({ top: 0, behavior: 'smooth' }); // Smooth scroll to top
-            } else {
-                toggleButton.innerHTML = '▼';
-                toggleButton.style.top = '10    '; /* Move the button back to the top */
-            }
-        });
 
 function celebrateCompletion() {
     confetti({
@@ -3631,74 +3106,7 @@ function applySorting() {
         activeButton.classList.add('active');
     }
 
-    function filterDailyTasks() {
-    const taskItems = document.querySelectorAll('.task-item');
-    
 
-    taskItems.forEach(task => {
-        const isDaily = task.getAttribute('data-is-daily') === 'True'; // Check if task is daily
-        console.log(task.getAttribute('data-is-daily'),isDaily)
-        if (isDaily) {
-            task.style.display = 'block'; // Show daily tasks
-        } else {
-            task.style.display = 'none'; // Hide non-daily tasks
-        }
-    });
-}
-
-function searchTasks() {
-    const query = document.getElementById('search-bar').value;
-    const taskList = document.getElementById('task-list');
-
-    fetch(`/search-tasks/?q=${encodeURIComponent(query)}`, {
-        headers: { "X-Requested-With": "XMLHttpRequest" }
-    })
-        .then(response => response.json())
-        .then(data => {
-            taskList.innerHTML = '';
-
-            if (data.tasks.length === 0) {
-                taskList.innerHTML = '<p>No tasks found.</p>';
-            } else {
-                data.tasks.forEach(task => {
-                    taskList.innerHTML += `
-                        <div class="task-card task-item" data-status="${task.status}" data-priority="${task.priority}">
-    <div class="task-header">
-        <strong class="task-title">📌 ${task.title}</strong>
-        <span class="task-priority ${task.priority}">
-            ${task.priority === 'high' ? '🚨' : task.priority === 'medium' ? '⚠️' : '✅'}
-            ${task.priority}
-        </span>
-    </div>
-    <div class="task-body">
-        <p><strong>📊 Status:</strong> ${task.status}</p>
-        <p><strong>📅 Due Date:</strong> ${task.due_date}</p>
-
-        <div class="task-mid-buttons">
-            <a href="/ai-task-management/${task.id}/" class="suggested-users-button">🤖</a>
-            <a href="/task/${task.id}/suggested_users/" class="suggested-users-button">👥</a>
-            ${task.is_overdue ? '<span class="badge badge-danger">⏳ Overdue</span>' : ''}
-            ${task.is_approaching_due_date ? '<span class="badge badge-warning">⏰ Approaching Due</span>' : ''}
-        </div>
-    </div>
-    
-    <div class="task-footer">
-        <button class="task-action" onclick="openViewDependencyModal(${task.id})">🔗 Dependencies</button>
-        <button class="task-action" onclick="openModal(${task.id})">✔️ Complete</button>
-        <a href="/task/${task.id}/" class="task-action">📄 Details</a>
-    </div>
-</div>
-`;
-                });
-
-                // // ✅ Attach event listeners to dynamically added elements
-                // attachModalEventListeners();
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching tasks:', error);
-        });
-}
 function showLoader() {
     document.getElementById('loader').style.display = 'block';
 }
@@ -3763,9 +3171,7 @@ function openViewDependencyModal(taskId) {
         });
 }
 
-function openFilterModal() {
-    document.getElementById('filterModal').style.display = 'flex';
-}
+
 
 function closeViewDependencyModal() {
 
@@ -3774,22 +3180,7 @@ function closeViewDependencyModal() {
 
 
     // JavaScript functions for modals
-    function openAddTaskModal(suggestion = "") {
-        console.log(suggestion,"suggetion")
-        const suggestionsList = document.getElementById('taskSuggestionsModal');
 
-suggestionsList.style.display = 'none';
-    document.getElementById("addTaskModal").style.display = "flex";
-    console.log( document.querySelector("#title-input"))
-    document.getElementById("id_title").value = suggestion;
-
-}
-
-    
-
-    function closeAddTaskModal() {
-        document.getElementById('addTaskModal').style.display = 'none';
-    }
 
    
 
@@ -3823,41 +3214,6 @@ function closeChatModal() {
     }
 
 
-
-    // Function to fetch data and populate modal
-function fetchAndDisplaySuggestions() {
-    // Show loader and hide form initially
-    const loader = document.getElementById('loader');
-    const taskSuggestionsModal = document.getElementById('taskSuggestionsModal');
-    const suggestionsList = document.getElementById('suggestionsList');
-
-    // Show loader and hide form initially
-    loader.style.display = 'block';
-    taskSuggestionsModal.style.display = 'flex';
-    suggestionsList.style.display = 'none';
- 
-    fetch('/tasks/suggestions/', {
-        method: 'GET',
-        headers: {
-            'Accept': 'application/json',
-        },
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.status === 'success') {
-           
-            populateForm(data.form_data);
-            populateSuggestions(data.suggestions);
-            loader.style.display = 'none';
-            suggestionsList.style.display = 'block';
-        } else {
-            console.error('Failed to load data:', data);
-        }
-    })
-    .catch(error => {
-        console.error('Error fetching data:', error);
-    });
-}
 
 // Function to populate form fields
 function populateForm(formData) {
@@ -4028,25 +3384,7 @@ function toggleInterestGoalForm() {
 // }
 
 
-function sortByLastVisited() {
-    console.log("hoo")
-    const taskContainer = document.querySelector('.task-grid');
-    const tasks = Array.from(taskContainer.querySelectorAll('.task-item')); // ✅ scoped correctly
 
-    tasks.sort((a, b) => {
-        const aVal = a.getAttribute('data-last-visited');
-        const bVal = b.getAttribute('data-last-visited');
-
-        if (!aVal && !bVal) return 0;
-        if (!aVal) return 1;
-        if (!bVal) return -1;
-
-        return new Date(bVal) - new Date(aVal);
-    });
-
-    tasks.forEach(task => taskContainer.appendChild(task)); // ✅ safe now
-
-}
 
 
 
@@ -4145,3 +3483,5 @@ window.onclick = function(event) {
 </script>
 
 {% endblock %}	
+
+

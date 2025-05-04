@@ -1,47 +1,279 @@
 <div class="header">
     <h1>📋 All Tasks</h1>
     
+    <!-- Floating Add Task Button -->
     <div class="mobile-bottom-bar">
-        <button class="floating-add-task-button wave" onclick="openAddTaskModal()">
-            <span class="plus-icon">➕</span>
-        </button>
+      <button class="floating-add-task-button wave" onclick="openAddTaskModal()">
+        <span class="plus-icon">➕</span>
+      </button>
     </div>
     
     <button type="button" class="btn btn-primary getSuggestionButton" onclick="fetchAndDisplaySuggestions()">
-        Get Task Suggestions
+      Get Task Suggestions
     </button>
     
     <div class="header-actions">
-        <button class="mobile-toggle-button" onclick="toggleHeaderActions()" title="Toggle Menu">⚙️</button>
-        
-        <div id="header-actions-container" class="header-actions-container">
-            <div class="search-container">
-                <input type="text" id="search-bar" class="search-bar" placeholder="🔍 Search tasks..." oninput="searchTasks()" title="Search tasks" />
-            </div>
-            
-            <div class="dropdown">
-                <button class="filter-button" title="Filters">⚙️</button>
-                <div class="dropdown-content">
-                    <button onclick="filterDailyTasks()" title="Daily Tasks">📅 Daily Tasks</button>
-                    <button onclick="showAssignedTasks()" title="My Assigned Tasks">👤 My Assigned Tasks</button>
-                    <button onclick="sortByLastVisited()" title="Sort by Last Visited">🕒 Last Visited</button>
-                    <button onclick="openFilterModal()" title="Advanced Filters">⚙️ Advanced Filters</button>
-                </div>
-            </div>
-            
-            <div class="date-filter-container">
-                <input type="text" id="date-filter" class="search-bar" placeholder="📅 Filter by date..." title="Filter by date" />
-            </div>
-            
-            <div class="private-task-toggle" title="Show Private Tasks">
-                <label class="switch">
-                    <input type="checkbox" id="is-private-task" onchange="filterTasks()">
-                    <span class="slider"></span>
-                </label>
-                <span>🔒</span>
-            </div>
-            
-            <button id="clear-filter-button" class="clear-filter-button" onclick="displayAllTasks()" title="Clear Filters">🗑️</button>
+      <!-- Toggle Button for Mobile View -->
+      <button class="mobile-toggle-button" onclick="toggleHeaderActions()" title="Toggle Menu">⚙️</button>
+  
+      <!-- Header Actions Container -->
+      <div id="header-actions-container" class="header-actions-container">
+        <!-- Search Bar -->
+        <div class="search-container">
+          <input type="text" id="search-bar" class="search-bar" 
+                 placeholder="🔍 Search tasks..." 
+                 oninput="searchTasks()" 
+                 title="Search tasks" />
         </div>
+        
+        <!-- Filter Dropdown -->
+        <div class="dropdown">
+          <button class="filter-button" title="Filters">⚙️</button>
+          <div class="dropdown-content">
+            <button onclick="filterDailyTasks()" title="Daily Tasks">📅 Daily Tasks</button>
+            <button onclick="showAssignedTasks()" title="My Assigned Tasks">👤 My Assigned Tasks</button>
+            <button onclick="sortByLastVisited()" title="Sort by Last Visited">🕒 Last Visited</button>
+            <button onclick="openFilterModal()" title="Advanced Filters">⚙️ Advanced Filters</button>
+          </div>
+        </div>
+  
+        <!-- Date Filter -->
+        <div class="date-filter-container">
+          <input type="text" id="date-filter" class="search-bar" 
+                 placeholder="📅 Filter by date..." 
+                 title="Filter by date" />
+        </div>
+        
+        <!-- Private Task Toggle -->
+        <div class="private-task-toggle" title="Show Private Tasks">
+          <label class="switch">
+            <input type="checkbox" id="is-private-task" onchange="filterTasks()">
+            <span class="slider"></span>
+          </label>
+          <span>🔒</span>
+        </div>
+        
+        <!-- Clear Filters Button -->
+        <button id="clear-filter-button" class="clear-filter-button" 
+                onclick="displayAllTasks()" 
+                title="Clear Filters">🗑️</button>
+      </div>
     </div>
-</div>
+  </div>
+  
+  {% include 'task/home/components/modals/filter_modal.html' %}
+
+
+
+
+        {% include 'task/home/components/modals/add_task_modal.html' %}
+        {% include 'task/home/components/modals/filter_modal.html' %}
+
+
+
+        <script>
+// Modal Functions
+function openAddTaskModal(suggestion = "") {
+  const suggestionsList = document.getElementById('taskSuggestionsModal');
+  suggestionsList.style.display = 'none';
+  document.getElementById("addTaskModal").style.display = "flex";
+  document.getElementById("id_title").value = suggestion;
+}
+
+function closeAddTaskModal() {
+  document.getElementById('addTaskModal').style.display = 'none';
+}
+
+function fetchAndDisplaySuggestions() {
+  const loader = document.getElementById('loader');
+  const taskSuggestionsModal = document.getElementById('taskSuggestionsModal');
+  const suggestionsList = document.getElementById('suggestionsList');
+
+  loader.style.display = 'block';
+  taskSuggestionsModal.style.display = 'flex';
+  suggestionsList.style.display = 'none';
+
+  fetch('/tasks/suggestions/', {
+    method: 'GET',
+    headers: {
+      'Accept': 'application/json',
+    },
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.status === 'success') {
+      populateForm(data.form_data);
+      populateSuggestions(data.suggestions);
+      loader.style.display = 'none';
+      suggestionsList.style.display = 'block';
+    } else {
+      console.error('Failed to load data:', data);
+    }
+  })
+  .catch(error => {
+    console.error('Error fetching data:', error);
+  });
+}
+
+// Filter Functions
+function openFilterTab(tabName) {
+  const tabContents = document.querySelectorAll('.filter-tab-content');
+  const tabButtons = document.querySelectorAll('.tab-button');
+
+  tabContents.forEach(content => content.classList.remove('active'));
+  tabButtons.forEach(button => button.classList.remove('active'));
+
+  document.getElementById(`${tabName}-filters`).classList.add('active');
+  document.querySelector(`[onclick="openFilterTab('${tabName}')"]`).classList.add('active');
+}
+
+function toggleHeaderActions() {
+  const container = document.getElementById("header-actions-container");
+  container.classList.toggle("active");
+}
+
+function filterTasks(statusFilter = 'all', priorityFilter = 'all') {
+  const dateFilterInput = document.getElementById("date-filter");
+  const selectedDate = dateFilterInput ? dateFilterInput.value.trim() : '';
+  const privateSwitch = document.getElementById('is-private-task');
+  
+  if (!privateSwitch) {
+    console.error("Private task switch element not found!");
+    return;
+  }
+
+  const showPrivate = privateSwitch.checked;
+  const taskItems = document.querySelectorAll('.task-item');
+
+  taskItems.forEach(task => {
+    const taskStatus = task.getAttribute('data-status');
+    const taskPriority = task.getAttribute('data-priority');
+    const taskDueDateTime = task.getAttribute('data-due-datetime');
+    const isPrivate = task.getAttribute('data-private') === 'False';
+
+    const matchesStatus = (statusFilter === 'all' || taskStatus === statusFilter);
+    const matchesPriority = (priorityFilter === 'all' || taskPriority === priorityFilter);
+    const matchesDate = (selectedDate === '' || taskDueDateTime.startsWith(selectedDate));
+    let matchesPrivacy = (!showPrivate || (showPrivate && isPrivate));
+
+    if (matchesStatus && matchesPriority && matchesDate && matchesPrivacy) {
+      task.style.display = 'block';
+    } else {
+      task.style.display = 'none';
+    }
+  });
+}
+
+function displayAllTasks() {
+  const taskItems = document.querySelectorAll('.task-item');
+  document.getElementById('is-private-task').checked = false;
+  
+  const dateFilterInput = flatpickr("#date-filter", {
+    enableTime: false,
+    dateFormat: "Y-m-d",
+    onChange: function (selectedDates, dateStr) {
+      filterTasks();
+    }
+  });
+
+  taskItems.forEach(task => {
+    dateFilterInput.clear();
+    task.style.display = 'block';
+  });
+}
+
+// Initialize Flatpickr
+document.addEventListener('DOMContentLoaded', function() {
+  flatpickr("#date-filter", {
+    enableTime: false,
+    dateFormat: "Y-m-d",
+    onChange: function(selectedDates, dateStr) {
+      let dueDateField = document.querySelector("[name='due_date']");
+      if (dueDateField) {
+        dueDateField.value = dateStr + " 12:00"; 
+      }
+      filterTasks();
+    }
+  });
+
+  const privateTaskToggle = document.getElementById('is-private-task');
+  if (privateTaskToggle) {
+    privateTaskToggle.addEventListener('change', function() {
+      filterTasks();
+    });
+  } else {
+    console.error('Private task toggle element not found.');
+  }
+});
+
+// Task Filtering Functions
+function filterDailyTasks() {
+  const taskItems = document.querySelectorAll('.task-item');
+
+  taskItems.forEach(task => {
+    const isDaily = task.getAttribute('data-is-daily') === 'True';
+    task.style.display = isDaily ? 'block' : 'none';
+  });
+}
+
+function searchTasks() {
+  const query = document.getElementById('search-bar').value;
+  const taskList = document.getElementById('task-list');
+
+  fetch(`/search-tasks/?q=${encodeURIComponent(query)}`, {
+    headers: { "X-Requested-With": "XMLHttpRequest" }
+  })
+  .then(response => response.json())
+  .then(data => {
+    taskList.innerHTML = '';
+    
+    if (data.tasks.length === 0) {
+      taskList.innerHTML = '<p>No tasks found.</p>';
+    } else {
+      data.tasks.forEach(task => {
+        taskList.innerHTML += `
+          <div class="task-card task-item" data-status="${task.status}" data-priority="${task.priority}">
+            <!-- Task card HTML here -->
+          </div>
+        `;
+      });
+    }
+  })
+  .catch(error => {
+    console.error('Error fetching tasks:', error);
+  });
+}
+
+function sortByLastVisited() {
+  const taskContainer = document.querySelector('.task-grid');
+  const tasks = Array.from(taskContainer.querySelectorAll('.task-item'));
+
+  tasks.sort((a, b) => {
+    const aVal = a.getAttribute('data-last-visited');
+    const bVal = b.getAttribute('data-last-visited');
+
+    if (!aVal && !bVal) return 0;
+    if (!aVal) return 1;
+    if (!bVal) return -1;
+
+    return new Date(bVal) - new Date(aVal);
+  });
+
+  tasks.forEach(task => taskContainer.appendChild(task));
+}
+
+function showAssignedTasks() {
+  const taskItems = document.querySelectorAll('.task-item');
+  const currentUserId = {{ request.user.id }};
+
+  taskItems.forEach(task => {
+    const assignedTo = task.getAttribute('data-assigned-to');
+    task.style.display = (assignedTo && assignedTo === currentUserId.toString()) ? 'block' : 'none';
+  });
+}
+
+function openFilterModal() {
+  document.getElementById('filterModal').style.display = 'flex';
+}
+
+        </script>

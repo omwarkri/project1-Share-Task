@@ -1,14 +1,17 @@
+<!-- Filter Modal -->
 <div id="filterModal" class="modal">
     <div class="modal-content">
         <span class="close-modal" onclick="closeFilterModal()">&times;</span>
         <h3>⚙️ Filters</h3>
 
+        <!-- Tabs for Filters -->
         <div class="filter-tabs">
             <button class="tab-button active" onclick="openFilterTab('status')">📊 Status</button>
             <button class="tab-button" onclick="openFilterTab('priority')">🚦 Priority</button>
             <button class="tab-button" onclick="openFilterTab('sort')">🔀 Sort By</button>
         </div>
 
+        <!-- Status Filters -->
         <div id="status-filters" class="filter-tab-content active">
             <h4>Filter by Status:</h4>
             <div class="filter-buttons">
@@ -20,6 +23,7 @@
             </div>
         </div>
 
+        <!-- Priority Filters -->
         <div id="priority-filters" class="filter-tab-content">
             <h4>Filter by Priority:</h4>
             <div class="filter-buttons">
@@ -31,6 +35,7 @@
             </div>
         </div>
 
+        <!-- Sort Filters -->
         <div id="sort-filters" class="filter-tab-content">
             <h4>Sort By:</h4>
             <div class="filter-options">
@@ -47,6 +52,7 @@
             </div>
         </div>
 
+        <!-- Apply Filters Button -->
         <button class="apply-filters-button" onclick="applyFilters()">Apply Filters</button>
     </div>
 </div>

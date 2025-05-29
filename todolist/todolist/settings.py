@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-q@=i731s$q8+^qv617(+f9-=&tkg)fmr80262)d7c%9nc*=!wb
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["share-task.onrender.com", "127.0.0.1", "localhost",  'share-task-9r0e.onrender.com']
+ALLOWED_HOSTS = ["share-task.onrender.com", "127.0.0.1", "localhost",  'share-task-9r0e.onrender.com','share-task-vq9v.onrender.com']
 
 CSRF_TRUSTED_ORIGINS = ["https://share-task.onrender.com","http://127.0.0.1:8000"]
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')

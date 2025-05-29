@@ -232,6 +232,7 @@ DATABASES = {
 
 
 
+
 BASE_URL='https://share-task.onrender.com'
 
 # DATABASES = {

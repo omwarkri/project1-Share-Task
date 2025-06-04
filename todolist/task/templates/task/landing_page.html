@@ -9,31 +9,31 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --primary: #32338a;
-      --primary-dark: #09064b;
-      --primary-light: #818cf8;
-      --secondary: #10b981;
-      --accent: #f59e0b;
-      --dark: #1e293b;
-      --light: #f8fafc;
-      --gray: #94a3b8;
-      --dark-gray: #64748b;
-      --light-blue: #f0f4ff;
-      --light-gray: #f8fafc;
+      --primary: #4361ee;
+      --primary-dark: #3a0ca3;
+      --primary-light: #4895ef;
+      --secondary: #4cc9f0;
+      --accent: #f72585;
+      --dark: #1a1a2e;
+      --light: #f8f9fa;
+      --gray: #adb5bd;
+      --dark-gray: #495057;
+      --light-blue: #e9f5ff;
+      --light-gray: #f1f3f5;
 
       --padding-sm: 8px;
       --padding-md: 16px;
       --padding-lg: 24px;
       --padding-xl: 32px;
 
-      --card-bg: rgba(255, 255, 255, 0.95);
+      --card-bg: rgba(255, 255, 255, 0.98);
       --glass: rgba(255, 255, 255, 0.2);
       --glass-border: rgba(255, 255, 255, 0.3);
 
-      --shadow-sm: 0 1px 3px rgba(0,0,0,0.12);
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
       --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
-      --shadow-lg: 0 10px 25px rgba(0,0,0,0.15);
-      --shadow-xl: 0 20px 50px rgba(0,0,0,0.2);
+      --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+      --shadow-xl: 0 20px 25px rgba(0,0,0,0.1);
     }
 
     * {
@@ -58,7 +58,7 @@
     }
 
     /* ==================== */
-    /* HERO SECTION - PREMIUM DESIGN */
+    /* HERO SECTION */
     /* ==================== */
     header {
       background: linear-gradient(135deg, var(--primary), var(--primary-dark));
@@ -106,7 +106,8 @@
       opacity: 0;
     }
 
-    /* Enhanced Floating Shapes */
+
+    /* Floating Shapes */
     .shape {
       position: absolute;
       border-radius: 50%;
@@ -121,7 +122,7 @@
       height: 600px;
       top: -250px;
       left: -250px;
-      background: radial-gradient(circle, var(--primary-light), transparent 70%);
+      background: radial-gradient(circle, var(--light-blue), transparent 70%);
       animation: float 15s ease-in-out infinite, fadeIn 1.5s ease-out;
     }
     .shape-2 {
@@ -131,6 +132,18 @@
       right: -200px;
       background: radial-gradient(circle, var(--accent), transparent 70%);
       animation: float 18s ease-in-out infinite reverse, fadeIn 1.5s ease-out;
+    }
+    .shape-3 {
+      width: 300px;
+      height: 300px;
+      background: conic-gradient(from 180deg, var(--primary-light), var(--secondary));
+      position: absolute;
+      right: 10%;
+      top: 30%;
+      border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+      filter: blur(60px);
+      opacity: 0.3;
+      animation: float 12s ease-in-out infinite alternate;
     }
 
     @keyframes float {
@@ -154,7 +167,7 @@
       }
     }
 
-    /* Premium CTA Button */
+    /* CTA Button */
     .cta-button {
       display: inline-flex;
       align-items: center;
@@ -165,7 +178,7 @@
       border-radius: 50px;
       font-weight: 600;
       font-size: 1.2rem;
-      box-shadow: 0 15px 40px rgba(99, 102, 241, 0.5);
+      box-shadow: 0 15px 40px rgba(67, 97, 238, 0.4);
       transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       position: relative;
       overflow: hidden;
@@ -178,7 +191,7 @@
 
     .cta-button:hover {
       transform: translateY(-5px) scale(1.05);
-      box-shadow: 0 20px 50px rgba(99, 102, 241, 0.6);
+      box-shadow: 0 20px 50px rgba(67, 97, 238, 0.5);
     }
 
     .cta-button::before {
@@ -204,39 +217,218 @@
       transform: translateX(5px);
     }
 
-    @keyframes pulse {
-      0% { box-shadow: 0 15px 40px rgba(99, 102, 241, 0.5); }
-      50% { box-shadow: 0 15px 50px rgba(99, 102, 241, 0.7); }
-      100% { box-shadow: 0 15px 40px rgba(99, 102, 241, 0.5); }
-    }
-
-    /* ======================== */
-    /* HOW IT WORKS - PREMIUM REDESIGN */
-    /* ======================== */
-   
-    /* How It Works Section - Subtle dot pattern */
-    .how-it-works {
-      background-color: white;
-      background-image: 
-        radial-gradient(circle at 10px 10px, var(--light-blue) 1px, transparent 1px),
-        radial-gradient(circle at 30px 30px, var(--light-blue) 1px, transparent 1px);
-      background-size: 40px 40px;
-      padding: 6rem 1rem 8rem;
+    .cta-button {
       position: relative;
-      overflow: hidden;
+      z-index: 1;
+      border: none;
     }
 
-    .how-it-works::before {
+    .cta-button::before {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      background: linear-gradient(45deg, 
+        var(--primary), var(--accent), var(--secondary), var(--primary));
+      background-size: 400%;
+      z-index: -1;
+      border-radius: 50px;
+      opacity: 0;
+      transition: 0.5s;
+    }
+
+    .cta-button:hover::before {
+      opacity: 1;
+      animation: gradientBorder 3s linear infinite;
+      filter: blur(2px);
+    }
+
+    @keyframes gradientBorder {
+      0% { background-position: 0% 50% }
+      100% { background-position: 400% 50% }
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 15px 40px rgba(67, 97, 238, 0.4); }
+      50% { box-shadow: 0 15px 50px rgba(67, 97, 238, 0.5); }
+      100% { box-shadow: 0 15px 40px rgba(67, 97, 238, 0.4); }
+    }
+
+    /* ==================== */
+    /* SECTIONS */
+    /* ==================== */
+.demo {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50'%3E%3Ccircle cx='10' cy='10' r='2' fill='gray'/%3E%3Ccircle cx='40' cy='10' r='2' fill='gray'/%3E%3Ccircle cx='10' cy='40' r='2' fill='gray'/%3E%3Ccircle cx='40' cy='40' r='2' fill='gray'/%3E%3Cpath d='M10 10 L40 40 M40 10 L10 40' stroke='gray' stroke-width='1' fill='none'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 50px 50px;
+
+
+  padding: 6rem 1rem 8rem;
+  position: relative;
+  overflow: hidden;
+
+}
+
+@keyframes hypnoticMove {
+  0% {
+    background-position: 0 0;
+  }
+  50% {
+    background-position: 25px 25px;
+  }
+  100% {
+    background-position: -25px -25px;
+  }
+}
+
+
+
+
+    .demo::before {
       content: '';
       position: absolute;
       top: 0;
       left: 0;
       right: 0;
       bottom: 0;
-      background: linear-gradient(to bottom, rgba(255,255,255,0.9), rgba(255,255,255,0.7));
+      background: linear-gradient(to bottom, rgb(248 249 255 / 90%), rgba(255,255,255,0.7));
       z-index: 0;
     }
 
+  .features-horizontal {
+        background-color: var(--dark);
+  background-image: 
+    linear-gradient(rgba(70, 130, 180, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(70, 130, 180, 0.05) 1px, transparent 1px);
+  background-size: 40px 40px;
+    padding: 4rem 1rem;
+  
+   
+  }
+  
+.features h2.section-title{
+        color: white;
+         }
+
+  .features {
+    background-color: var(--dark);
+  background-image: 
+    linear-gradient(rgba(70, 130, 180, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(70, 130, 180, 0.05) 1px, transparent 1px);
+  background-size: 40px 40px;
+    padding: 4rem 1rem;
+    padding: 4rem 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .feature-cards-container {
+    max-width: 100%;
+    padding: 0 2rem;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  .feature-cards-scroll {
+    overflow-x: auto;
+    padding-bottom: 1rem; /* Space for scrollbar */
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+  }
+
+  .feature-cards {
+    display: inline-flex;
+    gap: 1.5rem;
+    padding: 1rem 0;
+    white-space: nowrap;
+  }
+
+  .feature-card {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    width: 300px;
+    flex-shrink: 0;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    white-space: normal;
+  }
+
+  .feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+  }
+
+  .feature-card img {
+    width: 60px;
+    height: 60px;
+    margin-bottom: 1.5rem;
+  }
+
+  .feature-card h3 {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+    color: #1e293b;
+  }
+
+  .feature-card p {
+    color: #64748b;
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+
+  /* Hide scrollbar but keep functionality */
+  .feature-cards-scroll::-webkit-scrollbar {
+    height: 4px;
+  }
+
+  .feature-cards-scroll::-webkit-scrollbar-track {
+    background: #f1f5f9;
+  }
+
+  .feature-cards-scroll::-webkit-scrollbar-thumb {
+    background-color: #cbd5e1;
+    border-radius: 20px;
+  }
+
+  @media (min-width: 1024px) {
+    .feature-cards-container {
+      padding: 0 4rem;
+    }
+    
+    .feature-cards {
+      gap: 2rem;
+    }
+    
+    .feature-card {
+      width: 320px;
+    }
+  }
+
+
+.how-it-works {
+    background-color: #fff;
+  background-image: 
+    linear-gradient(to right, #ccc 1px, transparent 1px),
+    linear-gradient(to bottom, #ccc 1px, transparent 1px);
+  background-size: 20px 20px;
+  background-size: 100% 100%, 40px 40px;
+  padding: 6rem 1rem 8rem;
+  position: relative;
+  overflow: hidden;
+}
+
+
+
+
+
+
+
+
+    /* ======================== */
+    /* HOW IT WORKS */
+    /* ======================== */
     .steps-container {
       max-width: 1200px;
       margin: 0 auto;
@@ -290,7 +482,7 @@
       height: 4px;
       background: linear-gradient(90deg, var(--primary), var(--accent));
       z-index: 1;
-      box-shadow: 0 5px 15px rgba(99, 102, 241, 0.3);
+      box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
       animation: drawLine 1.5s ease-out forwards;
     }
 
@@ -299,32 +491,31 @@
       to { width: 85%; }
     }
 
-    /* Premium Step Cards */
+    /* Step Cards */
     .step-card {
-      background: white;
-      border: none;
+      background: var(--card-bg);
+      border: 1px solid rgba(0, 0, 0, 0.05);
       box-shadow: 
-        0 5px 15px rgba(0,0,0,0.05),
-        0 2px 5px rgba(0,0,0,0.03);
-      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+        0 5px 15px rgba(0, 0, 0, 0.03),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+      transition: all 0.4s ease;
       border-radius: 24px;
       padding: 3rem 2.5rem 2.5rem;
       width: 280px;
-      box-shadow: var(--shadow-xl);
-      transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       position: relative;
       z-index: 2;
       text-align: center;
-      border: 1px solid rgba(0,0,0,0.05);
       opacity: 0;
       transform: translateY(30px);
       animation: fadeInUp 0.8s ease-out forwards;
     }
 
     .step-card:hover {
+      background: white;
       box-shadow: 
-        0 15px 30px rgba(0,0,0,0.1),
-        0 5px 10px rgba(0,0,0,0.05);
+        0 15px 30px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+      transform: translateY(-15px);
     }
 
     .step-card:nth-child(1) { animation-delay: 0.3s; }
@@ -370,14 +561,14 @@
       align-items: center;
       justify-content: center;
       border-radius: 50%;
-      box-shadow: 0 10px 25px rgba(99, 102, 241, 0.4);
+      box-shadow: 0 10px 25px rgba(67, 97, 238, 0.4);
       z-index: 3;
       transition: all 0.3s ease;
     }
 
     .step-card:hover .step-number {
       transform: translateX(-50%) scale(1.1);
-      box-shadow: 0 15px 30px rgba(99, 102, 241, 0.5);
+      box-shadow: 0 15px 30px rgba(67, 97, 238, 0.5);
     }
 
     .step-card img {
@@ -420,11 +611,6 @@
       transition: color 0.3s ease;
     }
 
-    .step-card:hover {
-      transform: translateY(-15px);
-      box-shadow: 0 25px 60px rgba(0,0,0,0.15);
-    }
-
     .step-card:hover img {
       transform: scale(1.15) rotate(5deg);
       filter: drop-shadow(0 10px 20px rgba(0,0,0,0.15));
@@ -434,117 +620,7 @@
       color: var(--dark);
     }
 
-    /* ==================== */
-    /* OTHER SECTIONS ENHANCEMENT */
-    /* ==================== */
-
-    /* Demo Section - Now with subtle diagonal stripes */
-    .demo {
-      background: 
-        linear-gradient(45deg, var(--light-blue) 25%, transparent 25%) -50px 0,
-        linear-gradient(-45deg, var(--light-blue) 25%, transparent 25%) -50px 0,
-        linear-gradient(45deg, transparent 75%, var(--light-blue) 75%),
-        linear-gradient(-45deg, transparent 75%, var(--light-blue) 75%);
-      background-size: 100px 100px;
-      background-color: white;
-      padding: 6rem 1rem 8rem;
-      position: relative;
-      overflow: hidden;
-      clip-path: polygon(0 0, 100% 0, 100% 95%, 0 100%);
-    }
-
-    .demo::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: linear-gradient(to bottom, rgba(255,255,255,0.9), rgba(255,255,255,0.7));
-      z-index: 0;
-    }
-
-    .demo .section-title {
-      position: relative;
-      z-index: 1;
-    }
-
-    .demo .slideshow-container {
-      position: relative;
-      z-index: 1;
-      border: 15px solid white;
-      box-shadow: 
-        0 10px 30px rgba(0,0,0,0.1),
-        inset 0 0 0 1px rgba(0,0,0,0.05);
-    }
-
-    .slideshow-container {
-      max-width: 1200px;
-      margin: auto;
-      border-radius: 24px;
-      overflow: hidden;
-      box-shadow: var(--shadow-xl);
-      height: 650px;
-      position: relative;
-      border: 20px solid white;
-      transform: perspective(1000px) rotateX(5deg);
-      transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-
-    .slideshow-container:hover {
-      transform: perspective(1000px) rotateX(0deg) scale(1.01);
-    }
-
-    .slideshow {
-      position: relative;
-      width: 100%;
-      height: 100%;
-    }
-
-    .slide {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      opacity: 0;
-      transition: opacity 1s cubic-bezier(0.645, 0.045, 0.355, 1);
-    }
-
-    .slide.active {
-      opacity: 1;
-    }
-
-    /* Feature Cards - Premium Design */
-    .features {
-      background: 
-        linear-gradient(160deg, var(--light-gray) 0%, white 100%),
-        repeating-linear-gradient(
-          45deg,
-          rgba(200, 216, 255, 0.1),
-          rgba(200, 216, 255, 0.1) 10px,
-          rgba(255, 255, 255, 0.1) 10px,
-          rgba(255, 255, 255, 0.1) 20px
-        );
-      padding: 6rem 1rem 8rem;
-      position: relative;
-    }
-
-    .features::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 100px;
-      background: linear-gradient(to bottom, rgba(255,255,255,1), rgba(255,255,255,0));
-      z-index: 0;
-    }
-
-    .features .section-title {
-      position: relative;
-      z-index: 1;
-    }
-
+    /* Feature Cards */
     .feature-cards {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -556,21 +632,31 @@
     }
 
     .feature-card {
-      background: white;
+      background: var(--card-bg);
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      box-shadow: 
+        0 5px 15px rgba(0, 0, 0, 0.03),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
       border-radius: 16px;
       padding: 2.5rem;
       text-align: center;
       transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      box-shadow: var(--shadow-md);
       position: relative;
       overflow: hidden;
-      border: 1px solid rgba(0,0,0,0.05);
       opacity: 0;
       transform: translateY(30px);
     }
 
     .feature-card.animate-in {
       animation: fadeInUp 0.8s ease-out forwards;
+    }
+
+    .feature-card:hover {
+      background: white;
+      transform: translateY(-15px) scale(1.02);
+      box-shadow: 
+        0 15px 30px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
     }
 
     .feature-card::before {
@@ -586,11 +672,6 @@
 
     .feature-card:hover::before {
       height: 100%;
-    }
-
-    .feature-card:hover {
-      transform: translateY(-15px) scale(1.02);
-      box-shadow: var(--shadow-xl);
     }
 
     .feature-card img {
@@ -627,9 +708,46 @@
       color: var(--dark);
     }
 
-    /* CTA Section - Premium Design */
+    /* Slideshow Container */
+    .slideshow-container {
+      max-width: 1200px;
+      margin: auto;
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: var(--shadow-xl);
+      height: 650px;
+      position: relative;
+      border: 20px solid white;
+      transform: perspective(1000px) rotateX(5deg);
+      transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .slideshow-container:hover {
+      transform: perspective(1000px) rotateX(0deg) scale(1.01);
+    }
+
+    .slideshow {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    .slide {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0;
+      transition: opacity 1s cubic-bezier(0.645, 0.045, 0.355, 1);
+    }
+
+    .slide.active {
+      opacity: 1;
+    }
+
+    /* CTA Section */
     .cta-section {
-      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      background: linear-gradient(135deg, var(--primary-dark), #560bad);
       color: white;
       text-align: center;
       padding: 8rem 1rem;
@@ -678,7 +796,7 @@
       line-height: 1.7;
     }
 
-    /* Footer - Premium Design */
+    /* Footer */
     footer {
       background: var(--dark);
       color: white;
@@ -797,20 +915,19 @@
         display: none;
       }
       
-      .demo {
-        background-size: 60px 60px;
-        clip-path: none;
-        padding: 4rem 1rem;
-      }
+
       
       .features {
         padding: 4rem 1rem;
       }
-      
-      .how-it-works {
-        padding: 4rem 1rem;
-        background-size: 30px 30px;
+
+
+      .demo{
+          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Cpath d='M0,20 L10,10 L20,30 L30,10 L40,20' stroke='rgba(0, 0, 0, 0.1)' stroke-width='1' fill='none'/%3E%3C/svg%3E");
+  background-repeat: repeat;
       }
+      
+   
       
       .demo::before,
       .how-it-works::before,
@@ -846,6 +963,8 @@
       scroll-behavior: smooth;
     }
   </style>
+
+
 </head>
 <body>
   
@@ -853,6 +972,7 @@
     <div class="particles" id="particles"></div>
     <div class="shape shape-1"></div>
     <div class="shape shape-2"></div>
+    <div class="shape shape-3"></div>
     <div class="header-content">
       <h1>Collaborate Smarter with AI-Powered Task Management</h1>
       <p>Share Task combines intelligent automation with seamless collaboration to help teams and individuals achieve more.</p>
@@ -876,52 +996,55 @@
   </section>
 
   <!-- Features Section -->
-  <section class="features">
-    <h2 class="section-title">Why Choose Share Task?</h2>
-    <div class="feature-cards">
-      <div class="feature-card">
-        <img src="https://res.cloudinary.com/ddw1upvx3/image/upload/v1741984457/share-task-media/symbols/h8ltxmmafnbigqckimmy.png" alt="AI Assistance">
-        <h3>Smart AI Assistance</h3>
-        <p>Get intelligent task breakdowns and personalized recommendations to optimize your workflow.</p>
-      </div>
-      <div class="feature-card">
-        <img src="https://res.cloudinary.com/ddw1upvx3/image/upload/v1741984460/share-task-media/symbols/hu1syg2ktunlirh3bvgo.png" alt="Task Sharing">
-        <h3>Seamless Task Sharing</h3>
-        <p>Delegate and collaborate on tasks with team members or external partners effortlessly.</p>
-      </div>
-      <div class="feature-card">
-        <img src="https://res.cloudinary.com/ddw1upvx3/image/upload/v1741984457/share-task-media/symbols/v17yqxaypplfzake54p5.png" alt="Collaboration">
-        <h3>Real-Time Collaboration</h3>
-        <p>Chat, share files, and track progress with built-in communication tools.</p>
-      </div>
-      <div class="feature-card">
-        <img src="https://res.cloudinary.com/ddw1upvx3/image/upload/v1741984459/share-task-media/symbols/cyamdcs3wkfogxegcpzf.png" alt="Add Notes">
-        <h3>Context-Rich Tasks</h3>
-        <p>Attach detailed notes, files, and checklists to each task for complete clarity.</p>
-      </div>
-      <div class="feature-card">
-        <img src="https://res.cloudinary.com/ddw1upvx3/image/upload/v1741984457/share-task-media/symbols/rldvd0zvwol0uquob2vf.png" alt="Team Task Management">
-        <h3>Team Task Management</h3>
-        <p>Organize team workflows with roles, permissions, and progress tracking.</p>
-      </div>
-      <div class="feature-card">
-        <img src="https://res.cloudinary.com/ddw1upvx3/image/upload/v1741984457/share-task-media/symbols/vtd048uyseaiqnapg1cj.png" alt="Tasks Feed">
-        <h3>Tasks Activity Feed</h3>
-        <p>Stay updated with a centralized feed of completed tasks and updates.</p>
-      </div>
-      <div class="feature-card">
-        <img src="https://res.cloudinary.com/ddw1upvx3/image/upload/v1741984459/share-task-media/symbols/lvdrlmchaji9gvnezicg.png" alt="Reminders">
-        <h3>Smart Reminders</h3>
-        <p>Automated notifications and deadline alerts keep everyone on track.</p>
-      </div>
-      <div class="feature-card">
-        <img src="https://res.cloudinary.com/ddw1upvx3/image/upload/v1741984459/share-task-media/symbols/zdrt8whohloizsj30iw7.png" alt="Cross-Device Sync">
-        <h3>Cross-Device Sync</h3>
-        <p>Access your tasks from anywhere with perfect sync across all devices.</p>
+<section class="features">
+  <h2 class="section-title">Why Choose Share Task?</h2>
+  <div class="feature-cards-container">
+    <div class="feature-cards-scroll">
+      <div class="feature-cards">
+        <div class="feature-card">
+          <img src="https://res.cloudinary.com/ddw1upvx3/image/upload/v1741984457/share-task-media/symbols/h8ltxmmafnbigqckimmy.png" alt="AI Assistance">
+          <h3>Smart AI Assistance</h3>
+          <p>Get intelligent task breakdowns and personalized recommendations to optimize your workflow.</p>
+        </div>
+        <div class="feature-card">
+          <img src="https://res.cloudinary.com/ddw1upvx3/image/upload/v1741984460/share-task-media/symbols/hu1syg2ktunlirh3bvgo.png" alt="Task Sharing">
+          <h3>Seamless Task Sharing</h3>
+          <p>Delegate and collaborate on tasks with team members or external partners effortlessly.</p>
+        </div>
+        <div class="feature-card">
+          <img src="https://res.cloudinary.com/ddw1upvx3/image/upload/v1741984457/share-task-media/symbols/v17yqxaypplfzake54p5.png" alt="Collaboration">
+          <h3>Real-Time Collaboration</h3>
+          <p>Chat, share files, and track progress with built-in communication tools.</p>
+        </div>
+        <div class="feature-card">
+          <img src="https://res.cloudinary.com/ddw1upvx3/image/upload/v1741984459/share-task-media/symbols/cyamdcs3wkfogxegcpzf.png" alt="Add Notes">
+          <h3>Context-Rich Tasks</h3>
+          <p>Attach detailed notes, files, and checklists to each task for complete clarity.</p>
+        </div>
+        <div class="feature-card">
+          <img src="https://res.cloudinary.com/ddw1upvx3/image/upload/v1741984457/share-task-media/symbols/rldvd0zvwol0uquob2vf.png" alt="Team Task Management">
+          <h3>Team Task Management</h3>
+          <p>Organize team workflows with roles, permissions, and progress tracking.</p>
+        </div>
+        <div class="feature-card">
+          <img src="https://res.cloudinary.com/ddw1upvx3/image/upload/v1741984457/share-task-media/symbols/vtd048uyseaiqnapg1cj.png" alt="Tasks Feed">
+          <h3>Tasks Activity Feed</h3>
+          <p>Stay updated with a centralized feed of completed tasks and updates.</p>
+        </div>
+        <div class="feature-card">
+          <img src="https://res.cloudinary.com/ddw1upvx3/image/upload/v1741984459/share-task-media/symbols/lvdrlmchaji9gvnezicg.png" alt="Reminders">
+          <h3>Smart Reminders</h3>
+          <p>Automated notifications and deadline alerts keep everyone on track.</p>
+        </div>
+        <div class="feature-card">
+          <img src="https://res.cloudinary.com/ddw1upvx3/image/upload/v1741984459/share-task-media/symbols/zdrt8whohloizsj30iw7.png" alt="Cross-Device Sync">
+          <h3>Cross-Device Sync</h3>
+          <p>Access your tasks from anywhere with perfect sync across all devices.</p>
+        </div>
       </div>
     </div>
-  </section>
-
+  </div>
+</section>
   <!-- How It Works Section -->
   <section class="how-it-works">
     <h2 class="section-title">How It Works</h2>
@@ -954,7 +1077,6 @@
       </div>
     </div>
   </section>
-
 
   <!-- CTA Section -->
   <section class="section cta-section">
@@ -1019,35 +1141,98 @@
     animateOnScroll();
 
     // Particle animation
-    function createParticles() {
-      const particlesContainer = document.getElementById('particles');
-      if (!particlesContainer) return;
+    function createParticleNetwork() {
+      const canvas = document.createElement('canvas');
+      const container = document.getElementById('particles');
+      if (!container) return;
       
-      const particleCount = 50;
+      container.appendChild(canvas);
+      canvas.style.position = 'absolute';
+      canvas.style.top = 0;
+      canvas.style.left = 0;
+      canvas.style.width = '100%';
+      canvas.style.height = '100%';
       
-      for (let i = 0; i < particleCount; i++) {
-        const particle = document.createElement('div');
-        particle.classList.add('particle');
-        
-        // Random properties
-        const size = Math.random() * 8 + 2;
-        const posX = Math.random() * 100;
-        const duration = Math.random() * 25 + 15;
-        const delay = Math.random() * 15;
-        
-        particle.style.width = `${size}px`;
-        particle.style.height = `${size}px`;
-        particle.style.left = `${posX}%`;
-        particle.style.bottom = `-${size}px`;
-        particle.style.animationDuration = `${duration}s`;
-        particle.style.animationDelay = `${delay}s`;
-        particle.style.opacity = Math.random() * 0.6 + 0.1;
-        
-        particlesContainer.appendChild(particle);
+      const ctx = canvas.getContext('2d');
+      let width = container.offsetWidth;
+      let height = container.offsetHeight;
+      
+      const particles = [];
+      const particleCount = Math.floor(width * height / 5000);
+      
+      // Resize handler
+      function resize() {
+        width = container.offsetWidth;
+        height = container.offsetHeight;
+        canvas.width = width;
+        canvas.height = height;
       }
+      
+      // Particle class
+      class Particle {
+        constructor() {
+          this.x = Math.random() * width;
+          this.y = Math.random() * height;
+          this.size = Math.random() * 2 + 0.5;
+          this.speedX = Math.random() * 2 - 1;
+          this.speedY = Math.random() * 2 - 1;
+          this.color = `rgba(255,255,255,${Math.random() * 0.4 + 0.1})`;
+        }
+        
+        update() {
+          this.x += this.speedX;
+          this.y += this.speedY;
+          
+          if (this.x < 0 || this.x > width) this.speedX *= -1;
+          if (this.y < 0 || this.y > height) this.speedY *= -1;
+        }
+        
+        draw() {
+          ctx.fillStyle = this.color;
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+      
+      // Create particles
+      for (let i = 0; i < particleCount; i++) {
+        particles.push(new Particle());
+      }
+      
+      // Animation loop
+      function animate() {
+        ctx.clearRect(0, 0, width, height);
+        
+        // Draw connections
+        for (let a = 0; a < particles.length; a++) {
+          for (let b = a; b < particles.length; b++) {
+            const dx = particles[a].x - particles[b].x;
+            const dy = particles[a].y - particles[b].y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            if (distance < 100) {
+              ctx.strokeStyle = `rgba(255,255,255,${1 - distance/100})`;
+              ctx.lineWidth = 0.5;
+              ctx.beginPath();
+              ctx.moveTo(particles[a].x, particles[a].y);
+              ctx.lineTo(particles[b].x, particles[b].y);
+              ctx.stroke();
+            }
+          }
+          particles[a].update();
+          particles[a].draw();
+        }
+        
+        requestAnimationFrame(animate);
+      }
+      
+      resize();
+      window.addEventListener('resize', resize);
+      animate();
     }
 
-    createParticles();
+    createParticleNetwork();
 
     // Ensure buttons are clickable
     document.addEventListener('DOMContentLoaded', function() {

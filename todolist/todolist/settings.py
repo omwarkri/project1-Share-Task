@@ -360,3 +360,5 @@ PAYPAL_CLIENT_SECRET="EMkEBl8Gc21xA4cuXHGKyxWz8HNaZq4MGuVjH2bZm1EF1QfI3rKhNcFXrY
 
 # Use the CustomUser model as the default user model
 AUTH_USER_MODEL = 'user.CustomUser'
+ACCOUNT_LOGIN_METHODS = {'username'}
+

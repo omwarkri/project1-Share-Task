@@ -738,3 +738,61 @@ def update_challenge_progress(request):
 
     return JsonResponse({'success': True})
 
+
+
+
+
+from django.http import JsonResponse
+from django.views.decorators.http import require_http_methods
+from task.models import Task
+from .models import Schedule
+from django.utils import timezone
+import json
+
+@require_http_methods(["GET"])
+def get_schedule(request):
+    today = timezone.now().date()
+    schedule_items = Schedule.objects.filter(
+        user=request.user,
+        date=today
+    ).order_by('start_time')
+    
+    schedule_data = []
+    for item in schedule_items:
+        schedule_data.append({
+            'start_time': item.start_time.strftime('%H:%M'),
+            'end_time': item.end_time.strftime('%H:%M'),
+            'task_id': item.task.id if item.task else None,
+            'task_name': item.task.title if item.task else None,
+            'completed': item.completed
+        })
+    
+    return JsonResponse({'schedule': schedule_data})
+
+from django.utils import timezone
+from datetime import timedelta
+
+@require_http_methods(["POST"])
+def save_schedule(request):
+    try:
+        data = json.loads(request.body)
+        now = timezone.now()
+        cutoff = now - timedelta(hours=24)
+
+        # Delete only old schedules (older than 24 hours)
+        Schedule.objects.filter(user=request.user, created_at__lte=cutoff).delete()
+
+        today = now.date()
+        for item in data.get('schedule', []):
+            Schedule.objects.create(
+                user=request.user,
+                date=today,
+                start_time=item['start_time'],
+                end_time=item['end_time'],
+                task_id=item['task_id'] or None,
+                completed =False
+            )
+
+        return JsonResponse({'status': 'success'})
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)

@@ -1,52 +1,17 @@
 <!-- Daily Schedule Section -->
 <style>
-    /* Schedule Styles */
-        .ai-schedule-item {
-        display: flex;
-        flex-direction: column;
-        padding: 12px;
-        border-bottom: 1px solid #e0e0e0;
-        gap: 8px;
-    }
-
-    .ai-schedule-time {
-        font-weight: bold;
-        color: #3498db;
-    }
-
-    .ai-schedule-task {
-        flex-grow: 1;
-        margin: 0 10px;
-    }
-
-    .ai-schedule-actions {
-        display: flex;
-        gap: 8px;
-        justify-content: flex-end;
-    }
-
-    .add-single-block {
-        background-color: #2ecc71;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        padding: 4px 8px;
-        cursor: pointer;
-        font-size: 12px;
-    }
-
-    .ai-schedule-break {
-        font-style: italic;
-        color: #7f8c8d;
-    }
+    /* Schedule Container */
     .schedule-container {
         background-color: #ffffff;
         border-radius: 12px;
         padding: 20px;
         margin: 20px;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        max-height: 80vh;
+        overflow-y: auto;
     }
 
+    /* Schedule Header */
     .schedule-header {
         display: flex;
         justify-content: space-between;
@@ -65,19 +30,6 @@
         align-items: center;
     }
 
-    .edit-schedule-btn, .ai-schedule-btn {
-        background: none;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        padding: 5px 10px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }
-
-    .edit-schedule-btn:hover, .ai-schedule-btn:hover {
-        background-color: #f8f9fa;
-    }
-
     .ai-toggle {
         display: flex;
         align-items: center;
@@ -86,7 +38,79 @@
 
     .ai-toggle-label {
         font-size: 14px;
-        color: #555;
+        color: #7f8c8d;
+    }
+
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 50px;
+        height: 24px;
+    }
+
+    .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        transition: .4s;
+        border-radius: 24px;
+    }
+
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 16px;
+        width: 16px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        transition: .4s;
+        border-radius: 50%;
+    }
+
+    input:checked + .slider {
+        background-color: #3498db;
+    }
+
+    input:checked + .slider:before {
+        transform: translateX(26px);
+    }
+
+    .edit-schedule-btn, .ai-schedule-btn {
+        background: none;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 5px 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 14px;
+    }
+
+    .edit-schedule-btn:hover, .ai-schedule-btn:hover {
+        background-color: #f8f9fa;
+    }
+
+    /* Schedule View */
+    .schedule-view {
+        transition: all 0.3s ease;
+        max-height: 40vh;
+        overflow-y: auto;
+    }
+
+    .no-schedule {
+        text-align: center;
+        padding: 20px;
+        color: #7f8c8d;
     }
 
     .schedule-list {
@@ -118,6 +142,20 @@
         margin: 0 15px;
     }
 
+    /* Schedule Edit */
+    .schedule-edit {
+        transition: all 0.3s ease;
+        max-height: 60vh;
+        overflow-y: auto;
+    }
+
+    .time-block-container {
+        margin-bottom: 15px;
+        max-height: 45vh;
+        overflow-y: auto;
+        padding-right: 8px;
+    }
+
     .time-block {
         display: flex;
         align-items: center;
@@ -139,6 +177,13 @@
     }
 
     .task-select {
+        flex-grow: 1;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+    }
+
+    .task-name-input {
         flex-grow: 1;
         padding: 8px;
         border: 1px solid #ddd;
@@ -191,26 +236,40 @@
         color: white;
     }
 
-    .no-schedule {
-        text-align: center;
-        padding: 20px;
-        color: #7f8c8d;
-    }
-
     /* AI Schedule Suggestions */
     .ai-schedule-container {
         margin-top: 20px;
-        padding: 15px;
-        background-color: #f9f9f9;
-        border-radius: 8px;
-        border: 1px solid #eee;
+        padding-top: 20px;
+        border-top: 1px solid #eee;
+        max-height: 50vh;
+        overflow-y: auto;
     }
 
     .ai-schedule-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 10px;
+        margin-bottom: 15px;
+    }
+
+    .ai-schedule-header h4 {
+        margin: 0;
+        color: #2c3e50;
+    }
+
+    .add-all-btn {
+        background-color: #2ecc71;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        padding: 6px 12px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background-color 0.2s;
+    }
+
+    .add-all-btn:hover {
+        background-color: #27ae60;
     }
 
     .ai-schedule-list {
@@ -221,70 +280,83 @@
 
     .ai-schedule-item {
         display: flex;
-        justify-content: space-between;
-        padding: 8px 12px;
+        flex-direction: column;
+        padding: 12px;
         border-bottom: 1px solid #e0e0e0;
+        gap: 8px;
+        background-color: #fff;
+        border-radius: 8px;
+        margin-bottom: 8px;
+    }
+
+    .ai-schedule-time {
+        font-weight: bold;
+        color: #3498db;
+        display: flex;
+        justify-content: space-between;
         align-items: center;
     }
 
-    .ai-schedule-item:last-child {
-        border-bottom: none;
+    .ai-schedule-task {
+        flex-grow: 1;
+        margin: 0;
+        padding: 8px;
+        background-color: #f8f9fa;
+        border-radius: 6px;
     }
 
-    .add-to-schedule-btn {
+    .ai-schedule-break {
+        font-style: italic;
+        color: #7f8c8d;
+        background-color: #f0f8ff;
+    }
+
+    .add-single-block {
         background-color: #3498db;
         color: white;
         border: none;
         border-radius: 4px;
-        padding: 4px 8px;
+        padding: 6px 12px;
         cursor: pointer;
-        font-size: 12px;
+        font-size: 14px;
+        transition: background-color 0.2s;
     }
 
-    /* Switch styling */
-    .switch {
-        position: relative;
-        display: inline-block;
-        width: 50px;
-        height: 24px;
+    .add-single-block:hover {
+        background-color: #2980b9;
     }
 
-    .switch input {
-        opacity: 0;
-        width: 0;
-        height: 0;
+    /* Toast notification */
+    .toast {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background-color: #2ecc71;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 4px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        z-index: 1000;
+        transition: opacity 0.5s;
     }
 
-    .slider {
-        position: absolute;
-        cursor: pointer;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: #ccc;
-        transition: .4s;
-        border-radius: 24px;
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+        width: 8px;
     }
 
-    .slider:before {
-        position: absolute;
-        content: "";
-        height: 16px;
-        width: 16px;
-        left: 4px;
-        bottom: 4px;
-        background-color: white;
-        transition: .4s;
-        border-radius: 50%;
+    ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 4px;
     }
 
-    input:checked + .slider {
-        background-color: #1abc9c;
+    ::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 4px;
     }
 
-    input:checked + .slider:before {
-        transform: translateX(26px);
+    ::-webkit-scrollbar-thumb:hover {
+        background: #a8a8a8;
     }
 </style>
 
@@ -320,7 +392,7 @@
         </div>
     </div>
 
-    <!-- AI Schedule Suggestions (hidden by default) -->
+    <!-- AI Schedule Suggestions -->
     <div class="ai-schedule-container" id="aiScheduleContainer" style="display: none;">
         <div class="ai-schedule-header">
             <h4>🤖 AI Suggested Schedule</h4>
@@ -334,43 +406,64 @@
 
 <script>
     // Schedule Management Functions
-    function loadSchedule() {
-        fetch('/api/schedule/', {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json',
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            const scheduleList = document.getElementById('scheduleList');
-            const noScheduleMessage = document.getElementById('noScheduleMessage');
-            
-            scheduleList.innerHTML = '';
-            
-            if (data.schedule && data.schedule.length > 0) {
-                noScheduleMessage.style.display = 'none';
-                
-                data.schedule.forEach(item => {
-                    const li = document.createElement('li');
-                    li.className = 'schedule-item';
-                    
-                    li.innerHTML = `
-                        <span class="time-range">${formatTime(item.start_time)} - ${formatTime(item.end_time)}</span>
-                        <span class="task-name">${item.task_name || 'Free Time'}</span>
-                        <span class="task-status">${item.completed ? '✅' : '⏳'}</span>
-                    `;
-                    
-                    scheduleList.appendChild(li);
-                });
-            } else {
-                noScheduleMessage.style.display = 'block';
-            }
-        })
-        .catch(error => {
-            console.error('Error loading schedule:', error);
-        });
-    }
+function formatTime(timeStr) {
+    console.log("Raw timeStr:", timeStr);
+
+    if (!timeStr) return 'Invalid Time';
+
+    const date = new Date(timeStr);
+    if (isNaN(date)) return 'Invalid Time';
+
+    let hours = date.getHours();
+    let minutes = date.getMinutes();
+
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    const formattedHour = hours % 12 || 12;
+
+    return `${formattedHour}:${minutes.toString().padStart(2, '0')} ${ampm}`;
+}
+
+function loadSchedule() {
+
+    fetch('/user/api/schedule/', {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        const scheduleList = document.getElementById('scheduleList');
+        const noScheduleMessage = document.getElementById('noScheduleMessage');
+
+        scheduleList.innerHTML = '';
+
+        if (data.schedule && data.schedule.length > 0) {
+            noScheduleMessage.style.display = 'none';
+
+            data.schedule.forEach(item => {
+                const li = document.createElement('li');
+                li.className = 'schedule-item';
+                    console.log("loadSchedule called",item.start_time); // Debug log
+                const start = formatTime(item.start_time);
+                const end = formatTime(item.end_time);
+
+                li.innerHTML = `
+                    <span class="time-range">${item.start_time} - ${item.end_time}</span>
+                    <span class="task-name">${item.task_name || 'Free Time'}</span>
+                    <span class="task-status">${item.completed ? '✅' : '⏳'}</span>
+                `;
+                scheduleList.appendChild(li);
+            });
+        } else {
+            noScheduleMessage.style.display = 'block';
+        }
+    })
+    .catch(error => {
+        console.error('Error loading schedule:', error);
+    });
+}
+
 
     function toggleScheduleEdit() {
         const view = document.getElementById('scheduleView');
@@ -389,7 +482,7 @@
     }
 
     function loadScheduleForEditing() {
-        fetch('/api/schedule/', {
+        fetch('/user/api/schedule/', {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -402,7 +495,7 @@
             
             if (data.schedule && data.schedule.length > 0) {
                 data.schedule.forEach(item => {
-                    addTimeBlock(item.start_time, item.end_time, item.task_id);
+                    addTimeBlock(item.start_time, item.end_time, item.task_id, item.task_name);
                 });
             } else {
                 // Add one empty time block by default
@@ -416,49 +509,79 @@
         });
     }
 
-    function addTimeBlock(startTime = '', endTime = '', taskId = '') {
-        const container = document.getElementById('timeBlocksContainer');
-        
-        const blockDiv = document.createElement('div');
-        blockDiv.className = 'time-block';
-        
-        blockDiv.innerHTML = `
-            <div class="time-inputs">
-                <input type="time" class="time-input start-time" value="${startTime}">
-                <span>to</span>
-                <input type="time" class="time-input end-time" value="${endTime}">
-            </div>
-            <select class="task-select">
-                <option value="">Free Time</option>
-                <!-- Tasks will be populated here -->
-            </select>
-            <button class="remove-time-block" onclick="removeTimeBlock(this)">×</button>
-        `;
-        
-        container.appendChild(blockDiv);
-        
-        // Populate tasks dropdown
-        const select = blockDiv.querySelector('.task-select');
-        if (taskId) {
-            select.value = taskId;
-        }
-        
-        // Load available tasks
-        fetch('/api/tasks/?status=pending,in_progress')
-            .then(response => response.json())
-            .then(data => {
-                data.tasks.forEach(task => {
-                    const option = document.createElement('option');
-                    option.value = task.id;
-                    option.textContent = task.title;
-                    select.appendChild(option);
-                });
-                
-                if (taskId) {
-                    select.value = taskId;
-                }
-            });
+    const allTasks = [
+        {% for task_data in tasks_with_suggestions %}
+            {
+                id: "{{ task_data.task.id }}",
+                title: "{{ task_data.task.title|escapejs }}"
+            }{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ];
+
+ function addTimeBlock(startTime = '', endTime = '', taskId = '', taskName = '') {
+    const container = document.getElementById('timeBlocksContainer');
+
+    const blockDiv = document.createElement('div');
+    blockDiv.className = 'time-block';
+
+    blockDiv.innerHTML = `
+        <div class="time-inputs">
+            <input type="time" class="time-input start-time" value="${startTime}">
+            <span>to</span>
+            <input type="time" class="time-input end-time" value="${endTime}">
+        </div>
+        <select class="task-select">
+            <option value="">Free Time</option>
+            <!-- Existing task options will be inserted here -->
+            <option value="new">➕ New Task Title...</option>
+        </select>
+        <input type="text" class="task-name-input" placeholder="New Task Title" style="display:none;">
+        <button class="remove-time-block" onclick="removeTimeBlock(this)">×</button>
+    `;
+
+    container.appendChild(blockDiv);
+
+    const select = blockDiv.querySelector('.task-select');
+    const input = blockDiv.querySelector('.task-name-input');
+
+    // Populate select dropdown with allTasks
+    allTasks.forEach(task => {
+        const option = document.createElement('option');
+        option.value = task.id;
+        option.textContent = task.title;
+        select.insertBefore(option, select.querySelector('option[value="new"]'));
+    });
+
+    // Set initial values
+    if (taskId) {
+        select.value = taskId;
+        input.style.display = 'inline-block';
+        input.value = taskName || (allTasks.find(t => t.id == taskId)?.title || '');
+    } else if (taskName) {
+        select.value = 'new';
+        input.style.display = 'inline-block';
+        input.value = taskName;
     }
+
+    // On dropdown change
+    select.addEventListener('change', () => {
+        if (select.value === 'new') {
+            input.style.display = 'inline-block';
+            input.value = '';
+            input.focus();
+        } else if (select.value === '') {
+            input.style.display = 'none';
+            input.value = '';
+        } else {
+            input.style.display = 'inline-block';
+            input.value = select.options[select.selectedIndex].textContent;
+        }
+    });
+}
+
+
+
+
 
     function removeTimeBlock(button) {
         const block = button.closest('.time-block');
@@ -478,18 +601,22 @@
         timeBlocks.forEach(block => {
             const startTime = block.querySelector('.start-time').value;
             const endTime = block.querySelector('.end-time').value;
-            const taskId = block.querySelector('.task-select').value;
+            const taskSelect = block.querySelector('.task-select');
+            const taskId = taskSelect ? taskSelect.value : '';
+            const taskNameInput = block.querySelector('.task-name-input');
+            const taskName = taskNameInput ? taskNameInput.value : '';
             
             if (startTime && endTime) {
                 schedule.push({
                     start_time: startTime,
                     end_time: endTime,
-                    task_id: taskId || null
+                    task_id: taskId || null,
+                    task_name: taskName || null
                 });
             }
         });
         
-        fetch('/api/schedule/', {
+        fetch('/user/api/schedule/save/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -502,6 +629,7 @@
             if (data.status === 'success') {
                 toggleScheduleEdit();
                 loadSchedule();
+                showToast('Schedule saved successfully!');
             } else {
                 alert('Error saving schedule: ' + (data.message || 'Unknown error'));
             }
@@ -523,16 +651,43 @@
         return `${hour12}:${minutes} ${ampm}`;
     }
 
-    // AI Schedule Functions
+    function convertTo24HourFormat(timeStr) {
+        if (!timeStr) return '';
+        
+        // Check if it's already in 24-hour format
+        if (timeStr.includes(':')) {
+            const [hours, minutes] = timeStr.split(':');
+            if (hours.length === 2 && minutes.length === 2) {
+                return timeStr;
+            }
+        }
+        
+        // Convert from 12-hour format
+        const time = timeStr.trim();
+        const period = time.slice(-2).toUpperCase();
+        let [hours, minutes] = time.slice(0, -2).split(':');
+        
+        hours = parseInt(hours);
+        minutes = minutes || '00';
+        
+        if (period === 'PM' && hours < 12) {
+            hours += 12;
+        } else if (period === 'AM' && hours === 12) {
+            hours = 0;
+        }
+        
+        return `${hours.toString().padStart(2, '0')}:${minutes}`;
+    }
+
     function toggleAISchedule() {
         const toggle = document.getElementById('aiScheduleToggle');
-        const aiContainer = document.getElementById('aiScheduleContainer');
+        const container = document.getElementById('aiScheduleContainer');
         
         if (toggle.checked) {
-            aiContainer.style.display = 'block';
-            loadAISuggestions();
+            container.style.display = 'block';
+            generateAISchedule();
         } else {
-            aiContainer.style.display = 'none';
+            container.style.display = 'none';
         }
     }
 
@@ -540,7 +695,7 @@
         const aiList = document.getElementById('aiScheduleList');
         aiList.innerHTML = '<li>Generating AI schedule suggestions...</li>';
         
-        fetch('/api/ai-schedule/', {
+        fetch('/api/daily-schedule/', {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -548,7 +703,11 @@
         })
         .then(response => response.json())
         .then(data => {
-            loadAISuggestions();
+            if (data.status === 'success') {
+                parseAndDisplayAISchedule(data.schedule);
+            } else {
+                aiList.innerHTML = '<li>Error generating suggestions: ' + (data.message || 'Unknown error') + '</li>';
+            }
         })
         .catch(error => {
             console.error('Error generating AI schedule:', error);
@@ -556,84 +715,181 @@
         });
     }
 
-    function loadAISuggestions() {
-        const aiList = document.getElementById('aiScheduleList');
-        aiList.innerHTML = '<li>Loading AI suggestions...</li>';
-        
-        fetch('/api/ai-schedule/', {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json',
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            aiList.innerHTML = '';
-            
-            if (data.suggestions && data.suggestions.length > 0) {
-                data.suggestions.forEach(suggestion => {
-                    const li = document.createElement('li');
-                    li.className = 'ai-schedule-item';
-                    
-                    li.innerHTML = `
-                        <span class="time-range">${formatTime(suggestion.start_time)} - ${formatTime(suggestion.end_time)}</span>
-                        <span class="task-name">${suggestion.task_name}</span>
-                        <button class="add-to-schedule-btn" onclick="addAISuggestionToSchedule('${suggestion.start_time}', '${suggestion.end_time}', '${suggestion.task_id}')">
-                            Add
-                        </button>
-                    `;
-                    
-                    aiList.appendChild(li);
-                });
-            } else {
-                aiList.innerHTML = '<li>No AI suggestions available. Click "AI Daily Plan" to generate some.</li>';
-            }
-        })
-        .catch(error => {
-            console.error('Error loading AI suggestions:', error);
-            aiList.innerHTML = '<li>Error loading suggestions</li>';
-        });
+function parseAndDisplayAISchedule(scheduleText) {
+    const aiList = document.getElementById('aiScheduleList');
+    aiList.innerHTML = '';
+
+    if (!scheduleText) {
+        aiList.innerHTML = '<li>No schedule generated</li>';
+        return;
     }
 
-    function addAISuggestionToSchedule(startTime, endTime, taskId) {
-        // Add to the manual schedule editor
-        addTimeBlock(startTime, endTime, taskId);
+    // Split the schedule into lines
+    const scheduleLines = scheduleText.split('\n');
+
+    if (scheduleLines.length === 0) {
+        aiList.innerHTML = '<li>No schedule items found</li>';
+        return;
+    }
+
+    scheduleLines.forEach(line => {
+        if (!line.trim()) return;
+
+        const li = document.createElement('li');
+        li.className = 'ai-schedule-item';
+
+        // Check if this is a break item
+        const isBreak = line.toLowerCase().includes('break') || 
+                        line.toLowerCase().includes('lunch') || 
+                        line.toLowerCase().includes('dinner') ||
+                        line.toLowerCase().includes('meal');
+
+        // Parse time and task using last colon
+        const timeSeparatorIndex = line.lastIndexOf(':');
+        const timeRange = timeSeparatorIndex !== -1 ? line.substring(0, timeSeparatorIndex).trim() : '';
+        const task = timeSeparatorIndex !== -1 ? line.substring(timeSeparatorIndex + 1).trim() : line.trim();
+
+        // Parse start and end times
+        let startTime = '';
+        let endTime = '';
+        if (timeRange) {
+            const times = timeRange.split('-');
+            if (times.length === 2) {
+                startTime = convertTo24HourFormat(times[0].trim());
+                endTime = convertTo24HourFormat(times[1].trim());
+            }
+        }
+
+        li.innerHTML = `
+            <div class="ai-schedule-time">
+                <span>${timeRange || 'All day'}</span>
+                ${startTime && endTime ? `
+                    <button class="add-single-block" 
+                            onclick="addAISuggestionToSchedule('${startTime}', '${endTime}', '${escapeHtml(task)}')">
+                        Add to Schedule
+                    </button>
+                ` : ''}
+            </div>
+            <div class="ai-schedule-task ${isBreak ? 'ai-schedule-break' : ''}">${escapeHtml(task)}</div>
+        `;
+
+        aiList.appendChild(li);
+    });
+}
+
+// Helper: Convert 12-hour format to 24-hour
+function convertTo24HourFormat(timeStr) {
+    try {
+        const [time, modifier] = timeStr.toUpperCase().split(' ');
+        let [hours, minutes] = time.split(':').map(Number);
+
+        if (modifier === 'PM' && hours !== 12) hours += 12;
+        if (modifier === 'AM' && hours === 12) hours = 0;
+
+        return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+    } catch (e) {
+        return '';
+    }
+}
+
+// Helper: Escape HTML to prevent XSS
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.innerText = text;
+    return div.innerHTML;
+}
+
+
+    function addAISuggestionToSchedule(startTime, endTime, taskName) {
+        // First, ensure the edit view is visible
+        const editView = document.getElementById('scheduleEdit');
+        if (editView.style.display === 'none') {
+            toggleScheduleEdit();
+        }
         
-        // Optionally scroll to the added block
+        // Add the new time block
+        addTimeBlock(startTime, endTime, '', taskName);
+        
+        // Scroll to the newly added block
         const container = document.getElementById('timeBlocksContainer');
         container.scrollTop = container.scrollHeight;
+        
+        // Highlight the new block temporarily
+        const blocks = document.querySelectorAll('.time-block');
+        const newBlock = blocks[blocks.length - 1];
+        newBlock.style.backgroundColor = '#e8f4fc';
+        setTimeout(() => {
+            newBlock.style.backgroundColor = '';
+        }, 2000);
+        
+        // Show success message
+        const formattedStart = formatTime(startTime);
+        const formattedEnd = formatTime(endTime);
+        showToast(`Added "${truncateText(taskName, 30)}" (${formattedStart} - ${formattedEnd}) to your schedule`);
     }
 
     function addAllAISuggestions() {
-        fetch('/api/ai-schedule/', {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json',
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.suggestions && data.suggestions.length > 0) {
-                // Clear existing blocks first
-                document.getElementById('timeBlocksContainer').innerHTML = '';
+        const items = document.querySelectorAll('.ai-schedule-item');
+        let addedCount = 0;
+        
+        items.forEach(item => {
+            const timeRange = item.querySelector('.ai-schedule-time span').textContent;
+            const task = item.querySelector('.ai-schedule-task').textContent;
+            const isBreak = item.querySelector('.ai-schedule-task').classList.contains('ai-schedule-break');
+            
+            if (timeRange && timeRange.includes('-') && !isBreak) {
+                const [startPart, endPart] = timeRange.split('-');
+                const startTime = convertTo24HourFormat(startPart.trim());
+                const endTime = convertTo24HourFormat(endPart.trim());
                 
-                // Add all AI suggestions
-                data.suggestions.forEach(suggestion => {
-                    addTimeBlock(suggestion.start_time, suggestion.end_time, suggestion.task_id);
-                });
-                
-                // Show success message
-                alert(`Added ${data.suggestions.length} time blocks to your schedule`);
+                if (startTime && endTime) {
+                    addAISuggestionToSchedule(startTime, endTime, task);
+                    addedCount++;
+                }
             }
-        })
-        .catch(error => {
-            console.error('Error adding all suggestions:', error);
         });
+        
+        showToast(`Added ${addedCount} items to your schedule`);
     }
 
-    // Utility function to get CSRF token
+    // Helper function to escape HTML for safe insertion
+    function escapeHtml(unsafe) {
+        return unsafe
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+    // Helper function to truncate text
+    function truncateText(text, maxLength) {
+        return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+    }
+
+    // Helper function to show toast notifications
+    function showToast(message) {
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.textContent = message;
+        
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            setTimeout(() => {
+                document.body.removeChild(toast);
+            }, 500);
+        }, 3000);
+    }
+
+    // Helper function to get CSRF token
     function getCSRFToken() {
-        return document.querySelector('[name=csrfmiddlewaretoken]').value;
+        const cookieValue = document.cookie
+            .split('; ')
+            .find(row => row.startsWith('csrftoken='))
+            ?.split('=')[1];
+        return cookieValue || '';
     }
 
     // Load schedule when page loads

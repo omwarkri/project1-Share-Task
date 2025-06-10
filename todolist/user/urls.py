@@ -26,5 +26,7 @@ urlpatterns = [
     path('api/daily-challenges/', views.get_daily_challenges, name='daily-challenges'),
     path('api/accept-challenge/', views.accept_challenge, name='accept-challenge'),
     path('api/update-challenge-progress/', views.update_challenge_progress, name='update_challenge_progress'),
+     path('api/schedule/', views.get_schedule, name='get_schedule'),
+    path('api/schedule/save/', views.save_schedule, name='save_schedule'),
    
 ]

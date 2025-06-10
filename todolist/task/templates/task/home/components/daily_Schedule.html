@@ -1,0 +1,605 @@
+<!-- Daily Schedule Section -->
+<style>
+    /* Schedule Styles */
+    .schedule-container {
+        background-color: #ffffff;
+        border-radius: 12px;
+        padding: 20px;
+        margin: 20px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .schedule-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+
+    .schedule-header h3 {
+        margin: 0;
+        color: #2c3e50;
+    }
+
+    .schedule-controls {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .edit-schedule-btn, .ai-schedule-btn {
+        background: none;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 5px 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .edit-schedule-btn:hover, .ai-schedule-btn:hover {
+        background-color: #f8f9fa;
+    }
+
+    .ai-toggle {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .ai-toggle-label {
+        font-size: 14px;
+        color: #555;
+    }
+
+    .schedule-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .schedule-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 15px;
+        border-bottom: 1px solid #eee;
+        align-items: center;
+    }
+
+    .schedule-item:last-child {
+        border-bottom: none;
+    }
+
+    .time-range {
+        font-weight: bold;
+        color: #3498db;
+        min-width: 120px;
+    }
+
+    .task-name {
+        flex-grow: 1;
+        margin: 0 15px;
+    }
+
+    .time-block {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+        gap: 10px;
+    }
+
+    .time-inputs {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .time-input {
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        width: 70px;
+    }
+
+    .task-select {
+        flex-grow: 1;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+    }
+
+    .remove-time-block {
+        background: none;
+        border: none;
+        color: #e74c3c;
+        cursor: pointer;
+        font-size: 18px;
+    }
+
+    .add-time-block {
+        width: 100%;
+        padding: 10px;
+        background-color: #f8f9fa;
+        border: 1px dashed #ddd;
+        border-radius: 8px;
+        margin-bottom: 15px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .add-time-block:hover {
+        background-color: #e9ecef;
+    }
+
+    .schedule-edit-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+    }
+
+    .save-schedule, .cancel-edit {
+        padding: 8px 16px;
+        border-radius: 8px;
+        cursor: pointer;
+        border: none;
+    }
+
+    .save-schedule {
+        background-color: #2ecc71;
+        color: white;
+    }
+
+    .cancel-edit {
+        background-color: #e74c3c;
+        color: white;
+    }
+
+    .no-schedule {
+        text-align: center;
+        padding: 20px;
+        color: #7f8c8d;
+    }
+
+    /* AI Schedule Suggestions */
+    .ai-schedule-container {
+        margin-top: 20px;
+        padding: 15px;
+        background-color: #f9f9f9;
+        border-radius: 8px;
+        border: 1px solid #eee;
+    }
+
+    .ai-schedule-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .ai-schedule-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .ai-schedule-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 12px;
+        border-bottom: 1px solid #e0e0e0;
+        align-items: center;
+    }
+
+    .ai-schedule-item:last-child {
+        border-bottom: none;
+    }
+
+    .add-to-schedule-btn {
+        background-color: #3498db;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 4px 8px;
+        cursor: pointer;
+        font-size: 12px;
+    }
+
+    /* Switch styling */
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 50px;
+        height: 24px;
+    }
+
+    .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        transition: .4s;
+        border-radius: 24px;
+    }
+
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 16px;
+        width: 16px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        transition: .4s;
+        border-radius: 50%;
+    }
+
+    input:checked + .slider {
+        background-color: #1abc9c;
+    }
+
+    input:checked + .slider:before {
+        transform: translateX(26px);
+    }
+</style>
+
+<div class="schedule-container">
+    <div class="schedule-header">
+        <h3>📅 Daily Schedule</h3>
+        <div class="schedule-controls">
+            <div class="ai-toggle">
+                <span class="ai-toggle-label">AI Suggestions</span>
+                <label class="switch">
+                    <input type="checkbox" id="aiScheduleToggle" onchange="toggleAISchedule()">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <button class="edit-schedule-btn" onclick="toggleScheduleEdit()">✏️ Edit</button>
+            <button class="ai-schedule-btn" onclick="generateAISchedule()">🤖 AI Daily Plan</button>
+        </div>
+    </div>
+    
+    <div class="schedule-view" id="scheduleView">
+        <div class="no-schedule" id="noScheduleMessage">No schedule set for today.</div>
+        <ul class="schedule-list" id="scheduleList"></ul>
+    </div>
+    
+    <div class="schedule-edit" id="scheduleEdit" style="display: none;">
+        <div class="time-block-container" id="timeBlocksContainer">
+            <!-- Time blocks will be added here -->
+        </div>
+        <button class="add-time-block" onclick="addTimeBlock()">➕ Add Time Block</button>
+        <div class="schedule-edit-actions">
+            <button class="save-schedule" onclick="saveSchedule()">💾 Save</button>
+            <button class="cancel-edit" onclick="toggleScheduleEdit()">❌ Cancel</button>
+        </div>
+    </div>
+
+    <!-- AI Schedule Suggestions (hidden by default) -->
+    <div class="ai-schedule-container" id="aiScheduleContainer" style="display: none;">
+        <div class="ai-schedule-header">
+            <h4>🤖 AI Suggested Schedule</h4>
+            <button class="add-all-btn" onclick="addAllAISuggestions()">Add All to Schedule</button>
+        </div>
+        <ul class="ai-schedule-list" id="aiScheduleList">
+            <!-- AI suggestions will be loaded here -->
+        </ul>
+    </div>
+</div>
+
+<script>
+    // Schedule Management Functions
+    function loadSchedule() {
+        fetch('/api/schedule/', {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            const scheduleList = document.getElementById('scheduleList');
+            const noScheduleMessage = document.getElementById('noScheduleMessage');
+            
+            scheduleList.innerHTML = '';
+            
+            if (data.schedule && data.schedule.length > 0) {
+                noScheduleMessage.style.display = 'none';
+                
+                data.schedule.forEach(item => {
+                    const li = document.createElement('li');
+                    li.className = 'schedule-item';
+                    
+                    li.innerHTML = `
+                        <span class="time-range">${formatTime(item.start_time)} - ${formatTime(item.end_time)}</span>
+                        <span class="task-name">${item.task_name || 'Free Time'}</span>
+                        <span class="task-status">${item.completed ? '✅' : '⏳'}</span>
+                    `;
+                    
+                    scheduleList.appendChild(li);
+                });
+            } else {
+                noScheduleMessage.style.display = 'block';
+            }
+        })
+        .catch(error => {
+            console.error('Error loading schedule:', error);
+        });
+    }
+
+    function toggleScheduleEdit() {
+        const view = document.getElementById('scheduleView');
+        const edit = document.getElementById('scheduleEdit');
+        
+        if (edit.style.display === 'none') {
+            // Switching to edit mode - load current schedule
+            view.style.display = 'none';
+            edit.style.display = 'block';
+            loadScheduleForEditing();
+        } else {
+            // Switching back to view mode
+            view.style.display = 'block';
+            edit.style.display = 'none';
+        }
+    }
+
+    function loadScheduleForEditing() {
+        fetch('/api/schedule/', {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            const container = document.getElementById('timeBlocksContainer');
+            container.innerHTML = '';
+            
+            if (data.schedule && data.schedule.length > 0) {
+                data.schedule.forEach(item => {
+                    addTimeBlock(item.start_time, item.end_time, item.task_id);
+                });
+            } else {
+                // Add one empty time block by default
+                addTimeBlock();
+            }
+        })
+        .catch(error => {
+            console.error('Error loading schedule for editing:', error);
+            // Add one empty time block if there's an error
+            addTimeBlock();
+        });
+    }
+
+    function addTimeBlock(startTime = '', endTime = '', taskId = '') {
+        const container = document.getElementById('timeBlocksContainer');
+        
+        const blockDiv = document.createElement('div');
+        blockDiv.className = 'time-block';
+        
+        blockDiv.innerHTML = `
+            <div class="time-inputs">
+                <input type="time" class="time-input start-time" value="${startTime}">
+                <span>to</span>
+                <input type="time" class="time-input end-time" value="${endTime}">
+            </div>
+            <select class="task-select">
+                <option value="">Free Time</option>
+                <!-- Tasks will be populated here -->
+            </select>
+            <button class="remove-time-block" onclick="removeTimeBlock(this)">×</button>
+        `;
+        
+        container.appendChild(blockDiv);
+        
+        // Populate tasks dropdown
+        const select = blockDiv.querySelector('.task-select');
+        if (taskId) {
+            select.value = taskId;
+        }
+        
+        // Load available tasks
+        fetch('/api/tasks/?status=pending,in_progress')
+            .then(response => response.json())
+            .then(data => {
+                data.tasks.forEach(task => {
+                    const option = document.createElement('option');
+                    option.value = task.id;
+                    option.textContent = task.title;
+                    select.appendChild(option);
+                });
+                
+                if (taskId) {
+                    select.value = taskId;
+                }
+            });
+    }
+
+    function removeTimeBlock(button) {
+        const block = button.closest('.time-block');
+        block.remove();
+        
+        // If this was the last block, add a new empty one
+        const container = document.getElementById('timeBlocksContainer');
+        if (container.children.length === 0) {
+            addTimeBlock();
+        }
+    }
+
+    function saveSchedule() {
+        const timeBlocks = document.querySelectorAll('.time-block');
+        const schedule = [];
+        
+        timeBlocks.forEach(block => {
+            const startTime = block.querySelector('.start-time').value;
+            const endTime = block.querySelector('.end-time').value;
+            const taskId = block.querySelector('.task-select').value;
+            
+            if (startTime && endTime) {
+                schedule.push({
+                    start_time: startTime,
+                    end_time: endTime,
+                    task_id: taskId || null
+                });
+            }
+        });
+        
+        fetch('/api/schedule/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCSRFToken(),
+            },
+            body: JSON.stringify({ schedule })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                toggleScheduleEdit();
+                loadSchedule();
+            } else {
+                alert('Error saving schedule: ' + (data.message || 'Unknown error'));
+            }
+        })
+        .catch(error => {
+            console.error('Error saving schedule:', error);
+            alert('Error saving schedule');
+        });
+    }
+
+    function formatTime(timeString) {
+        if (!timeString) return '';
+        
+        const [hours, minutes] = timeString.split(':');
+        const hour = parseInt(hours);
+        const ampm = hour >= 12 ? 'PM' : 'AM';
+        const hour12 = hour % 12 || 12;
+        
+        return `${hour12}:${minutes} ${ampm}`;
+    }
+
+    // AI Schedule Functions
+    function toggleAISchedule() {
+        const toggle = document.getElementById('aiScheduleToggle');
+        const aiContainer = document.getElementById('aiScheduleContainer');
+        
+        if (toggle.checked) {
+            aiContainer.style.display = 'block';
+            loadAISuggestions();
+        } else {
+            aiContainer.style.display = 'none';
+        }
+    }
+
+    function generateAISchedule() {
+        const aiList = document.getElementById('aiScheduleList');
+        aiList.innerHTML = '<li>Generating AI schedule suggestions...</li>';
+        
+        fetch('/api/ai-schedule/', {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            loadAISuggestions();
+        })
+        .catch(error => {
+            console.error('Error generating AI schedule:', error);
+            aiList.innerHTML = '<li>Error generating suggestions</li>';
+        });
+    }
+
+    function loadAISuggestions() {
+        const aiList = document.getElementById('aiScheduleList');
+        aiList.innerHTML = '<li>Loading AI suggestions...</li>';
+        
+        fetch('/api/ai-schedule/', {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            aiList.innerHTML = '';
+            
+            if (data.suggestions && data.suggestions.length > 0) {
+                data.suggestions.forEach(suggestion => {
+                    const li = document.createElement('li');
+                    li.className = 'ai-schedule-item';
+                    
+                    li.innerHTML = `
+                        <span class="time-range">${formatTime(suggestion.start_time)} - ${formatTime(suggestion.end_time)}</span>
+                        <span class="task-name">${suggestion.task_name}</span>
+                        <button class="add-to-schedule-btn" onclick="addAISuggestionToSchedule('${suggestion.start_time}', '${suggestion.end_time}', '${suggestion.task_id}')">
+                            Add
+                        </button>
+                    `;
+                    
+                    aiList.appendChild(li);
+                });
+            } else {
+                aiList.innerHTML = '<li>No AI suggestions available. Click "AI Daily Plan" to generate some.</li>';
+            }
+        })
+        .catch(error => {
+            console.error('Error loading AI suggestions:', error);
+            aiList.innerHTML = '<li>Error loading suggestions</li>';
+        });
+    }
+
+    function addAISuggestionToSchedule(startTime, endTime, taskId) {
+        // Add to the manual schedule editor
+        addTimeBlock(startTime, endTime, taskId);
+        
+        // Optionally scroll to the added block
+        const container = document.getElementById('timeBlocksContainer');
+        container.scrollTop = container.scrollHeight;
+    }
+
+    function addAllAISuggestions() {
+        fetch('/api/ai-schedule/', {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.suggestions && data.suggestions.length > 0) {
+                // Clear existing blocks first
+                document.getElementById('timeBlocksContainer').innerHTML = '';
+                
+                // Add all AI suggestions
+                data.suggestions.forEach(suggestion => {
+                    addTimeBlock(suggestion.start_time, suggestion.end_time, suggestion.task_id);
+                });
+                
+                // Show success message
+                alert(`Added ${data.suggestions.length} time blocks to your schedule`);
+            }
+        })
+        .catch(error => {
+            console.error('Error adding all suggestions:', error);
+        });
+    }
+
+    // Utility function to get CSRF token
+    function getCSRFToken() {
+        return document.querySelector('[name=csrfmiddlewaretoken]').value;
+    }
+
+    // Load schedule when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        loadSchedule();
+    });
+</script>

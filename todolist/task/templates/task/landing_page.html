@@ -260,16 +260,22 @@
     /* SECTIONS */
     /* ==================== */
 .demo {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50'%3E%3Ccircle cx='10' cy='10' r='2' fill='gray'/%3E%3Ccircle cx='40' cy='10' r='2' fill='gray'/%3E%3Ccircle cx='10' cy='40' r='2' fill='gray'/%3E%3Ccircle cx='40' cy='40' r='2' fill='gray'/%3E%3Cpath d='M10 10 L40 40 M40 10 L10 40' stroke='gray' stroke-width='1' fill='none'/%3E%3C/svg%3E");
-  background-repeat: repeat;
-  background-size: 50px 50px;
+  /* Layer 1: SVG pattern */
+  background-image: 
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50'%3E%3Ccircle cx='10' cy='10' r='2' fill='gray'/%3E%3Ccircle cx='40' cy='10' r='2' fill='gray'/%3E%3Ccircle cx='10' cy='40' r='2' fill='gray'/%3E%3Ccircle cx='40' cy='40' r='2' fill='gray'/%3E%3Cpath d='M10 10 L40 40 M40 10 L10 40' stroke='gray' stroke-width='1' fill='none'/%3E%3C/svg%3E"),
+    
+    /* Layer 2: Gradient mask from dark → transparent → dark */
+    linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 40%, rgba(0,0,0,0) 60%, rgba(0,0,0,1) 100%);
 
+  background-blend-mode: multiply;
+  background-repeat: repeat;
+  background-size: 50px 50px, 100% 100%;
 
   padding: 6rem 1rem 8rem;
   position: relative;
   overflow: hidden;
-
 }
+
 
 @keyframes hypnoticMove {
   0% {
@@ -322,6 +328,7 @@
     padding: 4rem 0;
     position: relative;
     overflow: hidden;
+    padding: 80px ;
   }
 
   .feature-cards-container {
@@ -620,93 +627,70 @@
       color: var(--dark);
     }
 
-    /* Feature Cards */
-    .feature-cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 2rem;
-      max-width: 1200px;
-      margin: 0 auto;
-      position: relative;
-      z-index: 1;
-    }
+    .slider-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+  }
 
-    .feature-card {
-      background: var(--card-bg);
-      border: 1px solid rgba(0, 0, 0, 0.05);
-      box-shadow: 
-        0 5px 15px rgba(0, 0, 0, 0.03),
-        inset 0 1px 0 rgba(255, 255, 255, 0.8);
-      border-radius: 16px;
-      padding: 2.5rem;
-      text-align: center;
-      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      position: relative;
-      overflow: hidden;
-      opacity: 0;
-      transform: translateY(30px);
-    }
+  .feature-cards-scroll {
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none;  /* IE 10+ */
+  }
 
-    .feature-card.animate-in {
-      animation: fadeInUp 0.8s ease-out forwards;
-    }
+  .feature-cards-scroll::-webkit-scrollbar {
+    display: none; /* Chrome, Safari */
+  }
 
-    .feature-card:hover {
-      background: white;
-      transform: translateY(-15px) scale(1.02);
-      box-shadow: 
-        0 15px 30px rgba(0, 0, 0, 0.1),
-        inset 0 1px 0 rgba(255, 255, 255, 0.9);
-    }
+  .feature-cards {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem 0;
+  }
 
-    .feature-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 6px;
-      height: 0;
-      background: linear-gradient(to bottom, var(--primary), var(--accent));
-      transition: height 0.6s ease;
-    }
+  .feature-card {
+    flex: 0 0 300px;
+    background: #fff;
+    border-radius: 8px;
+    padding: 1rem;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
 
-    .feature-card:hover::before {
-      height: 100%;
-    }
+  .feature-card img {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    margin-bottom: 1rem;
+  }
 
-    .feature-card img {
-      width: 70px;
-      height: 70px;
-      margin-bottom: 2rem;
-      transition: all 0.4s ease;
-      filter: drop-shadow(0 5px 10px rgba(0,0,0,0.1));
-    }
+  .slider-btn {
+    background: rgba(0, 0, 0, 0.5);
+    border: none;
+    color: #fff;
+    font-size: 2rem;
+    cursor: pointer;
+    padding: 0.5rem 1rem;
+    z-index: 1;
+  }
 
-    .feature-card:hover img {
-      transform: scale(1.15) rotate(5deg);
-      filter: drop-shadow(0 10px 20px rgba(0,0,0,0.2));
-    }
+  .slider-btn:hover {
+    background: rgba(0, 0, 0, 0.7);
+  }
 
-    .feature-card h3 {
-      font-size: 1.5rem;
-      margin-bottom: 1.5rem;
-      position: relative;
-      z-index: 2;
-      font-weight: 700;
-    }
+  .prev {
+    position: absolute;
+    left: 0;
+  }
 
-    .feature-card p {
-      color: var(--dark-gray);
-      font-size: 1.1rem;
-      position: relative;
-      z-index: 2;
-      line-height: 1.7;
-      transition: color 0.3s ease;
-    }
-
-    .feature-card:hover p {
-      color: var(--dark);
-    }
+  .next {
+    position: absolute;
+    right: 0;
+  }
 
     /* Slideshow Container */
     .slideshow-container {
@@ -922,10 +906,28 @@
       }
 
 
-      .demo{
-          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Cpath d='M0,20 L10,10 L20,30 L30,10 L40,20' stroke='rgba(0, 0, 0, 0.1)' stroke-width='1' fill='none'/%3E%3C/svg%3E");
+
+.demo {
+  background-image: 
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50'%3E%3Ccircle cx='10' cy='10' r='2' fill='%23ccc'/%3E%3Ccircle cx='40' cy='10' r='2' fill='%23ccc'/%3E%3Ccircle cx='10' cy='40' r='2' fill='%23ccc'/%3E%3Ccircle cx='40' cy='40' r='2' fill='%23ccc'/%3E%3Cpath d='M10 10 L40 40 M40 10 L10 40' stroke='%23ccc' stroke-width='1' fill='none'/%3E%3C/svg%3E"),
+    linear-gradient(to right, 
+  rgba(194, 194, 194, 1) 0%,    /* Dark gray on left */
+  rgba(194, 194, 194, 0) 25%,   /* Transparent at 25% */
+  rgba(194, 194, 194, 0) 75%,   /* Transparent at 75% */
+  rgba(194, 194, 194, 1) 100%   /* Dark gray on right */
+);
+
+  
+  background-blend-mode: multiply;
   background-repeat: repeat;
-      }
+  background-size: 50px 50px, 100% 100%;
+  
+  padding: 6rem 1rem 8rem;
+  position: relative;
+  overflow: hidden;
+}
+
+
       
    
       
@@ -995,13 +997,16 @@
     </div>
   </section>
 
-  <!-- Features Section -->
+
+
+
 <section class="features">
   <h2 class="section-title">Why Choose Share Task?</h2>
-  <div class="feature-cards-container">
+  <div class="slider-wrapper">
+    <button class="slider-btn prev">&#10094;</button>
     <div class="feature-cards-scroll">
       <div class="feature-cards">
-        <div class="feature-card">
+              <div class="feature-card">
           <img src="https://res.cloudinary.com/ddw1upvx3/image/upload/v1741984457/share-task-media/symbols/h8ltxmmafnbigqckimmy.png" alt="AI Assistance">
           <h3>Smart AI Assistance</h3>
           <p>Get intelligent task breakdowns and personalized recommendations to optimize your workflow.</p>
@@ -1043,6 +1048,7 @@
         </div>
       </div>
     </div>
+    <button class="slider-btn next">&#10095;</button>
   </div>
 </section>
   <!-- How It Works Section -->
@@ -1245,6 +1251,31 @@
         });
       });
     });
+
+      const cardsContainer = document.querySelector('.feature-cards');
+  const totalCards = document.querySelectorAll('.feature-card').length;
+  const prevBtn = document.querySelector('.prev');
+  const nextBtn = document.querySelector('.next');
+  let currentIndex = 0;
+
+  function updateSlider() {
+    const offset = currentIndex * -100;
+    cardsContainer.style.transform = `translateX(${offset}%)`;
+  }
+
+  prevBtn.addEventListener('click', () => {
+    if (currentIndex > 0) {
+      currentIndex--;
+      updateSlider();
+    }
+  });
+
+  nextBtn.addEventListener('click', () => {
+    if (currentIndex < totalCards - 1) {
+      currentIndex++;
+      updateSlider();
+    }
+  });
   </script>
 </body>
 </html>

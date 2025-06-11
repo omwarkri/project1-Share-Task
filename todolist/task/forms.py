@@ -115,31 +115,28 @@ class TeamForm(forms.ModelForm):
 class AddMemberForm(forms.Form):
     user = forms.ModelChoiceField(queryset=CustomUser.objects.all(), label="Select User")
 
-
-
 class TaskForm(forms.ModelForm):
-    class Meta:
-        model = Task
-        fields = ['title', 'description', 'due_date', 'priority', 'category', 'status', 'dependencies','is_daily']
-        widgets = {
-            'title': forms.TextInput(attrs={}),  # Ensure empty attrs
-            'due_date': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
-        }
-
-
-    def __init__(self, *args, **kwargs):
-        user = kwargs.pop('user', None)  # Get the current user from kwargs
-        super().__init__(*args, **kwargs)
-
-        # Filter dependencies to only include tasks for the current user
-        if user:
-            self.fields['dependencies'].queryset = Task.objects.filter(user=user)
-
     dependencies = forms.ModelMultipleChoiceField(
         queryset=Task.objects.none(),  # Start with an empty queryset
         widget=forms.CheckboxSelectMultiple,
         required=False,
     )
+
+    class Meta:
+        model = Task
+        fields = ['title', 'description', 'due_date', 'priority', 'category', 'status', 'dependencies', 'is_daily']
+        widgets = {
+            'title': forms.TextInput(attrs={}),
+            'due_date': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)  # Get user from kwargs
+        super().__init__(*args, **kwargs)
+
+        # Only show the user's tasks as dependency options
+        if user:
+            self.fields['dependencies'].queryset = Task.objects.filter(user=user)
 
 
 

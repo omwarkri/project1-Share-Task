@@ -484,14 +484,21 @@ import json
 from .models import Task
 
 from django.shortcuts import render, redirect
-from .forms import TaskForm  # Import your TaskForm
+from .forms import TaskForm
 
 def add_task(request):
     if request.method == "POST":
-        form = TaskForm(request.POST)
+        form = TaskForm(request.POST, user=request.user)  # Pass user
         if form.is_valid():
-            form.save()  # Save the task to the database
-            return redirect('home')  # Redirect to the task list view after saving
+            task = form.save(commit=False)  # Don't save to DB yet
+            task.user = request.user       # Assign the current user
+            task.save()
+            form.save_m2m()  # Save many-to-many relationships like dependencies
+            return redirect('home')
+    else:
+        form = TaskForm(user=request.user)  # Pass user to the form
+    return render(request, 'add_task.html', {'form': form})
+
 
 
 

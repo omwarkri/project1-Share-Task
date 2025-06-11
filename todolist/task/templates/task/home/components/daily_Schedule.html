@@ -358,6 +358,28 @@
     ::-webkit-scrollbar-thumb:hover {
         background: #a8a8a8;
     }
+
+    @media (min-width: 600px) {
+  .time-block {
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .time-inputs {
+    flex: 1 1 200px;
+  }
+
+  .task-select,
+  .task-name-input {
+    flex: 1 1 200px;
+  }
+
+  .remove-time-block {
+    margin-left: auto;
+    margin-top: 0;
+  }
+}
 </style>
 
 <div class="schedule-container">

@@ -250,20 +250,30 @@ generativeai.configure(api_key="AIzaSyDx3rr0MzUPaumvdII3WIffmtsZqAz7JIs")
 model = generativeai.GenerativeModel('gemini-1.5-flash')
 
 
-def generate_microtasks_for_each_subtask(request, task_id):
+from django.http import JsonResponse
+from .models import Task, SubTask, Microtask
+import google.generativeai as generativeai
+
+# Configure the generative AI model
+generativeai.configure(api_key="AIzaSyDx3rr0MzUPaumvdII3WIffmtsZqAz7JIs")
+model = generativeai.GenerativeModel('gemini-1.5-flash')
+
+
+def generate_microtasks_for_each_subtask(request, subtask_id):
     """
     Generate microtasks for each subtask of a given task using AI
     """
     try:
-        task = Task.objects.prefetch_related('subtasks').get(id=task_id)
-        subtasks = task.subtasks.all()
+        subtask = SubTask.objects.select_related('task').get(id=subtask_id)
+        task = Task.objects.prefetch_related('subtasks').get(id=subtask.task_id)
 
+        subtasks = task.subtasks.all()
         all_microtasks = {}
 
-        for subtask in subtasks:
+        for sub in subtasks:
             prompt = f"""
             I have a task titled: "{task.title}".
-            One of its subtasks is: "{subtask.title}".
+            One of its subtasks is: "{sub.title}".
 
             Please generate 3-5 microtasks specifically for this subtask.
             Return only the microtasks in a bullet point list.
@@ -283,15 +293,15 @@ def generate_microtasks_for_each_subtask(request, task_id):
                 for title in microtask_list:
                     microtask = Microtask.objects.create(
                         task=task,
-                        subtask=subtask,
+                        subtask=sub,
                         title=title
                     )
                     created_microtasks.append(title)
 
-                all_microtasks[subtask.title] = created_microtasks
+                all_microtasks[sub.title] = created_microtasks
 
             except Exception as e:
-                all_microtasks[subtask.title] = [f"Error generating microtasks: {str(e)}"]
+                all_microtasks[sub.title] = [f"Error generating microtasks: {str(e)}"]
                 continue
 
         return JsonResponse({
@@ -299,17 +309,18 @@ def generate_microtasks_for_each_subtask(request, task_id):
             'generated_microtasks': all_microtasks
         })
 
-    except Task.DoesNotExist:
+    except SubTask.DoesNotExist:
         return JsonResponse({
             'status': 'error',
-            'message': f'Task with id {task_id} does not exist'
+            'message': f'SubTask with id {subtask_id} does not exist'
         }, status=404)
 
     except Exception as e:
         return JsonResponse({
             'status': 'error',
             'message': str(e)
-        })  # ✅ Corrected the closing of JsonResponse here
+        }, status=500)
+
 
 
 from django.http import JsonResponse

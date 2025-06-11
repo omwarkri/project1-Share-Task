@@ -64,7 +64,7 @@ class CommentAdmin(admin.ModelAdmin):
 # Register SubTask model
 @admin.register(SubTask)
 class SubTaskAdmin(admin.ModelAdmin):
-    list_display = ('task', 'title', 'completed')
+    list_display = ('id','task', 'title', 'completed')
     list_filter = ('completed',)
     search_fields = ('task__title', 'title')
 

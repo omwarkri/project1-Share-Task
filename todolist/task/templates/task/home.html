@@ -754,83 +754,6 @@ input:checked + .slider:before {
     transform: translateY(20px);
 }
 
-.subtasks-container {
-    background: #f9f9f9;
-    border-radius: 12px;
-    padding: 16px;
-    margin-top: 20px;
-    width: 100%;
-}
-
-.subtasks-container h5 {
-    font-size: 18px;
-    margin-bottom: 12px;
-    color: #333;
-}
-
-.subtasks-list,
-.microtasks-list {
-    list-style: none;
-    padding-left: 0;
-    margin: 0;
-    width: 100%;
-}
-
-.subtask-item,
-.microtask-item {
-    margin-bottom: 10px;
-    padding: 10px 12px;
-    background: #ffffff;
-    border-radius: 8px;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-.subtask-item:hover,
-.microtask-item:hover {
-    background: #f0f8ff;
-}
-
-.subtask-item.completed > label > span,
-.microtask-item.completed > span {
-    text-decoration: line-through;
-    color: #888;
-}
-
-label {
-    display: flex;
-    align-items: center;
-    font-size: 15px;
-    width: 100%;
-    cursor: pointer;
-    gap: 12px; /* adds space between checkbox and title */
-    width: 100%;
-}
-
-input[type="checkbox"] {
-    transform: scale(1.2);
-    cursor: pointer;
-    margin: 0;
-    
-}
-
-span {
-    flex-grow: 1;
-    word-break: break-word;
-    padding-left: 2px; /* optional slight padding for extra separation */
-    margin-left: 8px;
-}
-
-
-.no-subtasks,
-.no-microtasks {
-    padding: 12px;
-    text-align: center;
-    color: #777;
-    background: #ffffff;
-    border-radius: 8px;
-    margin-bottom: 10px;
-}
 
 .task-action {
     background-color: #4f46e5;
@@ -2303,21 +2226,7 @@ body {
 <!-- Modals -->
 <!-- Add Task Modal -->
 <!-- Add Task Modal -->
-<div id="addTaskModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <span class="close-modal" onclick="AddTaskcloseModal()">&times;</span>
-            <h2>Add Task</h2>
-        </div>
-        <div class="modal-body">
-            <form method="POST" action="{% url 'add_task' %}">
-                {% csrf_token %}
-                {{ form.as_p }}
-                <button type="submit" class="submit-btn btn btn-primary">Add Task</button>
-            </form>
-        </div>
-    </div>
-</div>
+
 
 
 <!-- Modal -->
@@ -2372,43 +2281,13 @@ body {
 
 
 
-<!-- Add this modal near your other modals in the template -->
-<div id="dailyTaskModal" class="modal">
-    <div class="modal-content">
-        <span class="close-modal" onclick="closeActiveTaskModal()">&times;</span>
-
-        <div class="modal-body" id="dailyTaskContent">
-            <div class="loader"></div>
-        </div>
-
-        <div class="modal-footer">
-            <button class="task-action" onclick="completeActiveTask()">✔️ Complete</button>
-            <button class="task-action" onclick="closeActiveTaskModal()">⏱️ Later</button>
-            <button class="task-action" onclick="location.href='/task/' + document.getElementById('activeTaskId').value">
-                📄 Details
-            </button>
-        </div>
-    </div>
-</div>
 
 
-<div id="detailTaskModal" class="modal" style="display: none;">
-    <div class="modal-content">
-        <span class="close-modal" onclick="closeDetailTaskModal()">&times;</span>
+{% include 'task/home/components/modals/daily_task_modal.html' %}
+{% include 'task/home/components/modals/detail_task_modal.html  ' %}
 
-        <div class="modal-body" id="detailTaskContent">
-            <div class="loader">Loading...</div>
-        </div>
 
-        <div class="modal-footer">  
-            <button class="task-action" onclick="completeActiveTask()">✔️ Complete</button>
-            <button class="task-action" onclick="closeDetailTaskModal()">⏱️ Later</button>
-            <button class="task-action" onclick="viewTaskDetails()">
-                📄 Details
-            </button>
-        </div>
-    </div>
-</div>
+
 
 
  
@@ -2922,86 +2801,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 });
 
-function renderActiveTaskModal(task) {
 
-    const detailTaskContent = document.getElementById('detailTaskContent');
-    let subtasksHtml = '';
-
-    if (task.subtasks && task.subtasks.length > 0) {
-        subtasksHtml = `
-            <div class="subtasks-container">
-                <h5>📋 Subtasks / Microtasks</h5>
-                <ul class="subtasks-list">
-                    ${task.subtasks.map(subtask => `
-                        <li class="subtask-item ${subtask.is_completed ? 'completed' : ''}">
-                            <label>
-                                <input type="checkbox" 
-                                       ${subtask.is_completed ? 'checked' : ''}
-                                       onchange="toggleSubtaskCompletion(${subtask.id}, this)">
-                                <span>${subtask.title}</span>
-                            </label>
-                            <ul class="microtasks-list">
-                                ${
-                                    (subtask.microtasks && subtask.microtasks.length > 0)
-                                    ? subtask.microtasks.map(microtask => `
-                                        <li class="microtask-item ${microtask.is_completed ? 'completed' : ''}">
-                                            <label>
-                                                <input type="checkbox"
-                                                       ${microtask.is_completed ? 'checked' : ''}
-                                                       onchange="toggleMicrotaskCompletion(${microtask.id}, this)"
-                                                       onclick="event.stopPropagation();">
-                                            </label>
-                                            <span onclick="openInstructionModal(${microtask.id})">${microtask.title}</span>
-                                        </li>
-                                    `).join('')
-                                    : `
-                                        <li class="no-microtasks">
-                                            <p>No microtasks yet. 🤖</p>
-                                            <button class="task-action" onclick="generateAIMicrotasks(${subtask.id})">
-                                                Generate Microtasks
-                                            </button>
-                                        </li>
-                                    `
-                                }
-                            </ul>
-                        </li>
-                    `).join('')}
-                </ul>
-            </div>
-        `;
-    } else {
-        subtasksHtml = `
-            <div class="no-subtasks">
-                <p>No subtasks yet. 🤖</p>
-                <button class="task-action" onclick="generateAISubtasks(${task.id})">🤖 Generate AI Subtasks</button>
-            </div>
-        `;
-    }
-
-    detailTaskContent.innerHTML = `
-        <div class="active-task-header">
-            <h4>🌟 Your Active Task</h4>
-            <p>This is your currently active task:</p>
-        </div>
-        <div class="active-task-content">
-            <h3>${task.title}</h3>
-            <p>${task.description || 'No description provided.'}</p>
-            <div class="task-meta">
-                <span class="priority-badge ${task.priority}">
-                    Priority: ${task.get_priority_display}
-                </span>
-                <span class="due-date">
-                    Due: ${new Date(task.due_date).toLocaleString()}
-                </span>
-            </div>
-            ${subtasksHtml}
-            <input type="hidden" id="activeTaskId" value="${task.id}">
-        </div>
-    `;
-
-    // ✅ Show the modal
-    
-    }
 
 
    
@@ -3481,6 +3281,8 @@ window.onclick = function(event) {
         modal.style.display = "none";
     }
 }
+
+
 
 </script>
 

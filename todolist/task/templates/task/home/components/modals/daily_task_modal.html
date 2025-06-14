@@ -1,0 +1,18 @@
+<!-- Add this modal near your other modals in the template -->
+<div id="dailyTaskModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeActiveTaskModal()">&times;</span>
+
+        <div class="modal-body" id="dailyTaskContent">
+            <div class="loader"></div>
+        </div>
+
+        <div class="modal-footer">
+            <button class="task-action" onclick="completeActiveTask()">✔️ Complete</button>
+            <button class="task-action" onclick="closeActiveTaskModal()">⏱️ Later</button>
+            <button class="task-action" onclick="location.href='/task/' + document.getElementById('activeTaskId').value">
+                📄 Details
+            </button>
+        </div>
+    </div>
+</div>

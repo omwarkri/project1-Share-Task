@@ -5,11 +5,30 @@
             <h2>Add Task</h2>
         </div>
         <div class="modal-body">
-            <form method="POST" action="{% url 'add_task' %}">
+             <form method="POST" action="{% url 'add_task' %}" id="taskForm">
                 {% csrf_token %}
                 {{ form.as_p }}
-                <button type="submit" class="submit-btn btn btn-primary">Add Task</button>
+                <button type="submit" id="addTaskBtn" class="submit-btn btn ">Add Task</button>
             </form>
         </div>
     </div>
 </div>
+
+<script>
+    // Better approach using event delegation
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('taskForm');
+        const button = document.getElementById('addTaskBtn');
+        
+        if (form && button) {
+            form.addEventListener('submit', function(e) {
+                // Change button text and state
+                button.innerHTML = 'Adding...';
+                button.disabled = true;
+                
+                // Form will continue submitting normally
+                return true;
+            });
+        }
+    });
+</script>

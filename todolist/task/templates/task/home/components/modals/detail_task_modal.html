@@ -1,0 +1,236 @@
+<style>
+    .loader {
+    border: 4px solid #f3f3f3; /* Light grey */
+    border-top: 4px solid #34dbc2; /* Blue */
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin: 20px auto;
+    display: block; /* Ensure it's visible */
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Make sure modal is properly styled */
+.modal {
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 5% auto;
+  
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 600px;
+}
+
+.subtasks-container {
+    background: #f9f9f9;
+    border-radius: 12px;
+    width: 100%;
+}
+
+.subtasks-container h5 {
+    font-size: 18px;
+    margin-bottom: 12px;
+    color: #333;
+}
+
+.subtasks-list,
+.microtasks-list {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+    width: 100%;
+}
+
+.subtask-item,
+.microtask-item {
+    margin-bottom: 10px;
+    padding: 10px 12px;
+    background: #ffffff;
+    border-radius: 8px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.subtask-item:hover,
+.microtask-item:hover {
+    background: #f0f8ff;
+}
+
+.subtask-item.completed > label > span,
+.microtask-item.completed > span {
+    text-decoration: line-through;
+    color: #888;
+}
+
+label {
+    display: flex;
+    align-items: center;
+    font-size: 15px;
+    width: 100%;
+    cursor: pointer;
+    gap: 12px; /* adds space between checkbox and title */
+    width: 100%;
+}
+
+input[type="checkbox"] {
+    transform: scale(1.2);
+    cursor: pointer;
+    margin: 0;
+    
+}
+
+span {
+    flex-grow: 1;
+    word-break: break-word;
+    padding-left: 2px; /* optional slight padding for extra separation */
+    margin-left: 8px;
+}
+
+
+.no-subtasks,
+.no-microtasks {
+    padding: 12px;
+    text-align: center;
+    color: #777;
+    background: #ffffff;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+</style>
+
+<div id="detailTaskModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeDetailTaskModal()">&times;</span>
+      
+        <div class="modal-body" id="detailTaskContent">
+            <!-- Loader will be visible by default -->
+           
+        </div>
+        
+
+        <div class="modal-footer">  
+            <button class="task-action" onclick="completeActiveTask()">✔️ Complete</button>
+            <button class="task-action" onclick="closeDetailTaskModal()">⏱️ Later</button>
+            <button class="task-action" onclick="viewTaskDetails()">📄 Details</button>
+        </div>
+    </div>
+</div>
+
+
+<script>
+       async function renderActiveTaskModal(task) {
+        const detailTaskContent = document.getElementById('detailTaskContent');
+        const modal = document.getElementById('detailTaskModal');
+        
+        // Clear previous content and show loader immediately
+    
+        modal.style.display = 'block';
+        
+        try {
+            // Show loader while processing
+            
+            
+            // Simulate potential delay (remove in production)
+            await new Promise(resolve => setTimeout(resolve, 300));
+            
+            let subtasksHtml = '';
+            
+            if (task.subtasks && task.subtasks.length > 0) {
+                subtasksHtml = `
+                    <div class="subtasks-container">
+                        <h5>📋 Subtasks / Microtasks</h5>
+                        <ul class="subtasks-list">
+                            ${task.subtasks.map(subtask => `
+                                <li class="subtask-item ${subtask.is_completed ? 'completed' : ''}">
+                                    <label>
+                                        <input type="checkbox" 
+                                               ${subtask.is_completed ? 'checked' : ''}
+                                               onchange="toggleSubtaskCompletion(${subtask.id}, this)">
+                                        <span>${subtask.title}</span>
+                                    </label>
+                                    <ul class="microtasks-list">
+                                        ${
+                                            (subtask.microtasks && subtask.microtasks.length > 0)
+                                            ? subtask.microtasks.map(microtask => `
+                                                <li class="microtask-item ${microtask.is_completed ? 'completed' : ''}">
+                                                    <label>
+                                                        <input type="checkbox"
+                                                               ${microtask.is_completed ? 'checked' : ''}
+                                                               onchange="toggleMicrotaskCompletion(${microtask.id}, this)"
+                                                               onclick="event.stopPropagation();">
+                                                    </label>
+                                                    <span onclick="openInstructionModal(${microtask.id})">${microtask.title}</span>
+                                                </li>
+                                            `).join('')
+                                            : `
+                                                <li class="no-microtasks">
+                                                    <p>No microtasks yet. 🤖</p>
+                                                    <button class="task-action" onclick="generateAIMicrotasks(${subtask.id})">
+                                                        Generate Microtasks
+                                                    </button>
+                                                </li>
+                                            `
+                                        }
+                                    </ul>
+                                </li>
+                            `).join('')}
+                        </ul>
+                    </div>
+                `;
+            } else {
+                subtasksHtml = `
+                    <div class="no-subtasks">
+                        <p>No subtasks yet. 🤖</p>
+                        <button class="task-action" onclick="generateAISubtasks(${task.id})">🤖 Generate AI Subtasks</button>
+                    </div>
+                `;
+            }
+
+            // Render the actual content
+            detailTaskContent.innerHTML = `
+                <div class="active-task-header">
+                    <h4>🌟 Your Active Task</h4>
+                    <p>This is your currently active task:</p>
+                </div>
+                <div class="active-task-content">
+                    <h3>${task.title}</h3>
+                    <p>${task.description || 'No description provided.'}</p>
+                    <div class="task-meta">
+                        <span class="priority-badge ${task.priority}">
+                            Priority: ${task.get_priority_display}
+                        </span>
+                        <span class="due-date">
+                            Due: ${new Date(task.due_date).toLocaleString()}
+                        </span>
+                    </div>
+                    ${subtasksHtml}
+                    <input type="hidden" id="activeTaskId" value="${task.id}">
+                </div>
+            `;
+            
+        } catch (error) {
+            console.error("Error rendering task modal:", error);
+            detailTaskContent.innerHTML = `
+                <div class="error-message">
+                    <p>⚠️ Failed to load task details</p>
+                    <button onclick="renderActiveTaskModal(task)">Retry</button>
+                </div>
+            `;
+        }
+    }
+</script>

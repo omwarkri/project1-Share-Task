@@ -35,21 +35,19 @@ def login_view(request, token=None):
         if user:
             login(request, user)
 
+            # First time onboarding redirect
+            if not user.onboarding_completed:
+                return redirect('onboarding_goal')
+
             if invitation:
-               
+                return redirect('view_team_tasks', team_id=invitation.team.id)
 
-                # Add user to the team
-                team = invitation.team
-
-                return redirect('view_team_tasks', team_id=team.id)
-
-            return redirect('home')  # Replace 'home' with your desired homepage
+            return redirect('home')
         else:
             return render(request, 'user/login.html', {'error': 'Invalid credentials'})
-    if token:
-        return render(request, 'user/login.html' ,{'token': token})
-    else:
-        return render(request, 'user/login.html')
+
+    return render(request, 'user/login.html', {'token': token} if token else {})
+
 
 
 from django.shortcuts import render, redirect, get_object_or_404
@@ -109,6 +107,118 @@ def register_view(request, token=None):
     else:
         return render(request, 'user/register.html')
 
+
+from django.shortcuts import render, redirect, get_object_or_404
+from task.models import Task
+
+def onboarding_goal(request):
+    if request.method == 'POST':
+        goal = request.POST.get("goal")
+        interest = request.POST.get("interest")
+
+        request.session['goal'] = goal
+        request.session['interest'] = interest
+
+        # Save to user model
+        user = request.user
+        user.goals = [goal]
+        user.interests = [interest]
+        user.save()
+
+        return redirect('onboarding_suggestions')
+
+    return render(request, 'user/onboarding_goal.html')
+
+
+from task.models import Task
+
+def generate_user_task_suggestions(user):
+    print("Generating personalized task suggestions for user...")
+
+    completed_tasks = [task.title for task in user.tasks.all()]
+    goals = user.goals or []
+    interests = user.interests or []
+
+    prompt = f"""
+    You are a personal task recommendation system. Based on the user's goals, interests, and completed tasks, suggest 10 personalized, specific, and actionable tasks.
+
+    **User Context:**
+    - Goals: {goals}
+    - Interests: {interests}
+    - Completed Tasks: {completed_tasks}
+
+    **Guidelines:**
+    - Provide exactly 10 tasks.
+    - Each task should be one sentence.
+    - Start each task with a verb (e.g., "Create", "Learn", "Design", "Optimize").
+    - Make tasks achievable and aligned with user's interests and goals.
+
+    **Task Suggestions:**
+    """
+
+    # Simulated AI call (replace this with OpenAI or another model in production)
+    response = model.generate_content(prompt)  # Replace with actual model call
+
+    suggestions = response.text.strip().split('\n') if response and response.text else []
+    suggestions = [s.strip() for s in suggestions if s.strip()]
+    return suggestions[:10]
+
+
+def onboarding_suggestions(request):
+    goal = request.session.get('goal')
+    interest = request.session.get('interest')
+
+    user = request.user
+    user.goals = [goal]
+    user.interests = [interest]
+    user.save()
+
+    suggestions = generate_user_task_suggestions(user)
+
+    if request.method == 'POST':
+        selected_task = request.POST.get("selected_task")
+        custom_task = request.POST.get("custom_task")
+
+        task_title = custom_task.strip() if custom_task else selected_task
+        if not task_title:
+            return render(request, 'user/onboarding_suggestions.html', {
+                'suggestions': suggestions,
+                'error': "Please select or enter a task."
+            })
+
+        # ✅ Instead of creating the task here, pass the title to the next view
+        return redirect(f"/user/onboarding/form/?title={task_title}")
+
+    return render(request, 'user/onboarding_suggestions.html', {'suggestions': suggestions})
+
+
+
+from .forms import TaskForm
+
+def onboarding_task_form(request):
+    initial_title = request.GET.get("title", "")
+    if request.method == 'POST':
+        form = TaskForm(request.POST, user=request.user)
+        if form.is_valid():
+            task = form.save(commit=False)
+            task.user = request.user
+            task.save()
+            form.save_m2m()
+            request.user.onboarding_completed = True
+            request.user.save()
+            return redirect('onboarding_confirm', task.id)
+    else:
+        form = TaskForm(initial={'title': initial_title}, user=request.user)
+
+    return render(request, 'user/onboarding_task_form.html', {'form': form})
+
+
+    
+def onboarding_confirm(request, task_id):
+    task = get_object_or_404(Task, id=task_id, user=request.user)
+    if request.method == 'POST':
+        return redirect('/task/')
+    return render(request, 'user/onboarding_confirm.html', {'task': task})
 
 
 

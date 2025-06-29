@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Finalize Your Task</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f6f9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .form-box {
+      background-color: #ffffff;
+      padding: 20px 25px;
+      border-radius: 12px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+      width: 100%;
+      max-width: 400px; /* ✅ smaller width */
+    }
+
+    h2 {
+      text-align: center;
+      color: #333333;
+      margin-bottom: 20px;
+      font-size: 20px;
+    }
+
+    form label {
+      font-weight: 600;
+      color: #444444;
+      display: block;
+      margin-bottom: 6px;
+      font-size: 14px;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 10px 12px;
+      margin-bottom: 15px;
+      border: 1px solid #cccccc;
+      border-radius: 6px;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+
+    input[type="checkbox"],
+    input[type="radio"] {
+      width: auto;
+      margin-right: 6px;
+    }
+
+    button {
+      width: 100%;
+      background-color: #007bff;
+      color: white;
+      padding: 10px;
+      font-size: 15px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    @media (max-width: 480px) {
+      .form-box {
+        padding: 15px 20px;
+      }
+
+      h2 {
+        font-size: 18px;
+      }
+
+      button {
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="form-box">
+    <h2>Finalize Your Task</h2>
+    <form method="POST">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit">Save Task</button>
+    </form>
+  </div>
+
+</body>
+</html>

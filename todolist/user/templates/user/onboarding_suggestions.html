@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>AI Task Suggestions</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f5f7fa;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+
+    .form-container {
+      background: #ffffff;
+      padding: 30px 40px;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 600px;
+    }
+
+    h2 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+      font-size: 16px;
+      color: #444;
+    }
+
+    h3 {
+      margin-top: 30px;
+      color: #333;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 12px 14px;
+      margin-top: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 15px;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 20px;
+      padding: 12px;
+      font-size: 16px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .error {
+      color: red;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="form-container">
+    <h2>AI Task Suggestions</h2>
+
+    <form method="POST">
+      {% csrf_token %}
+
+      {% for suggestion in suggestions %}
+        <label>
+          <input type="radio" name="selected_task" value="{{ suggestion }}">
+          {{ suggestion }}
+        </label>
+      {% endfor %}
+
+      <h3>Or write your own task</h3>
+      <input type="text" name="custom_task" placeholder="Enter custom task name">
+
+      {% if error %}
+        <p class="error">{{ error }}</p>
+      {% endif %}
+
+      <button type="submit">Create Task</button>
+    </form>
+  </div>
+
+</body>
+</html>

@@ -3,7 +3,7 @@ from .models import CustomUser, UserActivity, Badge, UserBadge
 
 # Customize the display for CustomUser
 class CustomUserAdmin(admin.ModelAdmin):
-    list_display = ('username', 'email', 'phone_number', 'score')
+    list_display = ('username', 'email', 'phone_number', 'score',   'onboarding_completed')
     search_fields = ('username', 'email', 'phone_number')
     list_filter = ('is_staff', 'is_active')
 

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Task Confirmation</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f5f7fa;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .confirm-box {
+      background: #ffffff;
+      padding: 30px 40px;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 500px;
+      text-align: center;
+    }
+
+    h2 {
+      color: #007bff;
+      margin-bottom: 10px;
+    }
+
+    p {
+      color: #444;
+      font-size: 16px;
+      margin-bottom: 30px;
+    }
+
+    button {
+      background-color: #28a745;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      font-size: 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #218838;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="confirm-box">
+    <h2>{{ task.title }}</h2>
+    <p>{{ task.description }}</p>
+
+    <form method="POST">
+      {% csrf_token %}
+      <button type="submit">Go to Dashboard</button>
+    </form>
+  </div>
+
+</body>
+</html>

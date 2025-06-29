@@ -499,7 +499,7 @@ def add_task(request):
         form = TaskForm(user=request.user)  # Pass user to the form
     return render(request, 'add_task.html', {'form': form})
 
-
+        
 
 
 

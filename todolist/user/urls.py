@@ -28,5 +28,11 @@ urlpatterns = [
     path('api/update-challenge-progress/', views.update_challenge_progress, name='update_challenge_progress'),
      path('api/schedule/', views.get_schedule, name='get_schedule'),
     path('api/schedule/save/', views.save_schedule, name='save_schedule'),
+
+    path('onboarding/goal/', views.onboarding_goal, name='onboarding_goal'),
+    path('onboarding/suggestions/', views.onboarding_suggestions, name='onboarding_suggestions'),
+    path('onboarding/confirm/<int:task_id>/', views.onboarding_confirm, name='onboarding_confirm'),
+    path('onboarding/form/', views.onboarding_task_form, name='onboarding_task_form'),
+
    
 ]

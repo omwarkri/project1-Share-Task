@@ -1,34 +1,73 @@
 <div id="addTaskModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <span class="close-modal" onclick="AddTaskcloseModal()">&times;</span>
-            <h2>Add Task</h2>
-        </div>
-        <div class="modal-body">
-             <form method="POST" action="{% url 'add_task' %}" id="taskForm">
-                {% csrf_token %}
-                {{ form.as_p }}
-                <button type="submit" id="addTaskBtn" class="submit-btn btn ">Add Task</button>
-            </form>
-        </div>
+  <div class="modal-content">
+    <div class="modal-header">
+      <span class="close-modal" onclick="AddTaskcloseModal()">&times;</span>
+      <h2>Add Task</h2>
     </div>
+    <div class="modal-body">
+      <form method="POST" action="{% url 'add_task' %}" id="taskForm">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" id="addTaskBtn" class="submit-btn btn">Add Task</button>
+      </form>
+      <div id="addTaskMessage" style="margin-top: 1em;"></div>
+    </div>
+  </div>
 </div>
 
 <script>
-    // Better approach using event delegation
-    document.addEventListener('DOMContentLoaded', function() {
-        const form = document.getElementById('taskForm');
-        const button = document.getElementById('addTaskBtn');
-        
-        if (form && button) {
-            form.addEventListener('submit', function(e) {
-                // Change button text and state
-                button.innerHTML = 'Adding...';
-                button.disabled = true;
-                
-                // Form will continue submitting normally
-                return true;
-            });
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.getElementById('taskForm');
+  const button = document.getElementById('addTaskBtn');
+  const messageBox = document.getElementById('addTaskMessage');
+
+  if (form && button) {
+    form.addEventListener('submit', function(e) {
+      e.preventDefault(); // Prevent default form submission
+
+      button.disabled = true;
+      button.innerText = 'Adding...';
+      messageBox.innerHTML = '';
+
+      const formData = new FormData(form);
+      const csrfToken = formData.get('csrfmiddlewaretoken');
+
+      fetch(form.action, {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': csrfToken,
+        },
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        button.disabled = false;
+        button.innerText = 'Add Task';
+
+        if (data.success) {
+          messageBox.innerHTML = `<p style="color:green;">✅ ${data.message}</p>`;
+          form.reset();
+          // Optionally close modal or refresh task list
+          setTimeout(() => {
+            AddTaskcloseModal();
+            // location.reload(); // Or reload task list via JS
+          }, 1000);
+        } else if (data.errors) {
+          const errors = Object.entries(data.errors)
+            .map(([field, msgs]) => `<li><strong>${field}:</strong> ${msgs.join(', ')}</li>`)
+            .join('');
+          messageBox.innerHTML = `<ul style="color:red;">${errors}</ul>`;
+        } else {
+          messageBox.innerHTML = `<p style="color:red;">❌ Something went wrong.</p>`;
         }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        button.disabled = false;
+        button.innerText = 'Add Task';
+        messageBox.innerHTML = `<p style="color:red;">⚠️ Error submitting form.</p>`;
+      });
     });
+  }
+});
 </script>

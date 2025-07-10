@@ -22,11 +22,26 @@ def preprocess_text(text):
 
     # Ensure at least 3 words remain (to avoid over-filtering)
     return " ".join(words) if len(words) >= 3 else text.lower()
+from django.db.models import Avg, Count, F, DurationField, ExpressionWrapper
+from django.db.models.functions import Coalesce
+from django.utils import timezone
+from django.db.models import Exists, OuterRef
+from user.models import CustomUser
 
 @receiver([post_save, post_delete], sender=Task)
 def update_user_task_analytics(sender, instance, **kwargs):
     """Updates analytics when a task is created, updated, or deleted."""
-    user = instance.user
+    user = getattr(instance, "user", None)
+    print(user.id)
+    
+    # ✅ If user is None or has been deleted, skip analytics update
+    if not user or not CustomUser.objects.filter(id=user.id).exists():
+        print("not found")
+        return
+    
+    print("found")
+
+
     tasks = Task.objects.filter(user=user)
 
     completed_tasks = tasks.filter(status="completed")
@@ -36,24 +51,25 @@ def update_user_task_analytics(sender, instance, **kwargs):
     avg_completion_time = completed_tasks.aggregate(
         avg_time=Coalesce(
             Avg(ExpressionWrapper(F("updated_at") - F("created_at"), output_field=DurationField())),
-            timezone.timedelta(seconds=0),  # Default value instead of 0
+            timezone.timedelta(seconds=0),  # Default value
         )
     )["avg_time"]
 
     # Find the most common category
     most_common_category = tasks.values("category").annotate(count=Count("category")).order_by("-count").first()
 
-    # Ensure analytics entry exists, or create one
-    UserTaskAnalytics.objects.update_or_create(
-        user=user,
-        defaults={
-            "total_tasks": tasks.count(),
-            "completed_tasks": completed_tasks.count(),
-            "overdue_tasks": overdue_tasks.count(),
-            "average_completion_time": avg_completion_time.total_seconds() / 3600 if avg_completion_time else 0,
-            "most_common_category": most_common_category["category"] if most_common_category else None,
-        },
-    )
+    # Update or create UserTaskAnalytics
+    # UserTaskAnalytics.objects.create(
+    #     user=user,
+    #     defaults={
+    #         "total_tasks": tasks.count(),
+    #         "completed_tasks": completed_tasks.count(),
+    #         "overdue_tasks": overdue_tasks.count(),
+    #         "average_completion_time": avg_completion_time.total_seconds() / 3600 if avg_completion_time else 0,
+    #         "most_common_category": most_common_category["category"] if most_common_category else None,
+    #     },
+    # )
+
 
 
 @receiver(post_save, sender=Task)

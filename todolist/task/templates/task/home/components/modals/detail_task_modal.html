@@ -1,235 +1,761 @@
 <style>
+    /* Loader Styles */
     .loader {
-    border: 4px solid #f3f3f3; /* Light grey */
-    border-top: 4px solid #34dbc2; /* Blue */
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    animation: spin 1s linear infinite;
-    margin: 20px auto;
-    display: block; /* Ensure it's visible */
-}
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #34dbc2;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin: 20px auto;
+        display: block;
+    }
 
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
 
-/* Make sure modal is properly styled */
-.modal {
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0,0,0,0.5);
-}
-
-.modal-content {
-    background-color: #fefefe;
-    margin: 5% auto;
+    /* Modal Styles */
   
-    border: 1px solid #888;
-    width: 80%;
-    max-width: 600px;
-}
 
-.subtasks-container {
-    background: #f9f9f9;
-    border-radius: 12px;
-    width: 100%;
-}
+    .close-modal {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+    }
 
-.subtasks-container h5 {
-    font-size: 18px;
-    margin-bottom: 12px;
-    color: #333;
-}
+    .close-modal:hover {
+        color: #333;
+    }
 
-.subtasks-list,
-.microtasks-list {
-    list-style: none;
-    padding-left: 0;
-    margin: 0;
-    width: 100%;
-}
+    /* Task Content Styles */
+    .active-task-header h4 {
+        margin: 0 0 20px 0;
+        color: #2c3e50;
+        font-size: 1.5rem;
+    }
 
-.subtask-item,
-.microtask-item {
-    margin-bottom: 10px;
-    padding: 10px 12px;
-    background: #ffffff;
+    .active-task-content h3 {
+        margin: 0 0 10px 0;
+        color: #2c3e50;
+    }
+
+    .active-task-content p {
+        color: #7f8c8d;
+        margin: 0 0 15px 0;
+    }
+
+    .task-meta {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+
+    .priority-badge {
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 500;
+    }
+
+    .priority-high {
+        background-color: #ffebee;
+        color: #c62828;
+    }
+
+    .priority-medium {
+        background-color: #fff8e1;
+        color: #f57f17;
+    }
+
+    .priority-low {
+        background-color: #e8f5e9;
+        color: #2e7d32;
+    }
+
+    .due-date {
+        color: #7f8c8d;
+        font-size: 14px;
+    }
+
+    /* Subtasks Container */
+    .subtasks-container {
+        background: #f9f9f9;
+        border-radius: 12px;
+        padding: 15px;
+        margin-top: 20px;
+    }
+
+    .subtasks-container h5 {
+        font-size: 18px;
+        margin: 0 0 15px 0;
+        color: #2c3e50;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .subtasks-list,
+    .microtasks-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .subtask-item {
+        margin-bottom: 15px;
+        padding: 12px;
+        background: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .subtask-item.completed {
+        background-color: #f5f5f5;
+    }
+
+    .subtask-item label {
+        display: flex;
+        align-items: center;
+        font-size: 16px;
+        cursor: pointer;
+        gap: 10px;
+    }
+
+.subtask-item.locked {
+    position: relative;
+    background: rgba(245,245,245,0.9) !important; /* Solid light gray */
     border-radius: 8px;
-    width: 100%;
-    box-sizing: border-box;
+    pointer-events: none;
+    user-select: none;
+    min-height: 40px; /* Ensure consistent height */
 }
 
-.subtask-item:hover,
-.microtask-item:hover {
-    background: #f0f8ff;
+.subtask-item.locked > * {
+    visibility: hidden; /* Hide all child elements */
 }
 
-.subtask-item.completed > label > span,
-.microtask-item.completed > span {
-    text-decoration: line-through;
-    color: #888;
-}
-
-label {
+/* Lock icon container */
+.subtask-item.locked::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     display: flex;
     align-items: center;
-    font-size: 15px;
-    width: 100%;
-    cursor: pointer;
-    gap: 12px; /* adds space between checkbox and title */
-    width: 100%;
+    justify-content: center;
+    background: transparent;
+    z-index: 10;
 }
 
-input[type="checkbox"] {
-    transform: scale(1.2);
-    cursor: pointer;
-    margin: 0;
-    
+/* Actual lock icon with better styling */
+.subtask-item.locked::before {
+    content: "🔒";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 24px;
+    color: #e74c3c;
+    text-shadow: 0 0 10px rgba(255,255,255,0.8);
+    z-index: 11;
+    background: rgba(255,255,255,0.9);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    animation: gentlePulse 2s infinite;
 }
 
-span {
-    flex-grow: 1;
-    word-break: break-word;
-    padding-left: 2px; /* optional slight padding for extra separation */
+@keyframes gentlePulse {
+    0% { transform: translate(-50%, -50%) scale(1); }
+    50% { transform: translate(-50%, -50%) scale(1.1); }
+    100% { transform: translate(-50%, -50%) scale(1); }
+}
+
+.subtask-item.locked {
+    position: relative;
+    background: #f8f9fa !important; /* Solid light gray background */
+    border-radius: 8px;
+    pointer-events: none;
+    user-select: none;
+    min-height: 40px;
+    overflow: hidden; /* Hide any overflowing content */
+}
+
+.subtask-item.locked > * {
+    opacity: 0 !important; /* Completely transparent */
+    height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+}
+
+.subtask-item.locked::before {
+    content: "LOCKED";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 14px;
+    font-weight: bold;
+    color: #e74c3c;
+    background: white;
+    padding: 6px 12px;
+    border-radius: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    z-index: 100;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    white-space: nowrap;
+}
+
+/* Optional: Add icon alongside text */
+.subtask-item.locked::after {
+    content: "🔒";
     margin-left: 8px;
 }
 
-
-.no-subtasks,
-.no-microtasks {
-    padding: 12px;
-    text-align: center;
-    color: #777;
-    background: #ffffff;
+/* Completely hide all content in locked subtasks */
+.subtask-item.locked {
+    position: relative;
+    background: #f5f5f5 !important;
     border-radius: 8px;
-    margin-bottom: 10px;
+    min-height: 40px;
+    overflow: hidden;
 }
 
+.subtask-item.locked > * {
+    display: none !important; /* Nuclear option - removes from render tree */
+}
+
+/* Show only the lock indicator */
+.subtask-item.locked::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        /* White semi-circle behind lock */
+        radial-gradient(circle at center, white 0%, white 60%, transparent 61%),
+        /* Diagonal stripes pattern */
+        repeating-linear-gradient(
+            45deg,
+            #f5f5f5,
+            #f5f5f5 10px,
+            #e0e0e0 10px,
+            #e0e0e0 20px
+        );
+    z-index: 1;
+}
+
+/* Lock icon with text */
+.subtask-item.locked::after {
+    content: "🔒 Locked";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 14px;
+    font-weight: bold;
+    color: #673f3a;
+    background: white;
+    padding: 6px 12px;
+    border-radius: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    z-index: 2;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+
+  
+
+    .microtask-item {
+        padding: 6px 8px;
+        margin-bottom: 6px;
+        background: #ffffff;
+        border-radius: 4px;
+        transition: all 0.2s;
+        font-size: 14px;
+    }
+
+    .microtask-item:hover {
+        background: #f0f8ff;
+    }
+
+    .microtask-item.completed {
+        background-color: #f5f5f5;
+    }
+
+    .microtask-item.completed > label > span {
+        text-decoration: line-through;
+        color: #888;
+    }
+
+    /* Locked Microtask Styles */
+    .microtask-item.locked {
+        position: relative;
+        padding: 4px 8px;
+        margin-bottom: 4px;
+    }
+    
+    .microtask-item.locked::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(255,255,255,0.7);
+        border-radius: 4px;
+        z-index: 1;
+    }
+    
+    .microtask-item.locked > * {
+        position: relative;
+        z-index: 2;
+        opacity: 0.6;
+    }
+    
+    .microtask-item.locked label {
+        cursor: not-allowed;
+        pointer-events: none;
+    }
+    
+    .microtask-item.locked input[type="checkbox"] {
+        visibility: hidden;
+    }
+    
+    .microtask-item.locked .lock-icon {
+        display: inline-block;
+        margin-left: 6px;
+        color: #e74c3c;
+    }
+    
+    .microtask-item.locked .microtask-title {
+        color: #888;
+    }
+
+    /* Empty States */
+    .no-subtasks,
+    .no-microtasks {
+        padding: 12px;
+        text-align: center;
+        color: #7f8c8d;
+        background: #ffffff;
+        border-radius: 8px;
+        margin-bottom: 10px;
+        font-size: 14px;
+    }
+
+    /* Action Buttons */
+    /* .task-action {
+        padding: 10px 15px;
+        border: none;
+        border-radius: 8px;
+        background-color: #16a085;
+        color: white;
+        cursor: pointer;
+        font-size: 14px;
+        margin-right: 10px;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    } */
+
+    .task-action:hover {
+        background-color: #138d75;
+        transform: translateY(-1px);
+    }
+
+    .modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 20px;
+        padding-top: 15px;
+        border-top: 1px solid #eee;
+    }
+
+
+    .subtask-item {
+    padding: 12px 12px 12px 8px; /* Adjust padding to be balanced */
+}
+
+.microtasks-list {
+    margin: 10px 0 0 0; /* Reset margins */
+    padding: 0 0 0 20px; /* Adjust left padding only */
+    border-left: 1px solid #e0e0e0;
+    list-style-position: inside; /* Align bullets with text */
+    width: 100%;
+}
+
+
+
+.microtask-item label {
+    display: flex;
+    width: 100%; /* Ensure label takes full width */
+    align-items: center; /* Keep vertical alignment */
+}
+
+.microtask-title {
+    display: block; /* Change from inline to block */
+    width: 100%; /* Take full available width */
+    flex-grow: 1; /* Expand to fill remaining space */
+    overflow-wrap: break-word; /* Handle long text */
+}
+
+    /* Responsive Adjustments */
+    @media (max-width: 600px) {
+        .modal-content {
+            width: 95%;
+            padding: 15px;
+        }
+        
+        .modal-footer {
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .task-action {
+            margin-right: 0;
+            flex-grow: 1;
+            justify-content: center;
+        }
+    }
 </style>
 
 <div id="detailTaskModal" class="modal" style="display: none;">
     <div class="modal-content">
         <span class="close-modal" onclick="closeDetailTaskModal()">&times;</span>
-      
         <div class="modal-body" id="detailTaskContent">
-            <!-- Loader will be visible by default -->
-           
+            <div class="loader"></div>
         </div>
-        
-
         <div class="modal-footer">  
-            <button class="task-action" onclick="completeActiveTask()">✔️ Complete</button>
-            <button class="task-action" onclick="closeDetailTaskModal()">⏱️ Later</button>
-            <button class="task-action" onclick="viewTaskDetails()">📄 Details</button>
+            <button class="task-action" onclick="completeActiveTask()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+                Complete
+            </button>
+            <button class="task-action" onclick="closeDetailTaskModal()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+                Later
+            </button>
+            <button class="task-action" onclick="viewTaskDetails()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                    <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
+                Details
+            </button>
         </div>
     </div>
 </div>
 
-
 <script>
-       async function renderActiveTaskModal(task) {
-        const detailTaskContent = document.getElementById('detailTaskContent');
-        const modal = document.getElementById('detailTaskModal');
-        
-        // Clear previous content and show loader immediately
+// Global variable to store current task
+let currentTask = null;
+
+async function renderActiveTaskModal(task) {
+    currentTask = task;
+    const detailTaskContent = document.getElementById('detailTaskContent');
+    const modal = document.getElementById('detailTaskModal');
+
+    // Show modal immediately with loader
+    modal.style.display = 'flex';
+    detailTaskContent.innerHTML = '<div class="loader"></div>';
     
-        modal.style.display = 'block';
+    try {
+        // Simulate loading (remove in production)
+        await new Promise(resolve => setTimeout(resolve, 300));
         
-        try {
-            // Show loader while processing
+        let subtasksHtml = '';
+        
+        if (task.subtasks && task.subtasks.length > 0) {
+            // Find the first incomplete subtask
+            const firstIncompleteIndex = task.subtasks.findIndex(
+                subtask => !subtask.is_completed
+            );
             
-            
-            // Simulate potential delay (remove in production)
-            await new Promise(resolve => setTimeout(resolve, 300));
-            
-            let subtasksHtml = '';
-            
-            if (task.subtasks && task.subtasks.length > 0) {
-                subtasksHtml = `
-                    <div class="subtasks-container">
-                        <h5>📋 Subtasks / Microtasks</h5>
-                        <ul class="subtasks-list">
-                            ${task.subtasks.map(subtask => `
+            subtasksHtml = `
+                <div class="subtasks-container">
+                    <h5>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                        </svg>
+                        Subtasks / Microtasks
+                    </h5>
+                    <ul class="subtasks-list">
+                        ${task.subtasks.map((subtask, index) => {
+                            // Determine if microtasks should be locked
+                            const shouldLockMicrotasks = firstIncompleteIndex >= 0 && 
+                                                       index > firstIncompleteIndex;
+                            
+                            return `
                                 <li class="subtask-item ${subtask.is_completed ? 'completed' : ''}">
                                     <label>
                                         <input type="checkbox" 
                                                ${subtask.is_completed ? 'checked' : ''}
-                                               onchange="toggleSubtaskCompletion(${subtask.id}, this)">
+                                               onchange="toggleSubtaskCompletion(${subtask.id}, this, ${task.id})">
                                         <span>${subtask.title}</span>
                                     </label>
                                     <ul class="microtasks-list">
                                         ${
                                             (subtask.microtasks && subtask.microtasks.length > 0)
                                             ? subtask.microtasks.map(microtask => `
-                                                <li class="microtask-item ${microtask.is_completed ? 'completed' : ''}">
+                                                <li class="microtask-item ${microtask.is_completed ? 'completed' : ''} 
+                                                    ${shouldLockMicrotasks ? 'locked' : ''}">
                                                     <label>
                                                         <input type="checkbox"
                                                                ${microtask.is_completed ? 'checked' : ''}
-                                                               onchange="toggleMicrotaskCompletion(${microtask.id}, this)"
+                                                               ${shouldLockMicrotasks ? 'disabled' : ''}
+                                                               onchange="toggleMicrotaskCompletion(${microtask.id}, this, ${subtask.id}, ${task.id})"
                                                                onclick="event.stopPropagation();">
+                                                        <span class="microtask-title">
+                                                            ${microtask.title}
+                                                        </span>
+                                                        ${shouldLockMicrotasks ? 
+                                                            `<svg class="lock-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                                                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                                            </svg>` : ''}
                                                     </label>
-                                                    <span onclick="openInstructionModal(${microtask.id})">${microtask.title}</span>
                                                 </li>
                                             `).join('')
                                             : `
                                                 <li class="no-microtasks">
-                                                    <p>No microtasks yet. 🤖</p>
-                                                    <button class="task-action" onclick="generateAIMicrotasks(${subtask.id})">
-                                                        Generate Microtasks
-                                                    </button>
+                                                    <p>No microtasks yet</p>
+                                                    ${!shouldLockMicrotasks ? 
+                                                        `<button class="task-action" onclick="generateAIMicrotasks(${task.id}, ${subtask.id})">
+                                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                                <circle cx="12" cy="12" r="10"></circle>
+                                                                <line x1="12" y1="8" x2="12" y2="12"></line>
+                                                                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                                                            </svg>
+                                                            Generate Microtasks
+                                                        </button>` : 
+                                                        `<div style="color: #888; font-size: 12px; margin-top: 5px;">
+                                                            Complete previous subtasks first
+                                                        </div>`
+                                                    }
                                                 </li>
                                             `
                                         }
                                     </ul>
                                 </li>
-                            `).join('')}
-                        </ul>
-                    </div>
-                `;
-            } else {
-                subtasksHtml = `
-                    <div class="no-subtasks">
-                        <p>No subtasks yet. 🤖</p>
-                        <button class="task-action" onclick="generateAISubtasks(${task.id})">🤖 Generate AI Subtasks</button>
-                    </div>
-                `;
-            }
-
-            // Render the actual content
-            detailTaskContent.innerHTML = `
-                <div class="active-task-header">
-                    <h4>🌟 Your Active Task</h4>
-                </div>
-                <div class="active-task-content">
-                    <h3>${task.title}</h3>
-                    <p>${task.description || 'No description provided.'}</p>
-                    <div class="task-meta">
-                        <span class="priority-badge ${task.priority}">
-                            Priority: ${task.get_priority_display}
-                        </span>
-                        <span class="due-date">
-                            Due: ${new Date(task.due_date).toLocaleString()}
-                        </span>
-                    </div>
-                    ${subtasksHtml}
-                    <input type="hidden" id="activeTaskId" value="${task.id}">
+                            `;
+                        }).join('')}
+                    </ul>
                 </div>
             `;
-            
-        } catch (error) {
-            console.error("Error rendering task modal:", error);
-            detailTaskContent.innerHTML = `
-                <div class="error-message">
-                    <p>⚠️ Failed to load task details</p>
-                    <button onclick="renderActiveTaskModal(task)">Retry</button>
+        } else {
+            subtasksHtml = `
+                <div class="no-subtasks">
+                    <p>No subtasks yet</p>
+                    <button class="task-action" onclick="generateAISubtasks(${task.id})">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="8" x2="12" y2="12"></line>
+                            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                        </svg>
+                        Generate AI Subtasks
+                    </button>
                 </div>
             `;
         }
+
+        // Render the actual content
+        detailTaskContent.innerHTML = `
+            <div class="active-task-header">
+                <h4>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="M12 8v4l3 3"></path>
+                    </svg>
+                    Task Details
+                </h4>
+            </div>
+            <div class="active-task-content">
+                <h3>${task.title}</h3>
+                <p>${task.description || 'No description provided.'}</p>
+                <div class="task-meta">
+                    <span class="priority-badge priority-${task.priority.toLowerCase()}">
+                        Priority: ${task.priority}
+                    </span>
+                    <span class="due-date">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                        </svg>
+                        Due: ${new Date(task.due_date).toLocaleDateString()}
+                    </span>
+                </div>
+                ${subtasksHtml}
+                <input type="hidden" id="activeTaskId" value="${task.id}">
+            </div>
+        `;
+        
+    } catch (error) {
+        console.error("Error rendering task modal:", error);
+        detailTaskContent.innerHTML = `
+            <div class="error-message">
+                <p>⚠️ Failed to load task details</p>
+                <button class="task-action" onclick="renderActiveTaskModal(currentTask)">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"></path>
+                    </svg>
+                    Retry
+                </button>
+            </div>
+        `;
     }
+}
+
+async function toggleSubtaskCompletion(subtaskId, checkbox, taskId) {
+    try {
+        // Show loading state
+        checkbox.disabled = true;
+        
+        // Call your API to update subtask completion status
+        const response = await fetch(`/api/subtasks/${subtaskId}/toggle/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCSRFToken(),
+            },
+            body: JSON.stringify({
+                is_completed: checkbox.checked
+            })
+        });
+        
+        if (response.ok) {
+            // Refresh the modal to update the locked state of microtasks
+            const task = await fetchTaskDetails(taskId);
+            renderActiveTaskModal(task);
+        } else {
+            checkbox.checked = !checkbox.checked; // Revert if failed
+            checkbox.disabled = false;
+        }
+    } catch (error) {
+        console.error("Error toggling subtask:", error);
+        checkbox.checked = !checkbox.checked; // Revert on error
+        checkbox.disabled = false;
+    }
+}
+
+async function toggleMicrotaskCompletion(microtaskId, checkbox, subtaskId, taskId) {
+    try {
+        // Show loading state
+        checkbox.disabled = true;
+        
+        // Call your API to update microtask completion status
+        const response = await fetch(`/api/microtasks/${microtaskId}/toggle/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCSRFToken(),
+            },
+            body: JSON.stringify({
+                is_completed: checkbox.checked
+            })
+        });
+        
+        if (response.ok) {
+            // Refresh the modal to update the state
+            const task = await fetchTaskDetails(taskId);
+            renderActiveTaskModal(task);
+        } else {
+            checkbox.checked = !checkbox.checked; // Revert if failed
+            checkbox.disabled = false;
+        }
+    } catch (error) {
+        console.error("Error toggling microtask:", error);
+        checkbox.checked = !checkbox.checked; // Revert on error
+        checkbox.disabled = false;
+    }
+}
+
+function closeDetailTaskModal() {
+    document.getElementById('detailTaskModal').style.display = 'none';
+}
+
+// Helper function to get CSRF token
+function getCSRFToken() {
+    const cookieValue = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('csrftoken='))
+        ?.split('=')[1];
+    return cookieValue || '';
+}
+
+// You'll need to implement these functions according to your backend API
+async function fetchTaskDetails(taskId) {
+    // Implement this to fetch task details from your backend
+    const response = await fetch(`/api/tasks/${taskId}/`);
+    return await response.json();
+}
+
+async function completeActiveTask() {
+    const taskId = document.getElementById('activeTaskId').value;
+    // Implement this to mark task as complete
+    await fetch(`/api/tasks/${taskId}/complete/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCSRFToken(),
+        }
+    });
+    closeDetailTaskModal();
+    // Refresh your task list here
+}
+
+function viewTaskDetails() {
+    const taskId = document.getElementById('activeTaskId').value;
+    // Implement this to navigate to full task details
+    window.location.href = `/tasks/${taskId}/`;
+}
+
+function openInstructionModal(microtaskId) {
+    // Implement this to show microtask instructions
+    console.log("Open instructions for microtask:", microtaskId);
+}
+
+function generateAISubtasks(taskId) {
+    // Implement this to generate AI subtasks
+    console.log("Generate AI subtasks for task:", taskId);
+}
+
+function generateAIMicrotasks(taskId, subtaskId) {
+    // Implement this to generate AI microtasks
+    console.log("Generate AI microtasks for subtask:", subtaskId);
+}
 </script>

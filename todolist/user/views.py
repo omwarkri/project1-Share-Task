@@ -20,6 +20,14 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login
 from task.models import TeamInvitation
 
+from google import generativeai
+generativeai.configure(api_key="AIzaSyAEm8U3DW756WMqX_6OLDAHQNnYIY9SFjY")
+
+# AIzaSyDx3rr0MzUPaumvdII3WIffmtsZqAz7JIs
+# Initialize the Gemini model
+# model = generativeai.GenerativeModel('gemini-1.5-flash')
+model = generativeai.GenerativeModel("gemini-1.5-flash")
+
 def login_view(request, token=None):
     invitation = get_object_or_404(TeamInvitation, token=token) if token else None
 
@@ -157,12 +165,12 @@ def generate_user_task_suggestions(user):
     """
 
     # Simulated AI call (replace this with OpenAI or another model in production)
-    response = model.generate_content(prompt)  # Replace with actual model call
+    
+    response = model.generate_content(prompt)
 
     suggestions = response.text.strip().split('\n') if response and response.text else []
     suggestions = [s.strip() for s in suggestions if s.strip()]
     return suggestions[:10]
-
 
 def onboarding_suggestions(request):
     goal = request.session.get('goal')
@@ -173,7 +181,22 @@ def onboarding_suggestions(request):
     user.interests = [interest]
     user.save()
 
-    suggestions = generate_user_task_suggestions(user)
+    # Fallback suggestions in case AI generation fails
+    manual_tasks = [
+        "Read a book for 30 minutes",
+        "Organize your workspace",
+        "Review your weekly goals",
+        "Go for a short walk",
+        "Practice 10 minutes of mindfulness"
+    ]
+
+    try:
+        suggestions = generate_user_task_suggestions(user)
+        if not suggestions or not isinstance(suggestions, list):
+            raise ValueError("Invalid suggestions returned.")
+    except Exception as e:
+        print("❌ AI Suggestion generation failed:", e)
+        suggestions = manual_tasks
 
     if request.method == 'POST':
         selected_task = request.POST.get("selected_task")
@@ -193,6 +216,7 @@ def onboarding_suggestions(request):
 
 
 
+
 from .forms import TaskForm
 
 def onboarding_task_form(request):
@@ -202,6 +226,7 @@ def onboarding_task_form(request):
         if form.is_valid():
             task = form.save(commit=False)
             task.user = request.user
+            task.active=True
             task.save()
             form.save_m2m()
             request.user.onboarding_completed = True
@@ -214,11 +239,42 @@ def onboarding_task_form(request):
 
 
     
+import json
+from django.core.serializers.json import DjangoJSONEncoder
+
 def onboarding_confirm(request, task_id):
     task = get_object_or_404(Task, id=task_id, user=request.user)
+
+    # Preprocess subtasks and microtasks
+    subtasks_list = []
+    for sub in task.subtasks.all():
+        subtasks_list.append({
+            'id': sub.id,
+            'title': sub.title,
+            'is_completed': sub.completed,
+            'microtasks': [
+                {
+                    'id': m.id,
+                    'title': m.title,
+                    'is_completed': m.is_completed
+                } for m in sub.microtasks.all()
+            ]
+        })
+
     if request.method == 'POST':
         return redirect('/task/')
-    return render(request, 'user/onboarding_confirm.html', {'task': task})
+
+    return render(request, 'user/onboarding_confirm.html', {
+        'task': task,
+        'task_id': task.id,
+        'task_title': task.title,
+        'task_description': task.description,
+        'task_subtasks': task.subtasks.all(),
+        'task_microtasks': [m for sub in task.subtasks.all() for m in sub.microtasks.all()],
+        'task_obj': task,
+        'task_subtasks_json': json.dumps(subtasks_list, cls=DjangoJSONEncoder),
+    })
+
 
 
 
@@ -642,11 +698,7 @@ def update_user_interests_goals(request):
     return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=405)
 
 
-from google import generativeai
-generativeai.configure(api_key="AIzaSyDx3rr0MzUPaumvdII3WIffmtsZqAz7JIs")
 
-# Initialize the Gemini model
-model = generativeai.GenerativeModel('gemini-1.5-flash')
 
 from datetime import date
 from .models import DailySchedule
@@ -868,12 +920,14 @@ def get_schedule(request):
     ).order_by('start_time')
     
     schedule_data = []
+    
     for item in schedule_items:
+        print(item.task)
         schedule_data.append({
             'start_time': item.start_time.strftime('%H:%M'),
             'end_time': item.end_time.strftime('%H:%M'),
-            'task_id': item.task.id if item.task else None,
-            'task_name': item.task.title if item.task else None,
+          
+            'task': item.task ,
             'completed': item.completed
         })
     
@@ -899,7 +953,8 @@ def save_schedule(request):
                 date=today,
                 start_time=item['start_time'],
                 end_time=item['end_time'],
-                task_id=item['task_id'] or None,
+                task=item['task_name'],
+                
                 completed =False
             )
 

@@ -24,7 +24,7 @@
     }
 
     h2 {
-      color: #007bff;
+      color:  #1abc9c;
       margin-bottom: 10px;
     }
 
@@ -46,15 +46,59 @@
     }
 
     button:hover {
-      background-color: #218838;
+      background-color:  #109c80;
+    }
+
+    .subtask-item, .microtask-item {
+      background: #ffffff;
+      border-radius: 8px;
+      padding: 10px;
+      margin: 10px 0;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    }
+
+    .task-action {
+      background-color: #1abc9c;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      margin-top: 8px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .task-action:hover {
+      background-color: #109c80;
+    }
+
+    .loader {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #34dbc2;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+      display: none;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
   </style>
 </head>
 <body>
-
   <div class="confirm-box">
     <h2>{{ task.title }}</h2>
     <p>{{ task.description }}</p>
+
+    <div id="subtaskSection">
+      <p>No subtasks yet. 🤖</p>
+      <button class="task-action" onclick="generateAISubtasks({{ task.id }})">Generate Subtasks</button>
+    </div>
+
+    <div class="loader" id="loader"></div>
 
     <form method="POST">
       {% csrf_token %}
@@ -62,5 +106,54 @@
     </form>
   </div>
 
+  <script>
+    // async function generateAISubtasks(taskId) {
+    //   const loader = document.getElementById("loader");
+    //   const subtaskSection = document.getElementById("subtaskSection");
+
+    //   loader.style.display = "block";
+    //   subtaskSection.innerHTML = "";
+
+    //   try {
+    //     const response = await fetch(`/api/tasks/${taskId}/subtasks/ai_suggestions/`, {
+    //       method: 'GET'
+    //     });
+
+    //     console.log(response.success)
+
+    //     if (!response.status) {
+    //       const text = await response.text();
+    //       console.error("Subtask generation failed:", response.status, text);
+    //       subtaskSection.innerHTML = `<p style="color:red;">Failed to generate subtasks.</p>`;
+    //       loader.style.display = "none";
+    //       return;
+    //     }
+
+    //     const data = await response.json();
+    //     console.log(data)
+    //     loader.style.display = "none";
+
+    //     const subtasks = data.task;
+    //     if (!subtasks.length) {
+    //       subtaskSection.innerHTML = `<p>No subtasks generated.</p>`;
+    //       return;
+    //     }
+
+    //     const html = subtasks.map(sub => `
+    //       <div class="subtask-item">
+    //         <strong>${sub}</strong>
+           
+    //       </div>
+    //     `).join('');
+
+    //     subtaskSection.innerHTML = html;
+
+    //   } catch (err) {
+    //     loader.style.display = "none";
+    //     console.error("Error:", err);
+    //     subtaskSection.innerHTML = `<p style="color:red;">Unexpected error occurred.</p>`;
+    //   }
+    // }
+  </script>
 </body>
 </html>

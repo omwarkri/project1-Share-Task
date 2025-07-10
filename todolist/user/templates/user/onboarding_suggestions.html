@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html>
 <head>
   <title>AI Task Suggestions</title>
@@ -20,6 +20,12 @@
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
       width: 100%;
       max-width: 600px;
+      animation: fadeIn 0.6s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     h2 {
@@ -35,6 +41,13 @@
       margin-bottom: 12px;
       font-size: 16px;
       color: #444;
+      padding: 10px;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+
+    label:hover {
+      background-color: #f8f9fa;
     }
 
     h3 {
@@ -49,6 +62,13 @@
       border: 1px solid #ccc;
       border-radius: 8px;
       font-size: 15px;
+      transition: all 0.3s ease;
+    }
+
+    input[type="text"]:focus {
+      border-color: #1abc9c;
+      box-shadow: 0 0 0 3px rgba(26, 188, 156, 0.1);
+      outline: none;
     }
 
     button {
@@ -56,38 +76,88 @@
       margin-top: 20px;
       padding: 12px;
       font-size: 16px;
-      background-color: #007bff;
+      background-color: #1abc9c;
       color: #fff;
       border: none;
       border-radius: 8px;
       cursor: pointer;
-      transition: background-color 0.3s ease;
+      transition: all 0.3s ease;
     }
 
     button:hover {
-      background-color: #0056b3;
+      background-color: #16a085;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
 
     .error {
       color: red;
       margin-top: 10px;
+      animation: shake 0.5s;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-5px); }
+      40%, 80% { transform: translateX(5px); }
+    }
+
+    /* Progress Steps */
+    .progress-steps {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 25px;
+    }
+
+    .step {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background-color: #ddd;
+      transition: all 0.3s ease;
+    }
+
+    .step.active {
+      background-color: #1abc9c;
+      transform: scale(1.2);
+    }
+
+    /* Task Option Animations */
+    .task-option {
+      opacity: 0;
+      animation: fadeInUp 0.5s forwards;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
 <body>
 
   <div class="form-container">
+    <div class="progress-steps">
+      <div class="step active"></div>
+      <div class="step active"></div>
+      <div class="step "></div>
+      <div class="step"></div>
+    </div>
+
     <h2>AI Task Suggestions</h2>
 
     <form method="POST">
       {% csrf_token %}
 
-      {% for suggestion in suggestions %}
-        <label>
-          <input type="radio" name="selected_task" value="{{ suggestion }}">
-          {{ suggestion }}
-        </label>
-      {% endfor %}
+      <div class="task-options">
+        {% for suggestion in suggestions %}
+          <label class="task-option" style="animation-delay: {{ forloop.counter|add:0.1 }}s">
+            <input type="radio" name="selected_task" value="{{ suggestion }}">
+            {{ suggestion }}
+          </label>
+        {% endfor %}
+      </div>
 
       <h3>Or write your own task</h3>
       <input type="text" name="custom_task" placeholder="Enter custom task name">
@@ -96,9 +166,45 @@
         <p class="error">{{ error }}</p>
       {% endif %}
 
-      <button type="submit">Create Task</button>
+      <div style="display: flex; gap: 15px;">
+        <button type="button" onclick="window.history.back()" 
+                style="background: #95a5a6; width: 30%;">Back</button>
+        <button type="submit" style="width: 70%;">Create Task</button>
+      </div>
     </form>
   </div>
 
+  <script>
+    // Initialize animations
+    document.addEventListener('DOMContentLoaded', function() {
+      // Animate task options in sequence
+      const options = document.querySelectorAll('.task-option');
+      options.forEach((option, index) => {
+        option.style.animationDelay = `${index * 0.1}s`;
+      });
+      
+      // Add form submission handler
+      document.querySelector('form').addEventListener('submit', function(e) {
+        const submitBtn = this.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = 'Creating...';
+        
+        // Add loading animation
+        submitBtn.style.background = 'linear-gradient(90deg, #1abc9c, #16a085)';
+        submitBtn.style.backgroundSize = '200% 100%';
+        
+        const style = document.createElement('style');
+        style.textContent = `
+          @keyframes loading {
+            0% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+          }
+        `;
+        document.head.appendChild(style);
+        
+        submitBtn.style.animation = 'loading 1.5s infinite';
+      });
+    });
+  </script>
 </body>
 </html>

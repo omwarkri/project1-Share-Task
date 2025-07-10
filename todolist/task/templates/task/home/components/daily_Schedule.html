@@ -446,6 +446,7 @@ function formatTime(timeStr) {
 }
 
 function loadSchedule() {
+    console.log("loading")
 
     fetch('/user/api/schedule/', {
         method: 'GET',
@@ -462,18 +463,18 @@ function loadSchedule() {
 
         if (data.schedule && data.schedule.length > 0) {
             noScheduleMessage.style.display = 'none';
-
+            console.log(data.schedule)
             data.schedule.forEach(item => {
                 const li = document.createElement('li');
                 li.className = 'schedule-item';
-                    console.log("loadSchedule called",item.start_time); // Debug log
+                console.log("loadSchedule called",item.start_time); // Debug log
                 const start = formatTime(item.start_time);
                 const end = formatTime(item.end_time);
 
                 li.innerHTML = `
                     <span class="time-range">${item.start_time} - ${item.end_time}</span>
-                    <span class="task-name">${item.task_name || 'Free Time'}</span>
-                    <span class="task-status">${item.completed ? '✅' : '⏳'}</span>
+                    <span class="task-name">${item.task || 'Free Time'}</span>
+                 <span class="task-status">${item.completed ? '✅' : '⏳'}</span>
                 `;
                 scheduleList.appendChild(li);
             });
@@ -515,14 +516,15 @@ function loadSchedule() {
             const container = document.getElementById('timeBlocksContainer');
             container.innerHTML = '';
             
-            if (data.schedule && data.schedule.length > 0) {
-                data.schedule.forEach(item => {
-                    addTimeBlock(item.start_time, item.end_time, item.task_id, item.task_name);
-                });
-            } else {
-                // Add one empty time block by default
-                addTimeBlock();
-            }
+            // if (data.schedule && data.schedule.length > 0) {
+            //     data.schedule.forEach(item => {
+            //         addTimeBlock(item.start_time, item.end_time, item.task_id, item.task_name);
+            //     });
+            // } else {
+            //     // Add one empty time block by default
+                
+            // }
+            addTimeBlock();
         })
         .catch(error => {
             console.error('Error loading schedule for editing:', error);
@@ -616,51 +618,113 @@ function loadSchedule() {
         }
     }
 
-    function saveSchedule() {
-        const timeBlocks = document.querySelectorAll('.time-block');
-        const schedule = [];
+
+
+function saveSchedule() {
+    const timeBlocks = document.querySelectorAll('.time-block');
+    const schedule = [];
+    
+    timeBlocks.forEach(block => {
+        const startTime = block.querySelector('.start-time').value;
+        const endTime = block.querySelector('.end-time').value;
+        const taskSelect = block.querySelector('.task-select');
+        const taskId = taskSelect ? taskSelect.value : '';
+        const taskNameInput = block.querySelector('.task-name-input');
+        const taskName = taskNameInput ? taskNameInput.value : null; // Send null if empty
         
-        timeBlocks.forEach(block => {
-            const startTime = block.querySelector('.start-time').value;
-            const endTime = block.querySelector('.end-time').value;
-            const taskSelect = block.querySelector('.task-select');
-            const taskId = taskSelect ? taskSelect.value : '';
-            const taskNameInput = block.querySelector('.task-name-input');
-            const taskName = taskNameInput ? taskNameInput.value : '';
-            
-            if (startTime && endTime) {
-                schedule.push({
-                    start_time: startTime,
-                    end_time: endTime,
-                    task_id: taskId || null,
-                    task_name: taskName || null
-                });
-            }
-        });
-        
-        fetch('/user/api/schedule/save/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCSRFToken(),
-            },
-            body: JSON.stringify({ schedule })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success') {
-                toggleScheduleEdit();
-                loadSchedule();
-                showToast('Schedule saved successfully!');
-            } else {
-                alert('Error saving schedule: ' + (data.message || 'Unknown error'));
-            }
-        })
-        .catch(error => {
-            console.error('Error saving schedule:', error);
-            alert('Error saving schedule');
-        });
+        if (startTime && endTime) {
+            schedule.push({
+                start_time: startTime,
+                end_time: endTime,
+                
+                task_name: taskName // Will be null if empty
+            });
+        }
+    });
+    
+    fetch('/user/api/schedule/save/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCSRFToken(),
+        },
+        body: JSON.stringify({ schedule })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            toggleScheduleEdit();
+            loadSchedule();
+            showToast('Schedule saved successfully!');
+        } else {
+            alert('Error saving schedule: ' + (data.message || 'Unknown error'));
+        }
+    })
+    .catch(error => {
+        console.error('Error saving schedule:', error);
+        alert('Error saving schedule');
+    });
+}
+
+function addTimeBlock(startTime = '', endTime = '', taskId = '', taskName = '') {
+    const container = document.getElementById('timeBlocksContainer');
+
+    const blockDiv = document.createElement('div');
+    blockDiv.className = 'time-block';
+
+    blockDiv.innerHTML = `
+        <div class="time-inputs">
+            <input type="time" class="time-input start-time" value="${startTime}">
+            <span>to</span>
+            <input type="time" class="time-input end-time" value="${endTime}">
+        </div>
+        <select class="task-select">
+            <option value="">Free Time</option>
+            <!-- Existing task options will be inserted here -->
+            <option value="new">➕ New Task Title...</option>
+        </select>
+        <input type="text" class="task-name-input" placeholder="New Task Title" style="display:none;" value="${taskName || ''}">
+        <button class="remove-time-block" onclick="removeTimeBlock(this)">×</button>
+    `;
+
+    container.appendChild(blockDiv);
+
+    const select = blockDiv.querySelector('.task-select');
+    const input = blockDiv.querySelector('.task-name-input');
+
+    // Populate select dropdown with allTasks
+    allTasks.forEach(task => {
+        const option = document.createElement('option');
+        option.value = task.id;
+        option.textContent = task.title;
+        select.insertBefore(option, select.querySelector('option[value="new"]'));
+    });
+
+    // Set initial values
+    if (taskId) {
+        select.value = taskId;
+        input.style.display = 'block';
+    } else if (taskName) {
+        select.value = 'new';
+        input.style.display = 'block';
     }
+
+    // On dropdown change
+    select.addEventListener('change', () => {
+        if (select.value === 'new') {
+            input.style.display = 'block';
+            input.value = '';
+            input.focus();
+        } else if (select.value === '') {
+            input.style.display = 'none';
+            input.value = '';
+        } else {
+            input.style.display = 'block';
+            input.value = select.options[select.selectedIndex].textContent;
+        }
+    });
+}
+
 
     function formatTime(timeString) {
         if (!timeString) return '';

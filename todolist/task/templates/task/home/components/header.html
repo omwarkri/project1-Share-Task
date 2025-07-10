@@ -99,7 +99,12 @@ function fetchAndDisplaySuggestions() {
       'Accept': 'application/json',
     },
   })
-  .then(response => response.json())
+  .then(response => {
+    if (!response.ok) {
+      throw new Error(`Server error: ${response.status}`);
+    }
+    return response.json();
+  })
   .then(data => {
     if (data.status === 'success') {
       populateForm(data.form_data);
@@ -107,13 +112,22 @@ function fetchAndDisplaySuggestions() {
       loader.style.display = 'none';
       suggestionsList.style.display = 'block';
     } else {
-      console.error('Failed to load data:', data);
+      console.error('Unexpected response:', data);
     }
   })
   .catch(error => {
+    loader.style.display = 'none';
+    suggestionsList.style.display = 'block';
+    suggestionsList.innerHTML = `
+      <div class="error-message">
+        <p>⚠️ Failed to load suggestions.</p>
+        <button onclick="fetchAndDisplaySuggestions()">Retry</button>
+      </div>
+    `;
     console.error('Error fetching data:', error);
   });
 }
+
 
 // Filter Functions
 function openFilterTab(tabName) {

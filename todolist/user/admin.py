@@ -57,3 +57,29 @@ class UserChallengeAdmin(admin.ModelAdmin):
     list_filter = ('accepted', 'completed')
     search_fields = ('user__username', 'daily_challenge__template__title')
 
+
+from .models import UserTaskAnalytics
+@admin.register(UserTaskAnalytics)
+class UserTaskAnalyticsAdmin(admin.ModelAdmin):
+    list_display = (
+        'user',
+        'total_tasks',
+        'completed_tasks',
+        'overdue_tasks',
+        'average_completion_time',
+        'most_common_category',
+        'last_updated'
+    )
+    search_fields = ('user__username', 'most_common_category')
+    list_filter = ('last_updated',)
+
+
+from django.contrib import admin
+from .models import Schedule
+
+@admin.register(Schedule)
+class ScheduleAdmin(admin.ModelAdmin):
+    list_display = ('user', 'date', 'start_time', 'end_time', 'task', 'completed')
+    list_filter = ('date', 'completed', 'user')
+    search_fields = ('task__title', 'user__username')
+    ordering = ('date', 'start_time')

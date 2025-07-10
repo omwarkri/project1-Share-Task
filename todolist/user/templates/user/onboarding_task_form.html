@@ -14,6 +14,16 @@
       min-height: 100vh;
       margin: 0;
       padding: 20px;
+
+      /* Animation on load */
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    body.loaded {
+      opacity: 1;
+      transform: translateY(0);
     }
 
     .form-box {
@@ -22,7 +32,7 @@
       border-radius: 12px;
       box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
       width: 100%;
-      max-width: 400px; /* ✅ smaller width */
+      max-width: 400px;
     }
 
     h2 {
@@ -58,7 +68,7 @@
 
     button {
       width: 100%;
-      background-color: #007bff;
+      background-color:  #1abc9c;
       color: white;
       padding: 10px;
       font-size: 15px;
@@ -85,18 +95,58 @@
         font-size: 14px;
       }
     }
+       /* Progress Steps */
+    .progress-steps {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 25px;
+    }
+
+    .step {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background-color: #ddd;
+      transition: all 0.3s ease;
+    }
+
+    .step.active {
+      background-color: #1abc9c;
+      transform: scale(1.2);
+    }
+
   </style>
 </head>
 <body>
 
   <div class="form-box">
+     <div class="progress-steps">
+      <div class="step active"></div>
+      <div class="step active"></div>
+      <div class="step active"></div>
+      <div class="step"></div>
+    </div>
     <h2>Finalize Your Task</h2>
-    <form method="POST">
+    <form method="POST" onsubmit="fadeOutPage()">
       {% csrf_token %}
       {{ form.as_p }}
       <button type="submit">Save Task</button>
     </form>
   </div>
+
+  <script>
+    // Trigger page load animation
+    window.addEventListener("load", () => {
+      document.body.classList.add("loaded");
+    });
+
+    // Trigger fade-out animation on submit
+    function fadeOutPage() {
+      document.body.style.transition = "opacity 0.5s ease";
+      document.body.style.opacity = 0;
+    }
+  </script>
 
 </body>
 </html>

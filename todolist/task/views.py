@@ -486,18 +486,42 @@ from .models import Task
 from django.shortcuts import render, redirect
 from .forms import TaskForm
 
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from .models import Task
+from .forms import TaskForm
+
+@csrf_exempt  # only if you're testing without CSRF token, not recommended for production
 def add_task(request):
     if request.method == "POST":
-        form = TaskForm(request.POST, user=request.user)  # Pass user
+        form = TaskForm(request.POST, user=request.user)
         if form.is_valid():
-            task = form.save(commit=False)  # Don't save to DB yet
-            task.user = request.user       # Assign the current user
+            task = form.save(commit=False)
+            task.user = request.user
             task.save()
-            form.save_m2m()  # Save many-to-many relationships like dependencies
-            return redirect('home')
+            form.save_m2m()
+
+            return JsonResponse({
+                'success': True,
+                'message': 'Task created successfully!',
+                'task': {
+                    'id': task.id,
+                    'title': task.title,
+                    'description': task.description,
+                    'due_date': task.due_date,
+                    'priority': task.priority,
+                    'status': task.status,
+                }
+            }, status=200)
+
+        else:
+            return JsonResponse({
+                'success': False,
+                'errors': form.errors,
+            }, status=400)
+
     else:
-        form = TaskForm(user=request.user)  # Pass user to the form
-    return render(request, 'add_task.html', {'form': form})
+        return JsonResponse({'error': 'Only POST method allowed.'}, status=405)
 
         
 

@@ -1584,7 +1584,7 @@ body {
     }
 
     .spinner-border {
-        width: 3rem;
+        width: 100%;
         height: 3rem;
         border-width: 0.4em;
     }
@@ -1737,7 +1737,7 @@ body {
 }
 
 .spinner-border {
-    width: 2rem;
+    width: 100%;
     height: 2rem;
     border-width: 0.2em;
     color: #1abc9c;
@@ -1913,6 +1913,53 @@ body {
     width: 10px;
     margin-right: 4px   ;
 }
+
+#addTaskBtn {
+    /* Modern teal color scheme */
+    color: white;
+    background-color: #16a085;       /* Your chosen teal */
+    padding: 14px 28px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    box-shadow: 0 2px 5px rgba(22, 160, 133, 0.3); /* Matching shadow */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;                        /* For icon + text spacing */
+}
+
+/* Hover: Darker teal + slight lift */
+#addTaskBtn:hover {
+    background-color: #138d75;       /* Darker shade */
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(22, 160, 133, 0.3);
+}
+
+/* Active: Deeper press effect */
+#addTaskBtn:active {
+    background-color: #0e7c68;
+    transform: translateY(0);
+    box-shadow: 0 1px 3px rgba(22, 160, 133, 0.3);
+}
+
+/* Focus: Accessibility outline */
+#addTaskBtn:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(22, 160, 133, 0.4);
+}
+
+/* Optional: Add a "+" icon */
+#addTaskBtn::before {
+    content: "+";
+    font-size: 18px;
+    font-weight: bold;
+}
+
+
     
     /* Mobile Responsiveness */
     @media (max-width: 768px) {
@@ -2493,11 +2540,11 @@ function loadActiveTask() {
                                             `).join('')
                                             : `
                                                 <li class="no-microtasks">
-                                                    <p>No microtasks yet. 🤖</p>
-                                                    <button class="task-action" onclick="generateAIMicrotasks(${subtask.id})">
-                                                        Generate Microtasks
-                                                    </button>
-                                                </li>
+        <p>No microtasks yet. 🤖</p>
+        <button class="task-action" onclick="generateAIMicrotasks(${task.id}, ${subtask.id})">
+            Generate Microtasks
+        </button>
+    </li>
                                             `
                                     }
                                 </ul>
@@ -2554,60 +2601,163 @@ function loadActiveTask() {
     });
 }
 
-
-
-
-
 function generateAISubtasks(taskId) {
-    // Show loading state if you want
-    document.getElementById('dailyTaskContent').innerHTML = '<p>Generating subtasks using AI...</p>';
+    const contentEl = document.getElementById('detailTaskContent');
+    const modalEl = document.getElementById('detailTaskModal');
 
+    modalEl.style.display = 'flex';
+
+    // Initial layout with loader
+    contentEl.innerHTML = `
+        <div class="active-task-header">
+            <h4>🌟 AI Subtask Suggestions</h4>
+        </div>
+        <div class="active-task-content">
+            <p>We're generating subtasks using AI...</p>
+
+            <div id="subtasksSection" style="margin-top: 20px;">
+                <div class="loader" style="margin: 20px auto;"></div>
+                <p style="text-align: center;">Generating subtasks...</p>
+            </div>
+
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="task-action" onclick="closeDetailTaskModal()">Close</button>
+            </div>
+        </div>
+    `;
+
+    // Fetch subtasks
     fetch(`/api/tasks/${taskId}/subtasks/ai_suggestions/`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRFToken': getCSRFToken(),  // Only if needed for Django or similar
+            'X-CSRFToken': getCSRFToken(),
         }
     })
     .then(response => response.json())
     .then(data => {
-        if (data) {
-            // Reload the task modal content or refresh the page
-            loadActiveTask(taskId);  // <- You should have a function like this that reloads the task modal
+        const sectionEl = document.getElementById('subtasksSection');
+
+        if (data && data.success && Array.isArray(data.subtasks)) {
+            if (data.subtasks.length === 0) {
+                sectionEl.innerHTML = `<p>No subtasks found.</p>`;
+                return;
+            }
+
+            const subtasksHtml = data.subtasks.map((subtask, index) => `
+                <li class="subtask-item">
+                    <label>
+                        <input type="checkbox" id="subtask-${subtask.id}" />
+                        <span>${subtask.title}</span>
+                    </label>
+                    <ul class="microtasks-list">
+                        <li class="no-microtasks">
+                            <button class="task-action" onclick="generateAIMicrotasks(${taskId}, ${subtask.id})">
+                                Generate Microtasks
+                            </button>
+                        </li>
+                    </ul>
+                </li>
+            `).join('');
+
+            sectionEl.innerHTML = `
+                <h5>📋 Generated Subtasks</h5>
+                <ul class="subtasks-list">
+                    ${subtasksHtml}
+                </ul>
+            `;
         } else {
-            alert('Failed to generate subtasks.');
+            sectionEl.innerHTML = `<p style="color: red;">❌ Failed to generate subtasks.</p>`;
         }
     })
     .catch(error => {
         console.error('Error generating subtasks:', error);
-        alert('Something went wrong.');
+        const sectionEl = document.getElementById('subtasksSection');
+        sectionEl.innerHTML = `<p style="color: red;">⚠️ Something went wrong.</p>`;
     });
 }
-function generateAIMicrotasks(subtaskId) {
-    // Show loading message inside dailyTaskContent while generating
-    document.getElementById('dailyTaskContent').innerHTML = '<p>Generating microtasks using AI...</p>';
+
+
+
+
+
+
+
+
+function generateAIMicrotasks(taskId, subtaskId) {
+    const subtaskEl = document.querySelector(`.subtask-item input[onchange*="${subtaskId}"]`)?.closest('.subtask-item');
+    const microtaskList = subtaskEl?.querySelector('.microtasks-list');
+
+    if (!microtaskList) return;
+
+    // Show loading spinner while microtasks are being fetched
+    microtaskList.innerHTML = `
+        <li class="no-microtasks">
+            <div class="loader"></div>
+            <p style="text-align:center;">Generating microtasks using AI...</p>
+        </li>
+    `;
 
     fetch(`/api/tasks/${subtaskId}/microtasks/ai_suggestions/`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRFToken': getCSRFToken(),  // Include CSRF if your backend needs it
+            'X-CSRFToken': getCSRFToken(),
         }
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Failed to fetch AI microtasks');
+        }
+        return response.json();
+    })
     .then(data => {
-        if (data) {
-            // After microtasks are generated, reload the active task view
-            loadActiveTask();  
+        const generated = data.generated_microtasks;
+        if (!generated || Object.keys(generated).length === 0) {
+            microtaskList.innerHTML = `<li class="no-microtasks"><p>❌ No microtasks returned from AI.</p></li>`;
+            return;
+        }
+
+        let html = '';
+
+        Object.entries(generated).forEach(([subtaskTitle, microtasks]) => {
+            // Filter out errors
+            const validMicrotasks = microtasks.filter(m => !m.startsWith("Error generating microtasks"));
+
+            if (validMicrotasks.length > 0) {
+                html += `
+                    <li class="microtask-item">
+                        <span class="microtask-heading">${subtaskTitle}</span>
+                        <ul class="microtask-sublist">
+                            ${validMicrotasks.map((microtask, idx) => `
+                                <li class="microtask-item">
+                                    <label>
+                                        <input type="checkbox"
+                                               onchange="toggleMicrotaskCompletion(null, this)"
+                                               onclick="event.stopPropagation();">
+                                    </label>
+                                    <span>${microtask}</span>
+                                </li>
+                            `).join('')}
+                        </ul>
+                    </li>
+                `;
+            }
+        });
+
+        if (html === '') {
+            microtaskList.innerHTML = `<li class="no-microtasks"><p>⚠️ No valid microtasks returned from AI.</p></li>`;
         } else {
-            alert('Failed to generate microtasks.');
+            microtaskList.innerHTML = html;
         }
     })
     .catch(error => {
         console.error('Error generating microtasks:', error);
-        alert('Something went wrong.');
+        microtaskList.innerHTML = `<li class="no-microtasks"><p>⚠️ Error generating microtasks.</p></li>`;
     });
 }
+
+
 
 
 function toggleSubtaskCompletion(subtaskId, checkbox) {
@@ -3281,6 +3431,17 @@ window.onclick = function(event) {
         modal.style.display = "none";
     }
 }
+
+ document.addEventListener('DOMContentLoaded', function () {
+      console.log("DOM ready");
+      if (!localStorage.getItem('onboardingShown')) {
+        setTimeout(() => {
+          console.log("Starting introJs");
+          introJs().start();
+          localStorage.setItem('onboardingShown', 'true');
+        }, 500);
+      }
+    });
 
 
 

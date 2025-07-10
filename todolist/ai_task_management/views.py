@@ -141,9 +141,10 @@ from django.conf import settings
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET
-from task.models import Task
+from task.models import Task, SubTask
 import re
-genai.configure(api_key="AIzaSyDx3rr0MzUPaumvdII3WIffmtsZqAz7JIs")
+
+genai.configure(api_key="AIzaSyAEm8U3DW756WMqX_6OLDAHQNnYIY9SFjY")
 
 @require_GET
 @csrf_exempt
@@ -154,28 +155,70 @@ def ai_subtask_suggestions(request, task_id):
         return JsonResponse({"error": "Task not found"}, status=404)
 
     model = genai.GenerativeModel('gemini-1.5-flash')
+    
+    # Prompt focused on quality and engagement without emojis
+    prompt = f"""Generate creative subtasks for: "{task.title}".
+    Requirements:
+    1. Make each subtask genuinely engaging and not boring
+    2. Focus on quality over quantity - suggest only valuable steps
+    3. No emojis or special characters
+    4. Use action-oriented language
+    5. Include variety in approach types
+    6. Make them feel rewarding to complete
+    
+    Good examples:
+    "Turn this into a 10-minute challenge against the clock"
+    "Research three surprising facts about this topic"
+    "Create a visual representation of your progress"
+    "Teach what you learn to someone else"
+    "Identify the most enjoyable aspect and amplify it"
+    
+    Generate the best subtasks you can think of (don't number them):
+    """
+    
+    try:
+        response = model.generate_content(prompt)
+        text = response.text.strip()
+        raw_lines = [line.strip() for line in text.splitlines() if line.strip()]
+        
+        response_data = []
+        created_count = 0
+        
+        for line in raw_lines:
+            # Clean the line thoroughly
+            clean_line = re.sub(r"^\s*\d+[.)]\s*", "", line)  # Remove numbering
+            clean_line = re.sub(r"^[-•*]\s*", "", clean_line)  # Remove bullets
+            clean_line = clean_line.replace('"', '').strip()
+            
+            if clean_line and len(clean_line.split()) >= 3:  # Ensure meaningful content
+                subtask = SubTask.objects.create(
+                    task=task,
+                    title=clean_line,
+                    completed=False
+                )
+                response_data.append({
+                    "id": subtask.id,
+                    "title": subtask.title
+                })
+                created_count += 1
+                
+                # Limit to a reasonable number of quality subtasks
+                if created_count >= 8:
+                    break
 
-    prompt = f"Generate 10 helpful subtasks for the main task: \"{task.title}\". Keep them short and actionable."
-    response = model.generate_content(prompt)
+        return JsonResponse({
+            "success": True, 
+            "subtasks": response_data,
+            "message": f"Created {created_count} engaging steps for your task!",
+            "quality_check": "Each subtask designed to maintain interest"
+        })
 
-    text = response.text.strip()
-    suggestions = []
+    except Exception as e:
+        return JsonResponse({
+            "error": str(e),
+            "message": "Failed to generate engaging subtasks"
+        }, status=500)
 
-    for line in text.splitlines():
-        clean_line = re.sub(r"^\s*(?:[-•*]|\d+[.)])\s*", "", line)  # remove bullets/numbers
-        clean_line = clean_line.replace("**", "").strip()  # remove bold markers
-        if clean_line:
-            suggestions.append(clean_line)
-
-    # ✅ Now: SAVE the generated subtasks into the database
-    for suggestion in suggestions:
-        SubTask.objects.create(
-            task=task,
-            title=suggestion,
-            completed=False
-        )
-
-    return JsonResponse({"success": True, "created": len(suggestions)})
 
 
 
@@ -258,10 +301,9 @@ import google.generativeai as generativeai
 generativeai.configure(api_key="AIzaSyDx3rr0MzUPaumvdII3WIffmtsZqAz7JIs")
 model = generativeai.GenerativeModel('gemini-1.5-flash')
 
-
 def generate_microtasks_for_each_subtask(request, subtask_id):
     """
-    Generate microtasks for each subtask of a given task using AI
+    Generate entertaining microtasks for each subtask of a given task using AI
     """
     try:
         subtask = SubTask.objects.select_related('task').get(id=subtask_id)
@@ -275,16 +317,18 @@ def generate_microtasks_for_each_subtask(request, subtask_id):
             I have a task titled: "{task.title}".
             One of its subtasks is: "{sub.title}".
 
-            Please generate 3-5 microtasks specifically for this subtask.
-            Return only the microtasks in a bullet point list.
+            Please generate 3-5 fun and entertaining microtasks specifically for this subtask.
+            Make them engaging and enjoyable to complete.
+            Return only the microtasks in a bullet point list without any asterisks or other special characters at the beginning.
             """
 
             try:
                 response = model.generate_content(prompt)
                 raw_text = response.text.strip()
 
+                # Clean up the response - remove any *, -, • or other bullet point markers
                 microtask_list = [
-                    line.strip("- ").strip()
+                    line.strip().lstrip('*-• ').strip()
                     for line in raw_text.split("\n")
                     if line.strip()
                 ]
@@ -294,7 +338,8 @@ def generate_microtasks_for_each_subtask(request, subtask_id):
                     microtask = Microtask.objects.create(
                         task=task,
                         subtask=sub,
-                        title=title
+                        title=title,
+                        is_entertaining=True  # Assuming you have this field
                     )
                     created_microtasks.append(title)
 
@@ -306,7 +351,8 @@ def generate_microtasks_for_each_subtask(request, subtask_id):
 
         return JsonResponse({
             'status': 'success',
-            'generated_microtasks': all_microtasks
+            'generated_microtasks': all_microtasks,
+            'message': 'Fun microtasks generated successfully!'
         })
 
     except SubTask.DoesNotExist:

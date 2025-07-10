@@ -16,17 +16,28 @@ class UserInterestGoalForm(forms.Form):
 
 from task.models import Task
 
+from django import forms
+from task.models import Task
+
 class TaskForm(forms.ModelForm):
     class Meta:
         model = Task
-        fields = ['title', 'description', 'due_date', 'priority', 'category', 'status', 'is_daily']
+        fields = ['title', 'description', 'due_date', 'priority', 'category', 'status', 'is_daily']  # 👈 no `is_active`
         widgets = {
-            'title': forms.TextInput(attrs={'id': 'title-input'}),  # ✅ Set an ID for JS
+            'title': forms.TextInput(attrs={'id': 'title-input'}),
             'due_date': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
         }
 
     def __init__(self, *args, **kwargs):
-        user = kwargs.pop('user', None)  # Get the current user from kwargs
+        kwargs.pop('user', None)  # You can remove this line if unused
         super().__init__(*args, **kwargs)
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        instance.is_active = True  # 👈 force is_active to True silently
+        if commit:
+            instance.save()
+        return instance
+
 
       

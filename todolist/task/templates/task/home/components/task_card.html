@@ -6,7 +6,9 @@
   data-is-daily="{{ task_data.task.is_daily }}"
   data-due-datetime="{{ task_data.task.due_date|date:'Y-m-d H:i' }}"
   data-private="{{ task_data.task.shareable }}" 
-  data-last-visited="{% if task_data.task.last_visited_at %}{{ task_data.task.last_visited_at|date:'c' }}{% endif %}">
+  data-last-visited="{% if task_data.task.last_visited_at %}{{ task_data.task.last_visited_at|date:'c' }}{% endif %}" 
+  data-intro="🖱️ Click on this to view or create your first task!"
+  >
   
   <div class="task-header">
     <strong class="task-title">📌 {{ task_data.task.title }}</strong>
@@ -62,3 +64,29 @@
     <button class="task-action" onclick="openViewDependencyModal({{ task_data.task.id }})">🔗 Dependencies</button> 
   </div>
 </div>
+
+
+<style>
+  .task-card-link {
+  display: block;
+  margin-bottom: 20px; /* spacing between cards */
+  text-decoration: none;
+  color: inherit;
+}
+
+.task-card-link:hover {
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+  background-color: #fafafa;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.click-hint {
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 6px;
+  user-select: none;
+  opacity: 0.7;
+}
+
+</style>

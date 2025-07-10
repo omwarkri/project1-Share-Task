@@ -1,4 +1,5 @@
-<div class="task-grid">
+<div class="task-grid" data-intro="🖱️ Click on this to view or create your first task!">
+    <div class="custom-tooltip">🖱️ Click on this to view or create a task!</div>
     {% for task_data in tasks_with_suggestions %}
         <div id="task-container"  class="task-card task-item cross-lines-background" 
         data-task-id="{{ task_data.task.id }}"
@@ -8,8 +9,14 @@
         data-is-daily="{{ task_data.task.is_daily }}"
         data-due-datetime="{{ task_data.task.due_date|date:'Y-m-d H:i' }}"
         data-private="{{ task_data.task.shareable  }}" 
-        data-last-visited="{% if task_data.task.last_visited_at %}{{ task_data.task.last_visited_at|date:'c' }}{% endif %}">
+        data-last-visited="{% if task_data.task.last_visited_at %}{{ task_data.task.last_visited_at|date:'c' }}{% endif %}"
+        >
+        
+                
+
+
             <div class="task-header">
+
                 <strong class="task-title">📌 {{ task_data.task.title }}</strong>
                 <span class="task-priority {{ task_data.task.priority }}">
                     {% if task_data.task.priority == 'high' %}🚨

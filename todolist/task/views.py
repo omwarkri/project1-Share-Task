@@ -577,6 +577,7 @@ from .forms import TaskForm, TaskCommentForm, SubTaskForm
 
 
 def task_detail(request, task_id):
+    print("hii")
     task = get_object_or_404(Task, id=task_id)
     subtasks = task.subtasks.all()
     comments = task.comments.all()
@@ -1258,13 +1259,13 @@ import os
 
 # Load environment variables from .env file
 load_dotenv()
-ai_key = os.getenv("AI_KEY")
+ai_key = "AIzaSyAlvIwjLl9S5tr3IQa3RtZf0Li7i8wXHXg"
 
 from chat.models import ChatAIMessage
 
 def generate_ai_procedure(request, task_id):
     client =  generativeai.configure(api_key=ai_key)
-    model=generativeai.GenerativeModel('gemini-1.5-flash')
+    model=generativeai.GenerativeModel('gemini-2.5-flash')
     if request.method == "GET":
         task = get_object_or_404(Task, id=task_id)  # Assuming Task is your model
         title = task.title
@@ -1939,10 +1940,10 @@ from google import generativeai
 
 
 # Configure Gemini API
-generativeai.configure(api_key="AIzaSyDx3rr0MzUPaumvdII3WIffmtsZqAz7JIs")
+generativeai.configure(api_key="AIzaSyAlvIwjLl9S5tr3IQa3RtZf0Li7i8wXHXg")
 
 # Initialize the Gemini model
-model = generativeai.GenerativeModel('gemini-1.5-flash')
+model = generativeai.GenerativeModel('gemini-2.5-flash')
 
 
 
@@ -2180,8 +2181,8 @@ import google.generativeai as genai
 from .models import Task
 
 # Configure Gemini API
-generativeai.configure(api_key="AIzaSyDx3rr0MzUPaumvdII3WIffmtsZqAz7JIs")
-model = generativeai.GenerativeModel('gemini-1.5-flash')
+generativeai.configure(api_key="AIzaSyAlvIwjLl9S5tr3IQa3RtZf0Li7i8wXHXg")
+model = generativeai.GenerativeModel('gemini-2.5-flash')
 
 # import requests
 
@@ -2224,7 +2225,7 @@ def get_ai_posts(request):
     tasks = Task.objects.filter(user=user).order_by("-created_at")[:10]
     task_titles = [task.title for task in tasks]
 
-    model = genai.GenerativeModel("gemini-1.5-flash")
+    model = genai.GenerativeModel("gemini-2.5-flash")
     prompt = f"""
     User has recently planned or completed these tasks: {task_titles}.
 
@@ -2372,7 +2373,7 @@ def get_extended_insight(request):
     if not insight_text:
         return JsonResponse({"error": "Missing insight text"}, status=400)
 
-    model = genai.GenerativeModel("gemini-1.5-flash")
+    model = genai.GenerativeModel("gemini-2.5-flash")
     
     # Prompt designed to continue the existing insight naturally
     prompt = f"""
@@ -2459,7 +2460,7 @@ def ai_chat(request):
             {question}
             """
 
-            model = genai.GenerativeModel("gemini-1.5-flash")
+            model = genai.GenerativeModel("gemini-2.5-flash")
             response = model.generate_content(prompt)
 
             # Safely extract the response
@@ -2492,7 +2493,7 @@ def get_ai_memes(request):
     tasks = Task.objects.filter(user=user).order_by("-created_at")[:10]
     task_titles = [task.title for task in tasks]
 
-    model = genai.GenerativeModel("gemini-1.5-flash")
+    model = genai.GenerativeModel("gemini-2.5-flash")
     prompt = f"""
     User has recently planned or completed these tasks: {task_titles}.
     
@@ -2554,7 +2555,7 @@ def get_ai_quotes(request):
     tasks = Task.objects.filter(user=user).order_by("-created_at")[:10]
     task_titles = [task.title for task in tasks]
 
-    model = genai.GenerativeModel("gemini-1.5-flash")
+    model = genai.GenerativeModel("gemini-2.5-flash")
     prompt = f"""
     User has recently planned or completed these tasks: {task_titles}.
     
@@ -2631,7 +2632,7 @@ from django.shortcuts import render, redirect
 import google.generativeai as genai
 
 
-model = genai.GenerativeModel("gemini-1.5-flash")
+model = genai.GenerativeModel("gemini-2.5-flash")
 
 
 def parse_mcqs(text):

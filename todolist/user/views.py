@@ -21,12 +21,12 @@ from django.contrib.auth import authenticate, login
 from task.models import TeamInvitation
 
 from google import generativeai
-generativeai.configure(api_key="AIzaSyAEm8U3DW756WMqX_6OLDAHQNnYIY9SFjY")
+generativeai.configure(api_key="AIzaSyAlvIwjLl9S5tr3IQa3RtZf0Li7i8wXHXg")
 
 # AIzaSyDx3rr0MzUPaumvdII3WIffmtsZqAz7JIs
 # Initialize the Gemini model
 # model = generativeai.GenerativeModel('gemini-1.5-flash')
-model = generativeai.GenerativeModel("gemini-1.5-flash")
+model = generativeai.GenerativeModel("gemini-2.5-flash")
 
 def login_view(request, token=None):
     invitation = get_object_or_404(TeamInvitation, token=token) if token else None

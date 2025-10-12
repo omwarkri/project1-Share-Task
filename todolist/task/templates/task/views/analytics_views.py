@@ -7,8 +7,8 @@ import google.generativeai as genai
 from user.forms import UserInterestGoalForm
 
 # Configure Gemini API
-genai.configure(api_key="AIzaSyDx3rr0MzUPaumvdII3WIffmtsZqAz7JIs")
-model = genai.GenerativeModel('gemini-1.5-flash')
+genai.configure(api_key="AIzaSyAlvIwjLl9S5tr3IQa3RtZf0Li7i8wXHXg")
+model = genai.GenerativeModel('gemini-2.5-flash')
 
 @login_required
 def generate_task_suggestions(user, task_model=Task):

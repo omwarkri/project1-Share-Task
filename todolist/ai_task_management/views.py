@@ -1,8 +1,8 @@
 import openai
 from chat.models import ChatAIMessage
 from google import generativeai  # Note the capital 'C' in Client
-client =  generativeai.configure(api_key="AIzaSyDx3rr0MzUPaumvdII3WIffmtsZqAz7JIs")
-model=generativeai.GenerativeModel('gemini-1.5-flash')
+client =  generativeai.configure(api_key="AIzaSyAlvIwjLl9S5tr3IQa3RtZf0Li7i8wXHXg")
+model=generativeai.GenerativeModel('gemini-2.5-flash')
 
 def generate_ai_response(task_id, user_message):
     # Fetch recent chat history for context (limit to last N messages if needed)
@@ -154,7 +154,7 @@ def ai_subtask_suggestions(request, task_id):
     except Task.DoesNotExist:
         return JsonResponse({"error": "Task not found"}, status=404)
 
-    model = genai.GenerativeModel('gemini-1.5-flash')
+    model = genai.GenerativeModel('gemini-2.5-flash')
     
     # Prompt focused on quality and engagement without emojis
     prompt = f"""Generate creative subtasks for: "{task.title}".
@@ -289,8 +289,8 @@ from django.http import JsonResponse
 from .models import Task, Microtask  # Ensure these are imported
 
 # Configure the generative AI model
-generativeai.configure(api_key="AIzaSyDx3rr0MzUPaumvdII3WIffmtsZqAz7JIs")
-model = generativeai.GenerativeModel('gemini-1.5-flash')
+generativeai.configure(api_key="AIzaSyAlvIwjLl9S5tr3IQa3RtZf0Li7i8wXHXg")
+model = generativeai.GenerativeModel('gemini-2.5-flash')
 
 
 from django.http import JsonResponse
@@ -298,8 +298,8 @@ from .models import Task, SubTask, Microtask
 import google.generativeai as generativeai
 
 # Configure the generative AI model
-generativeai.configure(api_key="AIzaSyDx3rr0MzUPaumvdII3WIffmtsZqAz7JIs")
-model = generativeai.GenerativeModel('gemini-1.5-flash')
+generativeai.configure(api_key="AIzaSyAlvIwjLl9S5tr3IQa3RtZf0Li7i8wXHXg")
+model = generativeai.GenerativeModel('gemini-2.5-flash')
 
 def generate_microtasks_for_each_subtask(request, subtask_id):
     """
@@ -375,8 +375,8 @@ from django.http import JsonResponse
 from .models import Microtask  # Adjust if your model import path differs
 import google.generativeai as generativeai
 
-generativeai.configure(api_key="AIzaSyDx3rr0MzUPaumvdII3WIffmtsZqAz7JIs")
-model = generativeai.GenerativeModel('gemini-1.5-flash')
+generativeai.configure(api_key="AIzaSyAlvIwjLl9S5tr3IQa3RtZf0Li7i8wXHXg")
+model = generativeai.GenerativeModel('gemini-2.5-flash')
 
 def get_microtask_instructions(request, microtask_id):
     try:

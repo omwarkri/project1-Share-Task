@@ -2,7 +2,7 @@ from django.shortcuts import render
 import google.generativeai as genai
 import re
 
-model = genai.GenerativeModel("gemini-1.5-flash")
+model = genai.GenerativeModel("gemini-2.5-flash")
 
 def parse_mcqs(text):
     import re

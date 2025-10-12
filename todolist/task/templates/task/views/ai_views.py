@@ -6,8 +6,8 @@ from .models import Task
 import json
 
 # Configure Gemini API
-genai.configure(api_key="AIzaSyDx3rr0MzUPaumvdII3WIffmtsZqAz7JIs")
-model = genai.GenerativeModel('gemini-1.5-flash')
+genai.configure(api_key="AIzaSyAlvIwjLl9S5tr3IQa3RtZf0Li7i8wXHXg")
+model = genai.GenerativeModel('gemini-2.5-flash')
 
 @login_required
 def get_ai_posts(request):

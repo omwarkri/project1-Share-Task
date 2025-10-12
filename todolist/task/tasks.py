@@ -12,8 +12,8 @@ from google import generativeai
 import re
 
 # Configure Gemini API
-generativeai.configure(api_key="AIzaSyDx3rr0MzUPaumvdII3WIffmtsZqAz7JIs")
-model = generativeai.GenerativeModel('gemini-1.5-flash')
+generativeai.configure(api_key="AIzaSyAlvIwjLl9S5tr3IQa3RtZf0Li7i8wXHXg")
+model = generativeai.GenerativeModel('gemini-2.5-flash')
 from django.utils import timezone
 from django.db.models import Q
 
@@ -287,10 +287,10 @@ def send_daily_task_schedule():
     print("✅ Daily task schedules sent successfully! to",user.email)
 
 
-generativeai.configure(api_key="AIzaSyDx3rr0MzUPaumvdII3WIffmtsZqAz7JIs")
+generativeai.configure(api_key="AIzaSyAlvIwjLl9S5tr3IQa3RtZf0Li7i8wXHXg")
 
 # Initialize the Gemini model
-model = generativeai.GenerativeModel('gemini-1.5-flash')
+model = generativeai.GenerativeModel('gemini-2.5-flash')
 
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required

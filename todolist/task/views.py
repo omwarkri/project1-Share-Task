@@ -39,8 +39,8 @@ import nltk
 import re
 import numpy as np
 from django.db.models import Q
-from sklearn.metrics.pairwise import cosine_similarity
-from sentence_transformers import SentenceTransformer
+# from sklearn.metrics.pairwise import cosine_similarity
+# from sentence_transformers import SentenceTransformer
 
 from .models import Task
 from user.models import CustomUser
@@ -49,7 +49,7 @@ from user.models import CustomUser
 # Load model once at startup (better than reloading every call)
 
 
-SentenceTransformerModel = SentenceTransformer("all-MiniLM-L6-v2")
+# SentenceTransformerModel = SentenceTransformer("all-MiniLM-L6-v2")
 
 
 

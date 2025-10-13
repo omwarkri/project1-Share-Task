@@ -3,7 +3,7 @@ from django.dispatch import receiver
 from django.utils import timezone
 from django.db.models import Count, Avg, F, DurationField, ExpressionWrapper
 from django.db.models.functions import Coalesce
-from sentence_transformers import SentenceTransformer
+# from sentence_transformers import SentenceTransformer
 from .models import Task
 from user.models import UserTaskAnalytics
 import re
@@ -19,6 +19,9 @@ def preprocess_text(text):
     text = re.sub(r"[^a-z0-9\s]", "", text)  # Remove special characters
     words = text.split()
     words = [word for word in words if word not in STOP_WORDS]  # Remove stopwords
+
+    # Ensure at least 3 words remain (to avoid over-filtering)
+    return " ".join(words) if len(words) >= 3 else text.lower()
 
     # Ensure at least 3 words remain (to avoid over-filtering)
     return " ".join(words) if len(words) >= 3 else text.lower()

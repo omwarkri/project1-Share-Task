@@ -1,0 +1,166 @@
+╔════════════════════════════════════════════════════════════════════════════╗
+║                        DOCKER QUICK REFERENCE                              ║
+║                   Share Task - Task Management System                       ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+┌─ ACCESS ─────────────────────────────────────────────────────────────────┐
+│                                                                           │
+│  Web App:        http://localhost:8000                                   │
+│  Admin Panel:    http://localhost:8000/admin                             │
+│  Nginx Proxy:    http://localhost:3000                                   │
+│  Database:       localhost:5432 (postgres/postgres)                      │
+│  Redis:          localhost:6379                                          │
+│                                                                           │
+└───────────────────────────────────────────────────────────────────────────┘
+
+┌─ CONTAINERS ──────────────────────────────────────────────────────────────┐
+│                                                                           │
+│  ✓ share-task-web             Django + Gunicorn (Port 8000)              │
+│  ✓ share-task-nginx           Reverse Proxy (Port 3000)                  │
+│  ✓ share-task-db              PostgreSQL (Port 5432)                     │
+│  ✓ share-task-redis           Cache/Queue (Port 6379)                    │
+│  ✓ share-task-celery          Background Tasks                           │
+│  ✓ share-task-celery-beat     Task Scheduler                             │
+│                                                                           │
+└───────────────────────────────────────────────────────────────────────────┘
+
+┌─ ESSENTIAL COMMANDS ──────────────────────────────────────────────────────┐
+│                                                                           │
+│  Start:                                                                   │
+│  $ docker compose up -d                                                  │
+│                                                                           │
+│  Stop:                                                                    │
+│  $ docker compose down                                                   │
+│                                                                           │
+│  Status:                                                                  │
+│  $ docker compose ps                                                     │
+│                                                                           │
+│  Logs (all):                                                              │
+│  $ docker compose logs -f                                                │
+│                                                                           │
+│  Logs (service):                                                          │
+│  $ docker compose logs -f web                                            │
+│  $ docker compose logs -f celery                                         │
+│  $ docker compose logs -f db                                             │
+│                                                                           │
+│  Restart:                                                                 │
+│  $ docker compose restart                                                │
+│                                                                           │
+│  Execute command in container:                                            │
+│  $ docker compose exec web <command>                                     │
+│                                                                           │
+│  Remove all data:                                                         │
+│  $ docker compose down -v                                                │
+│                                                                           │
+└───────────────────────────────────────────────────────────────────────────┘
+
+┌─ DJANGO COMMANDS ─────────────────────────────────────────────────────────┐
+│                                                                           │
+│  Create Superuser:                                                        │
+│  $ docker compose exec web python manage.py createsuperuser              │
+│                                                                           │
+│  Django Shell:                                                            │
+│  $ docker compose exec web python manage.py shell                        │
+│                                                                           │
+│  Run Migrations:                                                          │
+│  $ docker compose exec web python manage.py migrate                      │
+│                                                                           │
+│  Make Migrations:                                                         │
+│  $ docker compose exec web python manage.py makemigrations               │
+│                                                                           │
+│  Collect Static:                                                          │
+│  $ docker compose exec web python manage.py collectstatic --noinput      │
+│                                                                           │
+│  System Check:                                                            │
+│  $ docker compose exec web python manage.py check                        │
+│                                                                           │
+└───────────────────────────────────────────────────────────────────────────┘
+
+┌─ DATABASE COMMANDS ───────────────────────────────────────────────────────┐
+│                                                                           │
+│  Connect to Database:                                                     │
+│  $ docker compose exec db psql -U postgres -d todolist_db                │
+│                                                                           │
+│  Backup Database:                                                         │
+│  $ docker compose exec db pg_dump -U postgres todolist_db > backup.sql   │
+│                                                                           │
+│  Restore Database:                                                        │
+│  $ docker compose exec -T db psql -U postgres < backup.sql               │
+│                                                                           │
+│  Database Shell Commands:                                                 │
+│  \l              - List databases                                         │
+│  \dt             - List tables                                            │
+│  \d <table>      - Describe table                                         │
+│  \q              - Quit                                                   │
+│                                                                           │
+└───────────────────────────────────────────────────────────────────────────┘
+
+┌─ TROUBLESHOOTING ─────────────────────────────────────────────────────────┐
+│                                                                           │
+│  Container won't start:                                                   │
+│  $ docker compose logs web                                               │
+│                                                                           │
+│  Port in use:                                                             │
+│  $ docker compose down --remove-orphans                                  │
+│                                                                           │
+│  Database locked:                                                         │
+│  $ docker compose restart db                                             │
+│                                                                           │
+│  Rebuild images:                                                          │
+│  $ docker compose build --no-cache                                       │
+│                                                                           │
+│  Full reset:                                                              │
+│  $ docker compose down -v && docker compose up -d                        │
+│                                                                           │
+│  Check disk space:                                                        │
+│  $ docker system df                                                      │
+│                                                                           │
+│  Clean up unused:                                                         │
+│  $ docker system prune -a                                                │
+│                                                                           │
+└───────────────────────────────────────────────────────────────────────────┘
+
+┌─ MONITORING ──────────────────────────────────────────────────────────────┐
+│                                                                           │
+│  Real-time logs:                                                          │
+│  $ docker compose logs -f                                                │
+│                                                                           │
+│  Resource usage:                                                          │
+│  $ docker stats                                                          │
+│                                                                           │
+│  Container processes:                                                     │
+│  $ docker compose top                                                    │
+│                                                                           │
+│  Network inspection:                                                      │
+│  $ docker network inspect share-task_default                             │
+│                                                                           │
+└───────────────────────────────────────────────────────────────────────────┘
+
+┌─ CONFIGURATION ───────────────────────────────────────────────────────────┐
+│                                                                           │
+│  Environment: .env (in root directory)                                   │
+│  Compose: docker-compose.yml                                             │
+│  Dockerfile: Dockerfile (multi-stage build)                              │
+│  Nginx Config: nginx.conf                                                │
+│                                                                           │
+│  Key Environment Variables:                                               │
+│  DEBUG             - Django debug mode (False for prod)                  │
+│  SECRET_KEY        - Django secret key                                   │
+│  POSTGRES_*        - Database credentials                                │
+│  REDIS_URL         - Redis connection string                             │
+│  EMAIL_*           - Email configuration                                 │
+│                                                                           │
+└───────────────────────────────────────────────────────────────────────────┘
+
+┌─ DOCUMENTATION ───────────────────────────────────────────────────────────┐
+│                                                                           │
+│  DOCKER_SETUP.md        - Detailed setup guide                           │
+│  DEPLOYMENT_SUMMARY.txt - Full deployment info                           │
+│  docker-quickstart.sh   - Auto status check                              │
+│  README.md              - Project overview                               │
+│                                                                           │
+└───────────────────────────────────────────────────────────────────────────┘
+
+╔════════════════════════════════════════════════════════════════════════════╗
+║                  🚀 Ready to use! Happy coding!                          ║
+╚════════════════════════════════════════════════════════════════════════════╝

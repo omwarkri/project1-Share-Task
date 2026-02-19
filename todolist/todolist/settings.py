@@ -61,10 +61,10 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
 
-    'cloudinary',
-    'cloudinary_storage',
+    # 'cloudinary',
+    # 'cloudinary_storage',
 ]
-import cloudinary
+# import cloudinary
 
 # CLOUDINARY_STORAGE = {
 #     'CLOUD_NAME': 'ddw1upvx3',
@@ -74,13 +74,13 @@ import cloudinary
 
 
 
-cloudinary.config( 
-  cloud_name = 'ddw1upvx3', 
-  api_key = '935838691454949', 
-  api_secret = '2ZR0CSz_KyiZUN96SEmtB9Zwp7U'
-)
+# cloudinary.config( 
+#   cloud_name = 'ddw1upvx3', 
+#   api_key = '935838691454949', 
+#   api_secret = '2ZR0CSz_KyiZUN96SEmtB9Zwp7U'
+# )
 
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+# DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 
 
@@ -209,26 +209,29 @@ WSGI_APPLICATION = 'todolist.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
+import os
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'defaultdb',
-        'USER': 'avnadmin',
-        'PASSWORD': 'AVNS_wgp5e_Khn-9XrcTvxpQ',
-        'HOST': 'pg-23e5a587-shantanuchavhan002-568b.k.aivencloud.com',  
-        'PORT': '11560',
-        'OPTIONS': {
-            'sslmode': 'require',  # Enforce SSL connection
-        },
+# Allow easy local development with SQLite by default.
+# Set USE_SQLITE=0 in the environment to use Postgres settings below.
+if os.environ.get('USE_SQLITE', '1') == '1':
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.environ.get('POSTGRES_DB', 'defaultdb'),
+            'USER': os.environ.get('POSTGRES_USER', 'avnadmin'),
+            'PASSWORD': os.environ.get('POSTGRES_PASSWORD', 'AVNS_wgp5e_Khn-9XrcTvxpQ'),
+            'HOST': os.environ.get('POSTGRES_HOST', 'pg-23e5a587-shantanuchavhan002-568b.k.aivencloud.com'),
+            'PORT': os.environ.get('POSTGRES_PORT', '11560'),
+            'OPTIONS': {'sslmode': 'require'} if os.environ.get('POSTGRES_SSL', '1') == '1' else {},
+        }
+    }
 
 
 

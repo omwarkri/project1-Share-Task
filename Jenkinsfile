@@ -34,14 +34,14 @@ pipeline {
         }
 
         stage('Run Tests') {
-            steps {
-                echo "🧪 Running tests..."
-                sh """
-                    docker run --rm ${DOCKER_IMAGE} \
-                    python todolist/manage.py test --noinput
-                """
-            }
-        }
+    steps {
+        echo "🧪 Running tests..."
+        sh """
+            docker run --rm ${DOCKER_IMAGE} \
+            python manage.py test --noinput
+        """
+    }
+}
 
         stage('Security Scan (Trivy)') {
             steps {

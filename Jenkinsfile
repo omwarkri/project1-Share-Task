@@ -6,7 +6,6 @@ pipeline {
         IMAGE_TAG = "${BUILD_NUMBER}"
         DOCKER_IMAGE = "${IMAGE_NAME}:${IMAGE_TAG}"
         LATEST_IMAGE = "${IMAGE_NAME}:latest"
-        KUBECONFIG = credentials('kubeconfig') // optional if stored
     }
 
     options {
@@ -65,7 +64,7 @@ pipeline {
                     -n default || echo "Deployment not found"
 
                     kubectl rollout status deployment/todolist-app \
-                    --timeout=120s || true
+                    -n default --timeout=120s || true
                 """
             }
         }
@@ -74,8 +73,8 @@ pipeline {
             steps {
                 echo "💓 Checking pod status..."
                 sh """
-                    kubectl get pods
-                    kubectl get svc
+                    kubectl get pods -n default
+                    kubectl get svc -n default
                 """
             }
         }

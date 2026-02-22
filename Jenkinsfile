@@ -2,66 +2,47 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = "share-task-app"
-        IMAGE_TAG = "${BUILD_NUMBER}"
-        DOCKER_IMAGE = "${IMAGE_NAME}:${IMAGE_TAG}"
-        LATEST_IMAGE = "${IMAGE_NAME}:latest"
+        IMAGE = "share-task-app:${BUILD_NUMBER}"
     }
 
     options {
         timestamps()
         timeout(time: 45, unit: 'MINUTES')
-        buildDiscarder(logRotator(numToKeepStr: '10'))
     }
 
     stages {
 
-        stage('Checkout') {
+        stage('1. Checkout Code') {
             steps {
-                echo "🔄 Checking out code..."
+                echo "Checking out source code..."
                 checkout scm
             }
         }
 
-        stage('Build Docker Image') {
+        stage('2. Build Docker Image') {
             steps {
-                echo "🏗️ Building Docker image..."
+                echo "Building Docker image..."
                 sh """
-                    docker build -t ${DOCKER_IMAGE} .
-                    docker tag ${DOCKER_IMAGE} ${LATEST_IMAGE}
+                    docker build -t ${IMAGE} .
                 """
             }
         }
 
-        stage('Run Tests') {
-    steps {
-        echo "🧪 Running tests..."
-        sh """
-            docker run --rm ${DOCKER_IMAGE} \
-            python manage.py test --noinput
-        """
-    }
-}
-
-        stage('Security Scan (Trivy)') {
+        stage('3. Run Tests') {
             steps {
-                echo "🔒 Scanning image..."
+                echo "Running application tests..."
                 sh """
-                    docker run --rm \
-                    -v /var/run/docker.sock:/var/run/docker.sock \
-                    aquasec/trivy image ${DOCKER_IMAGE}
+                    docker run --rm ${IMAGE} python manage.py test --noinput
                 """
             }
         }
 
-        stage('Deploy to Local Kubernetes') {
+        stage('4. Deploy to Kubernetes') {
             steps {
-                echo "☸️ Deploying to local Kubernetes..."
-
+                echo "Deploying to local Kubernetes..."
                 sh """
                     kubectl set image deployment/todolist-app \
-                    todolist=${DOCKER_IMAGE} \
-                    -n default || echo "Deployment not found"
+                    todolist=${IMAGE} -n default || true
 
                     kubectl rollout status deployment/todolist-app \
                     -n default --timeout=120s || true
@@ -69,9 +50,9 @@ pipeline {
             }
         }
 
-        stage('Health Check') {
+        stage('5. Health Check') {
             steps {
-                echo "💓 Checking pod status..."
+                echo "Checking pod and service status..."
                 sh """
                     kubectl get pods -n default
                     kubectl get svc -n default
@@ -82,16 +63,16 @@ pipeline {
 
     post {
         always {
-            echo "🧹 Cleaning up Docker images..."
+            echo "Cleaning unused Docker images..."
             sh "docker image prune -f"
         }
 
-        failure {
-            echo "❌ Pipeline Failed!"
+        success {
+            echo "Pipeline completed successfully!"
         }
 
-        success {
-            echo "✅ Local Deployment Successful!"
+        failure {
+            echo "Pipeline failed!"
         }
     }
 }

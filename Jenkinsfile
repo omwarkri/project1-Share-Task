@@ -3,6 +3,7 @@ pipeline {
 
     environment {
         IMAGE = "share-task-app:${BUILD_NUMBER}"
+        KUBECONFIG = "${HOME}/.kube/config"
     }
 
     options {
